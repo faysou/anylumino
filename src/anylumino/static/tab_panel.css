@@ -1,0 +1,104 @@
+.anylumino-TabPanelHost {
+  min-width: 260px;
+  min-height: 180px;
+  overflow: hidden;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.anylumino-TabPanelHost *,
+.anylumino-TabPanelHost *::before,
+.anylumino-TabPanelHost *::after {
+  box-sizing: border-box;
+}
+
+.anylumino-TabPanelHost .lm-TabPanel {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  color: #172033;
+  background: #f8fafc;
+  border: 1px solid #d8dee9;
+}
+
+.anylumino-TabPanelHost .lm-TabBar {
+  min-height: 34px;
+  background: #eef2f7;
+  border-bottom: 1px solid #d8dee9;
+}
+
+.anylumino-TabPanelHost .lm-TabBar[data-orientation="vertical"] {
+  min-width: 132px;
+  min-height: 0;
+  border-right: 1px solid #d8dee9;
+  border-bottom: 0;
+}
+
+.anylumino-TabPanelHost .lm-TabBar-content {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  display: flex;
+  align-items: stretch;
+  min-height: 34px;
+}
+
+.anylumino-TabPanelHost .lm-TabBar[data-orientation="vertical"] .lm-TabBar-content {
+  flex-direction: column;
+  min-height: 0;
+}
+
+.anylumino-TabPanelHost .lm-TabBar-tab {
+  display: flex;
+  align-items: center;
+  min-width: 92px;
+  max-width: 220px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-right: 1px solid #d8dee9;
+  color: #475569;
+  background: #eef2f7;
+  cursor: pointer;
+  user-select: none;
+}
+
+.anylumino-TabPanelHost .lm-TabBar[data-orientation="vertical"] .lm-TabBar-tab {
+  max-width: none;
+  border-right: 0;
+  border-bottom: 1px solid #d8dee9;
+}
+
+.anylumino-TabPanelHost .lm-TabBar-tab.lm-mod-current {
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.anylumino-TabPanelHost .lm-TabBar-tabLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.anylumino-TabPanelHost .lm-TabPanel-stackedPanel {
+  min-width: 0;
+  min-height: 0;
+  background: #ffffff;
+}
+
+.anylumino-TabPanelHost .anylumino-TabPanelChild {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.anylumino-TabPanelHost .anylumino-TabPanelChild > .lm-Widget,
+.anylumino-TabPanelHost .anylumino-TabPanelChild > div,
+.anylumino-TabPanelHost .anylumino-TabPanelChild iframe {
+  max-width: 100%;
+}
