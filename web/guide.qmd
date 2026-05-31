@@ -2,11 +2,18 @@
 title: "Composition guide"
 ---
 
+## LayoutWidget
+
+`LayoutWidget` is the public base class for anylumino layouts. `TabPanel`,
+`SplitPanel`, `VBox`, `GridPanel`, and the other layout widgets all share its
+composition API: keyed children, child lookup, dynamic mutation, and method
+forwarding.
+
 ## Child widgets
 
-Every layout widget accepts children either as a sequence or as a mapping. A
-mapping is preferred for application-style notebooks because it gives each
-child a stable key:
+Every `LayoutWidget` accepts children either as a sequence or as a mapping. A
+mapping is preferred for application-style notebooks because it gives each child
+a stable key:
 
 ```python
 from anylumino import TabPanel, TextWidget
@@ -36,6 +43,60 @@ tabs.get_owner("price")       # original wrapper object
 tabs["price"]                 # same as get_owner("price")
 tabs.call_owner("price", "fit")
 ```
+
+## Adding methods to composed widgets
+
+Add methods directly to an anylumino layout by subclassing one of the public
+layout widgets. The subclass is still an anywidget, so it can be nested inside
+another layout.
+
+```python
+from anylumino import Toolbar, VBox
+
+
+class ChartPanel(VBox):
+    def __init__(self, chart):
+        self.chart = chart
+        toolbar = Toolbar(
+            [{"id": "fit", "label": "Fit", "icon": "arrows-to-circle"}],
+            callbacks={"fit": lambda _id: self.fit()},
+        )
+        super().__init__({"toolbar": toolbar, "chart": chart.widget}, height=520)
+
+    def fit(self):
+        self.chart.fit()
+
+    def set_data(self, data):
+        self.chart.set(data)
+
+
+tabs = TabPanel({"price": ChartPanel(chart)})
+tabs["price"].fit()
+```
+
+When a wrapper only adds Python behavior around an existing widget, it does not
+need to subclass `anywidget.AnyWidget`. Expose the renderable child as `.widget`;
+anylumino renders that view and keeps the wrapper as the keyed owner.
+
+```python
+class ChartWrapper:
+    def __init__(self, chart):
+        self.chart = chart
+        self.widget = chart.widget
+
+    def fit(self):
+        self.chart.fit()
+
+
+tabs = TabPanel({"price": ChartWrapper(chart)})
+
+tabs.get_widget("price")  # chart.widget
+tabs["price"].fit()       # wrapper.fit()
+tabs.call_owner("price", "fit")
+```
+
+Use a `LayoutWidget` subclass when the wrapper is itself UI or layout. Use a
+plain `.widget` owner wrapper when the wrapper only coordinates Python methods.
 
 ## Mutating layouts after display
 
@@ -85,7 +146,9 @@ SplitPanel({"left": controls, "right": chart}, resizable=False)
 ```
 
 `SplitPanel` uses Lumino split handles between child panes. The layout host
-resize handle controls the overall notebook footprint.
+resize handle controls the overall notebook footprint. When panes are adjusted
+with Lumino split handles, the current relative pane sizes are synced back to
+the `sizes` trait so Python can inspect or reuse them.
 
 ## Actions and callbacks
 

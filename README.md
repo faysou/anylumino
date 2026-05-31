@@ -34,9 +34,9 @@ SplitPanel({"controls": controls, "charts": tabs}, orientation="vertical")
 
 The current prototype provides:
 
-- Layout widgets: `TabPanel`, `BoxPanel`, `HBox`, `VBox`, `SplitPanel`,
-  `DockPanel`, `AccordionPanel`, `StackedPanel`, `GridPanel`, and
-  `ResponsivePanel`.
+- Layout widgets: public `LayoutWidget` base plus `TabPanel`, `BoxPanel`,
+  `HBox`, `VBox`, `SplitPanel`, `DockPanel`, `AccordionPanel`,
+  `StackedPanel`, `GridPanel`, and `ResponsivePanel`.
 - Action widgets: `Toolbar`, `MenuBar`, and `CommandPalette`.
 - Input controls re-exported from ipywidgets: `Button`, `TextInput`, `TextArea`,
   `PasswordInput`, `Checkbox`, `Dropdown`, `ListBox`, `MultiSelect`,
@@ -45,8 +45,12 @@ The current prototype provides:
   `Output`, `HTML`, `HTMLMath`, and `Label`.
 - `TextWidget`, a small helper used by tests and smoke notebooks.
 
+All layout containers inherit from `LayoutWidget`, which provides keyed child
+composition, owner access, dynamic mutation, and method forwarding.
+
 Layout widgets are resizable by drag and drop by default. Pass
-`resizable=False` to hide the bottom-right resize handle.
+`resizable=False` to hide the bottom-right resize handle. `SplitPanel` also
+syncs Lumino split-handle changes back to its `sizes` trait.
 
 Layout children can be declared with semantic keys. If `titles` is omitted for
 a mapping, the titles default to those keys.
@@ -66,6 +70,23 @@ tabs = TabPanel({"price": price_chart})
 tabs.get_widget("price")  # price_chart.widget
 tabs["price"].fit()
 tabs.call_owner("price", "fit")
+```
+
+To add methods to a composed UI object, subclass a layout widget. The subclass
+is still an anywidget and can be nested inside another layout:
+
+```python
+class ChartPanel(VBox):
+    def __init__(self, chart):
+        self.chart = chart
+        super().__init__({"chart": chart.widget})
+
+    def fit(self):
+        self.chart.fit()
+
+
+tabs = TabPanel({"price": ChartPanel(chart)})
+tabs["price"].fit()
 ```
 
 `Toolbar`, `MenuBar`, and `CommandPalette` accept Python callbacks keyed by

@@ -57,6 +57,7 @@ quartodoc:
     - title: "Layout widgets"
       desc: "Lumino-backed containers for composing anywidget and ipywidgets children."
       contents:
+        - LayoutWidget
         - TabPanel
         - BoxPanel
         - HBox

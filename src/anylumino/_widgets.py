@@ -16,10 +16,26 @@ BOX_DIRECTIONS = ("left-to-right", "right-to-left", "top-to-bottom", "bottom-to-
 ORIENTATIONS = ("horizontal", "vertical")
 DOCK_MODES = ("tab-after", "split-right", "split-left", "split-top", "split-bottom")
 ACTION_KINDS = ("toolbar", "menubar", "command_palette")
+COMPOSITION_IMPORT = """import {
+  combineSignals,
+  cssSize,
+  disposeLuminoWidget,
+  installResizeHandle,
+  notifyLuminoWidgetVisible,
+  removeModelListener,
+  renderWidgetRef,
+} from "./composition.js";
+"""
 
 ActionCallback = Callable[[str], None]
 ChildInput = Iterable[object] | Mapping[str, object] | None
 TitleInput = Iterable[str] | Mapping[str, str] | None
+
+
+def _esm_with_composition(filename: str) -> str:
+    composition = (STATIC_DIR / "composition.js").read_text()
+    module = (STATIC_DIR / filename).read_text().replace(COMPOSITION_IMPORT, "")
+    return f"{composition}\n\n{module}"
 
 
 def _widget_ref(value: object) -> object:
@@ -134,7 +150,14 @@ def _normalize_children(
     return widget_list, owner_list, key_list, title_list
 
 
-class _ComposedWidget(anywidget.AnyWidget):
+class LayoutWidget(anywidget.AnyWidget):
+    """Base class for keyed anywidget composition layouts.
+
+    ``LayoutWidget`` stores child widgets in a keyed map while syncing the
+    frontend-ready widget views to the browser. Subclasses choose the Lumino
+    layout that displays those children.
+    """
+
     _title_prefix = "Widget"
 
     widgets = t.List(anywidget.WidgetTrait(), default_value=[]).tag(
@@ -320,7 +343,10 @@ class _ComposedWidget(anywidget.AnyWidget):
         return complete
 
 
-class TabPanel(_ComposedWidget):
+_ComposedWidget = LayoutWidget
+
+
+class TabPanel(LayoutWidget):
     """Lumino tab container for composing child widgets.
 
     Children can be passed as a list or as a keyed mapping. Mapping keys become
@@ -354,7 +380,7 @@ class TabPanel(_ComposedWidget):
         Whether the panel receives a notebook-friendly resize handle.
     """
 
-    _esm = STATIC_DIR / "tab_panel.js"
+    _esm = _esm_with_composition("tab_panel.js")
     _css = STATIC_DIR / "tab_panel.css"
     _title_prefix = "Tab"
 
@@ -401,7 +427,7 @@ class TabPanel(_ComposedWidget):
         self.add_widget(widget, title=title, key=key, select=select)
 
 
-class BoxPanel(_ComposedWidget):
+class BoxPanel(LayoutWidget):
     """Lumino box layout with configurable direction, spacing, and stretch.
 
     ``HBox`` and ``VBox`` are direction-specific convenience subclasses. Set
@@ -438,7 +464,7 @@ class BoxPanel(_ComposedWidget):
         Minimum child sizes used when scrolling is enabled.
     """
 
-    _esm = STATIC_DIR / "layout_panel.js"
+    _esm = _esm_with_composition("layout_panel.js")
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("box").tag(sync=True)
@@ -536,7 +562,7 @@ class ScrollBox(VBox):
         super().__init__(widgets, **kwargs)
 
 
-class SplitPanel(_ComposedWidget):
+class SplitPanel(LayoutWidget):
     """Lumino split panel with draggable dividers between children.
 
     Parameters
@@ -564,7 +590,7 @@ class SplitPanel(_ComposedWidget):
         dividers remain draggable independently.
     """
 
-    _esm = STATIC_DIR / "layout_panel.js"
+    _esm = _esm_with_composition("layout_panel.js")
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("split").tag(sync=True)
@@ -598,7 +624,7 @@ class SplitPanel(_ComposedWidget):
         )
 
 
-class DockPanel(_ComposedWidget):
+class DockPanel(LayoutWidget):
     """Lumino dock panel for tabbed or split workspace-style layouts.
 
     Parameters
@@ -620,7 +646,7 @@ class DockPanel(_ComposedWidget):
         Whether the dock panel gets a notebook resize handle.
     """
 
-    _esm = STATIC_DIR / "layout_panel.js"
+    _esm = _esm_with_composition("layout_panel.js")
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("dock").tag(sync=True)
@@ -640,7 +666,7 @@ class DockPanel(_ComposedWidget):
         self._init_composed(widgets, titles, keys, width, height, resizable, mode=mode)
 
 
-class AccordionPanel(_ComposedWidget):
+class AccordionPanel(LayoutWidget):
     """Lumino accordion panel with titled collapsible sections.
 
     Parameters
@@ -660,7 +686,7 @@ class AccordionPanel(_ComposedWidget):
         Whether the accordion gets a notebook resize handle.
     """
 
-    _esm = STATIC_DIR / "layout_panel.js"
+    _esm = _esm_with_composition("layout_panel.js")
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("accordion").tag(sync=True)
@@ -678,7 +704,7 @@ class AccordionPanel(_ComposedWidget):
         self._init_composed(widgets, titles, keys, width, height, resizable)
 
 
-class StackedPanel(_ComposedWidget):
+class StackedPanel(LayoutWidget):
     """Lumino stacked panel that shows one selected child at a time.
 
     Parameters
@@ -699,7 +725,7 @@ class StackedPanel(_ComposedWidget):
         Whether the panel gets a notebook resize handle.
     """
 
-    _esm = STATIC_DIR / "layout_panel.js"
+    _esm = _esm_with_composition("layout_panel.js")
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("stacked").tag(sync=True)
@@ -722,7 +748,7 @@ class StackedPanel(_ComposedWidget):
         self.selected_index = index
 
 
-class GridPanel(_ComposedWidget):
+class GridPanel(LayoutWidget):
     """CSS grid-backed Lumino panel for placing children in grid cells.
 
     Parameters
@@ -751,7 +777,7 @@ class GridPanel(_ComposedWidget):
         Whether the grid gets a notebook resize handle.
     """
 
-    _esm = STATIC_DIR / "layout_panel.js"
+    _esm = _esm_with_composition("layout_panel.js")
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("grid").tag(sync=True)
@@ -788,7 +814,7 @@ class GridPanel(_ComposedWidget):
         )
 
 
-class ResponsivePanel(_ComposedWidget):
+class ResponsivePanel(LayoutWidget):
     """Box layout that switches direction when its width crosses a breakpoint.
 
     Parameters
@@ -815,7 +841,7 @@ class ResponsivePanel(_ComposedWidget):
         Whether the panel gets a notebook resize handle.
     """
 
-    _esm = STATIC_DIR / "layout_panel.js"
+    _esm = _esm_with_composition("layout_panel.js")
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("responsive").tag(sync=True)

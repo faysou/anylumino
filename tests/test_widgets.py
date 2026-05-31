@@ -13,6 +13,7 @@ from anylumino import (
     IntSlider,
     ListBox,
     DockPanel,
+    LayoutWidget,
     MenuBar,
     ResponsivePanel,
     ScrollBox,
@@ -38,6 +39,25 @@ def test_tab_panel_serializes_child_widgets_as_anywidget_refs() -> None:
         "titles": ["One", "Two"],
         "selected_index": 1,
     }
+
+
+def test_layout_widgets_share_public_base_class() -> None:
+    panels = [
+        TabPanel({"child": TextWidget("Child")}),
+        BoxPanel({"child": TextWidget("Child")}),
+        HBox({"child": TextWidget("Child")}),
+        VBox({"child": TextWidget("Child")}),
+        ScrollBox({"child": TextWidget("Child")}),
+        SplitPanel({"child": TextWidget("Child")}),
+        DockPanel({"child": TextWidget("Child")}),
+        AccordionPanel({"child": TextWidget("Child")}),
+        StackedPanel({"child": TextWidget("Child")}),
+        GridPanel({"child": TextWidget("Child")}),
+        ResponsivePanel({"child": TextWidget("Child")}),
+    ]
+
+    assert [isinstance(panel, LayoutWidget) for panel in panels] == [True] * len(panels)
+    assert [panel["child"].text for panel in panels] == ["Child"] * len(panels)
 
 
 def test_tab_panel_size_inputs_are_normalized_to_css_values() -> None:

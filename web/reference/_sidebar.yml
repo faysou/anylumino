@@ -3,6 +3,7 @@ website:
   - contents:
     - reference/index.qmd
     - contents:
+      - reference/LayoutWidget.qmd
       - reference/TabPanel.qmd
       - reference/BoxPanel.qmd
       - reference/HBox.qmd

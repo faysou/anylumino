@@ -76,8 +76,9 @@ reuse the existing `@jupyter-widgets/controls` frontend.
 
 ## Design model
 
-`anylumino` is designed around keyed children. A layout can be declared with a
-dictionary, and those keys become the stable access path from Python:
+`anylumino` is designed around `LayoutWidget`, the shared base class for layout
+containers. A layout can be declared with a dictionary, and those keys become
+the stable access path from Python:
 
 ```python
 tabs = TabPanel({"price": price_chart, "orders": orders_table})

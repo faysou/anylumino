@@ -6,6 +6,7 @@ Lumino-backed containers for composing anywidget and ipywidgets children.
 
 | | |
 | --- | --- |
+| [LayoutWidget](LayoutWidget.qmd#anylumino.LayoutWidget) | Base class for keyed anywidget composition layouts. |
 | [TabPanel](TabPanel.qmd#anylumino.TabPanel) | Lumino tab container for composing child widgets. |
 | [BoxPanel](BoxPanel.qmd#anylumino.BoxPanel) | Lumino box layout with configurable direction, spacing, and stretch. |
 | [HBox](HBox.qmd#anylumino.HBox) | Horizontal ``BoxPanel`` convenience wrapper. |
