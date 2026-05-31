@@ -1,0 +1,72 @@
+# Button { #anylumino.Button }
+
+```python
+Button(
+    description='',
+    icon='',
+    disabled=False,
+    button_style='',
+    tooltip='',
+    layout=None,
+    style=None,
+)
+```
+
+Clickable button control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type     | Description                                                     | Default    |
+|--------------|----------|-----------------------------------------------------------------|------------|
+| description | optional | Label shown next to the control. | `''` |
+| icon | optional | Font Awesome icon name without the ``fa-`` prefix. | `''` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| button_style | optional | Predefined button style such as ``'primary'`` or ``'success'``. | `''` |
+| tooltip | optional | Hover text. | `''` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [button_style](#anylumino.Button.button_style) | Use a predefined styling for the button. |
+| [description](#anylumino.Button.description) | Button label. |
+| [disabled](#anylumino.Button.disabled) | Enable or disable user changes. |
+| [icon](#anylumino.Button.icon) | Font-awesome icon names, without the 'fa-' prefix. |
+| [style](#anylumino.Button.style) | An instance trait which coerces a dict to an instance. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [click](#anylumino.Button.click) | Programmatically trigger a click event. |
+| [on_click](#anylumino.Button.on_click) | Register a callback to execute when the button is clicked. |
+
+### click { #anylumino.Button.click }
+
+```python
+Button.click()
+```
+
+Programmatically trigger a click event.
+
+This will call the callbacks registered to the clicked button
+widget instance.
+
+### on_click { #anylumino.Button.on_click }
+
+```python
+Button.on_click(callback, remove=False)
+```
+
+Register a callback to execute when the button is clicked.
+
+The callback will be called with one argument, the clicked button
+widget instance.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type   | Description                                                    | Default   |
+|--------|--------|----------------------------------------------------------------|-----------|
+| remove |        | Set to true to remove the callback from the list of callbacks. | `False`   |

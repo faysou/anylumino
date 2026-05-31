@@ -1,0 +1,32 @@
+# Checkbox { #anylumino.Checkbox }
+
+```python
+Checkbox(
+    value=False,
+    description='',
+    disabled=False,
+    indent=True,
+    layout=None,
+    style=None,
+)
+```
+
+Boolean checkbox control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type     | Description                                              | Default    |
+|-------------|----------|----------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `False` |
+| description | optional | Label shown next to the control. | `''` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| indent | optional | Whether checkbox labels are indented. | `True` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [indent](#anylumino.Checkbox.indent) | Indent the control to align with other controls with a description. |
+| [style](#anylumino.Checkbox.style) | Styling customizations |

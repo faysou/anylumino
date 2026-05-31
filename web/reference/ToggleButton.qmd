@@ -1,0 +1,37 @@
+# ToggleButton { #anylumino.ToggleButton }
+
+```python
+ToggleButton(
+    value=False,
+    description='',
+    icon='',
+    disabled=False,
+    button_style='',
+    tooltip='',
+    layout=None,
+    style=None,
+)
+```
+
+Boolean toggle-button control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type     | Description                                                     | Default    |
+|--------------|----------|-----------------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `False` |
+| description | optional | Label shown next to the control. | `''` |
+| icon | optional | Font Awesome icon name without the ``fa-`` prefix. | `''` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| button_style | optional | Predefined button style such as ``'primary'`` or ``'success'``. | `''` |
+| tooltip | optional | Hover text. | `''` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [button_style](#anylumino.ToggleButton.button_style) | Use a predefined styling for the button. |
+| [icon](#anylumino.ToggleButton.icon) | Font-awesome icon. |
+| [style](#anylumino.ToggleButton.style) | Styling customizations |

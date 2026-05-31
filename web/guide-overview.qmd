@@ -1,0 +1,78 @@
+---
+title: "Overview"
+---
+
+`anylumino` is a small Python package for building notebook interfaces where
+Lumino layout widgets arrange child anywidgets and ipywidgets controls.
+
+The package gives notebooks an app-like layout vocabulary: tabs, split panes,
+dock panels, scrollable control stacks, menus, command palettes, and keyed child
+access from Python.
+
+The core idea is direct composition:
+
+```python
+from anylumino import SplitPanel, TabPanel, TextInput, IntSlider, VBox
+
+controls = VBox(
+    {
+        "symbol": TextInput(value="AAPL", description="Symbol"),
+        "rows": IntSlider(value=200, min=50, max=500, description="Rows"),
+    },
+    scroll=True,
+    height=180,
+)
+
+tabs = TabPanel({"price": price_chart.widget, "volume": volume_chart.widget})
+SplitPanel({"controls": controls, "charts": tabs}, sizes=[0.25, 0.75])
+```
+
+## What it provides
+
+::: {.panel-tabset}
+
+## Layouts
+
+- `TabPanel` for tabbed child widgets.
+- `BoxPanel`, `HBox`, `VBox`, and `ScrollBox` for linear composition.
+- `SplitPanel` for drag-adjustable panes.
+- `DockPanel`, `AccordionPanel`, `StackedPanel`, `GridPanel`, and
+  `ResponsivePanel` for application-like notebook layouts.
+
+## Actions
+
+- `Toolbar` for compact command rows.
+- `MenuBar` for grouped commands.
+- `CommandPalette` for searchable actions.
+
+Each action can dispatch to a Python callback.
+
+## Controls
+
+`anylumino` re-exports ipywidgets controls such as `TextInput`, `IntSlider`,
+`Dropdown`, `Checkbox`, `Button`, `ListBox`, and `MultiSelect`. In Jupyter these
+reuse the existing `@jupyter-widgets/controls` frontend.
+
+:::
+
+## Design model
+
+`anylumino` is designed around keyed children. A layout can be declared with a
+dictionary, and those keys become the stable access path from Python:
+
+```python
+tabs = TabPanel({"price": price_chart, "orders": orders_table})
+tabs.select_key("orders")
+tabs["price"].fit()
+tabs.call_owner("price", "fit")
+```
+
+That lets a dashboard own layout, state, and behavior without relying on global
+variables.
+
+## Where to go next
+
+- Read the [composition guide](guide.qmd) for child mapping, mutation, resizing,
+  and callbacks.
+- Review [controls](controls.qmd) for the ipywidgets re-exports.
+- Explore the [examples](examples.qmd) for notebook dashboard patterns.

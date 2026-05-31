@@ -1,0 +1,42 @@
+# FileUpload { #anylumino.FileUpload }
+
+```python
+FileUpload(
+    accept='',
+    multiple=False,
+    disabled=False,
+    description='',
+    icon='upload',
+    button_style='',
+    layout=None,
+    style=None,
+)
+```
+
+File upload control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type     | Description                                                     | Default    |
+|--------------|----------|-----------------------------------------------------------------|------------|
+| accept | optional | Accepted file extensions or MIME types. | `''` |
+| multiple | optional | Whether multiple files can be uploaded. | `False` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| description | optional | Label shown next to the control. | `''` |
+| icon | optional | Font Awesome icon name without the ``fa-`` prefix. | `'upload'` |
+| button_style | optional | Predefined button style such as ``'primary'`` or ``'success'``. | `''` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [accept](#anylumino.FileUpload.accept) | File types to accept, empty string for all |
+| [button_style](#anylumino.FileUpload.button_style) | Use a predefined styling for the button. |
+| [disabled](#anylumino.FileUpload.disabled) | Enable or disable button |
+| [error](#anylumino.FileUpload.error) | Error message |
+| [icon](#anylumino.FileUpload.icon) | Font-awesome icon name, without the 'fa-' prefix. |
+| [multiple](#anylumino.FileUpload.multiple) | If True, allow for multiple files upload |
+| [style](#anylumino.FileUpload.style) | An instance trait which coerces a dict to an instance. |
+| [value](#anylumino.FileUpload.value) | The file upload value |

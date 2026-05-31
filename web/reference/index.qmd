@@ -1,0 +1,123 @@
+# API reference {.doc .doc-index}
+
+## Layout widgets
+
+Lumino-backed containers for composing anywidget and ipywidgets children.
+
+| | |
+| --- | --- |
+| [TabPanel](TabPanel.qmd#anylumino.TabPanel) | Lumino tab container for composing child widgets. |
+| [BoxPanel](BoxPanel.qmd#anylumino.BoxPanel) | Lumino box layout with configurable direction, spacing, and stretch. |
+| [HBox](HBox.qmd#anylumino.HBox) | Horizontal ``BoxPanel`` convenience wrapper. |
+| [VBox](VBox.qmd#anylumino.VBox) | Vertical ``BoxPanel`` convenience wrapper. |
+| [ScrollBox](ScrollBox.qmd#anylumino.ScrollBox) | Scrollable vertical box for notebook-sized control panels. |
+| [SplitPanel](SplitPanel.qmd#anylumino.SplitPanel) | Lumino split panel with draggable dividers between children. |
+| [DockPanel](DockPanel.qmd#anylumino.DockPanel) | Lumino dock panel for tabbed or split workspace-style layouts. |
+| [AccordionPanel](AccordionPanel.qmd#anylumino.AccordionPanel) | Lumino accordion panel with titled collapsible sections. |
+| [StackedPanel](StackedPanel.qmd#anylumino.StackedPanel) | Lumino stacked panel that shows one selected child at a time. |
+| [GridPanel](GridPanel.qmd#anylumino.GridPanel) | CSS grid-backed Lumino panel for placing children in grid cells. |
+| [ResponsivePanel](ResponsivePanel.qmd#anylumino.ResponsivePanel) | Box layout that switches direction when its width crosses a breakpoint. |
+
+## Action widgets
+
+Toolbar, menu, and command-palette widgets with Python callbacks.
+
+| | |
+| --- | --- |
+| [Toolbar](Toolbar.qmd#anylumino.Toolbar) | Toolbar of clickable actions that can invoke Python callbacks. |
+| [MenuBar](MenuBar.qmd#anylumino.MenuBar) | Lumino-style menu bar with nested menu items and Python callbacks. |
+| [CommandPalette](CommandPalette.qmd#anylumino.CommandPalette) | Command palette for searchable actions grouped by category. |
+
+## Text input controls
+
+Text, password, tag, and structured-list inputs re-exported from ipywidgets.
+
+| | |
+| --- | --- |
+| [TextInput](TextInput.qmd#anylumino.TextInput) | Single-line text input control. |
+| [Text](Text.qmd#anylumino.Text) | Single-line text input control. |
+| [TextArea](TextArea.qmd#anylumino.TextArea) | Multiline text input control. |
+| [Textarea](Textarea.qmd#anylumino.Textarea) | Multiline text input control. |
+| [PasswordInput](PasswordInput.qmd#anylumino.PasswordInput) | Password text input control. |
+| [Password](Password.qmd#anylumino.Password) | Password text input control. |
+| [Combobox](Combobox.qmd#anylumino.Combobox) | Text input with dropdown suggestions. |
+| [TagsInput](TagsInput.qmd#anylumino.TagsInput) | List input for string tags. |
+| [ColorsInput](ColorsInput.qmd#anylumino.ColorsInput) | List input for color tags. |
+| [FloatsInput](FloatsInput.qmd#anylumino.FloatsInput) | List input for float values. |
+| [IntsInput](IntsInput.qmd#anylumino.IntsInput) | List input for integer values. |
+
+## Selection controls
+
+Choice and multi-choice controls re-exported from ipywidgets.
+
+| | |
+| --- | --- |
+| [Dropdown](Dropdown.qmd#anylumino.Dropdown) | Dropdown selection control. |
+| [RadioButtons](RadioButtons.qmd#anylumino.RadioButtons) | Radio-button selection control. |
+| [ToggleButtons](ToggleButtons.qmd#anylumino.ToggleButtons) | Toggle-button selection control. |
+| [ListBox](ListBox.qmd#anylumino.ListBox) | List-box single-selection control. |
+| [Select](Select.qmd#anylumino.Select) | List-box single-selection control. |
+| [MultiSelect](MultiSelect.qmd#anylumino.MultiSelect) | List-box multi-selection control. |
+| [SelectMultiple](SelectMultiple.qmd#anylumino.SelectMultiple) | List-box multi-selection control. |
+| [SelectionSlider](SelectionSlider.qmd#anylumino.SelectionSlider) | Slider selection control. |
+| [SelectionRangeSlider](SelectionRangeSlider.qmd#anylumino.SelectionRangeSlider) | Range slider selection control. |
+
+## Boolean and action controls
+
+Buttons, toggles, checkboxes, and validation indicators.
+
+| | |
+| --- | --- |
+| [Button](Button.qmd#anylumino.Button) | Clickable button control. |
+| [Checkbox](Checkbox.qmd#anylumino.Checkbox) | Boolean checkbox control. |
+| [ToggleButton](ToggleButton.qmd#anylumino.ToggleButton) | Boolean toggle-button control. |
+| [Valid](Valid.qmd#anylumino.Valid) | Boolean validity indicator control. |
+
+## Numeric controls
+
+Numeric sliders, range sliders, text inputs, and progress indicators.
+
+| | |
+| --- | --- |
+| [IntSlider](IntSlider.qmd#anylumino.IntSlider) | Integer slider control. |
+| [IntegerSlider](IntegerSlider.qmd#anylumino.IntegerSlider) | Integer slider control. |
+| [IntRangeSlider](IntRangeSlider.qmd#anylumino.IntRangeSlider) | Integer range slider control. |
+| [IntegerRangeSlider](IntegerRangeSlider.qmd#anylumino.IntegerRangeSlider) | Integer range slider control. |
+| [IntText](IntText.qmd#anylumino.IntText) | Integer text input control. |
+| [IntegerInput](IntegerInput.qmd#anylumino.IntegerInput) | Integer text input control. |
+| [BoundedIntText](BoundedIntText.qmd#anylumino.BoundedIntText) | Bounded integer text input control. |
+| [FloatSlider](FloatSlider.qmd#anylumino.FloatSlider) | Float slider control. |
+| [FloatRangeSlider](FloatRangeSlider.qmd#anylumino.FloatRangeSlider) | Float range slider control. |
+| [FloatLogSlider](FloatLogSlider.qmd#anylumino.FloatLogSlider) | Logarithmic float slider control. |
+| [FloatText](FloatText.qmd#anylumino.FloatText) | Float text input control. |
+| [BoundedFloatText](BoundedFloatText.qmd#anylumino.BoundedFloatText) | Bounded float text input control. |
+| [IntProgress](IntProgress.qmd#anylumino.IntProgress) | Integer progress bar control. |
+| [FloatProgress](FloatProgress.qmd#anylumino.FloatProgress) | Float progress bar control. |
+| [Play](Play.qmd#anylumino.Play) | Playback stepper control. |
+
+## Date, color, file, and media controls
+
+Specialized ipywidgets inputs and display widgets.
+
+| | |
+| --- | --- |
+| [DatePicker](DatePicker.qmd#anylumino.DatePicker) | Date picker control. |
+| [TimePicker](TimePicker.qmd#anylumino.TimePicker) | Time picker control. |
+| [DatetimePicker](DatetimePicker.qmd#anylumino.DatetimePicker) | Datetime picker control. |
+| [ColorPicker](ColorPicker.qmd#anylumino.ColorPicker) | Color picker control. |
+| [FileUpload](FileUpload.qmd#anylumino.FileUpload) | File upload control. |
+| [Image](Image.qmd#anylumino.Image) | Image display widget. |
+| [Audio](Audio.qmd#anylumino.Audio) | Audio display widget. |
+| [Video](Video.qmd#anylumino.Video) | Video display widget. |
+| [Output](Output.qmd#anylumino.Output) | Output capture and display widget. |
+| [HTML](HTML.qmd#anylumino.HTML) | HTML display widget. |
+| [HTMLMath](HTMLMath.qmd#anylumino.HTMLMath) | HTML and math display widget. |
+| [Label](Label.qmd#anylumino.Label) | Plain text label widget. |
+
+## Utility widgets
+
+Small helper widgets used by examples and tests.
+
+| | |
+| --- | --- |
+| [TextWidget](TextWidget.qmd#anylumino.TextWidget) | Small synced text display widget used in examples and tests. |

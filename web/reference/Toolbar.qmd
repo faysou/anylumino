@@ -1,0 +1,16 @@
+# Toolbar { #anylumino.Toolbar }
+
+```python
+Toolbar(actions=None, *, callbacks=None, width='100%', height='auto')
+```
+
+Toolbar of clickable actions that can invoke Python callbacks.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                     | Description                                                                                                                                                                        | Default   |
+|-----------|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| actions   | iterable of dict         | Action definitions. Each action should include an ``id`` and ``label``; optional keys such as ``icon``, ``tooltip``, ``disabled``, or ``separator`` are forwarded to the frontend. | `None`    |
+| callbacks | dict\[str, callable\]    | Callback map keyed by action id. A callback receives the activated action id.                                                                                                      | `None`    |
+| width     | int, float, str, or None | Widget width.                                                                                                                                                                      | `'100%'`  |
+| height    | int, float, str, or None | Widget height.                                                                                                                                                                     | `'auto'`  |

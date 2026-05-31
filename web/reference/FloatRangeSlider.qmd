@@ -1,0 +1,50 @@
+# FloatRangeSlider { #anylumino.FloatRangeSlider }
+
+```python
+FloatRangeSlider(
+    value=None,
+    min=0.0,
+    max=100.0,
+    step=0.1,
+    description='',
+    disabled=False,
+    continuous_update=True,
+    orientation='horizontal',
+    readout=True,
+    readout_format='.2f',
+    layout=None,
+    style=None,
+)
+```
+
+Float range slider control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type     | Description                                                           | Default    |
+|-------------------|----------|-----------------------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `None` |
+| min | optional | Minimum numeric, date, or time value. | `0.0` |
+| max | optional | Maximum numeric, date, or time value. | `100.0` |
+| step | optional | Increment size. | `0.1` |
+| description | optional | Label shown next to the control. | `''` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
+| orientation | optional | ``'horizontal'`` or ``'vertical'``. | `'horizontal'` |
+| readout | optional | Slider readout visibility or validity readout text. | `True` |
+| readout_format | optional | Format string used for slider readouts. | `'.2f'` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [behavior](#anylumino.FloatRangeSlider.behavior) | Slider dragging behavior. |
+| [continuous_update](#anylumino.FloatRangeSlider.continuous_update) | Update the value of the widget as the user is sliding the slider. |
+| [disabled](#anylumino.FloatRangeSlider.disabled) | Enable or disable user changes |
+| [orientation](#anylumino.FloatRangeSlider.orientation) | Vertical or horizontal. |
+| [readout](#anylumino.FloatRangeSlider.readout) | Display the current value of the slider next to it. |
+| [readout_format](#anylumino.FloatRangeSlider.readout_format) | Format for the readout |
+| [step](#anylumino.FloatRangeSlider.step) | Minimum step to increment the value |
+| [style](#anylumino.FloatRangeSlider.style) | An instance trait which coerces a dict to an instance. |

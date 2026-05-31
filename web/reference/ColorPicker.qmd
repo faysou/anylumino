@@ -1,0 +1,39 @@
+# ColorPicker { #anylumino.ColorPicker }
+
+```python
+ColorPicker(
+    value='black',
+    description='',
+    concise=False,
+    disabled=False,
+    layout=None,
+    style=None,
+)
+```
+
+Color picker control.
+
+
+
+## Parameters {.doc-section .doc-section-parameters}
+
+value : optional
+    Initial value and synced Python value.
+description : optional
+    Label shown next to the control.
+concise : optional
+    Whether to use a compact color-picker display.
+disabled : optional
+    Whether user interaction is disabled.
+layout : optional
+    ipywidgets ``Layout`` object for CSS sizing and spacing.
+style : optional
+    ipywidgets style object or style dictionary.
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [concise](#anylumino.ColorPicker.concise) | Display short version with just a color selector. |
+| [disabled](#anylumino.ColorPicker.disabled) | Enable or disable user changes. |
+| [value](#anylumino.ColorPicker.value) | The color value. |

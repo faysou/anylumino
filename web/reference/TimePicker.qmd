@@ -1,0 +1,39 @@
+# TimePicker { #anylumino.TimePicker }
+
+```python
+TimePicker(
+    value=None,
+    min=None,
+    max=None,
+    step=60,
+    description='',
+    disabled=False,
+    layout=None,
+    style=None,
+)
+```
+
+Time picker control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type     | Description                                              | Default    |
+|-------------|----------|----------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `None` |
+| min | optional | Minimum numeric, date, or time value. | `None` |
+| max | optional | Maximum numeric, date, or time value. | `None` |
+| step | optional | Increment size. | `60` |
+| description | optional | Label shown next to the control. | `''` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [disabled](#anylumino.TimePicker.disabled) | Enable or disable user changes. |
+| [max](#anylumino.TimePicker.max) | A trait type holding a Python time object |
+| [min](#anylumino.TimePicker.min) | A trait type holding a Python time object |
+| [step](#anylumino.TimePicker.step) | The time step to use for the picker, in seconds, or "any". |
+| [value](#anylumino.TimePicker.value) | A trait type holding a Python time object |

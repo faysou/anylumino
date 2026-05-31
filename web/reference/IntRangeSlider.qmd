@@ -1,0 +1,50 @@
+# IntRangeSlider { #anylumino.IntRangeSlider }
+
+```python
+IntRangeSlider(
+    value=None,
+    min=0,
+    max=100,
+    step=1,
+    description='',
+    disabled=False,
+    continuous_update=True,
+    orientation='horizontal',
+    readout=True,
+    readout_format='d',
+    layout=None,
+    style=None,
+)
+```
+
+Integer range slider control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type     | Description                                                           | Default    |
+|-------------------|----------|-----------------------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `None` |
+| min | optional | Minimum numeric, date, or time value. | `0` |
+| max | optional | Maximum numeric, date, or time value. | `100` |
+| step | optional | Increment size. | `1` |
+| description | optional | Label shown next to the control. | `''` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
+| orientation | optional | ``'horizontal'`` or ``'vertical'``. | `'horizontal'` |
+| readout | optional | Slider readout visibility or validity readout text. | `True` |
+| readout_format | optional | Format string used for slider readouts. | `'d'` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [behavior](#anylumino.IntRangeSlider.behavior) | Slider dragging behavior. |
+| [continuous_update](#anylumino.IntRangeSlider.continuous_update) | Update the value of the widget as the user is sliding the slider. |
+| [disabled](#anylumino.IntRangeSlider.disabled) | Enable or disable user changes |
+| [orientation](#anylumino.IntRangeSlider.orientation) | Vertical or horizontal. |
+| [readout](#anylumino.IntRangeSlider.readout) | Display the current value of the slider next to it. |
+| [readout_format](#anylumino.IntRangeSlider.readout_format) | Format for the readout |
+| [step](#anylumino.IntRangeSlider.step) | Minimum step that the value can take |
+| [style](#anylumino.IntRangeSlider.style) | Slider style customizations. |

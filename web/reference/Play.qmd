@@ -1,0 +1,40 @@
+# Play { #anylumino.Play }
+
+```python
+Play(
+    value=0,
+    min=0,
+    max=100,
+    step=1,
+    interval=100,
+    disabled=False,
+    layout=None,
+    style=None,
+)
+```
+
+Playback stepper control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type     | Description                                              | Default    |
+|----------|----------|----------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `0` |
+| min | optional | Minimum numeric, date, or time value. | `0` |
+| max | optional | Maximum numeric, date, or time value. | `100` |
+| step | optional | Increment size. | `1` |
+| interval | optional | Delay between play-widget ticks in milliseconds. | `100` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [disabled](#anylumino.Play.disabled) | Enable or disable user changes |
+| [interval](#anylumino.Play.interval) | The time between two animation steps (ms). |
+| [playing](#anylumino.Play.playing) | Whether the control is currently playing. |
+| [repeat](#anylumino.Play.repeat) | Whether the control will repeat in a continuous loop. |
+| [show_repeat](#anylumino.Play.show_repeat) | Show the repeat toggle button in the widget. |
+| [step](#anylumino.Play.step) | Increment step |

@@ -1,4 +1,5 @@
 .anylumino-TabPanelHost {
+  position: relative;
   min-width: 260px;
   min-height: 180px;
   overflow: hidden;
@@ -20,6 +21,49 @@
   color: #172033;
   background: #f8fafc;
   border: 1px solid #d8dee9;
+}
+
+.anylumino-ResizeHandle {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  z-index: 1000;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  cursor: nwse-resize;
+  opacity: 0.72;
+}
+
+.anylumino-ResizeHandle::before {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #64748b;
+  border-bottom: 2px solid #64748b;
+}
+
+.anylumino-ResizeHandle::after {
+  content: "";
+  position: absolute;
+  right: 7px;
+  bottom: 3px;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid #94a3b8;
+  border-bottom: 2px solid #94a3b8;
+}
+
+.anylumino-ResizeHandle:hover {
+  background: rgba(255, 255, 255, 0.82);
+  opacity: 1;
+}
+
+.anylumino-ResizeHandle[hidden] {
+  display: none;
 }
 
 .anylumino-TabPanelHost .lm-TabBar {

@@ -1,0 +1,88 @@
+website:
+  sidebar:
+  - contents:
+    - reference/index.qmd
+    - contents:
+      - reference/TabPanel.qmd
+      - reference/BoxPanel.qmd
+      - reference/HBox.qmd
+      - reference/VBox.qmd
+      - reference/ScrollBox.qmd
+      - reference/SplitPanel.qmd
+      - reference/DockPanel.qmd
+      - reference/AccordionPanel.qmd
+      - reference/StackedPanel.qmd
+      - reference/GridPanel.qmd
+      - reference/ResponsivePanel.qmd
+      section: Layout widgets
+    - contents:
+      - reference/Toolbar.qmd
+      - reference/MenuBar.qmd
+      - reference/CommandPalette.qmd
+      section: Action widgets
+    - contents:
+      - reference/TextInput.qmd
+      - reference/Text.qmd
+      - reference/TextArea.qmd
+      - reference/Textarea.qmd
+      - reference/PasswordInput.qmd
+      - reference/Password.qmd
+      - reference/Combobox.qmd
+      - reference/TagsInput.qmd
+      - reference/ColorsInput.qmd
+      - reference/FloatsInput.qmd
+      - reference/IntsInput.qmd
+      section: Text input controls
+    - contents:
+      - reference/Dropdown.qmd
+      - reference/RadioButtons.qmd
+      - reference/ToggleButtons.qmd
+      - reference/ListBox.qmd
+      - reference/Select.qmd
+      - reference/MultiSelect.qmd
+      - reference/SelectMultiple.qmd
+      - reference/SelectionSlider.qmd
+      - reference/SelectionRangeSlider.qmd
+      section: Selection controls
+    - contents:
+      - reference/Button.qmd
+      - reference/Checkbox.qmd
+      - reference/ToggleButton.qmd
+      - reference/Valid.qmd
+      section: Boolean and action controls
+    - contents:
+      - reference/IntSlider.qmd
+      - reference/IntegerSlider.qmd
+      - reference/IntRangeSlider.qmd
+      - reference/IntegerRangeSlider.qmd
+      - reference/IntText.qmd
+      - reference/IntegerInput.qmd
+      - reference/BoundedIntText.qmd
+      - reference/FloatSlider.qmd
+      - reference/FloatRangeSlider.qmd
+      - reference/FloatLogSlider.qmd
+      - reference/FloatText.qmd
+      - reference/BoundedFloatText.qmd
+      - reference/IntProgress.qmd
+      - reference/FloatProgress.qmd
+      - reference/Play.qmd
+      section: Numeric controls
+    - contents:
+      - reference/DatePicker.qmd
+      - reference/TimePicker.qmd
+      - reference/DatetimePicker.qmd
+      - reference/ColorPicker.qmd
+      - reference/FileUpload.qmd
+      - reference/Image.qmd
+      - reference/Audio.qmd
+      - reference/Video.qmd
+      - reference/Output.qmd
+      - reference/HTML.qmd
+      - reference/HTMLMath.qmd
+      - reference/Label.qmd
+      section: Date, color, file, and media controls
+    - contents:
+      - reference/TextWidget.qmd
+      section: Utility widgets
+    id: reference
+  - id: dummy-sidebar

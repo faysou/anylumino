@@ -1,0 +1,31 @@
+# Image { #anylumino.Image }
+
+```python
+Image(
+    value=b'',
+    format='png',
+    width='',
+    height='',
+    layout=None,
+)
+```
+
+Image display widget.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type     | Description                                              | Default    |
+|--------|----------|----------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `b''` |
+| format | optional | Media format such as ``'png'``, ``'mp3'``, or ``'mp4'``. | `'png'` |
+| width | optional | CSS width for media widgets. | `''` |
+| height | optional | CSS height for media widgets. | `''` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [format](#anylumino.Image.format) | The format of the image. |
+| [height](#anylumino.Image.height) | Height of the image in pixels. Use layout.height for styling the widget. |
+| [width](#anylumino.Image.width) | Width of the image in pixels. Use layout.width for styling the widget. |

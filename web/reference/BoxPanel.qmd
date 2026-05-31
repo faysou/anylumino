@@ -1,0 +1,55 @@
+# BoxPanel { #anylumino.BoxPanel }
+
+```python
+BoxPanel(
+    widgets=None,
+    *,
+    titles=None,
+    keys=None,
+    direction='left-to-right',
+    spacing=8,
+    stretches=None,
+    width='100%',
+    height=420,
+    resizable=True,
+    scroll=False,
+    scroll_x=None,
+    scroll_y=None,
+    child_min_width=None,
+    child_min_height=None,
+)
+```
+
+Lumino box layout with configurable direction, spacing, and stretch.
+
+``HBox`` and ``VBox`` are direction-specific convenience subclasses. Set
+``scroll=True`` to enable scrolling along the natural box direction, or use
+``scroll_x`` and ``scroll_y`` for explicit overflow behavior.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                                                         | Description                                                                                                                               | Default           |
+|------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| widgets          | iterable or mapping                                                          | Child anywidgets, ipywidgets, or owner objects exposing a ``widget`` attribute. Mapping keys become stable child keys and default titles. | `None`            |
+| titles           | iterable or mapping                                                          | Optional labels associated with children. Mapping values are looked up by child key.                                                      | `None`            |
+| keys             | iterable of str                                                              | Stable child keys for iterable ``widgets``.                                                                                               | `None`            |
+| direction        | (\'left-to-right\', \'right-to-left\', \'top-to-bottom\', \'bottom-to-top\') | Lumino box direction.                                                                                                                     | `"left-to-right"` |
+| spacing          | int                                                                          | Pixel spacing between children.                                                                                                           | `8`               |
+| stretches        | iterable of int                                                              | Lumino stretch factors, one per child when provided.                                                                                      | `None`            |
+| width            | int, float, str, or None                                                     | Widget width. Numeric values use the shared anylumino size rules.                                                                         | `'100%'`          |
+| height           | int, float, str, or None                                                     | Widget height. Numeric values use the shared anylumino size rules.                                                                        | `420`             |
+| resizable        | bool                                                                         | Whether the panel receives a notebook-friendly resize handle.                                                                             | `True`            |
+| scroll           | bool                                                                         | Enables scrolling along the natural layout direction.                                                                                     | `False`           |
+| scroll_x         | bool                                                                         | Explicit horizontal or vertical overflow controls.                                                                                        | `None`            |
+| scroll_y         | bool                                                                         | Explicit horizontal or vertical overflow controls.                                                                                        | `None`            |
+| child_min_width  | int, float, str, or None                                                     | Minimum child sizes used when scrolling is enabled.                                                                                       | `None`            |
+| child_min_height | int, float, str, or None                                                     | Minimum child sizes used when scrolling is enabled.                                                                                       | `None`            |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [direction](#anylumino.BoxPanel.direction) | An enum whose value must be in a given sequence. |
+| [layout_kind](#anylumino.BoxPanel.layout_kind) | A trait for unicode strings. |
+| [spacing](#anylumino.BoxPanel.spacing) | An int trait. |
+| [stretches](#anylumino.BoxPanel.stretches) | An instance of a Python list. |

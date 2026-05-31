@@ -1,0 +1,37 @@
+# IntProgress { #anylumino.IntProgress }
+
+```python
+IntProgress(
+    value=0,
+    min=0,
+    max=100,
+    description='',
+    bar_style='',
+    orientation='horizontal',
+    layout=None,
+    style=None,
+)
+```
+
+Integer progress bar control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type     | Description                                                     | Default    |
+|-------------|----------|-----------------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `0` |
+| min | optional | Minimum numeric, date, or time value. | `0` |
+| max | optional | Maximum numeric, date, or time value. | `100` |
+| description | optional | Label shown next to the control. | `''` |
+| bar_style | optional | Progress-bar style name such as ``'success'`` or ``'warning'``. | `''` |
+| orientation | optional | ``'horizontal'`` or ``'vertical'``. | `'horizontal'` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [bar_style](#anylumino.IntProgress.bar_style) | Use a predefined styling for the progress bar. |
+| [orientation](#anylumino.IntProgress.orientation) | Vertical or horizontal. |
+| [style](#anylumino.IntProgress.style) | An instance trait which coerces a dict to an instance. |

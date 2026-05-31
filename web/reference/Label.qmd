@@ -1,0 +1,29 @@
+# Label { #anylumino.Label }
+
+```python
+Label(
+    value='',
+    description='',
+    disabled=False,
+    layout=None,
+    style=None,
+)
+```
+
+Plain text label widget.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type     | Description                                              | Default    |
+|-------------|----------|----------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `''` |
+| description | optional | Label shown next to the control. | `''` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [style](#anylumino.Label.style) | An instance trait which coerces a dict to an instance. |

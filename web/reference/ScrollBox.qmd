@@ -1,0 +1,14 @@
+# ScrollBox { #anylumino.ScrollBox }
+
+```python
+ScrollBox(widgets=None, **kwargs)
+```
+
+Scrollable vertical box for notebook-sized control panels.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                | Description                                                                                | Default   |
+|----------|---------------------|--------------------------------------------------------------------------------------------|-----------|
+| widgets  | iterable or mapping | Child widgets or keyed child mapping.                                                      | `None`    |
+| **kwargs | Any                 | Forwarded to ``VBox``. ``scroll`` defaults to ``True`` and ``height`` defaults to ``420``. | `{}`      |

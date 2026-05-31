@@ -1,0 +1,58 @@
+# TextInput { #anylumino.TextInput }
+
+```python
+TextInput(
+    value='',
+    description='',
+    placeholder='',
+    disabled=False,
+    continuous_update=True,
+    layout=None,
+    style=None,
+)
+```
+
+Single-line text input control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type     | Description                                                           | Default    |
+|-------------------|----------|-----------------------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `''` |
+| description | optional | Label shown next to the control. | `''` |
+| placeholder | optional | Text shown while the input is empty. | `''` |
+| disabled | optional | Whether user interaction is disabled. | `False` |
+| continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [continuous_update](#anylumino.TextInput.continuous_update) | Update the value as the user types. If False, update on submission, e.g., pressing Enter or navigating away. |
+| [disabled](#anylumino.TextInput.disabled) | Enable or disable user changes |
+| [style](#anylumino.TextInput.style) | An instance trait which coerces a dict to an instance. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [on_submit](#anylumino.TextInput.on_submit) | (Un)Register a callback to handle text submission. |
+
+### on_submit { #anylumino.TextInput.on_submit }
+
+```python
+TextInput.on_submit(callback, remove=False)
+```
+
+(Un)Register a callback to handle text submission.
+
+Triggered when the user clicks enter.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type   | Description                                                   | Default    |
+|----------|--------|---------------------------------------------------------------|------------|
+| callback |        | Will be called with exactly one argument: the Widget instance | _required_ |
+| remove   |        | Whether to unregister the callback                            | `False`    |

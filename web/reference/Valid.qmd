@@ -1,0 +1,29 @@
+# Valid { #anylumino.Valid }
+
+```python
+Valid(
+    value=False,
+    description='',
+    readout='',
+    layout=None,
+    style=None,
+)
+```
+
+Boolean validity indicator control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type     | Description                                              | Default    |
+|-------------|----------|----------------------------------------------------------|------------|
+| value | optional | Initial value and synced Python value. | `False` |
+| description | optional | Label shown next to the control. | `''` |
+| readout | optional | Slider readout visibility or validity readout text. | `''` |
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+| style | optional | ipywidgets style object or style dictionary. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [readout](#anylumino.Valid.readout) | Message displayed when the value is False |

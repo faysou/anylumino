@@ -1,0 +1,146 @@
+project:
+  type: website
+  output-dir: _site
+
+metadata-files:
+  - reference/_sidebar.yml
+
+website:
+  title: "anylumino"
+  search:
+    location: navbar
+    type: overlay
+  navbar:
+    background: "#101820"
+    foreground: "#f8fafc"
+    left:
+      - href: index.qmd
+        text: Overview
+      - href: guide-overview.qmd
+        text: Guide
+      - href: reference/index.qmd
+        text: API
+    right:
+      - icon: github
+        href: https://github.com/
+        aria-label: GitHub
+  sidebar:
+    - title: "Guide"
+      style: docked
+      contents:
+        - guide-overview.qmd
+        - guide.qmd
+        - controls.qmd
+        - examples.qmd
+
+format:
+  html:
+    theme:
+      light: [cosmo, styles.scss]
+    css:
+      - reference/_styles-quartodoc.css
+    toc: true
+    code-copy: true
+    anchor-sections: true
+
+execute:
+  freeze: auto
+
+quartodoc:
+  package: anylumino
+  title: "API reference"
+  dir: reference
+  dynamic: true
+  sidebar: reference/_sidebar.yml
+  css: reference/_styles-quartodoc.css
+  sections:
+    - title: "Layout widgets"
+      desc: "Lumino-backed containers for composing anywidget and ipywidgets children."
+      contents:
+        - TabPanel
+        - BoxPanel
+        - HBox
+        - VBox
+        - ScrollBox
+        - SplitPanel
+        - DockPanel
+        - AccordionPanel
+        - StackedPanel
+        - GridPanel
+        - ResponsivePanel
+    - title: "Action widgets"
+      desc: "Toolbar, menu, and command-palette widgets with Python callbacks."
+      contents:
+        - Toolbar
+        - MenuBar
+        - CommandPalette
+    - title: "Text input controls"
+      desc: "Text, password, tag, and structured-list inputs re-exported from ipywidgets."
+      contents:
+        - TextInput
+        - Text
+        - TextArea
+        - Textarea
+        - PasswordInput
+        - Password
+        - Combobox
+        - TagsInput
+        - ColorsInput
+        - FloatsInput
+        - IntsInput
+    - title: "Selection controls"
+      desc: "Choice and multi-choice controls re-exported from ipywidgets."
+      contents:
+        - Dropdown
+        - RadioButtons
+        - ToggleButtons
+        - ListBox
+        - Select
+        - MultiSelect
+        - SelectMultiple
+        - SelectionSlider
+        - SelectionRangeSlider
+    - title: "Boolean and action controls"
+      desc: "Buttons, toggles, checkboxes, and validation indicators."
+      contents:
+        - Button
+        - Checkbox
+        - ToggleButton
+        - Valid
+    - title: "Numeric controls"
+      desc: "Numeric sliders, range sliders, text inputs, and progress indicators."
+      contents:
+        - IntSlider
+        - IntegerSlider
+        - IntRangeSlider
+        - IntegerRangeSlider
+        - IntText
+        - IntegerInput
+        - BoundedIntText
+        - FloatSlider
+        - FloatRangeSlider
+        - FloatLogSlider
+        - FloatText
+        - BoundedFloatText
+        - IntProgress
+        - FloatProgress
+        - Play
+    - title: "Date, color, file, and media controls"
+      desc: "Specialized ipywidgets inputs and display widgets."
+      contents:
+        - DatePicker
+        - TimePicker
+        - DatetimePicker
+        - ColorPicker
+        - FileUpload
+        - Image
+        - Audio
+        - Video
+        - Output
+        - HTML
+        - HTMLMath
+        - Label
+    - title: "Utility widgets"
+      desc: "Small helper widgets used by examples and tests."
+      contents:
+        - TextWidget

@@ -1,0 +1,108 @@
+---
+title: "Composition guide"
+---
+
+## Child widgets
+
+Every layout widget accepts children either as a sequence or as a mapping. A
+mapping is preferred for application-style notebooks because it gives each
+child a stable key:
+
+```python
+from anylumino import TabPanel, TextWidget
+
+tabs = TabPanel(
+    {
+        "status": TextWidget("Ready"),
+        "logs": TextWidget("No events yet"),
+    },
+    titles={"status": "Status", "logs": "Logs"},
+)
+```
+
+If `titles` is omitted for a mapping, the child keys are used as the titles.
+
+## Accessing children
+
+Layout widgets keep both a renderable widget and an owner object. This is useful
+when a domain wrapper exposes a `.widget` view but also has methods that should
+be called from Python.
+
+```python
+tabs = TabPanel({"price": price_chart})
+
+tabs.get_widget("price")      # rendered child, usually price_chart.widget
+tabs.get_owner("price")       # original wrapper object
+tabs["price"]                 # same as get_owner("price")
+tabs.call_owner("price", "fit")
+```
+
+## Mutating layouts after display
+
+Children can be added, renamed, removed, and selected after the parent widget is
+already displayed:
+
+```python
+tabs.add("chart-2", chart.widget, title="Chart 2", select=True)
+tabs.rename_widget("chart-2", "Recent sample")
+tabs.select_key("chart-2")
+removed = tabs.remove_widget("chart-2")
+```
+
+## Scroll behavior
+
+`HBox`, `VBox`, and `ScrollBox` can expose scrollbars inside notebook output.
+The `scroll=True` convenience follows the natural axis:
+
+```python
+from anylumino import HBox, ScrollBox
+
+wide = HBox(children, scroll=True, height=160)
+vertical = ScrollBox(children, height=420)
+```
+
+For explicit overflow control:
+
+```python
+HBox(
+    children,
+    scroll_x=True,
+    scroll_y=False,
+    child_min_width=220,
+)
+```
+
+## Resizing
+
+Composed layouts are resizable by drag and drop by default. The resize handle is
+shown in the bottom-right corner of the layout host.
+
+```python
+from anylumino import SplitPanel
+
+SplitPanel({"left": controls, "right": chart}, sizes=[0.3, 0.7])
+SplitPanel({"left": controls, "right": chart}, resizable=False)
+```
+
+`SplitPanel` uses Lumino split handles between child panes. The layout host
+resize handle controls the overall notebook footprint.
+
+## Actions and callbacks
+
+Actions are plain dictionaries keyed by an `id`. The matching callback receives
+the action id.
+
+```python
+from anylumino import Toolbar
+
+toolbar = Toolbar(
+    [
+        {"id": "fit", "label": "Fit"},
+        {"id": "marker", "label": "Marker"},
+    ],
+    callbacks={
+        "fit": lambda _id: chart.fit(),
+        "marker": lambda _id: chart.marker(text="Event"),
+    },
+)
+```

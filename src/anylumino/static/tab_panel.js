@@ -70,13 +70,146 @@ function resizeEmbeddedDocument(contentWindow) {
   }
 }
 
+function modelIdFromRef(ref) {
+  if (typeof ref === "string" && ref.startsWith("anywidget:")) {
+    return ref.slice("anywidget:".length);
+  }
+  return ref;
+}
+
+function isMissingAnywidgetBinding(error) {
+  return String(error?.message ?? error).includes("No binding found for widget");
+}
+
+function disposeLuminoWidget(widget) {
+  if (!widget || widget.isDisposed) {
+    return;
+  }
+  try {
+    widget.dispose();
+  } catch (error) {
+    if (!String(error?.message ?? error).includes("Widget is not attached")) {
+      throw error;
+    }
+  }
+}
+
+async function renderWidgetRef(model, host, ref, el, signal) {
+  try {
+    const child = await host.getWidget(ref);
+    await child.render({ el, signal });
+    return;
+  } catch (error) {
+    if (!isMissingAnywidgetBinding(error)) {
+      throw error;
+    }
+  }
+
+  const manager = model.widget_manager;
+  if (!manager?.get_model || !manager?.create_view) {
+    throw new Error("[anylumino] The current widget manager cannot render ipywidgets controls.");
+  }
+
+  const childModel = await manager.get_model(modelIdFromRef(ref));
+  const childView = await manager.create_view(childModel);
+  if (signal.aborted) {
+    childView.remove?.();
+    return;
+  }
+
+  el.replaceChildren(childView.el);
+  signal.addEventListener("abort", () => childView.remove?.(), { once: true });
+}
+
+function installResizeHandle(model, root, onResize, signal) {
+  const handle = document.createElement("div");
+  handle.className = "anylumino-ResizeHandle";
+  handle.title = "Resize";
+  root.appendChild(handle);
+
+  const syncHandle = () => {
+    const enabled = Boolean(model.get("resizable"));
+    handle.hidden = !enabled;
+    root.classList.toggle("anylumino-mod-resizable", enabled);
+  };
+
+  const onPointerDown = (event) => {
+    if (!model.get("resizable")) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      handle.setPointerCapture(event.pointerId);
+    } catch {
+      // Synthetic pointer events used by browser tests do not always create capture state.
+    }
+
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startRect = root.getBoundingClientRect();
+
+    const onPointerMove = (moveEvent) => {
+      const nextWidth = Math.max(260, Math.round(startRect.width + moveEvent.clientX - startX));
+      const nextHeight = Math.max(180, Math.round(startRect.height + moveEvent.clientY - startY));
+      root.style.width = `${nextWidth}px`;
+      root.style.height = `${nextHeight}px`;
+      onResize();
+    };
+
+    const onPointerUp = () => {
+      try {
+        handle.releasePointerCapture(event.pointerId);
+      } catch {
+        // Ignore missing capture state during synthetic browser tests.
+      }
+      handle.removeEventListener("pointermove", onPointerMove);
+      handle.removeEventListener("pointerup", onPointerUp);
+      handle.removeEventListener("pointercancel", onPointerUp);
+
+      const rect = root.getBoundingClientRect();
+      model.set("width", `${Math.round(rect.width)}px`);
+      model.set("height", `${Math.round(rect.height)}px`);
+      model.save_changes();
+      onResize();
+    };
+
+    handle.addEventListener("pointermove", onPointerMove);
+    handle.addEventListener("pointerup", onPointerUp);
+    handle.addEventListener("pointercancel", onPointerUp);
+  };
+
+  syncHandle();
+  handle.addEventListener("pointerdown", onPointerDown, { signal });
+  model.on("change:resizable", syncHandle);
+  signal.addEventListener(
+    "abort",
+    () => {
+      removeModelListener(model, "change:resizable", syncHandle);
+    },
+    { once: true },
+  );
+}
+
 export default {
   initialize({ model }) {
     return {
       getCurrentIndex: () => model.get("selected_index"),
+      getCurrentKey: () => {
+        const keys = model.get("child_keys") ?? [];
+        return keys[model.get("selected_index")] ?? null;
+      },
       setCurrentIndex: (index) => {
         model.set("selected_index", index);
         model.save_changes();
+      },
+      setCurrentKey: (key) => {
+        const index = (model.get("child_keys") ?? []).indexOf(key);
+        if (index >= 0) {
+          model.set("selected_index", index);
+          model.save_changes();
+        }
       },
     };
   },
@@ -134,6 +267,8 @@ export default {
       notifyCurrentWidgetVisible();
     };
 
+    installResizeHandle(model, root, notifyCurrentWidgetVisible, signal);
+
     const syncPlacement = () => {
       panel.tabPlacement = model.get("tab_placement") || "top";
       updatePanel();
@@ -161,7 +296,7 @@ export default {
       childController.abort();
       childController = new AbortController();
       for (const widget of [...panel.widgets]) {
-        widget.dispose();
+        disposeLuminoWidget(widget);
       }
     };
 
@@ -191,13 +326,12 @@ export default {
       }
 
       const childSignal = combineSignals(signal, childController.signal);
-      const child = await host.getWidget(ref);
       if (childSignal.aborted || !currentWidget.isVisible) {
         currentWidget.node.dataset.anyluminoRendering = "false";
         return;
       }
 
-      await child.render({ el: currentWidget.node, signal: childSignal });
+      await renderWidgetRef(model, host, ref, currentWidget.node, childSignal);
       currentWidget.node.dataset.anyluminoRendered = "true";
       currentWidget.node.dataset.anyluminoRendering = "false";
       notifyCurrentWidgetVisible();
@@ -206,6 +340,7 @@ export default {
     const renderChildren = async () => {
       const refs = model.get("widgets") ?? [];
       const titles = model.get("titles") ?? [];
+      const keys = model.get("child_keys") ?? [];
 
       try {
         syncingFromModel = true;
@@ -214,6 +349,7 @@ export default {
           const node = document.createElement("div");
           node.className = "anylumino-TabPanelChild";
           node.dataset.anyluminoRef = refs[index];
+          node.dataset.anyluminoKey = keys[index] ?? "";
           node.dataset.anyluminoRendered = "false";
           node.dataset.anyluminoRendering = "false";
           const slot = new Widget({ node });
@@ -265,6 +401,7 @@ export default {
     panel.currentChanged.connect(onCurrentChanged);
     window.addEventListener("resize", updatePanel, { signal });
     model.on("change:widgets", onWidgetsChanged);
+    model.on("change:child_keys", onWidgetsChanged);
     model.on("change:titles", onTitlesChanged);
     model.on("change:selected_index", syncSelectedIndex);
     model.on("change:tab_placement", syncPlacement);
@@ -278,6 +415,7 @@ export default {
         clearPanel();
         panel.currentChanged.disconnect(onCurrentChanged);
         removeModelListener(model, "change:widgets", onWidgetsChanged);
+        removeModelListener(model, "change:child_keys", onWidgetsChanged);
         removeModelListener(model, "change:titles", onTitlesChanged);
         removeModelListener(model, "change:selected_index", syncSelectedIndex);
         removeModelListener(model, "change:tab_placement", syncPlacement);

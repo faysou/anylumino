@@ -1,0 +1,19 @@
+# TextWidget { #anylumino.TextWidget }
+
+```python
+TextWidget(text='')
+```
+
+Small synced text display widget used in examples and tests.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type   | Description                           | Default   |
+|--------|--------|---------------------------------------|-----------|
+| text   | str    | Initial text displayed by the widget. | `""`      |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [text](#anylumino.TextWidget.text) | A trait for unicode strings. |

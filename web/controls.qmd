@@ -1,0 +1,121 @@
+---
+title: "Input controls"
+---
+
+`anylumino` does not recreate input controls. It re-exports ipywidgets classes
+and lets Jupyter render them with the existing controls frontend.
+
+## Common controls
+
+```python
+from anylumino import (
+    Button,
+    Checkbox,
+    Dropdown,
+    IntSlider,
+    ListBox,
+    MultiSelect,
+    ScrollBox,
+    TextInput,
+)
+
+controls = ScrollBox(
+    {
+        "symbol": TextInput(value="AAPL", description="Symbol"),
+        "rows": IntSlider(value=200, min=50, max=500, description="Rows"),
+        "interval": Dropdown(options=["1m", "5m", "1h"], value="1m"),
+        "live": Checkbox(value=True, description="Live"),
+        "actions": Button(description="Apply"),
+    },
+    height=320,
+)
+```
+
+## Control families
+
+These controls are re-exported from `ipywidgets` and can be composed inside
+anylumino layouts:
+
+| Family | Controls |
+|---|---|
+| Text input | `TextInput`, `Text`, `TextArea`, `Textarea`, `PasswordInput`, `Password`, `Combobox` |
+| Structured input | `TagsInput`, `ColorsInput`, `FloatsInput`, `IntsInput` |
+| Selection | `Dropdown`, `RadioButtons`, `ToggleButtons`, `ListBox`, `Select`, `MultiSelect`, `SelectMultiple`, `SelectionSlider`, `SelectionRangeSlider` |
+| Boolean and actions | `Button`, `Checkbox`, `ToggleButton`, `Valid` |
+| Integers | `IntSlider`, `IntegerSlider`, `IntRangeSlider`, `IntegerRangeSlider`, `IntText`, `IntegerInput`, `BoundedIntText`, `IntProgress` |
+| Floats | `FloatSlider`, `FloatRangeSlider`, `FloatLogSlider`, `FloatText`, `BoundedFloatText`, `FloatProgress` |
+| Date and color | `DatePicker`, `TimePicker`, `DatetimePicker`, `ColorPicker` |
+| File and media | `FileUpload`, `Image`, `Audio`, `Video` |
+| Display and output | `Output`, `HTML`, `HTMLMath`, `Label` |
+| Playback | `Play` |
+
+The generated [API reference](reference/index.qmd) includes one page per
+control, with constructor signatures and argument details extracted from
+ipywidgets.
+
+## Common arguments
+
+Most input controls accept normal ipywidgets keyword arguments. These are the
+ones used most often in anylumino layouts:
+
+| Argument | Applies to | Purpose |
+|---|---|---|
+| `value` | Most controls | Initial value and synced Python value. |
+| `description` | Most form controls | Label shown next to the control. |
+| `disabled` | Most interactive controls | Prevent user edits while keeping the widget visible. |
+| `layout` | All ipywidgets controls | ipywidgets `Layout` object for CSS sizing and spacing. |
+| `style` | Many controls | ipywidgets style object or style dictionary. |
+| `continuous_update` | Text inputs and sliders | Whether Python receives updates while the user is typing or dragging. |
+| `placeholder` | `TextInput`, `TextArea`, `PasswordInput`, `Combobox` | Empty-state text inside the input. |
+| `options` | Selection controls | Choices for dropdowns, list boxes, radio buttons, and selection sliders. |
+| `index`, `label` | Selection controls | Alternative ways to select or inspect the current option. |
+| `min`, `max`, `step` | Numeric controls | Numeric bounds and increment size. |
+| `readout`, `readout_format` | Sliders | Whether and how to show the current numeric value. |
+| `orientation` | Sliders, progress bars, selection sliders | Horizontal or vertical display. |
+| `rows` | `TextArea`, `ListBox`, `MultiSelect` | Visible row count. |
+| `button_style`, `icon`, `tooltip` | Buttons and toggle buttons | Button appearance and hover text. |
+| `accept`, `multiple` | `FileUpload` | Accepted file types and whether multiple files are allowed. |
+
+Examples:
+
+```python
+TextInput(value="AAPL", description="Symbol", placeholder="Ticker")
+IntSlider(value=200, min=50, max=500, step=25, description="Rows")
+Dropdown(options=["1m", "5m", "1h"], value="1m", description="Interval")
+Button(description="Apply", icon="check", button_style="primary")
+```
+
+## Aliases
+
+These aliases are provided for application-style naming:
+
+| anylumino alias | ipywidgets class |
+|---|---|
+| `TextInput` | `Text` |
+| `TextArea` | `Textarea` |
+| `PasswordInput` | `Password` |
+| `ListBox` | `Select` |
+| `MultiSelect` | `SelectMultiple` |
+| `IntegerInput` | `IntText` |
+| `IntegerSlider` | `IntSlider` |
+| `IntegerRangeSlider` | `IntRangeSlider` |
+
+## Full control smoke test
+
+Open `notebooks/input_controls_hbox.py` in JupyterLab. Despite the filename, it
+now uses `ScrollBox` to show a vertical list of controls in one scrollable
+Lumino panel.
+
+## Callback pattern
+
+Controls remain normal ipywidgets objects, so use their standard callback API:
+
+```python
+status = TextWidget("Ready")
+symbol = TextInput(value="AAPL", description="Symbol")
+
+def on_symbol_change(change):
+    status.text = f"Symbol: {change['new']}"
+
+symbol.observe(on_symbol_change, names="value")
+```

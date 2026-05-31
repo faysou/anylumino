@@ -1,0 +1,14 @@
+# VBox { #anylumino.VBox }
+
+```python
+VBox(widgets=None, **kwargs)
+```
+
+Vertical ``BoxPanel`` convenience wrapper.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                | Description                                                                            | Default   |
+|----------|---------------------|----------------------------------------------------------------------------------------|-----------|
+| widgets  | iterable or mapping | Child widgets or keyed child mapping.                                                  | `None`    |
+| **kwargs | Any                 | Forwarded to ``BoxPanel`` except ``direction``, which is fixed to ``"top-to-bottom"``. | `{}`      |

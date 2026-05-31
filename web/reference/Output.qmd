@@ -1,0 +1,91 @@
+# Output { #anylumino.Output }
+
+```python
+Output(
+    layout=None,
+)
+```
+
+Output capture and display widget.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type     | Description                                              | Default    |
+|--------|----------|----------------------------------------------------------|------------|
+| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [msg_id](#anylumino.Output.msg_id) | Parent message id of messages to capture |
+| [outputs](#anylumino.Output.outputs) | The output messages synced from the frontend. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [append_display_data](#anylumino.Output.append_display_data) | Append a display object as an output. |
+| [append_stderr](#anylumino.Output.append_stderr) | Append text to the stderr stream. |
+| [append_stdout](#anylumino.Output.append_stdout) | Append text to the stdout stream. |
+| [capture](#anylumino.Output.capture) | Decorator to capture the stdout and stderr of a function. |
+| [clear_output](#anylumino.Output.clear_output) | Clear the content of the output widget. |
+
+### append_display_data { #anylumino.Output.append_display_data }
+
+```python
+Output.append_display_data(display_object)
+```
+
+Append a display object as an output.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type                               | Description                                                                                         | Default    |
+|----------------|------------------------------------|-----------------------------------------------------------------------------------------------------|------------|
+| display_object | IPython.core.display.DisplayObject | The object to display (e.g., an instance of `IPython.display.Markdown` or `IPython.display.Image`). | _required_ |
+
+### append_stderr { #anylumino.Output.append_stderr }
+
+```python
+Output.append_stderr(text)
+```
+
+Append text to the stderr stream.
+
+### append_stdout { #anylumino.Output.append_stdout }
+
+```python
+Output.append_stdout(text)
+```
+
+Append text to the stdout stream.
+
+### capture { #anylumino.Output.capture }
+
+```python
+Output.capture(clear_output=False, *clear_args, **clear_kwargs)
+```
+
+Decorator to capture the stdout and stderr of a function.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type   | Description                                                                                                                                   | Default    |
+|--------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| clear_output |        | If True, clear the content of the output widget at every new function call. Default: False                                                    | `False`    |
+| wait         |        | If True, wait to clear the output until new output is available to replace it. This is only used if clear_output is also True. Default: False | _required_ |
+
+### clear_output { #anylumino.Output.clear_output }
+
+```python
+Output.clear_output(*pargs, **kwargs)
+```
+
+Clear the content of the output widget.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type   | Description                                                                                   | Default    |
+|--------|--------|-----------------------------------------------------------------------------------------------|------------|
+| wait   |        | If True, wait to clear the output until new output is available to replace it. Default: False | _required_ |

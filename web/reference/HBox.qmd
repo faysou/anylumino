@@ -1,0 +1,14 @@
+# HBox { #anylumino.HBox }
+
+```python
+HBox(widgets=None, **kwargs)
+```
+
+Horizontal ``BoxPanel`` convenience wrapper.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                | Description                                                                            | Default   |
+|----------|---------------------|----------------------------------------------------------------------------------------|-----------|
+| widgets  | iterable or mapping | Child widgets or keyed child mapping.                                                  | `None`    |
+| **kwargs | Any                 | Forwarded to ``BoxPanel`` except ``direction``, which is fixed to ``"left-to-right"``. | `{}`      |

@@ -1,0 +1,150 @@
+.anylumino-ActionHost {
+  min-width: 220px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.anylumino-ActionHost *,
+.anylumino-ActionHost *::before,
+.anylumino-ActionHost *::after {
+  box-sizing: border-box;
+}
+
+.anylumino-ActionHost > .lm-Widget {
+  width: 100%;
+  height: 100%;
+}
+
+.anylumino-Toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  background: #f8fafc;
+  border: 1px solid #d8dee9;
+}
+
+.anylumino-ToolbarButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  color: #172033;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.anylumino-ToolbarButtonIconOnly {
+  width: 32px;
+  padding: 5px;
+}
+
+.anylumino-ToolbarIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.anylumino-ToolbarButton:hover {
+  background: #eef2f7;
+}
+
+.anylumino-ToolbarButton:disabled {
+  color: #94a3b8;
+  cursor: default;
+}
+
+.anylumino-MenuBar {
+  min-height: 32px;
+  color: #172033;
+  background: #f8fafc;
+  border: 1px solid #d8dee9;
+}
+
+.anylumino-MenuBar .lm-MenuBar-content {
+  display: flex;
+  align-items: stretch;
+  min-height: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.anylumino-MenuBar .lm-MenuBar-item {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 13px;
+  cursor: default;
+}
+
+.anylumino-MenuBar .lm-MenuBar-item.lm-mod-active {
+  background: #eef2f7;
+}
+
+.lm-Menu {
+  min-width: 160px;
+  padding: 4px 0;
+  color: #172033;
+  background: #ffffff;
+  border: 1px solid #d8dee9;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.lm-Menu-content {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lm-Menu-item {
+  min-height: 28px;
+  padding: 5px 12px;
+  font-size: 13px;
+}
+
+.lm-Menu-item.lm-mod-active {
+  background: #eef2f7;
+}
+
+.anylumino-CommandPalette {
+  overflow: auto;
+  color: #172033;
+  background: #ffffff;
+  border: 1px solid #d8dee9;
+}
+
+.anylumino-CommandPalette .lm-CommandPalette-search {
+  padding: 6px;
+  background: #f8fafc;
+  border-bottom: 1px solid #d8dee9;
+}
+
+.anylumino-CommandPalette input {
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+}
+
+.anylumino-CommandPalette .lm-CommandPalette-header {
+  padding: 7px 10px 4px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.anylumino-CommandPalette .lm-CommandPalette-item {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.anylumino-CommandPalette .lm-CommandPalette-item.lm-mod-active {
+  background: #eef2f7;
+}

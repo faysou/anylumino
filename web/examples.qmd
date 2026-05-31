@@ -1,0 +1,64 @@
+---
+title: "Examples"
+---
+
+## Minimal tabs
+
+```python
+from anylumino import TabPanel, TextWidget
+
+TabPanel(
+    {
+        "first": TextWidget("First child"),
+        "second": TextWidget("Second child"),
+    },
+    titles={"first": "First", "second": "Second"},
+)
+```
+
+## Add a tab after display
+
+```python
+tabs = TabPanel({"main": chart_a.widget}, titles={"main": "Main"})
+tabs
+
+tabs.add("recent", chart_b.widget, title="Recent", select=True)
+```
+
+## Chart dashboard skeleton
+
+```python
+from anylumino import CommandPalette, MenuBar, SplitPanel, TabPanel, Toolbar, VBox
+
+actions = [
+    {"id": "new-chart", "label": "New chart"},
+    {"id": "fit", "label": "Fit"},
+]
+
+callbacks = {
+    "new-chart": lambda _id: tabs.add("chart-2", new_chart.widget, title="Chart 2", select=True),
+    "fit": lambda _id: tabs.call_owner(tabs.selected_key, "fit"),
+}
+
+toolbar = Toolbar(actions, callbacks=callbacks)
+menu = MenuBar([{"label": "Chart", "items": actions}], callbacks=callbacks)
+palette = CommandPalette(actions, callbacks=callbacks)
+
+tabs = TabPanel({"chart-1": chart_1})
+controls = VBox({"menu": menu, "toolbar": toolbar, "palette": palette})
+
+SplitPanel({"controls": controls, "charts": tabs}, sizes=[0.25, 0.75])
+```
+
+## Local notebooks
+
+The repository includes Jupytext notebooks for smoke testing:
+
+- `notebooks/lightweight_charts_tabs.py` tests tabs and dynamic child addition.
+- `notebooks/lightweight_charts_dashboard.py` exercises all layout and action
+  widgets with `lightweight-charts-python`.
+- `notebooks/input_controls_hbox.py` shows ipywidgets controls inside
+  `ScrollBox`.
+- `notebooks/itables_tabs.py` places an `itables.widget.ITable` inside a tab,
+  appends rows to a pandas DataFrame, and refreshes the displayed table with
+  `ITable.update(...)`.

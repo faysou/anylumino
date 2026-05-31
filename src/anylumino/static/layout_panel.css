@@ -1,0 +1,149 @@
+.anylumino-LayoutHost {
+  position: relative;
+  min-width: 260px;
+  min-height: 160px;
+  overflow: hidden;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.anylumino-LayoutHost *,
+.anylumino-LayoutHost *::before,
+.anylumino-LayoutHost *::after {
+  box-sizing: border-box;
+}
+
+.anylumino-LayoutHost > .lm-Widget {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.anylumino-ResizeHandle {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  z-index: 1000;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  cursor: nwse-resize;
+  opacity: 0.72;
+}
+
+.anylumino-ResizeHandle::before {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #64748b;
+  border-bottom: 2px solid #64748b;
+}
+
+.anylumino-ResizeHandle::after {
+  content: "";
+  position: absolute;
+  right: 7px;
+  bottom: 3px;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid #94a3b8;
+  border-bottom: 2px solid #94a3b8;
+}
+
+.anylumino-ResizeHandle:hover {
+  background: rgba(255, 255, 255, 0.82);
+  opacity: 1;
+}
+
+.anylumino-ResizeHandle[hidden] {
+  display: none;
+}
+
+.anylumino-LayoutChild {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.anylumino-LayoutChild > .lm-Widget,
+.anylumino-LayoutChild > div,
+.anylumino-LayoutChild iframe {
+  max-width: 100%;
+}
+
+.anylumino-box,
+.anylumino-responsive,
+.anylumino-split,
+.anylumino-dock,
+.anylumino-accordion,
+.anylumino-stacked,
+.anylumino-grid {
+  color: #172033;
+  background: #f8fafc;
+  border: 1px solid #d8dee9;
+}
+
+.anylumino-grid {
+  display: grid;
+  padding: 8px;
+  overflow: auto;
+}
+
+.anylumino-grid .anylumino-LayoutChild {
+  border: 1px solid #e2e8f0;
+}
+
+.anylumino-split > .lm-SplitPanel-handle {
+  background: #e2e8f0;
+}
+
+.anylumino-split > .lm-SplitPanel-handle:hover {
+  background: #cbd5e1;
+}
+
+.anylumino-dock .lm-DockPanel-tabBar {
+  min-height: 34px;
+  background: #eef2f7;
+}
+
+.anylumino-dock .lm-TabBar-tab {
+  min-width: 92px;
+  min-height: 34px;
+  padding: 0 12px;
+  color: #475569;
+  background: #eef2f7;
+  border-right: 1px solid #d8dee9;
+}
+
+.anylumino-dock .lm-TabBar-tab.lm-mod-current {
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.anylumino-dock .lm-TabBar-tabLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.anylumino-accordion .lm-AccordionPanel-title {
+  min-height: 32px;
+  padding: 7px 10px;
+  color: #334155;
+  background: #eef2f7;
+  border-bottom: 1px solid #d8dee9;
+  font-size: 13px;
+}
+
+.anylumino-accordion .lm-AccordionPanel-title.lm-mod-expanded {
+  color: #0f172a;
+  background: #ffffff;
+}

@@ -56,11 +56,11 @@ def find_nautilus_root() -> Path:
 
 # %%
 TabPanel(
-    [
-        TextWidget("This is an anywidget child rendered in a Lumino tab."),
-        TextWidget("The second tab is a separate child widget."),
-    ],
-    titles=["First", "Second"],
+    {
+        "first": TextWidget("This is an anywidget child rendered in a Lumino tab."),
+        "second": TextWidget("The second tab is a separate child widget."),
+    },
+    titles={"first": "First", "second": "Second"},
     width="100%",
     height=260,
 )
@@ -90,8 +90,8 @@ chart_b = NotebookChart(width="100%", height="100%", toolbox=False)
 chart_b.set(data.tail(80))
 
 chart_tabs = TabPanel(
-    [chart_a.widget],
-    titles=["Full sample"],
+    {"full-sample": chart_a},
+    titles={"full-sample": "Full sample"},
     selected_index=0,
     width="100%",
     height=520,
@@ -103,6 +103,6 @@ chart_tabs
 # ## Add a chart tab after display
 
 # %%
-chart_tabs.add_tab(chart_b.widget, "Recent sample", select=True)
+chart_tabs.add_tab(chart_b, "Recent sample", key="recent-sample", select=True)
 
 # %%

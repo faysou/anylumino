@@ -12,16 +12,20 @@ license = "MIT"
 authors = [{ name = "Nautilus" }]
 dependencies = [
     "anywidget>=0.11.0",
+    "ipywidgets>=8.1.0",
     "traitlets>=5.0.0",
 ]
 
 [dependency-groups]
 dev = [
+    "griffe<2",
+    "itables[widget]>=2.4.0",
     "jupyter>=1.1.1",
     "jupytext>=1.19.0",
     "pandas>=2.3.0",
     "pytest>=8.0.0",
     "pywebview>=5.0.5",
+    "quartodoc>=0.11.1",
     "yfinance>=0.2.0",
 ]
 

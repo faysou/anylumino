@@ -1,0 +1,16 @@
+# CommandPalette { #anylumino.CommandPalette }
+
+```python
+CommandPalette(commands=None, *, callbacks=None, width='100%', height=320)
+```
+
+Command palette for searchable actions grouped by category.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                     | Description                                                                                                                                                                         | Default   |
+|-----------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| commands  | iterable of dict         | Command definitions. Each command should include an ``id`` and ``label``; optional keys such as ``category``, ``caption``, ``icon``, or ``disabled`` are forwarded to the frontend. | `None`    |
+| callbacks | dict\[str, callable\]    | Callback map keyed by command id. A callback receives the activated command id.                                                                                                     | `None`    |
+| width     | int, float, str, or None | Widget width.                                                                                                                                                                       | `'100%'`  |
+| height    | int, float, str, or None | Widget height.                                                                                                                                                                      | `320`     |
