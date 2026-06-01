@@ -82,8 +82,8 @@ status = TextWidget("Change a control or press Apply to see its value here.")
 
 
 controls = {
-    "text": TextInput(value="AAPL", description="Text"),
-    "textarea": TextArea(value="Watchlist note", description="Area"),
+    "text": TextInput(value="Iris", description="Text"),
+    "textarea": TextArea(value="Observation note", description="Area"),
     "password": PasswordInput(value="secret", description="Password"),
     "int": IntText(value=10, description="Int"),
     "bounded-int": BoundedIntText(value=5, min=0, max=10, description="Bounded int"),
@@ -96,12 +96,12 @@ controls = {
     "log-slider": FloatLogSlider(value=10.0, base=10, min=0, max=3, description="Log slider"),
     "checkbox": Checkbox(value=True, description="Checkbox"),
     "toggle": ToggleButton(value=True, description="Toggle"),
-    "toggle-buttons": ToggleButtons(options=["Buy", "Hold", "Sell"], value="Hold", description="Toggles"),
-    "dropdown": Dropdown(options=["1m", "5m", "1h"], value="5m", description="Dropdown"),
-    "combobox": Combobox(options=["AAPL", "MSFT", "NVDA"], value="AAPL", description="Combobox"),
-    "radio": RadioButtons(options=["Line", "Candle", "Area"], value="Candle", description="Radio"),
-    "list": ListBox(options=["AAPL", "MSFT", "NVDA"], value="AAPL", description="List"),
-    "multi": MultiSelect(options=["Volume", "SMA", "EMA"], value=("SMA",), description="Multi"),
+    "toggle-buttons": ToggleButtons(options=["Low", "Medium", "High"], value="Medium", description="Toggles"),
+    "dropdown": Dropdown(options=["Daily", "Weekly", "Monthly"], value="Weekly", description="Dropdown"),
+    "combobox": Combobox(options=["Iris", "Daisy", "Lupine"], value="Iris", description="Combobox"),
+    "radio": RadioButtons(options=["Line", "Bar", "Area"], value="Line", description="Radio"),
+    "list": ListBox(options=["Iris", "Daisy", "Lupine"], value="Iris", description="List"),
+    "multi": MultiSelect(options=["Temperature", "Humidity", "CO2"], value=("Humidity",), description="Multi"),
     "selection": SelectionSlider(options=["Low", "Medium", "High"], value="Medium", description="Selection"),
     "selection-range": SelectionRangeSlider(
         options=["Mon", "Tue", "Wed", "Thu", "Fri"],
@@ -116,8 +116,8 @@ controls = {
     ),
     "time": TimePicker(value=time(9, 30), description="Time"),
     "tags": TagsInput(
-        value=["breakout", "watch"],
-        allowed_tags=["breakout", "watch", "risk"],
+        value=["review", "field"],
+        allowed_tags=["review", "field", "lab"],
         description="Tags",
     ),
     "colors": ColorsInput(value=["red", "#0ea5e9"], description="Colors"),

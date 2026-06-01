@@ -30,13 +30,21 @@ function actionLabel(action) {
   return String(action?.label ?? action?.id ?? "");
 }
 
-function createIcon(name) {
+function iconClass(name) {
   const iconName = String(name ?? "").trim();
   if (!/^[a-z0-9-]+$/i.test(iconName)) {
     return null;
   }
+  return `fa fa-${iconName}`;
+}
+
+function createIcon(name) {
+  const className = iconClass(name);
+  if (!className) {
+    return null;
+  }
   const icon = document.createElement("i");
-  icon.className = `fa fa-${iconName} anylumino-ToolbarIcon`;
+  icon.className = `${className} anylumino-ToolbarIcon`;
   icon.setAttribute("aria-hidden", "true");
   return icon;
 }
@@ -62,6 +70,7 @@ function addCommands(commands, actions, activate) {
     commands.addCommand(id, {
       label: actionLabel(action),
       caption: String(action?.caption ?? actionLabel(action)),
+      iconClass: iconClass(action?.icon) ?? "",
       isEnabled: () => !action.disabled,
       execute: () => activate(id),
     });

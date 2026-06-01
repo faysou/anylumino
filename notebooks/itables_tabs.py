@@ -17,8 +17,9 @@
 # # anylumino with itables
 #
 # `itables.widget.ITable` is an AnyWidget, so it can be placed directly inside
-# an `anylumino.TabPanel`. This example appends rows to a pandas DataFrame and
-# calls `ITable.update(...)` so the table inside the tab reflects the new data.
+# an `anylumino.TabPanel`. This example appends lab sample rows to a pandas
+# DataFrame and calls `ITable.update(...)` so the table inside the tab reflects
+# the new data.
 
 # %%
 from __future__ import annotations
@@ -38,38 +39,38 @@ from anylumino import VBox
 
 
 # %%
-def initial_trades() -> pd.DataFrame:
+def initial_samples() -> pd.DataFrame:
     return pd.DataFrame(
         [
-            {"trade_id": 1, "symbol": "AAPL", "side": "BUY", "quantity": 100, "price": 189.24},
-            {"trade_id": 2, "symbol": "MSFT", "side": "SELL", "quantity": 75, "price": 421.16},
-            {"trade_id": 3, "symbol": "NVDA", "side": "BUY", "quantity": 40, "price": 908.88},
+            {"sample_id": 1, "site": "North bed", "species": "Iris", "count": 12, "height_cm": 34.2},
+            {"sample_id": 2, "site": "South bed", "species": "Daisy", "count": 18, "height_cm": 21.7},
+            {"sample_id": 3, "site": "West bed", "species": "Lupine", "count": 9, "height_cm": 45.1},
         ],
     )
 
 
-def total_notional(df: pd.DataFrame) -> float:
-    return float((df["quantity"] * df["price"]).sum())
+def mean_height(df: pd.DataFrame) -> float:
+    return float(df["height_cm"].mean())
 
 
 def make_summary(df: pd.DataFrame) -> str:
     return (
         f"Rows: {len(df)}\n"
-        f"Total quantity: {int(df['quantity'].sum())}\n"
-        f"Total notional: {total_notional(df):,.2f}"
+        f"Total count: {int(df['count'].sum())}\n"
+        f"Mean height: {mean_height(df):.1f} cm"
     )
 
 
 # %%
 state = {
-    "df": initial_trades(),
-    "next_trade_id": 4,
+    "df": initial_samples(),
+    "next_sample_id": 4,
 }
 
-symbol_input = TextInput(value="AAPL", description="Symbol")
-side_input = Dropdown(options=["BUY", "SELL"], value="BUY", description="Side")
-quantity_input = IntSlider(value=50, min=1, max=500, step=1, description="Quantity")
-price_input = IntSlider(value=190, min=1, max=1000, step=1, description="Price")
+site_input = TextInput(value="East bed", description="Site")
+species_input = Dropdown(options=["Iris", "Daisy", "Lupine"], value="Iris", description="Species")
+count_input = IntSlider(value=10, min=1, max=50, step=1, description="Count")
+height_input = IntSlider(value=30, min=5, max=80, step=1, description="Height cm")
 add_button = Button(description="Add row", button_style="primary", icon="plus")
 reset_button = Button(description="Reset", icon="rotate-left")
 status = TextWidget("Ready. Press Add row to append to the DataFrame and refresh the ITable.")
@@ -77,7 +78,7 @@ summary = TextWidget(make_summary(state["df"]))
 
 table = ITable(
     state["df"],
-    caption="Trades",
+    caption="Plant samples",
     select=True,
     selected_rows=[len(state["df"]) - 1],
     classes="display compact",
@@ -90,36 +91,36 @@ def refresh_table(selected_row: int | None = None) -> None:
     selected_rows = [] if selected_row is None else [selected_row]
     table.update(
         state["df"],
-        caption=f"Trades ({len(state['df'])} rows)",
+        caption=f"Plant samples ({len(state['df'])} rows)",
         selected_rows=selected_rows,
     )
     summary.text = make_summary(state["df"])
 
 
-def append_trade(_event: object | None = None) -> None:
-    trade_id = int(state["next_trade_id"])
+def append_sample(_event: object | None = None) -> None:
+    sample_id = int(state["next_sample_id"])
     row = {
-        "trade_id": trade_id,
-        "symbol": symbol_input.value.upper(),
-        "side": side_input.value,
-        "quantity": int(quantity_input.value),
-        "price": float(price_input.value),
+        "sample_id": sample_id,
+        "site": site_input.value,
+        "species": species_input.value,
+        "count": int(count_input.value),
+        "height_cm": float(height_input.value),
     }
     state["df"] = pd.concat([state["df"], pd.DataFrame([row])], ignore_index=True)
-    state["next_trade_id"] = trade_id + 1
+    state["next_sample_id"] = sample_id + 1
     refresh_table(selected_row=len(state["df"]) - 1)
-    status.text = f"Added trade {trade_id} to the DataFrame and refreshed the table."
+    status.text = f"Added sample {sample_id} to the DataFrame and refreshed the table."
 
 
-def reset_trades(_event: object | None = None) -> None:
-    state["df"] = initial_trades()
-    state["next_trade_id"] = 4
+def reset_samples(_event: object | None = None) -> None:
+    state["df"] = initial_samples()
+    state["next_sample_id"] = 4
     refresh_table(selected_row=len(state["df"]) - 1)
     status.text = "Reset the DataFrame and refreshed the table."
 
 
-add_button.on_click(append_trade)
-reset_button.on_click(reset_trades)
+add_button.on_click(append_sample)
+reset_button.on_click(reset_samples)
 
 
 # %%
@@ -129,17 +130,17 @@ toolbar = Toolbar(
         {"id": "reset", "label": "Reset", "icon": "rotate-left"},
     ],
     callbacks={
-        "add": lambda _id: append_trade(),
-        "reset": lambda _id: reset_trades(),
+        "add": lambda _id: append_sample(),
+        "reset": lambda _id: reset_samples(),
     },
 )
 
 controls = VBox(
     {
-        "symbol": symbol_input,
-        "side": side_input,
-        "quantity": quantity_input,
-        "price": price_input,
+        "site": site_input,
+        "species": species_input,
+        "count": count_input,
+        "height": height_input,
         "add": add_button,
         "reset": reset_button,
         "status": status,
@@ -150,10 +151,10 @@ controls = VBox(
 
 tabs = TabPanel(
     {
-        "trades": table,
+        "samples": table,
         "summary": summary,
     },
-    titles={"trades": "Live table", "summary": "Summary"},
+    titles={"samples": "Live table", "summary": "Summary"},
     height=460,
 )
 

@@ -13,13 +13,13 @@ dock panels, scrollable control stacks, menus, command palettes, and keyed child
 access from Python.
 :::
 
-![A stylized anylumino dashboard composed from panels, charts, tabs, and controls.](assets/anylumino-mark.svg){.hero-image}
+![A stylized anylumino dashboard composed from panels, figures, tabs, and controls.](assets/anylumino-mark.svg){.hero-image}
 :::
 
 <div class="anylumino-demo" aria-label="Animated overview of anylumino layout composition">
 <div class="demo-toolbar"><span></span><span></span><span></span><strong>Toolbar</strong></div>
 <div class="demo-stage">
-<div class="demo-tabs"><span class="active">Chart</span><span>Orders</span><span>Logs</span></div>
+<div class="demo-tabs"><span class="active">Figure</span><span>Samples</span><span>Notes</span></div>
 <div class="demo-split">
 <div class="demo-controls"><i></i><i></i><i></i><i></i></div>
 <div class="demo-chart"><svg viewBox="0 0 300 140" aria-hidden="true"><path class="line-a" d="M10 112 C60 62 91 98 132 72 S200 18 292 34"/><path class="line-b" d="M10 96 C68 80 95 38 145 58 S223 126 292 66"/></svg></div>
@@ -35,15 +35,15 @@ from anylumino import SplitPanel, TabPanel, TextInput, IntSlider, VBox
 
 controls = VBox(
     {
-        "symbol": TextInput(value="AAPL", description="Symbol"),
-        "rows": IntSlider(value=200, min=50, max=500, description="Rows"),
+        "dataset": TextInput(value="Greenhouse A", description="Dataset"),
+        "samples": IntSlider(value=120, min=25, max=250, description="Samples"),
     },
     scroll=True,
     height=180,
 )
 
-tabs = TabPanel({"price": price_chart.widget, "volume": volume_chart.widget})
-SplitPanel({"controls": controls, "charts": tabs}, sizes=[0.25, 0.75])
+tabs = TabPanel({"trend": trend_figure, "summary": samples_table})
+SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 ```
 
 ## What it provides
@@ -81,10 +81,10 @@ containers. A layout can be declared with a dictionary, and those keys become
 the stable access path from Python:
 
 ```python
-tabs = TabPanel({"price": price_chart, "orders": orders_table})
-tabs.select_key("orders")
-tabs["price"].fit()
-tabs.call_owner("price", "fit")
+tabs = TabPanel({"trend": trend_panel, "samples": samples_table})
+tabs.select_key("samples")
+tabs["trend"].refresh()
+tabs.call_owner("trend", "refresh")
 ```
 
 That lets a dashboard own layout, state, and behavior without relying on global

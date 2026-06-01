@@ -21,10 +21,10 @@ from anylumino import (
 
 controls = ScrollBox(
     {
-        "symbol": TextInput(value="AAPL", description="Symbol"),
-        "rows": IntSlider(value=200, min=50, max=500, description="Rows"),
-        "interval": Dropdown(options=["1m", "5m", "1h"], value="1m"),
-        "live": Checkbox(value=True, description="Live"),
+        "dataset": TextInput(value="Greenhouse A", description="Dataset"),
+        "samples": IntSlider(value=120, min=25, max=250, description="Samples"),
+        "metric": Dropdown(options=["Temperature", "Humidity", "CO2"], value="Temperature"),
+        "enabled": Checkbox(value=True, description="Enabled"),
         "actions": Button(description="Apply"),
     },
     height=320,
@@ -76,12 +76,17 @@ ones used most often in anylumino layouts:
 | `button_style`, `icon`, `tooltip` | Buttons and toggle buttons | Button appearance and hover text. |
 | `accept`, `multiple` | `FileUpload` | Accepted file types and whether multiple files are allowed. |
 
+Icons on ipywidgets controls use Font Awesome names without the `fa-` prefix,
+for example `check`, `plus`, `refresh`, `upload`, or `times`. Anylumino action
+widgets use the same naming convention so toolbar examples can share icon names
+with `Button` and `ToggleButton`.
+
 Examples:
 
 ```python
-TextInput(value="AAPL", description="Symbol", placeholder="Ticker")
-IntSlider(value=200, min=50, max=500, step=25, description="Rows")
-Dropdown(options=["1m", "5m", "1h"], value="1m", description="Interval")
+TextInput(value="Greenhouse A", description="Dataset", placeholder="Name")
+IntSlider(value=120, min=25, max=250, step=5, description="Samples")
+Dropdown(options=["Temperature", "Humidity", "CO2"], value="Temperature")
 Button(description="Apply", icon="check", button_style="primary")
 ```
 
@@ -112,10 +117,10 @@ Controls remain normal ipywidgets objects, so use their standard callback API:
 
 ```python
 status = TextWidget("Ready")
-symbol = TextInput(value="AAPL", description="Symbol")
+dataset = TextInput(value="Greenhouse A", description="Dataset")
 
-def on_symbol_change(change):
-    status.text = f"Symbol: {change['new']}"
+def on_dataset_change(change):
+    status.text = f"Dataset: {change['new']}"
 
-symbol.observe(on_symbol_change, names="value")
+dataset.observe(on_dataset_change, names="value")
 ```

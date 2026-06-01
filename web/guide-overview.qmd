@@ -16,16 +16,26 @@ from anylumino import SplitPanel, TabPanel, TextInput, IntSlider, VBox
 
 controls = VBox(
     {
-        "symbol": TextInput(value="AAPL", description="Symbol"),
-        "rows": IntSlider(value=200, min=50, max=500, description="Rows"),
+        "dataset": TextInput(value="Greenhouse A", description="Dataset"),
+        "samples": IntSlider(value=120, min=25, max=250, description="Samples"),
     },
     scroll=True,
     height=180,
 )
 
-tabs = TabPanel({"price": price_chart.widget, "volume": volume_chart.widget})
-SplitPanel({"controls": controls, "charts": tabs}, sizes=[0.25, 0.75])
+tabs = TabPanel({"trend": trend_figure, "summary": samples_table})
+SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 ```
+
+The benefit is not only visual layout. An anywidget layout library gives a
+notebook the same composition model used in application UI code: build larger
+reusable widgets from smaller widgets, keep children addressable by key, attach
+callbacks to controls, and place behavior on the composed object itself.
+
+For example, a `FigurePanel` can combine a toolbar and a figure, expose methods
+such as `refresh()` or `set_data()`, and still be nested inside a `TabPanel` or
+`SplitPanel` like any other widget. That keeps state and behavior close to the
+UI component instead of spreading them across notebook-global variables.
 
 ## What it provides
 
@@ -62,10 +72,10 @@ layout containers. A layout can be declared with a dictionary, and those keys
 become the stable access path from Python:
 
 ```python
-tabs = TabPanel({"price": price_chart, "orders": orders_table})
-tabs.select_key("orders")
-tabs["price"].fit()
-tabs.call_owner("price", "fit")
+tabs = TabPanel({"trend": trend_panel, "samples": samples_table})
+tabs.select_key("samples")
+tabs["trend"].refresh()
+tabs.call_owner("trend", "refresh")
 ```
 
 That lets a dashboard own layout, state, and behavior without relying on global

@@ -7,29 +7,35 @@ It targets the anywidget 0.11 AFM composition API: Python passes child
 anywidgets as synced widget references, and the frontend resolves each child
 with `host.getWidget(...)` before mounting it into a Lumino layout widget.
 
+The main benefit is composition. `anylumino` lets a notebook author build
+larger reusable widgets from existing anywidgets, ipywidgets controls, charts,
+tables, and outputs. A composed widget can own its layout, state, callbacks, and
+domain methods while still being an anywidget that can be nested into another
+layout.
+
 ## Widgets
 
 ```python
 from anylumino import Dropdown, IntSlider, SplitPanel, TabPanel, TextInput, Toolbar, VBox
 
-symbol = TextInput(value="AAPL", description="Symbol")
-rows = IntSlider(value=200, min=50, max=500, description="Rows")
-interval = Dropdown(options=["1m", "5m", "1h"], value="1m", description="Interval")
+dataset = TextInput(value="Greenhouse A", description="Dataset")
+samples = IntSlider(value=120, min=25, max=250, description="Samples")
+metric = Dropdown(options=["Temperature", "Humidity", "CO2"], value="Temperature")
 
 tabs = TabPanel(
-    {"chart-a": chart_a.widget, "chart-b": chart_b.widget},
-    titles={"chart-a": "Chart A", "chart-b": "Chart B"},
+    {"trend": trend_figure, "summary": summary_table},
+    titles={"trend": "Trend", "summary": "Summary"},
     height=460,
 )
 
 toolbar = Toolbar(
-    [{"id": "fit", "label": "Fit"}],
-    callbacks={"fit": lambda _id: chart_a.fit()},
+    [{"id": "refresh", "label": "Refresh"}],
+    callbacks={"refresh": lambda _id: trend_panel.refresh()},
 )
 
-controls = VBox({"symbol": symbol, "rows": rows, "interval": interval})
+controls = VBox({"dataset": dataset, "samples": samples, "metric": metric})
 
-SplitPanel({"controls": controls, "charts": tabs}, orientation="vertical")
+SplitPanel({"controls": controls, "workspace": tabs}, orientation="vertical")
 ```
 
 The current prototype provides:
@@ -48,6 +54,12 @@ The current prototype provides:
 All layout containers inherit from `LayoutWidget`, which provides keyed child
 composition, owner access, dynamic mutation, and method forwarding.
 
+This turns layout into an application structure, not only visual placement.
+Children remain addressable by key, callbacks can interact with sibling
+widgets, and larger components such as `FigurePanel`, `SampleReview`, or
+`LabDashboard` can be reused across notebooks without relying on global
+variables.
+
 Layout widgets are resizable by drag and drop by default. Pass
 `resizable=False` to hide the bottom-right resize handle. `SplitPanel` also
 syncs Lumino split-handle changes back to its `sizes` trait.
@@ -56,45 +68,49 @@ Layout children can be declared with semantic keys. If `titles` is omitted for
 a mapping, the titles default to those keys.
 
 ```python
-tabs = TabPanel({"price": price_chart.widget, "volume": volume_chart.widget})
-tabs.select_key("volume")
+tabs = TabPanel({"trend": trend_figure, "summary": summary_table})
+tabs.select_key("summary")
 tabs.selected_key
-tabs.get_widget("price")
+tabs.get_widget("trend")
 ```
 
 If a child is a Python wrapper with a `.widget` anywidget view, anylumino renders
 the view and keeps the wrapper as the keyed owner.
 
 ```python
-tabs = TabPanel({"price": price_chart})
-tabs.get_widget("price")  # price_chart.widget
-tabs["price"].fit()
-tabs.call_owner("price", "fit")
+tabs = TabPanel({"trend": trend_panel})
+tabs.get_widget("trend")  # trend_panel.widget
+tabs["trend"].refresh()
+tabs.call_owner("trend", "refresh")
 ```
 
 To add methods to a composed UI object, subclass a layout widget. The subclass
 is still an anywidget and can be nested inside another layout:
 
 ```python
-class ChartPanel(VBox):
-    def __init__(self, chart):
-        self.chart = chart
-        super().__init__({"chart": chart.widget})
+class FigurePanel(VBox):
+    def __init__(self, figure):
+        self.figure = figure
+        super().__init__({"figure": figure})
 
-    def fit(self):
-        self.chart.fit()
+    def refresh(self):
+        update_figure(self.figure)
 
 
-tabs = TabPanel({"price": ChartPanel(chart)})
-tabs["price"].fit()
+tabs = TabPanel({"trend": FigurePanel(figure)})
+tabs["trend"].refresh()
 ```
 
 `Toolbar`, `MenuBar`, and `CommandPalette` accept Python callbacks keyed by
-action id, so controls can mutate another widget such as a chart after display.
+action id, so controls can mutate another widget such as a figure after display.
+Action widget icons use Font Awesome names without the `fa-` prefix, matching
+ipywidgets button icons. Use names such as `plus`, `refresh`, `comment-o`,
+`line-chart`, `step-forward`, `expand`, and `adjust`.
 
 The input controls are ipywidgets classes exposed through anylumino. They reuse
 Jupyter's existing `@jupyter-widgets/controls` frontend and can be placed inside
-Lumino layouts like any other child widget.
+Lumino layouts like any other child widget. Ipywidgets controls with an `icon`
+argument use the same Font Awesome naming convention.
 
 ## Development
 
@@ -114,9 +130,9 @@ This opens `http://127.0.0.1:4200/` automatically. The rendered site is static
 under `web/_site`; use `make docs-serve` to rebuild it and serve that static
 output.
 
-Open `notebooks/lightweight_charts_tabs.py` for a focused dynamic-tab smoke
-test. Open `notebooks/lightweight_charts_dashboard.py` for a broader dashboard
-that exercises the layout widgets, action callbacks, and
-`lightweight-charts-python` chart operations together. Open
+Open `notebooks/plotly_tabs.py` for a focused dynamic-tab smoke test with
+Plotly figures. Open `notebooks/plotly_dashboard.py` for a broader dashboard
+that exercises the layout widgets, action callbacks, and Plotly figure updates
+together. Open
 `notebooks/itables_tabs.py` to see an `itables.widget.ITable` inside a tab with
 controls that append rows to a pandas DataFrame and refresh the displayed table.

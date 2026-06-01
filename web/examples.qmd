@@ -19,44 +19,48 @@ TabPanel(
 ## Add a tab after display
 
 ```python
-tabs = TabPanel({"main": chart_a.widget}, titles={"main": "Main"})
+tabs = TabPanel({"main": figure_a}, titles={"main": "Main"})
 tabs
 
-tabs.add("recent", chart_b.widget, title="Recent", select=True)
+tabs.add("recent", figure_b, title="Recent", select=True)
 ```
 
-## Chart dashboard skeleton
+## Figure dashboard skeleton
 
 ```python
 from anylumino import CommandPalette, MenuBar, SplitPanel, TabPanel, Toolbar, VBox
 
 actions = [
-    {"id": "new-chart", "label": "New chart"},
-    {"id": "fit", "label": "Fit"},
+    {"id": "new-figure", "label": "New figure", "icon": "plus"},
+    {"id": "refresh", "label": "Refresh", "icon": "refresh"},
 ]
 
 callbacks = {
-    "new-chart": lambda _id: tabs.add("chart-2", new_chart.widget, title="Chart 2", select=True),
-    "fit": lambda _id: tabs.call_owner(tabs.selected_key, "fit"),
+    "new-figure": lambda _id: tabs.add("figure-2", new_figure, title="Figure 2", select=True),
+    "refresh": lambda _id: tabs.call_owner(tabs.selected_key, "refresh"),
 }
 
 toolbar = Toolbar(actions, callbacks=callbacks)
-menu = MenuBar([{"label": "Chart", "items": actions}], callbacks=callbacks)
+menu = MenuBar([{"label": "Figure", "items": actions}], callbacks=callbacks)
 palette = CommandPalette(actions, callbacks=callbacks)
 
-tabs = TabPanel({"chart-1": chart_1})
+tabs = TabPanel({"figure-1": figure_panel})
 controls = VBox({"menu": menu, "toolbar": toolbar, "palette": palette})
 
-SplitPanel({"controls": controls, "charts": tabs}, sizes=[0.25, 0.75])
+SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 ```
+
+Icons use Font Awesome names without the `fa-` prefix, the same convention used
+by ipywidgets controls.
 
 ## Local notebooks
 
 The repository includes Jupytext notebooks for smoke testing:
 
-- `notebooks/lightweight_charts_tabs.py` tests tabs and dynamic child addition.
-- `notebooks/lightweight_charts_dashboard.py` exercises all layout and action
-  widgets with `lightweight-charts-python`.
+- `notebooks/plotly_tabs.py` tests tabs and dynamic child addition with Plotly
+  figures.
+- `notebooks/plotly_dashboard.py` exercises all layout and action widgets with
+  Plotly figure updates.
 - `notebooks/input_controls_hbox.py` shows ipywidgets controls inside
   `ScrollBox`.
 - `notebooks/itables_tabs.py` places an `itables.widget.ITable` inside a tab,

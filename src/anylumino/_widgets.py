@@ -924,7 +924,8 @@ class Toolbar(_ActionWidget):
     actions : iterable of dict, optional
         Action definitions. Each action should include an ``id`` and ``label``;
         optional keys such as ``icon``, ``tooltip``, ``disabled``, or
-        ``separator`` are forwarded to the frontend.
+        ``separator`` are forwarded to the frontend. ``icon`` uses Font Awesome
+        names without the ``fa-`` prefix, matching ipywidgets button icons.
     callbacks : dict[str, callable], optional
         Callback map keyed by action id. A callback receives the activated
         action id.
@@ -953,7 +954,9 @@ class MenuBar(_ActionWidget):
     menus : iterable of dict, optional
         Menu definitions. A menu normally has a ``label`` and an ``items``
         sequence. Item dictionaries should include an ``id`` and ``label`` and
-        may include frontend options such as ``disabled`` or ``separator``.
+        may include frontend options such as ``icon``, ``disabled``, or
+        ``separator``. ``icon`` uses Font Awesome names without the ``fa-``
+        prefix, matching ipywidgets button icons.
     callbacks : dict[str, callable], optional
         Callback map keyed by menu item id. A callback receives the activated
         item id.
@@ -982,7 +985,9 @@ class CommandPalette(_ActionWidget):
     commands : iterable of dict, optional
         Command definitions. Each command should include an ``id`` and
         ``label``; optional keys such as ``category``, ``caption``, ``icon``,
-        or ``disabled`` are forwarded to the frontend.
+        or ``disabled`` are forwarded to the frontend. ``icon`` uses Font
+        Awesome names without the ``fa-`` prefix, matching ipywidgets button
+        icons.
     callbacks : dict[str, callable], optional
         Callback map keyed by command id. A callback receives the activated
         command id.

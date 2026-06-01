@@ -9,6 +9,17 @@ title: "Composition guide"
 composition API: keyed children, child lookup, dynamic mutation, and method
 forwarding.
 
+The goal is to make bigger widgets from existing widgets. A composed widget can
+combine anywidgets, ipywidgets controls, charts, tables, and outputs into one
+reusable object. Because that object is still an anywidget, it can be nested
+again inside tabs, split panes, dock panels, or another domain-specific
+component.
+
+This makes notebook interfaces easier to structure: child widgets are
+addressable by key, callbacks can mutate sibling widgets, and application state
+can live on a composed object such as `FigurePanel`, `SampleReview`, or
+`LabDashboard` instead of in notebook-global variables.
+
 ## Child widgets
 
 Every `LayoutWidget` accepts children either as a sequence or as a mapping. A
@@ -36,12 +47,12 @@ when a domain wrapper exposes a `.widget` view but also has methods that should
 be called from Python.
 
 ```python
-tabs = TabPanel({"price": price_chart})
+tabs = TabPanel({"trend": trend_panel})
 
-tabs.get_widget("price")      # rendered child, usually price_chart.widget
-tabs.get_owner("price")       # original wrapper object
-tabs["price"]                 # same as get_owner("price")
-tabs.call_owner("price", "fit")
+tabs.get_widget("trend")      # rendered child, usually trend_panel.widget
+tabs.get_owner("trend")       # original wrapper object
+tabs["trend"]                 # same as get_owner("trend")
+tabs.call_owner("trend", "refresh")
 ```
 
 ## Adding methods to composed widgets
@@ -54,24 +65,24 @@ another layout.
 from anylumino import Toolbar, VBox
 
 
-class ChartPanel(VBox):
-    def __init__(self, chart):
-        self.chart = chart
+class FigurePanel(VBox):
+    def __init__(self, figure):
+        self.figure = figure
         toolbar = Toolbar(
-            [{"id": "fit", "label": "Fit", "icon": "arrows-to-circle"}],
-            callbacks={"fit": lambda _id: self.fit()},
+            [{"id": "refresh", "label": "Refresh", "icon": "refresh"}],
+            callbacks={"refresh": lambda _id: self.refresh()},
         )
-        super().__init__({"toolbar": toolbar, "chart": chart.widget}, height=520)
+        super().__init__({"toolbar": toolbar, "figure": figure}, height=520)
 
-    def fit(self):
-        self.chart.fit()
+    def refresh(self):
+        update_figure(self.figure)
 
     def set_data(self, data):
-        self.chart.set(data)
+        self.figure.data = data
 
 
-tabs = TabPanel({"price": ChartPanel(chart)})
-tabs["price"].fit()
+tabs = TabPanel({"trend": FigurePanel(figure)})
+tabs["trend"].refresh()
 ```
 
 When a wrapper only adds Python behavior around an existing widget, it does not
@@ -79,20 +90,20 @@ need to subclass `anywidget.AnyWidget`. Expose the renderable child as `.widget`
 anylumino renders that view and keeps the wrapper as the keyed owner.
 
 ```python
-class ChartWrapper:
-    def __init__(self, chart):
-        self.chart = chart
-        self.widget = chart.widget
+class FigureWrapper:
+    def __init__(self, figure):
+        self.figure = figure
+        self.widget = figure
 
-    def fit(self):
-        self.chart.fit()
+    def refresh(self):
+        update_figure(self.figure)
 
 
-tabs = TabPanel({"price": ChartWrapper(chart)})
+tabs = TabPanel({"trend": FigureWrapper(figure)})
 
-tabs.get_widget("price")  # chart.widget
-tabs["price"].fit()       # wrapper.fit()
-tabs.call_owner("price", "fit")
+tabs.get_widget("trend")  # figure
+tabs["trend"].refresh()   # wrapper.refresh()
+tabs.call_owner("trend", "refresh")
 ```
 
 Use a `LayoutWidget` subclass when the wrapper is itself UI or layout. Use a
@@ -104,10 +115,10 @@ Children can be added, renamed, removed, and selected after the parent widget is
 already displayed:
 
 ```python
-tabs.add("chart-2", chart.widget, title="Chart 2", select=True)
-tabs.rename_widget("chart-2", "Recent sample")
-tabs.select_key("chart-2")
-removed = tabs.remove_widget("chart-2")
+tabs.add("figure-2", figure, title="Figure 2", select=True)
+tabs.rename_widget("figure-2", "Recent sample")
+tabs.select_key("figure-2")
+removed = tabs.remove_widget("figure-2")
 ```
 
 ## Scroll behavior
@@ -160,12 +171,18 @@ from anylumino import Toolbar
 
 toolbar = Toolbar(
     [
-        {"id": "fit", "label": "Fit"},
-        {"id": "marker", "label": "Marker"},
+        {"id": "refresh", "label": "Refresh", "icon": "refresh"},
+        {"id": "note", "label": "Note", "icon": "comment-o"},
     ],
     callbacks={
-        "fit": lambda _id: chart.fit(),
-        "marker": lambda _id: chart.marker(text="Event"),
+        "refresh": lambda _id: figure_panel.refresh(),
+        "note": lambda _id: figure_panel.add_note(text="Event"),
     },
 )
 ```
+
+Action widget icons use Font Awesome names without the `fa-` prefix, matching
+ipywidgets controls such as `Button(icon="check")`. In notebooks, prefer names
+that are available in the Jupyter icon font, for example `plus`, `refresh`,
+`comment-o`, `line-chart`, `step-forward`, `expand`, `adjust`, `check`, and
+`times`.
