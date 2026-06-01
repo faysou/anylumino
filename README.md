@@ -8,10 +8,10 @@ anywidgets as synced widget references, and the frontend resolves each child
 with `host.getWidget(...)` before mounting it into a Lumino layout widget.
 
 The main benefit is composition. `anylumino` lets a notebook author build
-larger reusable widgets from existing anywidgets, ipywidgets controls, charts,
-tables, and outputs. A composed widget can own its layout, state, callbacks, and
-domain methods while still being an anywidget that can be nested into another
-layout.
+larger reusable widgets from existing anywidgets, native anylumino controls,
+charts, tables, and outputs. A composed widget can own its layout, state,
+callbacks, and domain methods while still being an anywidget that can be nested
+into another layout.
 
 ## Widgets
 
@@ -44,10 +44,10 @@ The current prototype provides:
   `HBox`, `VBox`, `SplitPanel`, `DockPanel`, `AccordionPanel`,
   `StackedPanel`, `GridPanel`, and `ResponsivePanel`.
 - Action widgets: `Toolbar`, `MenuBar`, and `CommandPalette`.
-- Input controls re-exported from ipywidgets: `Button`, `TextInput`, `TextArea`,
-  `PasswordInput`, `Checkbox`, `Dropdown`, `ListBox`, `MultiSelect`,
-  `RadioButtons`, `ToggleButton`, `ToggleButtons`, sliders, numeric inputs,
-  progress bars, date/time pickers, color picker, file upload, media widgets,
+- Native controls: `Button`, `TextInput`, `TextArea`, `PasswordInput`,
+  `Checkbox`, `Dropdown`, `ListBox`, `MultiSelect`, `RadioButtons`,
+  `ToggleButton`, `ToggleButtons`, sliders, numeric inputs, progress bars,
+  date/time pickers, color picker, file upload metadata, media widgets,
   `Output`, `HTML`, `HTMLMath`, and `Label`.
 - `TextWidget`, a small helper used by tests and smoke notebooks.
 
@@ -103,14 +103,17 @@ tabs["trend"].refresh()
 
 `Toolbar`, `MenuBar`, and `CommandPalette` accept Python callbacks keyed by
 action id, so controls can mutate another widget such as a figure after display.
-Action widget icons use Font Awesome names without the `fa-` prefix, matching
-ipywidgets button icons. Use names such as `plus`, `refresh`, `comment-o`,
-`line-chart`, `step-forward`, `expand`, and `adjust`.
+Action widget icons render with Web Awesome's `wa-icon` element. Use Web
+Awesome icon names such as `plus`, `rotate`, `comment`, `chart-line`,
+`forward-step`, `expand`, and `circle-half-stroke`; set `icon_family`,
+`icon_variant`, or `icon_library` when an icon needs a non-default Web Awesome
+source.
 
-The input controls are ipywidgets classes exposed through anylumino. They reuse
-Jupyter's existing `@jupyter-widgets/controls` frontend and can be placed inside
-Lumino layouts like any other child widget. Ipywidgets controls with an `icon`
-argument use the same Font Awesome naming convention.
+The input controls are anywidget-native and render browser controls with a
+Web Awesome-inspired design language. They can be placed inside Lumino layouts
+like any other child widget and expose synced `value` traits plus normal
+traitlets observers. Controls with an `icon` argument use the same Web Awesome
+icon fields as action widgets.
 
 ## Development
 

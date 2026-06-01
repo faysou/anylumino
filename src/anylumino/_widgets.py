@@ -356,8 +356,9 @@ class TabPanel(LayoutWidget):
     Parameters
     ----------
     widgets : iterable or mapping, optional
-        Child anywidgets, ipywidgets, or owner objects exposing a ``widget``
-        attribute. When a mapping is passed, its keys become stable child keys.
+        Child anywidget-compatible widgets or owner objects exposing a
+        ``widget`` attribute. When a mapping is passed, its keys become stable
+        child keys.
     titles : iterable or mapping, optional
         Tab titles. A mapping is resolved by child key. When ``widgets`` is a
         mapping and titles are omitted, keys are used as titles.
@@ -437,8 +438,9 @@ class BoxPanel(LayoutWidget):
     Parameters
     ----------
     widgets : iterable or mapping, optional
-        Child anywidgets, ipywidgets, or owner objects exposing a ``widget``
-        attribute. Mapping keys become stable child keys and default titles.
+        Child anywidget-compatible widgets or owner objects exposing a
+        ``widget`` attribute. Mapping keys become stable child keys and default
+        titles.
     titles : iterable or mapping, optional
         Optional labels associated with children. Mapping values are looked up
         by child key.
@@ -924,8 +926,9 @@ class Toolbar(_ActionWidget):
     actions : iterable of dict, optional
         Action definitions. Each action should include an ``id`` and ``label``;
         optional keys such as ``icon``, ``tooltip``, ``disabled``, or
-        ``separator`` are forwarded to the frontend. ``icon`` uses Font Awesome
-        names without the ``fa-`` prefix, matching ipywidgets button icons.
+        ``separator`` are forwarded to the frontend. ``icon`` uses Web Awesome
+        names. ``icon_family``, ``icon_variant``, and ``icon_library`` can be
+        supplied for the same ``wa-icon`` options as native anylumino controls.
     callbacks : dict[str, callable], optional
         Callback map keyed by action id. A callback receives the activated
         action id.
@@ -955,8 +958,8 @@ class MenuBar(_ActionWidget):
         Menu definitions. A menu normally has a ``label`` and an ``items``
         sequence. Item dictionaries should include an ``id`` and ``label`` and
         may include frontend options such as ``icon``, ``disabled``, or
-        ``separator``. ``icon`` uses Font Awesome names without the ``fa-``
-        prefix, matching ipywidgets button icons.
+        ``separator``. ``icon`` uses Web Awesome names, with optional
+        ``icon_family``, ``icon_variant``, and ``icon_library`` metadata.
     callbacks : dict[str, callable], optional
         Callback map keyed by menu item id. A callback receives the activated
         item id.
@@ -985,9 +988,9 @@ class CommandPalette(_ActionWidget):
     commands : iterable of dict, optional
         Command definitions. Each command should include an ``id`` and
         ``label``; optional keys such as ``category``, ``caption``, ``icon``,
-        or ``disabled`` are forwarded to the frontend. ``icon`` uses Font
-        Awesome names without the ``fa-`` prefix, matching ipywidgets button
-        icons.
+        or ``disabled`` are forwarded to the frontend. ``icon`` uses Web
+        Awesome names, with optional ``icon_family``, ``icon_variant``, and
+        ``icon_library`` metadata.
     callbacks : dict[str, callable], optional
         Callback map keyed by command id. A callback receives the activated
         command id.

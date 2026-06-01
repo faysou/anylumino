@@ -7,8 +7,6 @@ RadioButtons(
     index=None,
     description='',
     disabled=False,
-    layout=None,
-    style=None,
 )
 ```
 
@@ -16,18 +14,16 @@ Radio-button selection control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                              | Default    |
-|-------------|----------|----------------------------------------------------------|------------|
+| Name        | Type     | Description                                    | Default    |
+|-------------|----------|------------------------------------------------|------------|
 | options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
 | value | optional | Initial value and synced Python value. | `None` |
 | index | optional | Selected option index. | `None` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [orientation](#anylumino.RadioButtons.orientation) | Vertical or horizontal. |
+| [control_kind](#anylumino.RadioButtons.control_kind) | A trait for unicode strings. |

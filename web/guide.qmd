@@ -10,7 +10,7 @@ composition API: keyed children, child lookup, dynamic mutation, and method
 forwarding.
 
 The goal is to make bigger widgets from existing widgets. A composed widget can
-combine anywidgets, ipywidgets controls, charts, tables, and outputs into one
+combine anywidgets, native anylumino controls, charts, tables, and outputs into one
 reusable object. Because that object is still an anywidget, it can be nested
 again inside tabs, split panes, dock panels, or another domain-specific
 component.
@@ -69,7 +69,7 @@ class FigurePanel(VBox):
     def __init__(self, figure):
         self.figure = figure
         toolbar = Toolbar(
-            [{"id": "refresh", "label": "Refresh", "icon": "refresh"}],
+            [{"id": "refresh", "label": "Refresh", "icon": "rotate"}],
             callbacks={"refresh": lambda _id: self.refresh()},
         )
         super().__init__({"toolbar": toolbar, "figure": figure}, height=520)
@@ -171,8 +171,8 @@ from anylumino import Toolbar
 
 toolbar = Toolbar(
     [
-        {"id": "refresh", "label": "Refresh", "icon": "refresh"},
-        {"id": "note", "label": "Note", "icon": "comment-o"},
+        {"id": "refresh", "label": "Refresh", "icon": "rotate"},
+        {"id": "note", "label": "Note", "icon": "comment", "icon_variant": "regular"},
     ],
     callbacks={
         "refresh": lambda _id: figure_panel.refresh(),
@@ -181,8 +181,8 @@ toolbar = Toolbar(
 )
 ```
 
-Action widget icons use Font Awesome names without the `fa-` prefix, matching
-ipywidgets controls such as `Button(icon="check")`. In notebooks, prefer names
-that are available in the Jupyter icon font, for example `plus`, `refresh`,
-`comment-o`, `line-chart`, `step-forward`, `expand`, `adjust`, `check`, and
-`times`.
+Action widget icons render through Web Awesome's `wa-icon` element, matching
+native anylumino controls such as `Button(icon="check")`. Use Web Awesome icon
+names and add `icon_family`, `icon_variant`, or `icon_library` for non-default
+icon sources. Common names include `plus`, `rotate`, `comment`, `chart-line`,
+`forward-step`, `expand`, `circle-half-stroke`, `check`, and `xmark`.

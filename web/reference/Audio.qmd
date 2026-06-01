@@ -2,9 +2,8 @@
 
 ```python
 Audio(
-    value=b'',
+    value='',
     format='mp3',
-    layout=None,
 )
 ```
 
@@ -14,15 +13,11 @@ Audio display widget.
 
 | Name   | Type     | Description                                              | Default    |
 |--------|----------|----------------------------------------------------------|------------|
-| value | optional | Initial value and synced Python value. | `b''` |
+| value | optional | Initial value and synced Python value. | `''` |
 | format | optional | Media format such as ``'png'``, ``'mp3'``, or ``'mp4'``. | `'mp3'` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [autoplay](#anylumino.Audio.autoplay) | When true, the audio starts when it's displayed |
-| [controls](#anylumino.Audio.controls) | Specifies that audio controls should be displayed (such as a play/pause button etc) |
-| [format](#anylumino.Audio.format) | The format of the audio. |
-| [loop](#anylumino.Audio.loop) | When true, the audio will start from the beginning after finishing |
+| [control_kind](#anylumino.Audio.control_kind) | A trait for unicode strings. |

@@ -7,9 +7,6 @@ FloatProgress(
     max=100.0,
     description='',
     bar_style='',
-    orientation='horizontal',
-    layout=None,
-    style=None,
 )
 ```
 
@@ -22,16 +19,11 @@ Float progress bar control.
 | value | optional | Initial value and synced Python value. | `0.0` |
 | min | optional | Minimum numeric, date, or time value. | `0.0` |
 | max | optional | Maximum numeric, date, or time value. | `100.0` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | bar_style | optional | Progress-bar style name such as ``'success'`` or ``'warning'``. | `''` |
-| orientation | optional | ``'horizontal'`` or ``'vertical'``. | `'horizontal'` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [bar_style](#anylumino.FloatProgress.bar_style) | Use a predefined styling for the progress bar. |
-| [orientation](#anylumino.FloatProgress.orientation) | Vertical or horizontal. |
-| [style](#anylumino.FloatProgress.style) | An instance trait which coerces a dict to an instance. |
+| [control_kind](#anylumino.FloatProgress.control_kind) | A trait for unicode strings. |

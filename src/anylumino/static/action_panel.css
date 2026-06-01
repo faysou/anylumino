@@ -46,6 +46,10 @@
 }
 
 .anylumino-ToolbarIcon {
+  display: inline-flex;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
   font-size: 14px;
   line-height: 1;
 }

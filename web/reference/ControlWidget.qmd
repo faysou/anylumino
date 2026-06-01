@@ -1,0 +1,68 @@
+# ControlWidget { #anylumino.ControlWidget }
+
+```python
+ControlWidget(**kwargs)
+```
+
+Base class for portable anylumino controls.
+
+Controls are anywidget-native and render browser controls styled with
+Web Awesome-inspired tokens and component structure. They do not use the
+classic Jupyter controls frontend.
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [accept](#anylumino.ControlWidget.accept) | A trait for unicode strings. |
+| [allow_duplicates](#anylumino.ControlWidget.allow_duplicates) | A boolean (True, False) trait. |
+| [allowed_tags](#anylumino.ControlWidget.allowed_tags) | A trait which allows any value. |
+| [autoplay](#anylumino.ControlWidget.autoplay) | A boolean (True, False) trait. |
+| [base](#anylumino.ControlWidget.base) | A float trait. |
+| [button_style](#anylumino.ControlWidget.button_style) | A trait for unicode strings. |
+| [concise](#anylumino.ControlWidget.concise) | A boolean (True, False) trait. |
+| [continuous_update](#anylumino.ControlWidget.continuous_update) | A boolean (True, False) trait. |
+| [control_kind](#anylumino.ControlWidget.control_kind) | A trait for unicode strings. |
+| [controls](#anylumino.ControlWidget.controls) | A boolean (True, False) trait. |
+| [description](#anylumino.ControlWidget.description) | A trait for unicode strings. |
+| [disabled](#anylumino.ControlWidget.disabled) | A boolean (True, False) trait. |
+| [ensure_option](#anylumino.ControlWidget.ensure_option) | A boolean (True, False) trait. |
+| [format](#anylumino.ControlWidget.format) | A trait for unicode strings. |
+| [height](#anylumino.ControlWidget.height) | A trait for unicode strings. |
+| [html](#anylumino.ControlWidget.html) | A boolean (True, False) trait. |
+| [icon](#anylumino.ControlWidget.icon) | A trait for unicode strings. |
+| [icon_family](#anylumino.ControlWidget.icon_family) | A trait for unicode strings. |
+| [icon_library](#anylumino.ControlWidget.icon_library) | A trait for unicode strings. |
+| [icon_variant](#anylumino.ControlWidget.icon_variant) | A trait for unicode strings. |
+| [icons](#anylumino.ControlWidget.icons) | A trait which allows any value. |
+| [indent](#anylumino.ControlWidget.indent) | A boolean (True, False) trait. |
+| [index](#anylumino.ControlWidget.index) | A trait which allows any value. |
+| [loop](#anylumino.ControlWidget.loop) | A boolean (True, False) trait. |
+| [max](#anylumino.ControlWidget.max) | A trait which allows any value. |
+| [min](#anylumino.ControlWidget.min) | A trait which allows any value. |
+| [multiple](#anylumino.ControlWidget.multiple) | A boolean (True, False) trait. |
+| [options](#anylumino.ControlWidget.options) | An instance of a Python tuple. |
+| [orientation](#anylumino.ControlWidget.orientation) | A trait for unicode strings. |
+| [placeholder](#anylumino.ControlWidget.placeholder) | A trait for unicode strings. |
+| [readout](#anylumino.ControlWidget.readout) | A boolean (True, False) trait. |
+| [readout_format](#anylumino.ControlWidget.readout_format) | A trait for unicode strings. |
+| [rows](#anylumino.ControlWidget.rows) | An int trait. |
+| [step](#anylumino.ControlWidget.step) | A trait which allows any value. |
+| [tooltip](#anylumino.ControlWidget.tooltip) | A trait for unicode strings. |
+| [tooltips](#anylumino.ControlWidget.tooltips) | A trait which allows any value. |
+| [value](#anylumino.ControlWidget.value) | A trait which allows any value. |
+| [width](#anylumino.ControlWidget.width) | A trait for unicode strings. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [on_click](#anylumino.ControlWidget.on_click) | Register or unregister a callback for button-like activations. |
+
+### on_click { #anylumino.ControlWidget.on_click }
+
+```python
+ControlWidget.on_click(callback, remove=False)
+```
+
+Register or unregister a callback for button-like activations.

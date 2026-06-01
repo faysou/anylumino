@@ -9,8 +9,7 @@ Combobox(
     ensure_option=False,
     disabled=False,
     continuous_update=True,
-    layout=None,
-    style=None,
+    **kwargs,
 )
 ```
 
@@ -18,21 +17,18 @@ Text input with dropdown suggestions.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name              | Type     | Description                                                           | Default    |
-|-------------------|----------|-----------------------------------------------------------------------|------------|
+| Name              | Type     | Description                                                           | Default   |
+|-------------------|----------|-----------------------------------------------------------------------|-----------|
 | value | optional | Initial value and synced Python value. | `''` |
-| options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | placeholder | optional | Text shown while the input is empty. | `''` |
-| ensure_option | optional | Whether combobox values must be present in ``options``. | `False` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
 | continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
+| options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
+| ensure_option | optional | Whether combobox values must be present in ``options``. | `False` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [ensure_option](#anylumino.Combobox.ensure_option) | If set, ensure value is in options. Implies continuous_update=False. |
-| [options](#anylumino.Combobox.options) | Dropdown options for the combobox |
+| [control_kind](#anylumino.Combobox.control_kind) | A trait for unicode strings. |

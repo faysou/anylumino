@@ -83,6 +83,7 @@ website:
       - reference/Label.qmd
       section: Date, color, file, and media controls
     - contents:
+      - reference/ControlWidget.qmd
       - reference/TextWidget.qmd
       section: Utility widgets
     id: reference

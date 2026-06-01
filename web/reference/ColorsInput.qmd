@@ -7,8 +7,6 @@ ColorsInput(
     allow_duplicates=False,
     description='',
     disabled=False,
-    layout=None,
-    style=None,
 )
 ```
 
@@ -16,18 +14,16 @@ List input for color tags.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name             | Type     | Description                                              | Default    |
-|------------------|----------|----------------------------------------------------------|------------|
+| Name             | Type     | Description                                   | Default    |
+|------------------|----------|-----------------------------------------------|------------|
 | value | optional | Initial value and synced Python value. | `()` |
 | allowed_tags | optional | Optional allowed values for tag-style inputs. | `None` |
 | allow_duplicates | optional | Whether duplicate entries are allowed. | `False` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [value](#anylumino.ColorsInput.value) | List of string tags |
+| [control_kind](#anylumino.ColorsInput.control_kind) | A trait for unicode strings. |

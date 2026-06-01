@@ -93,7 +93,7 @@ function createPanel(model, root, slots, onSplitSizesChanged) {
     const stretches = model.get("stretches") ?? [];
     slots.forEach((slot, index) => {
       panel.addWidget(slot);
-      BoxPanel.setStretch(slot, Number(stretches[index] ?? 1));
+      BoxPanel.setStretch(slot, Number(stretches[index] ?? 0));
     });
 
     if (kind === "responsive") {

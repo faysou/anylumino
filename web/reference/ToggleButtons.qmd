@@ -7,36 +7,36 @@ ToggleButtons(
     index=None,
     description='',
     disabled=False,
-    layout=None,
-    style=None,
     button_style='',
     tooltips=None,
     icons=None,
+    icon_family='classic',
+    icon_variant='solid',
+    icon_library='default',
+    **kwargs,
 )
 ```
 
-Toggle-button selection control.
+Segmented toggle-button selection control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type     | Description                                                     | Default    |
-|--------------|----------|-----------------------------------------------------------------|------------|
+| Name         | Type     | Description                                                                       | Default     |
+|--------------|----------|-----------------------------------------------------------------------------------|-------------|
 | options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
 | value | optional | Initial value and synced Python value. | `None` |
 | index | optional | Selected option index. | `None` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
-| button_style | optional | Predefined button style such as ``'primary'`` or ``'success'``. | `''` |
+| button_style | optional | Visual variant such as ``'primary'``, ``'success'``, or ``'danger'``. | `''` |
 | tooltips | optional | Per-option tooltips. | `None` |
-| icons | optional | Icon names for toggle-button options. | `None` |
+| icons | optional | Web Awesome icon names or per-option icon dictionaries for toggle-button options. | `None` |
+| icon_family | optional | Web Awesome icon family, for example ``'classic'``. | `'classic'` |
+| icon_variant | optional | Web Awesome icon variant, for example ``'solid'`` or ``'regular'``. | `'solid'` |
+| icon_library | optional | Web Awesome icon library, for example ``'default'``. | `'default'` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [button_style](#anylumino.ToggleButtons.button_style) | Use a predefined styling for the buttons. |
-| [icons](#anylumino.ToggleButtons.icons) | Icons names for each button (FontAwesome names without the fa- prefix). |
-| [style](#anylumino.ToggleButtons.style) | An instance trait which coerces a dict to an instance. |
-| [tooltips](#anylumino.ToggleButtons.tooltips) | Tooltips for each button. |
+| [control_kind](#anylumino.ToggleButtons.control_kind) | A trait for unicode strings. |

@@ -5,8 +5,6 @@ Valid(
     value=False,
     description='',
     readout='',
-    layout=None,
-    style=None,
 )
 ```
 
@@ -14,16 +12,15 @@ Boolean validity indicator control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                              | Default    |
-|-------------|----------|----------------------------------------------------------|------------|
+| Name        | Type     | Description                            | Default   |
+|-------------|----------|----------------------------------------|-----------|
 | value | optional | Initial value and synced Python value. | `False` |
-| description | optional | Label shown next to the control. | `''` |
-| readout | optional | Slider readout visibility or validity readout text. | `''` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
+| description | optional | Label shown above the control. | `''` |
+| readout | optional | Whether to show the current value. | `''` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [readout](#anylumino.Valid.readout) | Message displayed when the value is False |
+| [control_kind](#anylumino.Valid.control_kind) | A trait for unicode strings. |
+| [placeholder](#anylumino.Valid.placeholder) | A trait for unicode strings. |

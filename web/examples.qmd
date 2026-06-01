@@ -32,7 +32,7 @@ from anylumino import CommandPalette, MenuBar, SplitPanel, TabPanel, Toolbar, VB
 
 actions = [
     {"id": "new-figure", "label": "New figure", "icon": "plus"},
-    {"id": "refresh", "label": "Refresh", "icon": "refresh"},
+    {"id": "refresh", "label": "Refresh", "icon": "rotate"},
 ]
 
 callbacks = {
@@ -50,8 +50,9 @@ controls = VBox({"menu": menu, "toolbar": toolbar, "palette": palette})
 SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 ```
 
-Icons use Font Awesome names without the `fa-` prefix, the same convention used
-by ipywidgets controls.
+Icons render through Web Awesome's `wa-icon` element, the same convention used
+by native anylumino controls. Use `icon_family`, `icon_variant`, and
+`icon_library` when a command needs non-default Web Awesome icon metadata.
 
 ## Local notebooks
 
@@ -61,7 +62,7 @@ The repository includes Jupytext notebooks for smoke testing:
   figures.
 - `notebooks/plotly_dashboard.py` exercises all layout and action widgets with
   Plotly figure updates.
-- `notebooks/input_controls_hbox.py` shows ipywidgets controls inside
+- `notebooks/input_controls_hbox.py` shows native anylumino controls inside
   `ScrollBox`.
 - `notebooks/itables_tabs.py` places an `itables.widget.ITable` inside a tab,
   appends rows to a pandas DataFrame, and refreshes the displayed table with

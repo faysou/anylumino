@@ -55,7 +55,7 @@ quartodoc:
   css: reference/_styles-quartodoc.css
   sections:
     - title: "Layout widgets"
-      desc: "Lumino-backed containers for composing anywidget and ipywidgets children."
+      desc: "Lumino-backed containers for composing anywidget children."
       contents:
         - LayoutWidget
         - TabPanel
@@ -76,7 +76,7 @@ quartodoc:
         - MenuBar
         - CommandPalette
     - title: "Text input controls"
-      desc: "Text, password, tag, and structured-list inputs re-exported from ipywidgets."
+      desc: "Text, password, tag, and structured-list controls."
       contents:
         - TextInput
         - Text
@@ -90,7 +90,7 @@ quartodoc:
         - FloatsInput
         - IntsInput
     - title: "Selection controls"
-      desc: "Choice and multi-choice controls re-exported from ipywidgets."
+      desc: "Choice and multi-choice controls."
       contents:
         - Dropdown
         - RadioButtons
@@ -127,7 +127,7 @@ quartodoc:
         - FloatProgress
         - Play
     - title: "Date, color, file, and media controls"
-      desc: "Specialized ipywidgets inputs and display widgets."
+      desc: "Specialized input and display widgets."
       contents:
         - DatePicker
         - TimePicker
@@ -144,4 +144,5 @@ quartodoc:
     - title: "Utility widgets"
       desc: "Small helper widgets used by examples and tests."
       contents:
+        - ControlWidget
         - TextWidget

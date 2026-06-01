@@ -5,11 +5,12 @@ FileUpload(
     accept='',
     multiple=False,
     disabled=False,
-    description='',
+    description='Upload',
     icon='upload',
-    button_style='',
-    layout=None,
-    style=None,
+    icon_family='classic',
+    icon_variant='solid',
+    icon_library='default',
+    **kwargs,
 )
 ```
 
@@ -17,26 +18,19 @@ File upload control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type     | Description                                                     | Default    |
-|--------------|----------|-----------------------------------------------------------------|------------|
+| Name         | Type     | Description                                                         | Default     |
+|--------------|----------|---------------------------------------------------------------------|-------------|
 | accept | optional | Accepted file extensions or MIME types. | `''` |
-| multiple | optional | Whether multiple files can be uploaded. | `False` |
+| multiple | optional | Whether multiple files can be selected. | `False` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| description | optional | Label shown next to the control. | `''` |
-| icon | optional | Font Awesome icon name without the ``fa-`` prefix. | `'upload'` |
-| button_style | optional | Predefined button style such as ``'primary'`` or ``'success'``. | `''` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
+| description | optional | Label shown above the control. | `'Upload'` |
+| icon | optional | Web Awesome icon name. | `'upload'` |
+| icon_family | optional | Web Awesome icon family, for example ``'classic'``. | `'classic'` |
+| icon_variant | optional | Web Awesome icon variant, for example ``'solid'`` or ``'regular'``. | `'solid'` |
+| icon_library | optional | Web Awesome icon library, for example ``'default'``. | `'default'` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [accept](#anylumino.FileUpload.accept) | File types to accept, empty string for all |
-| [button_style](#anylumino.FileUpload.button_style) | Use a predefined styling for the button. |
-| [disabled](#anylumino.FileUpload.disabled) | Enable or disable button |
-| [error](#anylumino.FileUpload.error) | Error message |
-| [icon](#anylumino.FileUpload.icon) | Font-awesome icon name, without the 'fa-' prefix. |
-| [multiple](#anylumino.FileUpload.multiple) | If True, allow for multiple files upload |
-| [style](#anylumino.FileUpload.style) | An instance trait which coerces a dict to an instance. |
-| [value](#anylumino.FileUpload.value) | The file upload value |
+| [control_kind](#anylumino.FileUpload.control_kind) | A trait for unicode strings. |

@@ -7,10 +7,9 @@ SelectionSlider(
     index=None,
     description='',
     disabled=False,
-    layout=None,
-    style=None,
     orientation='horizontal',
     readout=True,
+    **kwargs,
 )
 ```
 
@@ -18,24 +17,18 @@ Slider selection control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                              | Default    |
-|-------------|----------|----------------------------------------------------------|------------|
+| Name        | Type     | Description                                    | Default        |
+|-------------|----------|------------------------------------------------|----------------|
 | options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
 | value | optional | Initial value and synced Python value. | `None` |
 | index | optional | Selected option index. | `None` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
 | orientation | optional | ``'horizontal'`` or ``'vertical'``. | `'horizontal'` |
-| readout | optional | Slider readout visibility or validity readout text. | `True` |
+| readout | optional | Whether to show the current value. | `True` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [behavior](#anylumino.SelectionSlider.behavior) | Slider dragging behavior. |
-| [continuous_update](#anylumino.SelectionSlider.continuous_update) | Update the value of the widget as the user is holding the slider. |
-| [orientation](#anylumino.SelectionSlider.orientation) | Vertical or horizontal. |
-| [readout](#anylumino.SelectionSlider.readout) | Display the current selected label next to the slider |
-| [style](#anylumino.SelectionSlider.style) | An instance trait which coerces a dict to an instance. |
+| [control_kind](#anylumino.SelectionSlider.control_kind) | A trait for unicode strings. |

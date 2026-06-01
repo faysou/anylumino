@@ -8,8 +8,10 @@ ToggleButton(
     disabled=False,
     button_style='',
     tooltip='',
-    layout=None,
-    style=None,
+    icon_family='classic',
+    icon_variant='solid',
+    icon_library='default',
+    **kwargs,
 )
 ```
 
@@ -17,21 +19,21 @@ Boolean toggle-button control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type     | Description                                                     | Default    |
-|--------------|----------|-----------------------------------------------------------------|------------|
+| Name         | Type     | Description                                                           | Default     |
+|--------------|----------|-----------------------------------------------------------------------|-------------|
 | value | optional | Initial value and synced Python value. | `False` |
-| description | optional | Label shown next to the control. | `''` |
-| icon | optional | Font Awesome icon name without the ``fa-`` prefix. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| button_style | optional | Predefined button style such as ``'primary'`` or ``'success'``. | `''` |
+| indent | optional | Whether checkbox labels are indented. | `True` |
+| icon | optional | Web Awesome icon name. | `''` |
+| button_style | optional | Visual variant such as ``'primary'``, ``'success'``, or ``'danger'``. | `''` |
 | tooltip | optional | Hover text. | `''` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
+| icon_family | optional | Web Awesome icon family, for example ``'classic'``. | `'classic'` |
+| icon_variant | optional | Web Awesome icon variant, for example ``'solid'`` or ``'regular'``. | `'solid'` |
+| icon_library | optional | Web Awesome icon library, for example ``'default'``. | `'default'` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [button_style](#anylumino.ToggleButton.button_style) | Use a predefined styling for the button. |
-| [icon](#anylumino.ToggleButton.icon) | Font-awesome icon. |
-| [style](#anylumino.ToggleButton.style) | Styling customizations |
+| [control_kind](#anylumino.ToggleButton.control_kind) | A trait for unicode strings. |

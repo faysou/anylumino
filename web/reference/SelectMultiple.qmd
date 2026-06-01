@@ -3,13 +3,11 @@
 ```python
 SelectMultiple(
     options=(),
-    value=None,
-    index=None,
+    value=(),
+    rows=5,
     description='',
     disabled=False,
-    layout=None,
-    style=None,
-    rows=None,
+    **kwargs,
 )
 ```
 
@@ -17,19 +15,17 @@ List-box multi-selection control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                              | Default    |
-|-------------|----------|----------------------------------------------------------|------------|
+| Name        | Type     | Description                                    | Default    |
+|-------------|----------|------------------------------------------------|------------|
 | options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
 | value | optional | Initial value and synced Python value. | `None` |
 | index | optional | Selected option index. | `None` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
-| rows | optional | Visible row count. | `None` |
+| rows | optional | Visible row count. | `5` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [rows](#anylumino.SelectMultiple.rows) | The number of rows to display. |
+| [control_kind](#anylumino.SelectMultiple.control_kind) | A trait for unicode strings. |

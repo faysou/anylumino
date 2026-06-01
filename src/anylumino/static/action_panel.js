@@ -6,6 +6,7 @@ import {
   Widget,
 } from "https://esm.sh/@lumino/widgets@2.8.0?bundle";
 import { CommandRegistry } from "https://esm.sh/@lumino/commands@2.3.3?bundle";
+import "https://esm.sh/@awesome.me/webawesome@3.7.0/dist/components/icon/icon.js?bundle";
 
 function cssSize(value, fallback) {
   if (typeof value === "string" && value.trim()) {
@@ -30,21 +31,35 @@ function actionLabel(action) {
   return String(action?.label ?? action?.id ?? "");
 }
 
-function iconClass(name) {
-  const iconName = String(name ?? "").trim();
-  if (!/^[a-z0-9-]+$/i.test(iconName)) {
-    return null;
-  }
-  return `fa fa-${iconName}`;
+function actionIconClass(action) {
+  const id = actionId(action).replace(/[^a-zA-Z0-9_-]/g, "_");
+  return iconSpec(action) ? `anylumino-CommandIcon-${id}` : "";
 }
 
-function createIcon(name) {
-  const className = iconClass(name);
-  if (!className) {
+function iconSpec(action) {
+  const name = String(action?.icon ?? "").trim();
+  if (!name) {
     return null;
   }
-  const icon = document.createElement("i");
-  icon.className = `${className} anylumino-ToolbarIcon`;
+  return {
+    name,
+    family: String(action?.icon_family ?? "classic"),
+    variant: String(action?.icon_variant ?? "solid"),
+    library: String(action?.icon_library ?? "default"),
+  };
+}
+
+function createIcon(action) {
+  const spec = iconSpec(action);
+  if (!spec) {
+    return null;
+  }
+  const icon = document.createElement("wa-icon");
+  icon.className = "anylumino-ToolbarIcon";
+  icon.name = spec.name;
+  icon.family = spec.family;
+  icon.variant = spec.variant;
+  icon.library = spec.library;
   icon.setAttribute("aria-hidden", "true");
   return icon;
 }
@@ -70,11 +85,42 @@ function addCommands(commands, actions, activate) {
     commands.addCommand(id, {
       label: actionLabel(action),
       caption: String(action?.caption ?? actionLabel(action)),
-      iconClass: iconClass(action?.icon) ?? "",
+      iconClass: actionIconClass(action),
       isEnabled: () => !action.disabled,
       execute: () => activate(id),
     });
   }
+}
+
+function decorateCommandIcons(actions) {
+  const iconActions = flattenActions(actions).filter((action) => iconSpec(action));
+  if (iconActions.length === 0) {
+    return null;
+  }
+
+  const decorate = () => {
+    for (const action of iconActions) {
+      const className = actionIconClass(action);
+      if (!className) {
+        continue;
+      }
+      document.querySelectorAll(`.${className}`).forEach((node) => {
+        if (node.dataset.anyluminoIcon === "true") {
+          return;
+        }
+        const icon = createIcon(action);
+        if (icon) {
+          node.replaceChildren(icon);
+          node.dataset.anyluminoIcon = "true";
+        }
+      });
+    }
+  };
+
+  const observer = new MutationObserver(decorate);
+  observer.observe(document.body, { childList: true, subtree: true });
+  decorate();
+  return observer;
 }
 
 function createToolbar(model, activate) {
@@ -90,7 +136,7 @@ function createToolbar(model, activate) {
     button.title = String(action.tooltip ?? action.caption ?? actionLabel(action));
     button.setAttribute("aria-label", actionLabel(action));
 
-    const icon = action.icon ? createIcon(String(action.icon)) : null;
+    const icon = createIcon(action);
     if (icon) {
       button.classList.add("anylumino-ToolbarButtonIconOnly");
       button.appendChild(icon);
@@ -157,6 +203,7 @@ export default {
     el.replaceChildren(root);
 
     let panel = null;
+    let iconObserver = null;
 
     const activate = (id) => {
       model.send({ type: "activate", id });
@@ -166,6 +213,8 @@ export default {
       if (panel) {
         panel.dispose();
       }
+      iconObserver?.disconnect();
+      iconObserver = null;
       panel = null;
       root.replaceChildren();
     };
@@ -181,6 +230,7 @@ export default {
         panel = createToolbar(model, activate);
       }
       Widget.attach(panel, root);
+      iconObserver = decorateCommandIcons(model.get("actions") ?? []);
     };
 
     const syncSize = () => {

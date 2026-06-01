@@ -41,6 +41,7 @@ from anylumino import (
     IntSlider,
     MenuBar,
     ResponsivePanel,
+    ScrollBox,
     SplitPanel,
     StackedPanel,
     TabPanel,
@@ -97,11 +98,14 @@ figures: dict[str, go.FigureWidget] = {}
 figure_count = 0
 sample_offset = 0
 theme_name = "light"
+active_figure_key = "figure-1"
 
 
 def active_figure() -> go.FigureWidget:
     key = figure_tabs.selected_key
-    if key is None:
+    if key not in figures:
+        key = active_figure_key
+    if key not in figures:
         raise RuntimeError("No active figure tab")
     return figures[key]
 
@@ -116,11 +120,27 @@ def template_for_theme(theme: str) -> str:
 
 
 def style_figure(figure: go.FigureWidget, theme: str) -> None:
+    if theme == "dark":
+        paper_bgcolor = "#111827"
+        plot_bgcolor = "#172033"
+        font_color = "#f8fafc"
+        grid_color = "#334155"
+    else:
+        paper_bgcolor = "#ffffff"
+        plot_bgcolor = "#ffffff"
+        font_color = "#172033"
+        grid_color = "#d8dee9"
+
     figure.update_layout(
         template=template_for_theme(theme),
+        paper_bgcolor=paper_bgcolor,
+        plot_bgcolor=plot_bgcolor,
+        font={"color": font_color},
         margin={"l": 48, "r": 24, "t": 54, "b": 42},
         legend={"orientation": "h", "y": 1.08},
     )
+    figure.update_xaxes(gridcolor=grid_color, zerolinecolor=grid_color)
+    figure.update_yaxes(gridcolor=grid_color, zerolinecolor=grid_color)
 
 
 def frame_slice(rows: int, metric: str) -> pd.DataFrame:
@@ -152,6 +172,7 @@ def refresh_figure(figure: go.FigureWidget, rows: int, metric: str) -> None:
 
 
 def add_figure_tab(_action_id: str = "new_figure") -> None:
+    global active_figure_key
     global figure_count
 
     figure_count += 1
@@ -161,13 +182,16 @@ def add_figure_tab(_action_id: str = "new_figure") -> None:
     figure = create_figure(title, rows=rows, metric=str(metric_input.value))
     figures[key] = figure
     figure_tabs.add_tab(figure, title, key=key, select=True)
+    active_figure_key = key
     metric_rows.text = f"Samples: {rows}"
     log(f"Created {title}")
 
 
 def apply_inputs(_button: Button | None = None) -> None:
+    global active_figure_key
     global theme_name
 
+    active_figure_key = figure_tabs.selected_key or active_figure_key
     figure = active_figure()
     rows = int(samples_input.value)
     metric = str(metric_input.value)
@@ -181,6 +205,7 @@ def apply_inputs(_button: Button | None = None) -> None:
 
 
 def add_note(_action_id: str = "note") -> None:
+    sync_active_figure_key()
     figure = active_figure()
     y_value = float(figure.data[0].y[-1])
     x_value = int(figure.data[0].x[-1])
@@ -189,6 +214,7 @@ def add_note(_action_id: str = "note") -> None:
 
 
 def add_average(_action_id: str = "average") -> None:
+    sync_active_figure_key()
     figure = active_figure()
     values = list(map(float, figure.data[0].y))
     window = 12
@@ -201,6 +227,7 @@ def add_average(_action_id: str = "average") -> None:
 
 
 def focus_figure(_action_id: str = "focus") -> None:
+    sync_active_figure_key()
     figure = active_figure()
     figure.update_xaxes(autorange=True)
     figure.update_yaxes(autorange=True)
@@ -208,8 +235,10 @@ def focus_figure(_action_id: str = "focus") -> None:
 
 
 def append_sample(_action_id: str = "append") -> None:
+    global active_figure_key
     global sample_offset
 
+    active_figure_key = figure_tabs.selected_key or active_figure_key
     figure = active_figure()
     sample_offset += 1
     next_x = int(figure.data[0].x[-1]) + 1
@@ -228,6 +257,14 @@ def toggle_theme(_action_id: str = "theme") -> None:
         style_figure(figure, theme_name)
     theme_input.value = theme_name
     log(f"Switched to {theme_name} theme")
+
+
+def sync_active_figure_key(_change: object | None = None) -> None:
+    global active_figure_key
+
+    key = figure_tabs.selected_key
+    if key in figures:
+        active_figure_key = key
 
 
 def show_help(_action_id: str = "help") -> None:
@@ -251,17 +288,18 @@ figure_tabs = TabPanel(
     width="100%",
     height="100%",
 )
+figure_tabs.observe(sync_active_figure_key, names="selected_index")
 
 
 # %%
 toolbar = Toolbar(
     [
         {"id": "new_figure", "label": "New figure", "icon": "plus"},
-        {"id": "note", "label": "Note", "icon": "comment-o"},
-        {"id": "average", "label": "Average", "icon": "line-chart"},
-        {"id": "append", "label": "Append", "icon": "step-forward"},
+        {"id": "note", "label": "Note", "icon": "comment", "icon_variant": "regular"},
+        {"id": "average", "label": "Average", "icon": "chart-line"},
+        {"id": "append", "label": "Append", "icon": "forward-step"},
         {"id": "focus", "label": "Focus", "icon": "expand"},
-        {"id": "theme", "label": "Theme", "icon": "adjust"},
+        {"id": "theme", "label": "Theme", "icon": "circle-half-stroke"},
     ],
     callbacks={
         "new_figure": add_figure_tab,
@@ -285,17 +323,17 @@ menu = MenuBar(
         {
             "label": "Actions",
             "items": [
-                {"id": "note", "label": "Add note", "icon": "comment-o"},
-                {"id": "average", "label": "Add rolling average", "icon": "line-chart"},
-                {"id": "append", "label": "Append sample", "icon": "step-forward"},
-                {"id": "theme", "label": "Toggle theme", "icon": "adjust"},
+                {"id": "note", "label": "Add note", "icon": "comment", "icon_variant": "regular"},
+                {"id": "average", "label": "Add rolling average", "icon": "chart-line"},
+                {"id": "append", "label": "Append sample", "icon": "forward-step"},
+                {"id": "theme", "label": "Toggle theme", "icon": "circle-half-stroke"},
             ],
         },
         {
             "label": "Panels",
             "items": [
-                {"id": "status", "label": "Show status", "icon": "info-circle"},
-                {"id": "help", "label": "Show help", "icon": "question-circle"},
+                {"id": "status", "label": "Show status", "icon": "circle-info"},
+                {"id": "help", "label": "Show help", "icon": "circle-question", "icon_variant": "regular"},
             ],
         },
     ],
@@ -314,13 +352,19 @@ menu = MenuBar(
 commands = CommandPalette(
     [
         {"id": "new_figure", "label": "New figure tab", "category": "Data", "icon": "plus"},
-        {"id": "note", "label": "Add note", "category": "Data", "icon": "comment-o"},
-        {"id": "average", "label": "Add rolling average", "category": "Data", "icon": "line-chart"},
-        {"id": "append", "label": "Append sample", "category": "Data", "icon": "step-forward"},
+        {"id": "note", "label": "Add note", "category": "Data", "icon": "comment", "icon_variant": "regular"},
+        {"id": "average", "label": "Add rolling average", "category": "Data", "icon": "chart-line"},
+        {"id": "append", "label": "Append sample", "category": "Data", "icon": "forward-step"},
         {"id": "focus", "label": "Focus active figure", "category": "View", "icon": "expand"},
-        {"id": "theme", "label": "Toggle theme", "category": "View", "icon": "adjust"},
-        {"id": "status", "label": "Show status", "category": "Panels", "icon": "info-circle"},
-        {"id": "help", "label": "Show help", "category": "Panels", "icon": "question-circle"},
+        {"id": "theme", "label": "Toggle theme", "category": "View", "icon": "circle-half-stroke"},
+        {"id": "status", "label": "Show status", "category": "Panels", "icon": "circle-info"},
+        {
+            "id": "help",
+            "label": "Show help",
+            "category": "Panels",
+            "icon": "circle-question",
+            "icon_variant": "regular",
+        },
     ],
     callbacks={
         "new_figure": add_figure_tab,
@@ -350,7 +394,7 @@ metrics = GridPanel(
     gap=8,
     height=160,
 )
-input_controls = VBox(
+input_controls = ScrollBox(
     {
         "dataset": dataset_input,
         "samples": samples_input,
@@ -359,8 +403,9 @@ input_controls = VBox(
         "auto-focus": auto_focus_input,
         "apply": apply_inputs_button,
     },
-    spacing=6,
-    height=230,
+    spacing=10,
+    height=340,
+    child_min_height=58,
 )
 side_accordion = AccordionPanel(
     {"status": side_stack, "metrics": metrics, "inputs": input_controls},
@@ -384,8 +429,8 @@ main = SplitPanel(
     titles={"figures": "Figures", "controls": "Controls"},
     orientation="horizontal",
     spacing=8,
-    sizes=[0.76, 0.24],
-    height=560,
+    sizes=[0.70, 0.30],
+    height=640,
 )
 layout_lab = VBox(
     {
@@ -423,7 +468,8 @@ dashboard = VBox(
             sizes=[0.68, 0.32],
         )
     },
-    height=920,
+    stretches=[1],
+    height=1040,
 )
 
 dashboard

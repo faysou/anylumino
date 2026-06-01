@@ -5,8 +5,6 @@ DatePicker(
     value=None,
     description='',
     disabled=False,
-    layout=None,
-    style=None,
 )
 ```
 
@@ -14,20 +12,8 @@ Date picker control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                              | Default    |
-|-------------|----------|----------------------------------------------------------|------------|
+| Name        | Type     | Description                            | Default   |
+|-------------|----------|----------------------------------------|-----------|
 | value | optional | Initial value and synced Python value. | `None` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
-
-## Attributes
-
-| Name | Description |
-| --- | --- |
-| [disabled](#anylumino.DatePicker.disabled) | Enable or disable user changes. |
-| [max](#anylumino.DatePicker.max) | A trait type holding a Python date object |
-| [min](#anylumino.DatePicker.min) | A trait type holding a Python date object |
-| [step](#anylumino.DatePicker.step) | The date step to use for the picker, in days, or "any". |
-| [value](#anylumino.DatePicker.value) | A trait type holding a Python date object |

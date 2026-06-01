@@ -2,11 +2,10 @@
 
 ```python
 Video(
-    value=b'',
+    value='',
     format='mp4',
     width='',
     height='',
-    layout=None,
 )
 ```
 
@@ -16,19 +15,13 @@ Video display widget.
 
 | Name   | Type     | Description                                              | Default    |
 |--------|----------|----------------------------------------------------------|------------|
-| value | optional | Initial value and synced Python value. | `b''` |
+| value | optional | Initial value and synced Python value. | `''` |
 | format | optional | Media format such as ``'png'``, ``'mp3'``, or ``'mp4'``. | `'mp4'` |
 | width | optional | CSS width for media widgets. | `''` |
 | height | optional | CSS height for media widgets. | `''` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [autoplay](#anylumino.Video.autoplay) | When true, the video starts when it's displayed |
-| [controls](#anylumino.Video.controls) | Specifies that video controls should be displayed (such as a play/pause button etc) |
-| [format](#anylumino.Video.format) | The format of the video. |
-| [height](#anylumino.Video.height) | Height of the video in pixels. |
-| [loop](#anylumino.Video.loop) | When true, the video will start from the beginning after finishing |
-| [width](#anylumino.Video.width) | Width of the video in pixels. |
+| [control_kind](#anylumino.Video.control_kind) | A trait for unicode strings. |

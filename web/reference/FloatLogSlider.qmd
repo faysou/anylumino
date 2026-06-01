@@ -7,14 +7,8 @@ FloatLogSlider(
     min=0.0,
     max=4.0,
     step=0.1,
-    description='',
-    disabled=False,
-    continuous_update=True,
-    orientation='horizontal',
-    readout=True,
     readout_format='.3g',
-    layout=None,
-    style=None,
+    **kwargs,
 )
 ```
 
@@ -29,25 +23,15 @@ Logarithmic float slider control.
 | min | optional | Minimum numeric, date, or time value. | `0.0` |
 | max | optional | Maximum numeric, date, or time value. | `4.0` |
 | step | optional | Increment size. | `0.1` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
 | continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
 | orientation | optional | ``'horizontal'`` or ``'vertical'``. | `'horizontal'` |
-| readout | optional | Slider readout visibility or validity readout text. | `True` |
+| readout | optional | Whether to show the current value. | `True` |
 | readout_format | optional | Format string used for slider readouts. | `'.3g'` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [base](#anylumino.FloatLogSlider.base) | Base for the logarithm |
-| [behavior](#anylumino.FloatLogSlider.behavior) | Slider dragging behavior. |
-| [continuous_update](#anylumino.FloatLogSlider.continuous_update) | Update the value of the widget as the user is holding the slider. |
-| [disabled](#anylumino.FloatLogSlider.disabled) | Enable or disable user changes |
-| [orientation](#anylumino.FloatLogSlider.orientation) | Vertical or horizontal. |
-| [readout](#anylumino.FloatLogSlider.readout) | Display the current value of the slider next to it. |
-| [readout_format](#anylumino.FloatLogSlider.readout_format) | Format for the readout |
-| [step](#anylumino.FloatLogSlider.step) | Minimum step in the exponent to increment the value |
-| [style](#anylumino.FloatLogSlider.style) | An instance trait which coerces a dict to an instance. |
+| [control_kind](#anylumino.FloatLogSlider.control_kind) | A trait for unicode strings. |

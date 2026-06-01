@@ -7,8 +7,6 @@ FloatsInput(
     allow_duplicates=False,
     description='',
     disabled=False,
-    layout=None,
-    style=None,
 )
 ```
 
@@ -16,19 +14,16 @@ List input for float values.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name             | Type     | Description                                              | Default    |
-|------------------|----------|----------------------------------------------------------|------------|
+| Name             | Type     | Description                                   | Default    |
+|------------------|----------|-----------------------------------------------|------------|
 | value | optional | Initial value and synced Python value. | `()` |
 | allowed_tags | optional | Optional allowed values for tag-style inputs. | `None` |
 | allow_duplicates | optional | Whether duplicate entries are allowed. | `False` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [format](#anylumino.FloatsInput.format) | A string holding a number format specifier, e.g. '.3f' |
-| [value](#anylumino.FloatsInput.value) | List of float tags |
+| [control_kind](#anylumino.FloatsInput.control_kind) | A trait for unicode strings. |

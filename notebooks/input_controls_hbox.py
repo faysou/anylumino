@@ -16,8 +16,8 @@
 # %% [markdown]
 # # anylumino input controls ScrollBox
 #
-# This notebook shows the ipywidgets input controls exported by `anylumino`
-# inside one scrollable Lumino `VBox`.
+# This notebook shows native anylumino input controls inside one scrollable
+# Lumino `VBox`.
 
 # %%
 from __future__ import annotations
@@ -150,13 +150,15 @@ controls["apply"].on_click(lambda _button: update_status("apply", "clicked"))
 
 controls_vbox = ScrollBox(
     controls,
-    spacing=6,
-    stretches=[1] * len(controls),
+    spacing=10,
     width="100%",
-    height=640,
+    height=900,
+    child_min_height=72,
 )
 
 controls_vbox
 
 # %%
 status
+
+# %%

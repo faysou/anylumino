@@ -3,36 +3,30 @@
 ```python
 DatetimePicker(
     value=None,
-    min=None,
-    max=None,
-    step=60,
     description='',
     disabled=False,
-    layout=None,
-    style=None,
 )
 ```
 
 Datetime picker control.
 
+The frontend renders separate date and time inputs. The time input uses the
+same anylumino hour/minute popup as `TimePicker`, so users can pick any minute
+value instead of being limited to fixed 15-minute increments.
+
+Python `datetime.datetime` values are accepted and serialized with
+`isoformat()` before syncing to the frontend.
+
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                              | Default    |
-|-------------|----------|----------------------------------------------------------|------------|
-| value | optional | Initial value and synced Python value. | `None` |
-| min | optional | Minimum numeric, date, or time value. | `None` |
-| max | optional | Maximum numeric, date, or time value. | `None` |
-| step | optional | Increment size. | `60` |
-| description | optional | Label shown next to the control. | `''` |
+| Name        | Type     | Description                            | Default    |
+|-------------|----------|----------------------------------------|------------|
+| value | `datetime.datetime`, `str`, or `None` | Initial value and synced Python value. Strings should use an ISO datetime value compatible with browser date and time inputs. | `None` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [disabled](#anylumino.DatetimePicker.disabled) | Enable or disable user changes. |
-| [max](#anylumino.DatetimePicker.max) | A trait type holding a Python datetime object |
-| [min](#anylumino.DatetimePicker.min) | A trait type holding a Python datetime object |
-| [value](#anylumino.DatetimePicker.value) | A trait type holding a Python datetime object |
+| [control_kind](#anylumino.DatetimePicker.control_kind) | A trait for unicode strings. |

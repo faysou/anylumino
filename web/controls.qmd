@@ -2,8 +2,9 @@
 title: "Input controls"
 ---
 
-`anylumino` does not recreate input controls. It re-exports ipywidgets classes
-and lets Jupyter render them with the existing controls frontend.
+`anylumino` provides portable anywidget-native input controls. They render
+browser controls with a Web Awesome-inspired design language and can be nested
+inside any Lumino layout widget.
 
 ## Common controls
 
@@ -33,7 +34,7 @@ controls = ScrollBox(
 
 ## Control families
 
-These controls are re-exported from `ipywidgets` and can be composed inside
+These controls are native anylumino anywidgets and can be composed inside
 anylumino layouts:
 
 | Family | Controls |
@@ -50,21 +51,19 @@ anylumino layouts:
 | Playback | `Play` |
 
 The generated [API reference](reference/index.qmd) includes one page per
-control, with constructor signatures and argument details extracted from
-ipywidgets.
+control, with constructor signatures and argument details from anylumino's
+native control classes.
 
 ## Common arguments
 
-Most input controls accept normal ipywidgets keyword arguments. These are the
-ones used most often in anylumino layouts:
+Most controls accept a small application-oriented set of keyword arguments.
+These are the ones used most often in anylumino layouts:
 
 | Argument | Applies to | Purpose |
 |---|---|---|
 | `value` | Most controls | Initial value and synced Python value. |
-| `description` | Most form controls | Label shown next to the control. |
+| `description` | Most form controls | Label shown above the control. |
 | `disabled` | Most interactive controls | Prevent user edits while keeping the widget visible. |
-| `layout` | All ipywidgets controls | ipywidgets `Layout` object for CSS sizing and spacing. |
-| `style` | Many controls | ipywidgets style object or style dictionary. |
 | `continuous_update` | Text inputs and sliders | Whether Python receives updates while the user is typing or dragging. |
 | `placeholder` | `TextInput`, `TextArea`, `PasswordInput`, `Combobox` | Empty-state text inside the input. |
 | `options` | Selection controls | Choices for dropdowns, list boxes, radio buttons, and selection sliders. |
@@ -73,13 +72,28 @@ ones used most often in anylumino layouts:
 | `readout`, `readout_format` | Sliders | Whether and how to show the current numeric value. |
 | `orientation` | Sliders, progress bars, selection sliders | Horizontal or vertical display. |
 | `rows` | `TextArea`, `ListBox`, `MultiSelect` | Visible row count. |
-| `button_style`, `icon`, `tooltip` | Buttons and toggle buttons | Button appearance and hover text. |
+| `button_style`, `icon`, `icon_family`, `icon_variant`, `icon_library`, `tooltip` | Buttons and toggle buttons | Button appearance, Web Awesome icon metadata, and hover text. |
 | `accept`, `multiple` | `FileUpload` | Accepted file types and whether multiple files are allowed. |
 
-Icons on ipywidgets controls use Font Awesome names without the `fa-` prefix,
-for example `check`, `plus`, `refresh`, `upload`, or `times`. Anylumino action
-widgets use the same naming convention so toolbar examples can share icon names
-with `Button` and `ToggleButton`.
+Icons on anylumino controls render through Web Awesome's `wa-icon` element.
+Use Web Awesome icon names such as `check`, `plus`, `rotate`, `upload`, or
+`xmark`. The defaults are `icon_family="classic"`, `icon_variant="solid"`, and
+`icon_library="default"`. Anylumino action widgets accept the same icon fields,
+so toolbar examples can share icon declarations with `Button` and
+`ToggleButton`.
+
+## Date and time controls
+
+`DatePicker`, `TimePicker`, and `DatetimePicker` accept Python date/time
+objects as well as compatible strings. Python values are serialized with
+`isoformat()` before they are synced to the browser.
+
+`TimePicker` renders a compact time input plus an anylumino popup with separate
+hour and minute columns. The minute column contains all 60 minute values, so it
+is suitable for notebook workflows that need exact time selection.
+
+`DatetimePicker` renders a date input followed by the same time picker used by
+`TimePicker`, keeping date and time edits visible in one control.
 
 Examples:
 
@@ -88,13 +102,15 @@ TextInput(value="Greenhouse A", description="Dataset", placeholder="Name")
 IntSlider(value=120, min=25, max=250, step=5, description="Samples")
 Dropdown(options=["Temperature", "Humidity", "CO2"], value="Temperature")
 Button(description="Apply", icon="check", button_style="primary")
+TimePicker(value=time(9, 37), description="Start time")
+DatetimePicker(value=datetime(2026, 5, 31, 9, 37), description="Scheduled")
 ```
 
 ## Aliases
 
 These aliases are provided for application-style naming:
 
-| anylumino alias | ipywidgets class |
+| anylumino alias | Canonical class |
 |---|---|
 | `TextInput` | `Text` |
 | `TextArea` | `Textarea` |
@@ -113,7 +129,8 @@ Lumino panel.
 
 ## Callback pattern
 
-Controls remain normal ipywidgets objects, so use their standard callback API:
+Controls are normal anywidget objects with traitlets, so use `observe()` for
+state changes and `on_click()` for button-like activations:
 
 ```python
 status = TextWidget("Ready")
@@ -123,4 +140,7 @@ def on_dataset_change(change):
     status.text = f"Dataset: {change['new']}"
 
 dataset.observe(on_dataset_change, names="value")
+
+button = Button(description="Apply", icon="check", button_style="primary")
+button.on_click(lambda _button: setattr(status, "text", "Applied"))
 ```

@@ -6,8 +6,10 @@ IntText(
     description='',
     disabled=False,
     continuous_update=True,
-    layout=None,
-    style=None,
+    min=None,
+    max=None,
+    step=1,
+    **kwargs,
 )
 ```
 
@@ -15,19 +17,9 @@ Integer text input control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name              | Type     | Description                                                           | Default    |
-|-------------------|----------|-----------------------------------------------------------------------|------------|
+| Name              | Type     | Description                                                           | Default   |
+|-------------------|----------|-----------------------------------------------------------------------|-----------|
 | value | optional | Initial value and synced Python value. | `0` |
-| description | optional | Label shown next to the control. | `''` |
+| description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
 | continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
-| layout | optional | ipywidgets ``Layout`` object for CSS sizing and spacing. | `None` |
-| style | optional | ipywidgets style object or style dictionary. | `None` |
-
-## Attributes
-
-| Name | Description |
-| --- | --- |
-| [continuous_update](#anylumino.IntText.continuous_update) | Update the value as the user types. If False, update on submission, e.g., pressing Enter or navigating away. |
-| [disabled](#anylumino.IntText.disabled) | Enable or disable user changes |
-| [step](#anylumino.IntText.step) | Minimum step to increment the value |

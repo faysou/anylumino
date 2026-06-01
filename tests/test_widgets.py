@@ -6,6 +6,7 @@ from anylumino import (
     Button,
     Checkbox,
     CommandPalette,
+    ControlWidget,
     Dropdown,
     GridPanel,
     AccordionPanel,
@@ -339,21 +340,53 @@ def test_action_widget_invokes_registered_callback() -> None:
     assert calls == ["reset"]
 
 
+def test_control_icon_metadata_is_synced() -> None:
+    button = Button(
+        description="Help",
+        icon="circle-question",
+        icon_family="classic",
+        icon_variant="regular",
+        icon_library="default",
+    )
+
+    assert button.icon == "circle-question"
+    assert button.icon_family == "classic"
+    assert button.icon_variant == "regular"
+    assert button.icon_library == "default"
+
+
 def test_menubar_and_command_palette_store_actions() -> None:
-    menu = MenuBar([{"label": "Chart", "items": [{"id": "new", "label": "New chart"}]}])
-    palette = CommandPalette([{"id": "fit", "label": "Fit chart", "category": "Chart"}])
+    menu_actions = [
+        {
+            "label": "Chart",
+            "items": [
+                {"id": "new", "label": "New chart", "icon": "plus", "icon_variant": "regular"},
+            ],
+        },
+    ]
+    palette_actions = [
+        {
+            "id": "fit",
+            "label": "Fit chart",
+            "category": "Chart",
+            "icon": "expand",
+            "icon_family": "classic",
+        },
+    ]
+    menu = MenuBar(menu_actions)
+    palette = CommandPalette(palette_actions)
 
     assert menu.action_kind == "menubar"
-    assert menu.actions == [{"label": "Chart", "items": [{"id": "new", "label": "New chart"}]}]
+    assert menu.actions == menu_actions
     assert palette.action_kind == "command_palette"
-    assert palette.actions == [{"id": "fit", "label": "Fit chart", "category": "Chart"}]
+    assert palette.actions == palette_actions
 
 
-def test_ipywidgets_controls_are_composable_children() -> None:
+def test_anylumino_controls_are_composable_children() -> None:
     button = Button(description="Run")
-    symbol = TextInput(value="AAPL", description="Symbol")
-    interval = Dropdown(options=["1m", "5m"], value="1m", description="Interval")
-    live = Checkbox(value=True, description="Live")
+    symbol = TextInput(value="Greenhouse A", description="Dataset")
+    interval = Dropdown(options=["Daily", "Weekly"], value="Daily", description="Interval")
+    live = Checkbox(value=True, description="Enabled")
     rows = IntSlider(value=100, min=10, max=250, description="Rows")
 
     panel = GridPanel(
@@ -367,14 +400,16 @@ def test_ipywidgets_controls_are_composable_children() -> None:
         columns="1fr",
     )
 
+    assert isinstance(button, ControlWidget)
     assert panel.get_widget("button") is button
     assert panel["symbol"] is symbol
     assert panel.child_keys == ["button", "symbol", "interval", "live", "rows"]
     assert panel.get_state(key=["widgets"])["widgets"][0] == f"anywidget:{button.model_id}"
 
 
-def test_list_box_alias_uses_jupyter_select_control() -> None:
-    control = ListBox(options=["AAPL", "MSFT"], value="AAPL")
+def test_list_box_alias_uses_anylumino_select_control() -> None:
+    control = ListBox(options=["Greenhouse A", "Greenhouse B"], value="Greenhouse A")
 
-    assert control.value == "AAPL"
-    assert control.options == ("AAPL", "MSFT")
+    assert control.value == "Greenhouse A"
+    assert control.options == ("Greenhouse A", "Greenhouse B")
+    assert control.control_kind == "select"
