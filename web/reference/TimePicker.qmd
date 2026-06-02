@@ -5,25 +5,34 @@ TimePicker(
     value=None,
     description='',
     disabled=False,
+    min=None,
+    max=None,
+    step=None,
+    continuous_update=True,
+    width='',
 )
 ```
 
-Time picker control.
+Browser-native time picker control.
 
-The frontend renders a native time input with an anylumino popup picker. The
-popup shows hours and minutes in separate columns, so users can pick any minute
-value instead of being limited to fixed 15-minute increments.
+##     Parameters {.doc-section .doc-section-----parameters}
 
-Python `datetime.time` values are accepted and serialized with `isoformat()`
-before syncing to the frontend.
-
-## Parameters {.doc-section .doc-section-parameters}
-
-| Name        | Type     | Description                            | Default   |
-|-------------|----------|----------------------------------------|-----------|
-| value | `datetime.time`, `str`, or `None` | Initial value and synced Python value. Strings should use `HH:MM` or another browser-compatible time value. | `None` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
+value : optional
+    Initial value and synced Python value.
+description : optional
+    Label shown above the control.
+disabled : optional
+    Whether user interaction is disabled.
+min : optional
+    Minimum date, time, or datetime value.
+max : optional
+    Maximum date, time, or datetime value.
+step : optional
+    Native input step value.
+continuous_update : optional
+    Whether Python receives updates while the user edits the input.
+width : optional
+    CSS width for the control.
 
 ## Attributes
 

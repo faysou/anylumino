@@ -12,6 +12,7 @@ IntSlider(
     orientation='horizontal',
     readout=True,
     readout_format='d',
+    **kwargs,
 )
 ```
 
@@ -21,13 +22,13 @@ Integer slider control.
 
 | Name              | Type     | Description                                                           | Default        |
 |-------------------|----------|-----------------------------------------------------------------------|----------------|
-| value | optional | Initial value and synced Python value. | `0` |
-| min | optional | Minimum numeric, date, or time value. | `0` |
-| max | optional | Maximum numeric, date, or time value. | `100` |
-| step | optional | Increment size. | `1` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-| continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
-| orientation | optional | ``'horizontal'`` or ``'vertical'``. | `'horizontal'` |
-| readout | optional | Whether to show the current value. | `True` |
-| readout_format | optional | Format string used for slider readouts. | `'d'` |
+| value             | optional | Initial value and synced Python value.                                | `0`            |
+| min               | optional | Minimum numeric, date, or time value.                                 | `0`            |
+| max               | optional | Maximum numeric, date, or time value.                                 | `100`          |
+| step              | optional | Increment size.                                                       | `1`            |
+| description       | optional | Label shown above the control.                                        | `''`           |
+| disabled          | optional | Whether user interaction is disabled.                                 | `False`        |
+| continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True`         |
+| orientation       | optional | ``'horizontal'`` or ``'vertical'``.                                   | `'horizontal'` |
+| readout           | optional | Whether to show the current value.                                    | `True`         |
+| readout_format    | optional | Format string used for slider readouts.                               | `'d'`          |

@@ -1,0 +1,14 @@
+# OpacityCheckerboard { #anylumino.OpacityCheckerboard }
+
+```python
+OpacityCheckerboard(width=120, height=48, **kwargs)
+```
+
+Display an opacity checkerboard swatch.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type     | Description                                 | Default   |
+|--------|----------|---------------------------------------------|-----------|
+| width  | optional | CSS width for display-oriented components.  | `120`     |
+| height | optional | CSS height for display-oriented components. | `48`      |

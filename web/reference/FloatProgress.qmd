@@ -7,6 +7,7 @@ FloatProgress(
     max=100.0,
     description='',
     bar_style='',
+    **kwargs,
 )
 ```
 
@@ -16,11 +17,11 @@ Float progress bar control.
 
 | Name        | Type     | Description                                                     | Default   |
 |-------------|----------|-----------------------------------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `0.0` |
-| min | optional | Minimum numeric, date, or time value. | `0.0` |
-| max | optional | Maximum numeric, date, or time value. | `100.0` |
-| description | optional | Label shown above the control. | `''` |
-| bar_style | optional | Progress-bar style name such as ``'success'`` or ``'warning'``. | `''` |
+| value       | optional | Initial value and synced Python value.                          | `0.0`     |
+| min         | optional | Minimum numeric, date, or time value.                           | `0.0`     |
+| max         | optional | Maximum numeric, date, or time value.                           | `100.0`   |
+| description | optional | Label shown above the control.                                  | `''`      |
+| bar_style   | optional | Progress-bar style name such as ``'success'`` or ``'warning'``. | `''`      |
 
 ## Attributes
 

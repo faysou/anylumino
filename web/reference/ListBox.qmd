@@ -8,6 +8,7 @@ ListBox(
     description='',
     disabled=False,
     rows=5,
+    **kwargs,
 )
 ```
 
@@ -17,12 +18,12 @@ List-box single-selection control.
 
 | Name        | Type     | Description                                    | Default   |
 |-------------|----------|------------------------------------------------|-----------|
-| options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
-| value | optional | Initial value and synced Python value. | `None` |
-| index | optional | Selected option index. | `None` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-| rows | optional | Visible row count. | `5` |
+| options     | optional | Selectable values or ``(label, value)`` pairs. | `()`      |
+| value       | optional | Initial value and synced Python value.         | `None`    |
+| index       | optional | Selected option index.                         | `None`    |
+| description | optional | Label shown above the control.                 | `''`      |
+| disabled    | optional | Whether user interaction is disabled.          | `False`   |
+| rows        | optional | Visible row count.                             | `5`       |
 
 ## Attributes
 

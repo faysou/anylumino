@@ -7,12 +7,12 @@ ToggleButtons(
     index=None,
     description='',
     disabled=False,
-    button_style='',
+    variant='',
     tooltips=None,
     icons=None,
-    icon_family='classic',
-    icon_variant='solid',
-    icon_library='default',
+    icon_size='s',
+    quiet=False,
+    **kwargs,
 )
 ```
 
@@ -20,19 +20,18 @@ Segmented toggle-button selection control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type     | Description                                                                       | Default     |
-|--------------|----------|-----------------------------------------------------------------------------------|-------------|
-| options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
-| value | optional | Initial value and synced Python value. | `None` |
-| index | optional | Selected option index. | `None` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-| button_style | optional | Visual variant such as ``'primary'``, ``'success'``, or ``'danger'``. | `''` |
-| tooltips | optional | Per-option tooltips. | `None` |
-| icons | optional | Web Awesome icon names or per-option icon dictionaries for toggle-button options. | `None` |
-| icon_family | optional | Web Awesome icon family, for example ``'classic'``. | `'classic'` |
-| icon_variant | optional | Web Awesome icon variant, for example ``'solid'`` or ``'regular'``. | `'solid'` |
-| icon_library | optional | Web Awesome icon library, for example ``'default'``. | `'default'` |
+| Name        | Type     | Description                                                                                                        | Default   |
+|-------------|----------|--------------------------------------------------------------------------------------------------------------------|-----------|
+| options     | optional | Selectable values or ``(label, value)`` pairs.                                                                     | `()`      |
+| value       | optional | Initial value and synced Python value.                                                                             | `None`    |
+| index       | optional | Selected option index.                                                                                             | `None`    |
+| description | optional | Label shown above the control.                                                                                     | `''`      |
+| disabled    | optional | Whether user interaction is disabled.                                                                              | `False`   |
+| variant     | optional | Spectrum visual variant such as ``'accent'``, ``'primary'``, ``'negative'``, ``'positive'``, or ``'informative'``. | `''`      |
+| tooltips    | optional | Per-option tooltips.                                                                                               | `None`    |
+| icons       | optional | Spectrum workflow icon names or per-option icon dictionaries for toggle-button options.                            | `None`    |
+| icon_size   | optional | Spectrum icon size such as ``'s'``, ``'m'``, ``'l'``, ``'xl'``, or ``'xxl'``.                                      | `'s'`     |
+| quiet       | optional | Whether to use Spectrum's quiet visual treatment.                                                                  | `False`   |
 
 ## Attributes
 

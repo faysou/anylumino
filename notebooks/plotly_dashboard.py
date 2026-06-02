@@ -30,6 +30,7 @@ import plotly.graph_objects as go
 
 from anylumino import (
     AccordionPanel,
+    Badge,
     BoxPanel,
     Button,
     Checkbox,
@@ -39,6 +40,7 @@ from anylumino import (
     GridPanel,
     HBox,
     IntSlider,
+    Meter,
     MenuBar,
     ResponsivePanel,
     ScrollBox,
@@ -79,7 +81,11 @@ help_text = TextWidget(
 metric_dataset = TextWidget("Dataset: greenhouse")
 metric_rows = TextWidget(f"Samples: {len(data)}")
 metric_action = TextWidget("Last action: none")
+state_badge = Badge(value="Ready", variant="positive", icon="InfoCircle")
+completion_meter = Meter(value=75, description="Review coverage", variant="informative", readout=True)
 notes = TextWidget("Dock panel: command palette and notes can sit beside the main dashboard.")
+accordion_status = TextWidget("Accordion demo status section.")
+accordion_metrics = TextWidget("Accordion demo metrics section.")
 layout_lab_intro = TextWidget("Layout lab: BoxPanel, HBox, VBox, GridPanel, ResponsivePanel, and SplitPanel.")
 layout_lab_left = TextWidget("HBox child A")
 layout_lab_right = TextWidget("HBox child B")
@@ -92,7 +98,7 @@ samples_input = IntSlider(value=180, min=60, max=len(data), step=20, description
 metric_input = Dropdown(options=["temperature", "humidity", "co2"], value="temperature", description="Metric")
 theme_input = Dropdown(options=["light", "dark"], value="light", description="Theme")
 auto_focus_input = Checkbox(value=True, description="Auto focus")
-apply_inputs_button = Button(description="Apply inputs", button_style="primary")
+apply_inputs_button = Button(description="Apply inputs", variant="accent", icon="CheckmarkCircle")
 
 figures: dict[str, go.FigureWidget] = {}
 figure_count = 0
@@ -113,6 +119,7 @@ def active_figure() -> go.FigureWidget:
 def log(message: str) -> None:
     status.text = message
     metric_action.text = f"Last action: {message}"
+    state_badge.value = "Updated"
 
 
 def template_for_theme(theme: str) -> str:
@@ -294,12 +301,12 @@ figure_tabs.observe(sync_active_figure_key, names="selected_index")
 # %%
 toolbar = Toolbar(
     [
-        {"id": "new_figure", "label": "New figure", "icon": "plus"},
-        {"id": "note", "label": "Note", "icon": "comment", "icon_variant": "regular"},
-        {"id": "average", "label": "Average", "icon": "chart-line"},
-        {"id": "append", "label": "Append", "icon": "forward-step"},
-        {"id": "focus", "label": "Focus", "icon": "expand"},
-        {"id": "theme", "label": "Theme", "icon": "circle-half-stroke"},
+        {"id": "new_figure", "label": "New figure", "icon": "AddContent"},
+        {"id": "note", "label": "Note", "icon": "Comment"},
+        {"id": "average", "label": "Average", "icon": "GraphTrend"},
+        {"id": "append", "label": "Append", "icon": "StepForward"},
+        {"id": "focus", "label": "Focus", "icon": "FullScreen"},
+        {"id": "theme", "label": "Theme", "icon": "Light"},
     ],
     callbacks={
         "new_figure": add_figure_tab,
@@ -316,24 +323,24 @@ menu = MenuBar(
         {
             "label": "Data",
             "items": [
-                {"id": "new_figure", "label": "New figure tab", "icon": "plus"},
-                {"id": "focus", "label": "Focus active figure", "icon": "expand"},
+                {"id": "new_figure", "label": "New figure tab", "icon": "AddContent"},
+                {"id": "focus", "label": "Focus active figure", "icon": "FullScreen"},
             ],
         },
         {
             "label": "Actions",
             "items": [
-                {"id": "note", "label": "Add note", "icon": "comment", "icon_variant": "regular"},
-                {"id": "average", "label": "Add rolling average", "icon": "chart-line"},
-                {"id": "append", "label": "Append sample", "icon": "forward-step"},
-                {"id": "theme", "label": "Toggle theme", "icon": "circle-half-stroke"},
+                {"id": "note", "label": "Add note", "icon": "Comment"},
+                {"id": "average", "label": "Add rolling average", "icon": "GraphTrend"},
+                {"id": "append", "label": "Append sample", "icon": "StepForward"},
+                {"id": "theme", "label": "Toggle theme", "icon": "Light"},
             ],
         },
         {
             "label": "Panels",
             "items": [
-                {"id": "status", "label": "Show status", "icon": "circle-info"},
-                {"id": "help", "label": "Show help", "icon": "circle-question", "icon_variant": "regular"},
+                {"id": "status", "label": "Show status", "icon": "InfoCircle"},
+                {"id": "help", "label": "Show help", "icon": "HelpCircle"},
             ],
         },
     ],
@@ -351,19 +358,18 @@ menu = MenuBar(
 
 commands = CommandPalette(
     [
-        {"id": "new_figure", "label": "New figure tab", "category": "Data", "icon": "plus"},
-        {"id": "note", "label": "Add note", "category": "Data", "icon": "comment", "icon_variant": "regular"},
-        {"id": "average", "label": "Add rolling average", "category": "Data", "icon": "chart-line"},
-        {"id": "append", "label": "Append sample", "category": "Data", "icon": "forward-step"},
-        {"id": "focus", "label": "Focus active figure", "category": "View", "icon": "expand"},
-        {"id": "theme", "label": "Toggle theme", "category": "View", "icon": "circle-half-stroke"},
-        {"id": "status", "label": "Show status", "category": "Panels", "icon": "circle-info"},
+        {"id": "new_figure", "label": "New figure tab", "category": "Data", "icon": "AddContent"},
+        {"id": "note", "label": "Add note", "category": "Data", "icon": "Comment"},
+        {"id": "average", "label": "Add rolling average", "category": "Data", "icon": "GraphTrend"},
+        {"id": "append", "label": "Append sample", "category": "Data", "icon": "StepForward"},
+        {"id": "focus", "label": "Focus active figure", "category": "View", "icon": "FullScreen"},
+        {"id": "theme", "label": "Toggle theme", "category": "View", "icon": "Light"},
+        {"id": "status", "label": "Show status", "category": "Panels", "icon": "InfoCircle"},
         {
             "id": "help",
             "label": "Show help",
             "category": "Panels",
-            "icon": "circle-question",
-            "icon_variant": "regular",
+            "icon": "HelpCircle",
         },
     ],
     callbacks={
@@ -381,18 +387,20 @@ commands = CommandPalette(
 side_stack = StackedPanel(
     {"status": status, "help": help_text},
     titles={"status": "Status", "help": "Help"},
-    height=150,
+    height=92,
 )
 metrics = GridPanel(
     {
         "dataset": metric_dataset,
         "samples": metric_rows,
         "last-action": metric_action,
+        "state": state_badge,
+        "coverage": completion_meter,
     },
     columns="1fr",
-    rows="auto auto auto",
+    rows="auto auto auto auto auto",
     gap=8,
-    height=160,
+    height=190,
 )
 input_controls = ScrollBox(
     {
@@ -403,13 +411,23 @@ input_controls = ScrollBox(
         "auto-focus": auto_focus_input,
         "apply": apply_inputs_button,
     },
-    spacing=10,
-    height=340,
-    child_min_height=58,
+    spacing=14,
+    height=430,
+    child_min_height=68,
 )
-side_accordion = AccordionPanel(
-    {"status": side_stack, "metrics": metrics, "inputs": input_controls},
-    titles={"status": "Status", "metrics": "Metrics", "inputs": "Inputs"},
+control_panel = VBox(
+    {
+        "inputs": input_controls,
+        "status": side_stack,
+        "metrics": metrics,
+    },
+    spacing=12,
+    stretches=[1, 0, 0],
+    height="100%",
+)
+accordion_demo = AccordionPanel(
+    {"status": accordion_status, "metrics": accordion_metrics},
+    titles={"status": "Status", "metrics": "Metrics"},
     height="100%",
 )
 figure_app = GridPanel(
@@ -425,17 +443,23 @@ figure_app = GridPanel(
     height="100%",
 )
 main = SplitPanel(
-    {"figures": figure_app, "controls": side_accordion},
+    {"controls": control_panel, "figures": figure_app},
     titles={"figures": "Figures", "controls": "Controls"},
     orientation="horizontal",
     spacing=8,
-    sizes=[0.70, 0.30],
-    height=640,
+    sizes=[0.42, 0.58],
+    height=720,
 )
 layout_lab = VBox(
     {
         "intro": layout_lab_intro,
-        "hbox": HBox({"left": layout_lab_left, "right": layout_lab_right}, height=62),
+        "hbox": HBox(
+            {"left": layout_lab_left, "right": layout_lab_right},
+            spacing=12,
+            scroll=True,
+            child_min_width=180,
+            height=62,
+        ),
         "box": BoxPanel(
             {"primary": layout_lab_primary, "secondary": layout_lab_secondary},
             direction="left-to-right",
@@ -455,8 +479,8 @@ layout_lab = VBox(
     height="100%",
 )
 dock = DockPanel(
-    {"commands": commands, "layout-lab": layout_lab, "notes": notes},
-    titles={"commands": "Commands", "layout-lab": "Layout lab", "notes": "Notes"},
+    {"commands": commands, "layout-lab": layout_lab, "accordion": accordion_demo, "notes": notes},
+    titles={"commands": "Commands", "layout-lab": "Layout lab", "accordion": "Accordion", "notes": "Notes"},
     mode="split-right",
     height=280,
 )
@@ -466,6 +490,7 @@ dashboard = VBox(
             {"main": main, "dock": dock},
             orientation="vertical",
             sizes=[0.68, 0.32],
+            height="100%",
         )
     },
     stretches=[1],

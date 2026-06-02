@@ -9,6 +9,7 @@ SelectionSlider(
     disabled=False,
     orientation='horizontal',
     readout=True,
+    **kwargs,
 )
 ```
 
@@ -18,13 +19,13 @@ Slider selection control.
 
 | Name        | Type     | Description                                    | Default        |
 |-------------|----------|------------------------------------------------|----------------|
-| options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
-| value | optional | Initial value and synced Python value. | `None` |
-| index | optional | Selected option index. | `None` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-| orientation | optional | ``'horizontal'`` or ``'vertical'``. | `'horizontal'` |
-| readout | optional | Whether to show the current value. | `True` |
+| options     | optional | Selectable values or ``(label, value)`` pairs. | `()`           |
+| value       | optional | Initial value and synced Python value.         | `None`         |
+| index       | optional | Selected option index.                         | `None`         |
+| description | optional | Label shown above the control.                 | `''`           |
+| disabled    | optional | Whether user interaction is disabled.          | `False`        |
+| orientation | optional | ``'horizontal'`` or ``'vertical'``.            | `'horizontal'` |
+| readout     | optional | Whether to show the current value.             | `True`         |
 
 ## Attributes
 

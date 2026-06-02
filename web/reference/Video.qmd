@@ -1,12 +1,7 @@
 # Video { #anylumino.Video }
 
 ```python
-Video(
-    value='',
-    format='mp4',
-    width='',
-    height='',
-)
+Video(value='', format='mp4', width='', height='', **kwargs)
 ```
 
 Video display widget.
@@ -15,10 +10,10 @@ Video display widget.
 
 | Name   | Type     | Description                                              | Default   |
 |--------|----------|----------------------------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `''` |
-| format | optional | Media format such as ``'png'``, ``'mp3'``, or ``'mp4'``. | `'mp4'` |
-| width | optional | CSS width for media widgets. | `''` |
-| height | optional | CSS height for media widgets. | `''` |
+| value  | optional | Initial value and synced Python value.                   | `''`      |
+| format | optional | Media format such as ``'png'``, ``'mp3'``, or ``'mp4'``. | `'mp4'`   |
+| width  | optional | CSS width for media widgets.                             | `''`      |
+| height | optional | CSS height for media widgets.                            | `''`      |
 
 ## Attributes
 

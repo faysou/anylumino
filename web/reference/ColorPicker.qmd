@@ -6,6 +6,7 @@ ColorPicker(
     description='',
     concise=False,
     disabled=False,
+    **kwargs,
 )
 ```
 
@@ -15,13 +16,7 @@ Color picker control.
 
 | Name        | Type     | Description                                    | Default   |
 |-------------|----------|------------------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `'black'` |
-| description | optional | Label shown above the control. | `''` |
-| concise | optional | Whether to use a compact color-picker display. | `False` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-
-## Attributes
-
-| Name | Description |
-| --- | --- |
-| [control_kind](#anylumino.ColorPicker.control_kind) | A trait for unicode strings. |
+| value       | optional | Initial value and synced Python value.         | `'black'` |
+| description | optional | Label shown above the control.                 | `''`      |
+| concise     | optional | Whether to use a compact color-picker display. | `False`   |
+| disabled    | optional | Whether user interaction is disabled.          | `False`   |

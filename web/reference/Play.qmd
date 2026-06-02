@@ -1,14 +1,7 @@
 # Play { #anylumino.Play }
 
 ```python
-Play(
-    value=0,
-    min=0,
-    max=100,
-    step=1,
-    interval=100,
-    disabled=False,
-)
+Play(value=0, min=0, max=100, step=1, interval=100, disabled=False, **kwargs)
 ```
 
 Playback stepper control.
@@ -17,12 +10,12 @@ Playback stepper control.
 
 | Name     | Type     | Description                                      | Default   |
 |----------|----------|--------------------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `0` |
-| min | optional | Minimum numeric, date, or time value. | `0` |
-| max | optional | Maximum numeric, date, or time value. | `100` |
-| step | optional | Increment size. | `1` |
-| interval | optional | Delay between play-widget ticks in milliseconds. | `100` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
+| value    | optional | Initial value and synced Python value.           | `0`       |
+| min      | optional | Minimum numeric, date, or time value.            | `0`       |
+| max      | optional | Maximum numeric, date, or time value.            | `100`     |
+| step     | optional | Increment size.                                  | `1`       |
+| interval | optional | Delay between play-widget ticks in milliseconds. | `100`     |
+| disabled | optional | Whether user interaction is disabled.            | `False`   |
 
 ## Attributes
 

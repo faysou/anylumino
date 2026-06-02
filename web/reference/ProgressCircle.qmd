@@ -1,0 +1,23 @@
+# ProgressCircle { #anylumino.ProgressCircle }
+
+```python
+ProgressCircle(
+    value=0,
+    *,
+    label='',
+    indeterminate=False,
+    spectrum_size='m',
+    **kwargs,
+)
+```
+
+Display circular progress or indeterminate activity.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name          | Type     | Description                                                             | Default   |
+|---------------|----------|-------------------------------------------------------------------------|-----------|
+| value         | optional | Initial value and synced Python value.                                  | `0`       |
+| label         | optional | Accessible label or visible label, depending on the component.          | `''`      |
+| indeterminate | optional | Whether progress should render as an indeterminate indicator.           | `False`   |
+| spectrum_size | optional | Spectrum component size such as ``'s'``, ``'m'``, ``'l'``, or ``'xl'``. | `'m'`     |

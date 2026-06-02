@@ -1,0 +1,14 @@
+# ColorLoupe { #anylumino.ColorLoupe }
+
+```python
+ColorLoupe(value='#1473e6', *, open=True, **kwargs)
+```
+
+Display a color loupe preview.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type     | Description                                    | Default     |
+|--------|----------|------------------------------------------------|-------------|
+| value  | optional | Initial value and synced Python value.         | `'#1473e6'` |
+| open   | optional | Whether an overlay-like component starts open. | `True`      |

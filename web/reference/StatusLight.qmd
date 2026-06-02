@@ -1,0 +1,16 @@
+# StatusLight { #anylumino.StatusLight }
+
+```python
+StatusLight(value=True, description='', variant='', disabled=False, **kwargs)
+```
+
+Spectrum status-light display control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type     | Description                                                                                                        | Default   |
+|-------------|----------|--------------------------------------------------------------------------------------------------------------------|-----------|
+| value       | optional | Initial value and synced Python value.                                                                             | `True`    |
+| description | optional | Label shown above the control.                                                                                     | `''`      |
+| variant     | optional | Spectrum visual variant such as ``'accent'``, ``'primary'``, ``'negative'``, ``'positive'``, or ``'informative'``. | `''`      |
+| disabled    | optional | Whether user interaction is disabled.                                                                              | `False`   |

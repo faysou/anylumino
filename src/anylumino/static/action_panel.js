@@ -4,9 +4,14 @@ import {
   MenuBar,
   Panel,
   Widget,
-} from "https://esm.sh/@lumino/widgets@2.8.0?bundle";
-import { CommandRegistry } from "https://esm.sh/@lumino/commands@2.3.3?bundle";
-import "https://esm.sh/@awesome.me/webawesome@3.7.0/dist/components/icon/icon.js?bundle";
+} from "@lumino/widgets";
+import { CommandRegistry } from "@lumino/commands";
+import "@spectrum-web-components/theme/sp-theme.js";
+import "@spectrum-web-components/theme/theme-light.js";
+import "@spectrum-web-components/theme/scale-medium.js";
+import "@spectrum-web-components/action-button/sp-action-button.js";
+import "@spectrum-web-components/icon/sp-icon.js";
+import "./spectrum_icons.js";
 
 function cssSize(value, fallback) {
   if (typeof value === "string" && value.trim()) {
@@ -36,16 +41,49 @@ function actionIconClass(action) {
   return iconSpec(action) ? `anylumino-CommandIcon-${id}` : "";
 }
 
+function workflowIconName(rawName) {
+  const name = String(rawName ?? "").trim();
+  const aliases = {
+    "chart-line": "GraphTrend",
+    "circle-half-stroke": "Light",
+    "circle-info": "InfoCircle",
+    "circle-question": "HelpCircle",
+    "comment": "Comment",
+    "expand": "FullScreen",
+    "forward-step": "StepForward",
+    "plus": "AddContent",
+    "rotate-left": "RotateRight",
+    "rotate": "RotateRight",
+    "upload": "Upload",
+  };
+  if (aliases[name]) {
+    return aliases[name];
+  }
+  return name
+    .split(/[-_\s]+/u)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("");
+}
+
+function kebabName(name) {
+  return String(name)
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/_/g, "-")
+    .toLowerCase();
+}
+
 function iconSpec(action) {
   const name = String(action?.icon ?? "").trim();
-  if (!name) {
+  const src = String(action?.icon_src ?? "").trim();
+  if (!name && !src) {
     return null;
   }
   return {
-    name,
-    family: String(action?.icon_family ?? "classic"),
-    variant: String(action?.icon_variant ?? "solid"),
-    library: String(action?.icon_library ?? "default"),
+    name: workflowIconName(name),
+    src,
+    size: String(action?.icon_size ?? "s"),
+    label: String(action?.icon_label ?? ""),
   };
 }
 
@@ -54,13 +92,29 @@ function createIcon(action) {
   if (!spec) {
     return null;
   }
-  const icon = document.createElement("wa-icon");
+  if (spec.src) {
+    const icon = document.createElement("sp-icon");
+    icon.className = "anylumino-ToolbarIcon";
+    icon.src = spec.src;
+    icon.size = spec.size;
+    icon.slot = "icon";
+    if (spec.label) {
+      icon.label = spec.label;
+    } else {
+      icon.setAttribute("aria-hidden", "true");
+    }
+    return icon;
+  }
+  const tagName = `sp-icon-${kebabName(spec.name)}`;
+  const icon = document.createElement(tagName);
   icon.className = "anylumino-ToolbarIcon";
-  icon.name = spec.name;
-  icon.family = spec.family;
-  icon.variant = spec.variant;
-  icon.library = spec.library;
-  icon.setAttribute("aria-hidden", "true");
+  icon.size = spec.size;
+  icon.slot = "icon";
+  if (spec.label) {
+    icon.label = spec.label;
+  } else {
+    icon.setAttribute("aria-hidden", "true");
+  }
   return icon;
 }
 
@@ -128,13 +182,16 @@ function createToolbar(model, activate) {
   panel.addClass("anylumino-Toolbar");
   for (const action of model.get("actions") ?? []) {
     const id = actionId(action);
-    const button = document.createElement("button");
-    button.type = "button";
+    const button = document.createElement("sp-action-button");
     button.className = "anylumino-ToolbarButton";
     button.dataset.actionId = id;
     button.disabled = Boolean(action.disabled);
     button.title = String(action.tooltip ?? action.caption ?? actionLabel(action));
-    button.setAttribute("aria-label", actionLabel(action));
+    button.label = actionLabel(action);
+    button.size = String(action.size ?? "s");
+    if (action.quiet ?? true) {
+      button.setAttribute("quiet", "");
+    }
 
     const icon = createIcon(action);
     if (icon) {
@@ -200,7 +257,12 @@ export default {
     root.className = `anylumino-ActionHost anylumino-${model.get("action_kind")}Host`;
     root.style.width = cssSize(model.get("width"), "100%");
     root.style.height = cssSize(model.get("height"), "auto");
-    el.replaceChildren(root);
+    const theme = document.createElement("sp-theme");
+    theme.className = "anylumino-ActionTheme";
+    theme.color = "light";
+    theme.scale = "medium";
+    theme.append(root);
+    el.replaceChildren(theme);
 
     let panel = null;
     let iconObserver = null;
@@ -252,7 +314,7 @@ export default {
         removeModelListener(model, "change:action_kind", renderPanel);
         removeModelListener(model, "change:width", syncSize);
         removeModelListener(model, "change:height", syncSize);
-        root.remove();
+        theme.remove();
       },
       { once: true },
     );

@@ -8,7 +8,7 @@ anywidgets as synced widget references, and the frontend resolves each child
 with `host.getWidget(...)` before mounting it into a Lumino layout widget.
 
 The main benefit is composition. `anylumino` lets a notebook author build
-larger reusable widgets from existing anywidgets, native anylumino controls,
+larger reusable widgets from existing anywidgets, anylumino controls,
 charts, tables, and outputs. A composed widget can own its layout, state,
 callbacks, and domain methods while still being an anywidget that can be nested
 into another layout.
@@ -44,11 +44,16 @@ The current prototype provides:
   `HBox`, `VBox`, `SplitPanel`, `DockPanel`, `AccordionPanel`,
   `StackedPanel`, `GridPanel`, and `ResponsivePanel`.
 - Action widgets: `Toolbar`, `MenuBar`, and `CommandPalette`.
-- Native controls: `Button`, `TextInput`, `TextArea`, `PasswordInput`,
+- Spectrum-backed controls: `Button`, `TextInput`, `TextArea`, `PasswordInput`,
   `Checkbox`, `Dropdown`, `ListBox`, `MultiSelect`, `RadioButtons`,
   `ToggleButton`, `ToggleButtons`, sliders, numeric inputs, progress bars,
-  date/time pickers, color picker, file upload metadata, media widgets,
-  `Output`, `HTML`, `HTMLMath`, and `Label`.
+  color picker, file upload metadata, media widgets, `Output`, `HTML`,
+  `HTMLMath`, and `Label`.
+- Native controls: `DatePicker`, `TimePicker`, and `DatetimePicker`.
+- Surfaces and display helpers: `FieldGroup`, `HelpText`, `ProgressCircle`,
+  `Popover`, `Tooltip`, `Tray`, `DialogBox`, `Modal`, `ClearButton`,
+  `CloseButton`, `InfieldButton`, `PickerButton`, `ColorHandle`, `ColorLoupe`,
+  `OpacityCheckerboard`, `Icon`, `UIIcon`, and `SpectrumElement`.
 - `TextWidget`, a small helper used by tests and smoke notebooks.
 
 All layout containers inherit from `LayoutWidget`, which provides keyed child
@@ -103,22 +108,53 @@ tabs["trend"].refresh()
 
 `Toolbar`, `MenuBar`, and `CommandPalette` accept Python callbacks keyed by
 action id, so controls can mutate another widget such as a figure after display.
-Action widget icons render with Web Awesome's `wa-icon` element. Use Web
-Awesome icon names such as `plus`, `rotate`, `comment`, `chart-line`,
-`forward-step`, `expand`, and `circle-half-stroke`; set `icon_family`,
-`icon_variant`, or `icon_library` when an icon needs a non-default Web Awesome
-source.
+Action widget icons render with Spectrum workflow icons. Use Spectrum icon names
+such as `AddContent`, `RotateRight`, `Comment`, `GraphTrend`, `StepForward`,
+`FullScreen`, and `HelpCircle`. Pass `icon_src` for a custom SVG/image icon and
+`icon_size` for Spectrum icon sizing.
 
-The input controls are anywidget-native and render browser controls with a
-Web Awesome-inspired design language. They can be placed inside Lumino layouts
-like any other child widget and expose synced `value` traits plus normal
-traitlets observers. Controls with an `icon` argument use the same Web Awesome
-icon fields as action widgets.
+Most input controls are Spectrum-backed anywidgets and live in the Spectrum
+family internally, so future component-library families can be added without
+mixing renderer code. Date and time controls are browser-native controls in
+`_controls.py`. All controls can be placed inside Lumino layouts like any other
+child widget and expose synced `value` traits plus normal traitlets observers.
+Controls with an `icon` argument use the same Spectrum workflow icon fields as
+action widgets. Use the `variant`, `quiet`, `spectrum_size`,
+`spectrum_color`, and CSS custom properties exposed by Spectrum to align
+Spectrum-backed controls with a design system.
+
+Read an input widget's current value with `.value`. Use traitlets observers when
+another widget should react to edits:
+
+```python
+dataset = TextInput(value="Greenhouse A", description="Dataset")
+samples = IntSlider(value=120, min=25, max=250, description="Samples")
+
+dataset.value
+samples.value
+
+samples.observe(lambda change: print(change["new"]), names="value")
+```
+
+Selection widgets also expose `.value`, and many expose `.index` for the
+selected option position. Button-like widgets use callbacks because a click is
+an event, not a persistent value.
+
+Child-capable surface widgets accept keyed child anywidgets, support `show()`,
+`hide()`, and `toggle()` for overlay-style state, and remain composable inside
+Lumino layouts.
+
+Frontend assets are bundled into the Python package. Runtime notebooks do not
+need CDN access for Lumino, Spectrum components, or the bundled workflow icons.
+Use `icon_src` for custom local icons or data URI icons outside the bundled
+workflow icon set.
 
 ## Development
 
 ```sh
 uv sync --group dev
+npm ci
+npm run build
 uv run pytest
 uv run jupyter lab
 ```
@@ -139,3 +175,5 @@ that exercises the layout widgets, action callbacks, and Plotly figure updates
 together. Open
 `notebooks/itables_tabs.py` to see an `itables.widget.ITable` inside a tab with
 controls that append rows to a pandas DataFrame and refresh the displayed table.
+Open `notebooks/spectrum_remaining_components.py` for a smoke test of the
+surface widgets, display helpers, and button variants.

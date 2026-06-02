@@ -2,28 +2,47 @@ import pytest
 import traitlets as t
 
 from anylumino import (
+    Badge,
     BoxPanel,
     Button,
     Checkbox,
+    ClearButton,
+    CloseButton,
     CommandPalette,
+    ComponentWidget,
     ControlWidget,
+    DatePicker,
+    DialogBox,
+    Divider,
     Dropdown,
+    FieldGroup,
     GridPanel,
     AccordionPanel,
     HBox,
     IntSlider,
+    Link,
     ListBox,
+    Meter,
+    Modal,
+    OpacityCheckerboard,
     DockPanel,
     LayoutWidget,
     MenuBar,
     ResponsivePanel,
     ScrollBox,
+    SearchInput,
+    SelectionRangeSlider,
+    SpectrumElement,
+    SpectrumWidget,
     SplitPanel,
     StackedPanel,
     TabPanel,
     TextInput,
     TextWidget,
+    Tooltip,
     Toolbar,
+    StatusLight,
+    Switch,
     VBox,
 )
 
@@ -343,16 +362,12 @@ def test_action_widget_invokes_registered_callback() -> None:
 def test_control_icon_metadata_is_synced() -> None:
     button = Button(
         description="Help",
-        icon="circle-question",
-        icon_family="classic",
-        icon_variant="regular",
-        icon_library="default",
+        icon="HelpCircle",
+        icon_size="m",
     )
 
-    assert button.icon == "circle-question"
-    assert button.icon_family == "classic"
-    assert button.icon_variant == "regular"
-    assert button.icon_library == "default"
+    assert button.icon == "HelpCircle"
+    assert button.icon_size == "m"
 
 
 def test_menubar_and_command_palette_store_actions() -> None:
@@ -360,7 +375,7 @@ def test_menubar_and_command_palette_store_actions() -> None:
         {
             "label": "Chart",
             "items": [
-                {"id": "new", "label": "New chart", "icon": "plus", "icon_variant": "regular"},
+                {"id": "new", "label": "New chart", "icon": "AddContent"},
             ],
         },
     ]
@@ -369,8 +384,7 @@ def test_menubar_and_command_palette_store_actions() -> None:
             "id": "fit",
             "label": "Fit chart",
             "category": "Chart",
-            "icon": "expand",
-            "icon_family": "classic",
+            "icon": "FullScreen",
         },
     ]
     menu = MenuBar(menu_actions)
@@ -407,9 +421,94 @@ def test_anylumino_controls_are_composable_children() -> None:
     assert panel.get_state(key=["widgets"])["widgets"][0] == f"anywidget:{button.model_id}"
 
 
+def test_date_controls_are_native_family_not_spectrum_controls() -> None:
+    picker = DatePicker()
+
+    assert picker.control_family == "native"
+    assert isinstance(picker, ControlWidget) is False
+
+
+def test_spectrum_component_wrappers_sync_kind_and_metadata() -> None:
+    controls = {
+        "search": SearchInput(value="iris", description="Search"),
+        "switch": Switch(value=True, description="Enabled"),
+        "status": StatusLight(value=True, description="Ready", variant="positive"),
+        "badge": Badge(value="Ready", variant="informative", icon="InfoCircle"),
+        "meter": Meter(value=64, description="Coverage", variant="positive", readout=True),
+        "link": Link("https://example.com", description="Docs"),
+        "divider": Divider(spectrum_size="l"),
+    }
+
+    assert controls["search"].control_kind == "search"
+    assert controls["switch"].control_kind == "switch"
+    assert controls["status"].variant == "positive"
+    assert controls["badge"].icon == "InfoCircle"
+    assert controls["meter"].readout is True
+    assert controls["link"].href == "https://example.com"
+    assert controls["divider"].spectrum_size == "l"
+
+
+def test_selection_range_slider_resolves_index_to_values() -> None:
+    slider = SelectionRangeSlider(
+        options=["Mon", "Tue", "Wed", "Thu", "Fri"],
+        index=(1, 3),
+    )
+
+    assert slider.value == ["Tue", "Thu"]
+    assert slider.index == (1, 3)
+
+
 def test_list_box_alias_uses_anylumino_select_control() -> None:
     control = ListBox(options=["Greenhouse A", "Greenhouse B"], value="Greenhouse A")
 
     assert control.value == "Greenhouse A"
     assert control.options == ("Greenhouse A", "Greenhouse B")
     assert control.control_kind == "select"
+
+
+def test_spectrum_widgets_share_generic_component_base() -> None:
+    widgets = [
+        SpectrumElement("section"),
+        ClearButton(),
+        CloseButton(),
+        FieldGroup({"field": TextInput(value="x")}),
+        Tooltip("More detail", {"trigger": Button(description="Info")}),
+        OpacityCheckerboard(),
+        DialogBox({"body": TextWidget("Settings")}, title="Settings"),
+        Modal({"body": TextWidget("Confirm")}, title="Confirm"),
+    ]
+
+    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, SpectrumWidget) for widget in widgets] == [True] * len(widgets)
+
+
+def test_spectrum_widget_children_are_keyed_and_composable() -> None:
+    text = TextInput(value="Dataset")
+    switch = Switch(value=True, description="Enabled")
+    group = FieldGroup({"name": text, "enabled": switch}, orientation="vertical")
+
+    assert group.component_kind == "field-group"
+    assert group.child_keys == ["name", "enabled"]
+    assert group["name"] is text
+    assert group.get_owner("enabled") is switch
+    assert group.orientation == "vertical"
+    assert group.get_state(key=["widgets"])["widgets"] == [
+        f"anywidget:{text.model_id}",
+        f"anywidget:{switch.model_id}",
+    ]
+
+
+def test_spectrum_overlay_state_uses_is_open_without_shadowing_widget_open() -> None:
+    dialog = DialogBox({"body": TextWidget("Dialog")}, title="Settings", open=False)
+
+    assert callable(dialog.open)
+    assert dialog.is_open is False
+
+    dialog.show()
+    assert dialog.is_open is True
+
+    dialog.hide()
+    assert dialog.is_open is False
+
+    dialog.toggle()
+    assert dialog.is_open is True

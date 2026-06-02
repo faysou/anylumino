@@ -1,0 +1,25 @@
+# InfieldButton { #anylumino.InfieldButton }
+
+```python
+InfieldButton(
+    label='',
+    *,
+    component_kind='infield-button',
+    icon='',
+    disabled=False,
+    callbacks=None,
+    **kwargs,
+)
+```
+
+Button designed for placement inside an input field.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type     | Description                                                           | Default            |
+|----------------|----------|-----------------------------------------------------------------------|--------------------|
+| label          | optional | Accessible label or visible label, depending on the component.        | `''`               |
+| component_kind | optional | Internal component kind used by specialized button subclasses.        | `'infield-button'` |
+| icon           | optional | Spectrum workflow icon name.                                          | `''`               |
+| disabled       | optional | Whether user interaction is disabled.                                 | `False`            |
+| callbacks      | optional | Optional callbacks invoked when the widget sends an activation event. | `None`             |

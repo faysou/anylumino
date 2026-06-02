@@ -3,7 +3,7 @@ title: "Overview"
 ---
 
 `anylumino` is a small Python package for building notebook interfaces where
-Lumino layout widgets arrange child anywidgets and native anylumino controls.
+Lumino layout widgets arrange child anywidgets and anylumino controls.
 
 The package gives notebooks an app-like layout vocabulary: tabs, split panes,
 dock panels, scrollable control stacks, menus, command palettes, and keyed child
@@ -59,9 +59,9 @@ Each action can dispatch to a Python callback.
 
 ## Controls
 
-`anylumino` includes anywidget-native controls such as `TextInput`, `IntSlider`,
-`Dropdown`, `Checkbox`, `Button`, `ListBox`, and `MultiSelect`. They render
-browser controls with a Web Awesome-inspired design language.
+`anylumino` includes Spectrum-backed controls such as `TextInput`, `IntSlider`,
+`Dropdown`, `Checkbox`, `Button`, `ListBox`, and `MultiSelect`, plus
+browser-native date and time controls.
 
 :::
 
@@ -85,5 +85,5 @@ variables.
 
 - Read the [composition guide](guide.qmd) for child mapping, mutation, resizing,
   and callbacks.
-- Review [controls](controls.qmd) for the native control widgets.
+- Review [controls](controls.qmd) for the control widgets.
 - Explore the [examples](examples.qmd) for notebook dashboard patterns.

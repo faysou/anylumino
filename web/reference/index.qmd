@@ -18,6 +18,12 @@ Lumino-backed containers for composing anywidget children.
 | [StackedPanel](StackedPanel.qmd#anylumino.StackedPanel) | Lumino stacked panel that shows one selected child at a time. |
 | [GridPanel](GridPanel.qmd#anylumino.GridPanel) | CSS grid-backed Lumino panel for placing children in grid cells. |
 | [ResponsivePanel](ResponsivePanel.qmd#anylumino.ResponsivePanel) | Box layout that switches direction when its width crosses a breakpoint. |
+| [FieldGroup](FieldGroup.qmd#anylumino.FieldGroup) | Group child controls into a horizontal or vertical field layout. |
+| [Popover](Popover.qmd#anylumino.Popover) | Display child content in a popover surface. |
+| [Tray](Tray.qmd#anylumino.Tray) | Display child content in a tray surface. |
+| [Overlay](Overlay.qmd#anylumino.Overlay) | Position child content as an overlay. |
+| [DialogBox](DialogBox.qmd#anylumino.DialogBox) | Display a composable modal dialog. |
+| [Modal](Modal.qmd#anylumino.Modal) | Alias for a composable modal dialog. |
 
 ## Action widgets
 
@@ -28,6 +34,10 @@ Toolbar, menu, and command-palette widgets with Python callbacks.
 | [Toolbar](Toolbar.qmd#anylumino.Toolbar) | Toolbar of clickable actions that can invoke Python callbacks. |
 | [MenuBar](MenuBar.qmd#anylumino.MenuBar) | Lumino-style menu bar with nested menu items and Python callbacks. |
 | [CommandPalette](CommandPalette.qmd#anylumino.CommandPalette) | Command palette for searchable actions grouped by category. |
+| [ClearButton](ClearButton.qmd#anylumino.ClearButton) | Compact clear-style action button. |
+| [CloseButton](CloseButton.qmd#anylumino.CloseButton) | Compact close-style action button. |
+| [InfieldButton](InfieldButton.qmd#anylumino.InfieldButton) | Button designed for placement inside an input field. |
+| [PickerButton](PickerButton.qmd#anylumino.PickerButton) | Button styled for opening picker-style popups. |
 
 ## Text input controls
 
@@ -42,6 +52,7 @@ Text, password, tag, and structured-list controls.
 | [PasswordInput](PasswordInput.qmd#anylumino.PasswordInput) | Password text input control. |
 | [Password](Password.qmd#anylumino.Password) | Password text input control. |
 | [Combobox](Combobox.qmd#anylumino.Combobox) | Text input with dropdown suggestions. |
+| [SearchInput](SearchInput.qmd#anylumino.SearchInput) | Spectrum search input control. |
 | [TagsInput](TagsInput.qmd#anylumino.TagsInput) | List input for string tags. |
 | [ColorsInput](ColorsInput.qmd#anylumino.ColorsInput) | List input for color tags. |
 | [FloatsInput](FloatsInput.qmd#anylumino.FloatsInput) | List input for float values. |
@@ -72,7 +83,10 @@ Buttons, toggles, checkboxes, and validation indicators.
 | [Button](Button.qmd#anylumino.Button) | Clickable button control. |
 | [Checkbox](Checkbox.qmd#anylumino.Checkbox) | Boolean checkbox control. |
 | [ToggleButton](ToggleButton.qmd#anylumino.ToggleButton) | Boolean toggle-button control. |
+| [Switch](Switch.qmd#anylumino.Switch) | Spectrum switch control. |
 | [Valid](Valid.qmd#anylumino.Valid) | Boolean validity indicator control. |
+| [StatusLight](StatusLight.qmd#anylumino.StatusLight) | Spectrum status-light display control. |
+| [Tooltip](Tooltip.qmd#anylumino.Tooltip) | Display tooltip text with an optional trigger child. |
 
 ## Numeric controls
 
@@ -94,6 +108,8 @@ Numeric sliders, range sliders, text inputs, and progress indicators.
 | [BoundedFloatText](BoundedFloatText.qmd#anylumino.BoundedFloatText) | Bounded float text input control. |
 | [IntProgress](IntProgress.qmd#anylumino.IntProgress) | Integer progress bar control. |
 | [FloatProgress](FloatProgress.qmd#anylumino.FloatProgress) | Float progress bar control. |
+| [Meter](Meter.qmd#anylumino.Meter) | Spectrum meter display control. |
+| [ProgressCircle](ProgressCircle.qmd#anylumino.ProgressCircle) | Display circular progress or indeterminate activity. |
 | [Play](Play.qmd#anylumino.Play) | Playback stepper control. |
 
 ## Date, color, file, and media controls
@@ -102,10 +118,13 @@ Specialized input and display widgets.
 
 | | |
 | --- | --- |
-| [DatePicker](DatePicker.qmd#anylumino.DatePicker) | Date picker control. |
-| [TimePicker](TimePicker.qmd#anylumino.TimePicker) | Time picker control. |
-| [DatetimePicker](DatetimePicker.qmd#anylumino.DatetimePicker) | Datetime picker control. |
+| [DatePicker](DatePicker.qmd#anylumino.DatePicker) | Browser-native date picker control. |
+| [TimePicker](TimePicker.qmd#anylumino.TimePicker) | Browser-native time picker control. |
+| [DatetimePicker](DatetimePicker.qmd#anylumino.DatetimePicker) | Browser-native datetime picker control. |
 | [ColorPicker](ColorPicker.qmd#anylumino.ColorPicker) | Color picker control. |
+| [ColorHandle](ColorHandle.qmd#anylumino.ColorHandle) | Display a draggable-looking color handle. |
+| [ColorLoupe](ColorLoupe.qmd#anylumino.ColorLoupe) | Display a color loupe preview. |
+| [OpacityCheckerboard](OpacityCheckerboard.qmd#anylumino.OpacityCheckerboard) | Display an opacity checkerboard swatch. |
 | [FileUpload](FileUpload.qmd#anylumino.FileUpload) | File upload control. |
 | [Image](Image.qmd#anylumino.Image) | Image display widget. |
 | [Audio](Audio.qmd#anylumino.Audio) | Audio display widget. |
@@ -114,12 +133,12 @@ Specialized input and display widgets.
 | [HTML](HTML.qmd#anylumino.HTML) | HTML display widget. |
 | [HTMLMath](HTMLMath.qmd#anylumino.HTMLMath) | HTML and math display widget. |
 | [Label](Label.qmd#anylumino.Label) | Plain text label widget. |
-
-## Utility widgets
-
-Small helper widgets used by examples and tests.
-
-| | |
-| --- | --- |
-| [ControlWidget](ControlWidget.qmd#anylumino.ControlWidget) | Base class for portable anylumino controls. |
 | [TextWidget](TextWidget.qmd#anylumino.TextWidget) | Small synced text display widget used in examples and tests. |
+| [Badge](Badge.qmd#anylumino.Badge) | Spectrum badge display control. |
+| [Link](Link.qmd#anylumino.Link) | Spectrum link display control. |
+| [Divider](Divider.qmd#anylumino.Divider) | Spectrum divider display control. |
+| [SpectrumElement](SpectrumElement.qmd#anylumino.SpectrumElement) | Generic wrapper for rendering a Spectrum custom element. |
+| [Icon](Icon.qmd#anylumino.Icon) | Display a Spectrum workflow icon. |
+| [UIIcon](UIIcon.qmd#anylumino.UIIcon) | Display a Spectrum UI icon. |
+| [HelpText](HelpText.qmd#anylumino.HelpText) | Display contextual help or validation text. |
+| [Underlay](Underlay.qmd#anylumino.Underlay) | Display a page underlay backdrop. |

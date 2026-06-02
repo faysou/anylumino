@@ -7,6 +7,7 @@ RadioButtons(
     index=None,
     description='',
     disabled=False,
+    **kwargs,
 )
 ```
 
@@ -16,11 +17,11 @@ Radio-button selection control.
 
 | Name        | Type     | Description                                    | Default   |
 |-------------|----------|------------------------------------------------|-----------|
-| options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
-| value | optional | Initial value and synced Python value. | `None` |
-| index | optional | Selected option index. | `None` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
+| options     | optional | Selectable values or ``(label, value)`` pairs. | `()`      |
+| value       | optional | Initial value and synced Python value.         | `None`    |
+| index       | optional | Selected option index.                         | `None`    |
+| description | optional | Label shown above the control.                 | `''`      |
+| disabled    | optional | Whether user interaction is disabled.          | `False`   |
 
 ## Attributes
 

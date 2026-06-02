@@ -4,14 +4,15 @@
 ToggleButton(
     value=False,
     description='',
-    disabled=False,
     indent=True,
     icon='',
-    button_style='',
+    icon_src='',
+    icon_size='s',
+    disabled=False,
+    variant='',
     tooltip='',
-    icon_family='classic',
-    icon_variant='solid',
-    icon_library='default',
+    quiet=False,
+    **kwargs,
 )
 ```
 
@@ -19,18 +20,18 @@ Boolean toggle-button control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type     | Description                                                           | Default     |
-|--------------|----------|-----------------------------------------------------------------------|-------------|
-| value | optional | Initial value and synced Python value. | `False` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-| indent | optional | Whether checkbox labels are indented. | `True` |
-| icon | optional | Web Awesome icon name. | `''` |
-| button_style | optional | Visual variant such as ``'primary'``, ``'success'``, or ``'danger'``. | `''` |
-| tooltip | optional | Hover text. | `''` |
-| icon_family | optional | Web Awesome icon family, for example ``'classic'``. | `'classic'` |
-| icon_variant | optional | Web Awesome icon variant, for example ``'solid'`` or ``'regular'``. | `'solid'` |
-| icon_library | optional | Web Awesome icon library, for example ``'default'``. | `'default'` |
+| Name        | Type     | Description                                                                                                        | Default   |
+|-------------|----------|--------------------------------------------------------------------------------------------------------------------|-----------|
+| value       | optional | Initial value and synced Python value.                                                                             | `False`   |
+| description | optional | Label shown above the control.                                                                                     | `''`      |
+| disabled    | optional | Whether user interaction is disabled.                                                                              | `False`   |
+| indent      | optional | Whether checkbox labels are indented.                                                                              | `True`    |
+| icon        | optional | Spectrum workflow icon name, for example ``'AddContent'`` or ``'HelpCircle'``.                                     | `''`      |
+| icon_src    | optional | Custom icon image URL or data URI for ``sp-icon``.                                                                 | `''`      |
+| icon_size   | optional | Spectrum icon size such as ``'s'``, ``'m'``, ``'l'``, ``'xl'``, or ``'xxl'``.                                      | `'s'`     |
+| variant     | optional | Spectrum visual variant such as ``'accent'``, ``'primary'``, ``'negative'``, ``'positive'``, or ``'informative'``. | `''`      |
+| tooltip     | optional | Hover text.                                                                                                        | `''`      |
+| quiet       | optional | Whether to use Spectrum's quiet visual treatment.                                                                  | `False`   |
 
 ## Attributes
 

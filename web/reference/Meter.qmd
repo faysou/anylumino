@@ -1,0 +1,16 @@
+# Meter { #anylumino.Meter }
+
+```python
+Meter(value=0.0, description='', variant='informative', readout=False, **kwargs)
+```
+
+Spectrum meter display control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type     | Description                                                                                                        | Default         |
+|-------------|----------|--------------------------------------------------------------------------------------------------------------------|-----------------|
+| value       | optional | Initial value and synced Python value.                                                                             | `0.0`           |
+| description | optional | Label shown above the control.                                                                                     | `''`            |
+| variant     | optional | Spectrum visual variant such as ``'accent'``, ``'primary'``, ``'negative'``, ``'positive'``, or ``'informative'``. | `'informative'` |
+| readout     | optional | Whether to show the current value.                                                                                 | `False`         |

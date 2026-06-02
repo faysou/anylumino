@@ -6,10 +6,11 @@ FileUpload(
     multiple=False,
     disabled=False,
     description='Upload',
-    icon='upload',
-    icon_family='classic',
-    icon_variant='solid',
-    icon_library='default',
+    icon='Upload',
+    icon_src='',
+    icon_size='s',
+    variant='',
+    **kwargs,
 )
 ```
 
@@ -17,16 +18,16 @@ File upload control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type     | Description                                                         | Default     |
-|--------------|----------|---------------------------------------------------------------------|-------------|
-| accept | optional | Accepted file extensions or MIME types. | `''` |
-| multiple | optional | Whether multiple files can be selected. | `False` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-| description | optional | Label shown above the control. | `'Upload'` |
-| icon | optional | Web Awesome icon name. | `'upload'` |
-| icon_family | optional | Web Awesome icon family, for example ``'classic'``. | `'classic'` |
-| icon_variant | optional | Web Awesome icon variant, for example ``'solid'`` or ``'regular'``. | `'solid'` |
-| icon_library | optional | Web Awesome icon library, for example ``'default'``. | `'default'` |
+| Name        | Type     | Description                                                                                                        | Default    |
+|-------------|----------|--------------------------------------------------------------------------------------------------------------------|------------|
+| accept      | optional | Accepted file extensions or MIME types.                                                                            | `''`       |
+| multiple    | optional | Whether multiple files can be selected.                                                                            | `False`    |
+| disabled    | optional | Whether user interaction is disabled.                                                                              | `False`    |
+| description | optional | Label shown above the control.                                                                                     | `'Upload'` |
+| icon        | optional | Spectrum workflow icon name, for example ``'AddContent'`` or ``'HelpCircle'``.                                     | `'Upload'` |
+| icon_src    | optional | Custom icon image URL or data URI for ``sp-icon``.                                                                 | `''`       |
+| icon_size   | optional | Spectrum icon size such as ``'s'``, ``'m'``, ``'l'``, ``'xl'``, or ``'xxl'``.                                      | `'s'`      |
+| variant     | optional | Spectrum visual variant such as ``'accent'``, ``'primary'``, ``'negative'``, ``'positive'``, or ``'informative'``. | `''`       |
 
 ## Attributes
 

@@ -6,7 +6,7 @@ import {
   SplitPanel,
   StackedPanel,
   Widget,
-} from "https://esm.sh/@lumino/widgets@2.8.0?bundle";
+} from "@lumino/widgets";
 import {
   combineSignals,
   cssSize,

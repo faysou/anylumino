@@ -1,10 +1,7 @@
 # Label { #anylumino.Label }
 
 ```python
-Label(
-    value='',
-    description='',
-)
+Label(value='', description='', **kwargs)
 ```
 
 Plain text label widget.
@@ -13,5 +10,5 @@ Plain text label widget.
 
 | Name        | Type     | Description                            | Default   |
 |-------------|----------|----------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `''` |
-| description | optional | Label shown above the control. | `''` |
+| value       | optional | Initial value and synced Python value. | `''`      |
+| description | optional | Label shown above the control.         | `''`      |

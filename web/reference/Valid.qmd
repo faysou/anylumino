@@ -1,11 +1,7 @@
 # Valid { #anylumino.Valid }
 
 ```python
-Valid(
-    value=False,
-    description='',
-    readout='',
-)
+Valid(value=False, description='', readout='', **kwargs)
 ```
 
 Boolean validity indicator control.
@@ -14,9 +10,9 @@ Boolean validity indicator control.
 
 | Name        | Type     | Description                            | Default   |
 |-------------|----------|----------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `False` |
-| description | optional | Label shown above the control. | `''` |
-| readout | optional | Whether to show the current value. | `''` |
+| value       | optional | Initial value and synced Python value. | `False`   |
+| description | optional | Label shown above the control.         | `''`      |
+| readout     | optional | Whether to show the current value.     | `''`      |
 
 ## Attributes
 

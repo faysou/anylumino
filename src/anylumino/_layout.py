@@ -16,26 +16,9 @@ BOX_DIRECTIONS = ("left-to-right", "right-to-left", "top-to-bottom", "bottom-to-
 ORIENTATIONS = ("horizontal", "vertical")
 DOCK_MODES = ("tab-after", "split-right", "split-left", "split-top", "split-bottom")
 ACTION_KINDS = ("toolbar", "menubar", "command_palette")
-COMPOSITION_IMPORT = """import {
-  combineSignals,
-  cssSize,
-  disposeLuminoWidget,
-  installResizeHandle,
-  notifyLuminoWidgetVisible,
-  removeModelListener,
-  renderWidgetRef,
-} from "./composition.js";
-"""
-
 ActionCallback = Callable[[str], None]
 ChildInput = Iterable[object] | Mapping[str, object] | None
 TitleInput = Iterable[str] | Mapping[str, str] | None
-
-
-def _esm_with_composition(filename: str) -> str:
-    composition = (STATIC_DIR / "composition.js").read_text()
-    module = (STATIC_DIR / filename).read_text().replace(COMPOSITION_IMPORT, "")
-    return f"{composition}\n\n{module}"
 
 
 def _widget_ref(value: object) -> object:
@@ -381,7 +364,7 @@ class TabPanel(LayoutWidget):
         Whether the panel receives a notebook-friendly resize handle.
     """
 
-    _esm = _esm_with_composition("tab_panel.js")
+    _esm = STATIC_DIR / "tab_panel.bundle.js"
     _css = STATIC_DIR / "tab_panel.css"
     _title_prefix = "Tab"
 
@@ -466,7 +449,7 @@ class BoxPanel(LayoutWidget):
         Minimum child sizes used when scrolling is enabled.
     """
 
-    _esm = _esm_with_composition("layout_panel.js")
+    _esm = STATIC_DIR / "layout_panel.bundle.js"
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("box").tag(sync=True)
@@ -733,7 +716,7 @@ class SplitPanel(LayoutWidget):
         dividers remain draggable independently.
     """
 
-    _esm = _esm_with_composition("layout_panel.js")
+    _esm = STATIC_DIR / "layout_panel.bundle.js"
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("split").tag(sync=True)
@@ -789,7 +772,7 @@ class DockPanel(LayoutWidget):
         Whether the dock panel gets a notebook resize handle.
     """
 
-    _esm = _esm_with_composition("layout_panel.js")
+    _esm = STATIC_DIR / "layout_panel.bundle.js"
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("dock").tag(sync=True)
@@ -829,7 +812,7 @@ class AccordionPanel(LayoutWidget):
         Whether the accordion gets a notebook resize handle.
     """
 
-    _esm = _esm_with_composition("layout_panel.js")
+    _esm = STATIC_DIR / "layout_panel.bundle.js"
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("accordion").tag(sync=True)
@@ -868,7 +851,7 @@ class StackedPanel(LayoutWidget):
         Whether the panel gets a notebook resize handle.
     """
 
-    _esm = _esm_with_composition("layout_panel.js")
+    _esm = STATIC_DIR / "layout_panel.bundle.js"
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("stacked").tag(sync=True)
@@ -920,7 +903,7 @@ class GridPanel(LayoutWidget):
         Whether the grid gets a notebook resize handle.
     """
 
-    _esm = _esm_with_composition("layout_panel.js")
+    _esm = STATIC_DIR / "layout_panel.bundle.js"
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("grid").tag(sync=True)
@@ -984,7 +967,7 @@ class ResponsivePanel(LayoutWidget):
         Whether the panel gets a notebook resize handle.
     """
 
-    _esm = _esm_with_composition("layout_panel.js")
+    _esm = STATIC_DIR / "layout_panel.bundle.js"
     _css = STATIC_DIR / "layout_panel.css"
 
     layout_kind = t.Unicode("responsive").tag(sync=True)
@@ -1022,7 +1005,7 @@ class ResponsivePanel(LayoutWidget):
 
 
 class _ActionWidget(anywidget.AnyWidget):
-    _esm = STATIC_DIR / "action_panel.js"
+    _esm = STATIC_DIR / "action_panel.bundle.js"
     _css = STATIC_DIR / "action_panel.css"
 
     action_kind = t.Enum(ACTION_KINDS).tag(sync=True)
@@ -1066,10 +1049,9 @@ class Toolbar(_ActionWidget):
     ----------
     actions : iterable of dict, optional
         Action definitions. Each action should include an ``id`` and ``label``;
-        optional keys such as ``icon``, ``tooltip``, ``disabled``, or
-        ``separator`` are forwarded to the frontend. ``icon`` uses Web Awesome
-        names. ``icon_family``, ``icon_variant``, and ``icon_library`` can be
-        supplied for the same ``wa-icon`` options as native anylumino controls.
+        optional keys such as ``icon``, ``icon_src``, ``icon_size``,
+        ``tooltip``, ``disabled``, or ``separator`` are forwarded to the
+        frontend. ``icon`` uses Spectrum workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by action id. A callback receives the activated
         action id.
@@ -1098,9 +1080,9 @@ class MenuBar(_ActionWidget):
     menus : iterable of dict, optional
         Menu definitions. A menu normally has a ``label`` and an ``items``
         sequence. Item dictionaries should include an ``id`` and ``label`` and
-        may include frontend options such as ``icon``, ``disabled``, or
-        ``separator``. ``icon`` uses Web Awesome names, with optional
-        ``icon_family``, ``icon_variant``, and ``icon_library`` metadata.
+        may include frontend options such as ``icon``, ``icon_src``,
+        ``icon_size``, ``disabled``, or ``separator``. ``icon`` uses Spectrum
+        workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by menu item id. A callback receives the activated
         item id.
@@ -1129,9 +1111,8 @@ class CommandPalette(_ActionWidget):
     commands : iterable of dict, optional
         Command definitions. Each command should include an ``id`` and
         ``label``; optional keys such as ``category``, ``caption``, ``icon``,
-        or ``disabled`` are forwarded to the frontend. ``icon`` uses Web
-        Awesome names, with optional ``icon_family``, ``icon_variant``, and
-        ``icon_library`` metadata.
+        ``icon_src``, ``icon_size``, or ``disabled`` are forwarded to the
+        frontend. ``icon`` uses Spectrum workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by command id. A callback receives the activated
         command id.

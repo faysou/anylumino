@@ -71,8 +71,8 @@ site_input = TextInput(value="East bed", description="Site")
 species_input = Dropdown(options=["Iris", "Daisy", "Lupine"], value="Iris", description="Species")
 count_input = IntSlider(value=10, min=1, max=50, step=1, description="Count")
 height_input = IntSlider(value=30, min=5, max=80, step=1, description="Height cm")
-add_button = Button(description="Add row", button_style="primary", icon="plus")
-reset_button = Button(description="Reset", icon="rotate-left")
+add_button = Button(description="Add row", variant="accent", icon="AddContent")
+reset_button = Button(description="Reset", icon="RotateRight")
 status = TextWidget("Ready. Press Add row to append to the DataFrame and refresh the ITable.")
 summary = TextWidget(make_summary(state["df"]))
 
@@ -126,8 +126,8 @@ reset_button.on_click(reset_samples)
 # %%
 toolbar = Toolbar(
     [
-        {"id": "add", "label": "Add row", "icon": "plus"},
-        {"id": "reset", "label": "Reset", "icon": "rotate-left"},
+        {"id": "add", "label": "Add row", "icon": "AddContent"},
+        {"id": "reset", "label": "Reset", "icon": "RotateRight"},
     ],
     callbacks={
         "add": lambda _id: append_sample(),

@@ -15,11 +15,21 @@ website:
       - reference/StackedPanel.qmd
       - reference/GridPanel.qmd
       - reference/ResponsivePanel.qmd
+      - reference/FieldGroup.qmd
+      - reference/Popover.qmd
+      - reference/Tray.qmd
+      - reference/Overlay.qmd
+      - reference/DialogBox.qmd
+      - reference/Modal.qmd
       section: Layout widgets
     - contents:
       - reference/Toolbar.qmd
       - reference/MenuBar.qmd
       - reference/CommandPalette.qmd
+      - reference/ClearButton.qmd
+      - reference/CloseButton.qmd
+      - reference/InfieldButton.qmd
+      - reference/PickerButton.qmd
       section: Action widgets
     - contents:
       - reference/TextInput.qmd
@@ -29,6 +39,7 @@ website:
       - reference/PasswordInput.qmd
       - reference/Password.qmd
       - reference/Combobox.qmd
+      - reference/SearchInput.qmd
       - reference/TagsInput.qmd
       - reference/ColorsInput.qmd
       - reference/FloatsInput.qmd
@@ -49,7 +60,10 @@ website:
       - reference/Button.qmd
       - reference/Checkbox.qmd
       - reference/ToggleButton.qmd
+      - reference/Switch.qmd
       - reference/Valid.qmd
+      - reference/StatusLight.qmd
+      - reference/Tooltip.qmd
       section: Boolean and action controls
     - contents:
       - reference/IntSlider.qmd
@@ -66,6 +80,8 @@ website:
       - reference/BoundedFloatText.qmd
       - reference/IntProgress.qmd
       - reference/FloatProgress.qmd
+      - reference/Meter.qmd
+      - reference/ProgressCircle.qmd
       - reference/Play.qmd
       section: Numeric controls
     - contents:
@@ -73,6 +89,9 @@ website:
       - reference/TimePicker.qmd
       - reference/DatetimePicker.qmd
       - reference/ColorPicker.qmd
+      - reference/ColorHandle.qmd
+      - reference/ColorLoupe.qmd
+      - reference/OpacityCheckerboard.qmd
       - reference/FileUpload.qmd
       - reference/Image.qmd
       - reference/Audio.qmd
@@ -81,10 +100,15 @@ website:
       - reference/HTML.qmd
       - reference/HTMLMath.qmd
       - reference/Label.qmd
-      section: Date, color, file, and media controls
-    - contents:
-      - reference/ControlWidget.qmd
       - reference/TextWidget.qmd
-      section: Utility widgets
+      - reference/Badge.qmd
+      - reference/Link.qmd
+      - reference/Divider.qmd
+      - reference/SpectrumElement.qmd
+      - reference/Icon.qmd
+      - reference/UIIcon.qmd
+      - reference/HelpText.qmd
+      - reference/Underlay.qmd
+      section: Date, color, file, and media controls
     id: reference
   - id: dummy-sidebar

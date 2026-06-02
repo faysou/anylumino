@@ -1,0 +1,32 @@
+# SearchInput { #anylumino.SearchInput }
+
+```python
+SearchInput(
+    value='',
+    description='',
+    placeholder='',
+    disabled=False,
+    continuous_update=True,
+    quiet=False,
+    **kwargs,
+)
+```
+
+Spectrum search input control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type     | Description                                                           | Default   |
+|-------------------|----------|-----------------------------------------------------------------------|-----------|
+| value             | optional | Initial value and synced Python value.                                | `''`      |
+| description       | optional | Label shown above the control.                                        | `''`      |
+| placeholder       | optional | Text shown while the input is empty.                                  | `''`      |
+| disabled          | optional | Whether user interaction is disabled.                                 | `False`   |
+| continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True`    |
+| quiet             | optional | Whether to use Spectrum's quiet visual treatment.                     | `False`   |
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [control_kind](#anylumino.SearchInput.control_kind) | A trait for unicode strings. |

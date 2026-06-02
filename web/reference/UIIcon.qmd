@@ -1,0 +1,14 @@
+# UIIcon { #anylumino.UIIcon }
+
+```python
+UIIcon(value='checkmark100', *, label='', **kwargs)
+```
+
+Display a Spectrum UI icon.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type     | Description                                                    | Default          |
+|--------|----------|----------------------------------------------------------------|------------------|
+| value  | optional | Initial value and synced Python value.                         | `'checkmark100'` |
+| label  | optional | Accessible label or visible label, depending on the component. | `''`             |

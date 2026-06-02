@@ -1,9 +1,7 @@
 # Output { #anylumino.Output }
 
 ```python
-Output(
-    value='',
-)
+Output(value='', **kwargs)
 ```
 
 Simple output display widget.
@@ -12,4 +10,4 @@ Simple output display widget.
 
 | Name   | Type     | Description                            | Default   |
 |--------|----------|----------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `''` |
+| value  | optional | Initial value and synced Python value. | `''`      |

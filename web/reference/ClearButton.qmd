@@ -1,0 +1,23 @@
+# ClearButton { #anylumino.ClearButton }
+
+```python
+ClearButton(
+    label='Clear',
+    *,
+    component_kind='clear-button',
+    disabled=False,
+    callbacks=None,
+    **kwargs,
+)
+```
+
+Compact clear-style action button.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type     | Description                                                           | Default          |
+|----------------|----------|-----------------------------------------------------------------------|------------------|
+| label          | optional | Accessible label or visible label, depending on the component.        | `'Clear'`        |
+| component_kind | optional | Internal component kind used by specialized button subclasses.        | `'clear-button'` |
+| disabled       | optional | Whether user interaction is disabled.                                 | `False`          |
+| callbacks      | optional | Optional callbacks invoked when the widget sends an activation event. | `None`           |

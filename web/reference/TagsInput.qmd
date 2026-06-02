@@ -7,6 +7,7 @@ TagsInput(
     allow_duplicates=False,
     description='',
     disabled=False,
+    **kwargs,
 )
 ```
 
@@ -16,8 +17,8 @@ List input for string tags.
 
 | Name             | Type     | Description                                   | Default   |
 |------------------|----------|-----------------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `()` |
-| allowed_tags | optional | Optional allowed values for tag-style inputs. | `None` |
-| allow_duplicates | optional | Whether duplicate entries are allowed. | `False` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
+| value            | optional | Initial value and synced Python value.        | `()`      |
+| allowed_tags     | optional | Optional allowed values for tag-style inputs. | `None`    |
+| allow_duplicates | optional | Whether duplicate entries are allowed.        | `False`   |
+| description      | optional | Label shown above the control.                | `''`      |
+| disabled         | optional | Whether user interaction is disabled.         | `False`   |

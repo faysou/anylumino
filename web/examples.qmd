@@ -31,8 +31,8 @@ tabs.add("recent", figure_b, title="Recent", select=True)
 from anylumino import CommandPalette, MenuBar, SplitPanel, TabPanel, Toolbar, VBox
 
 actions = [
-    {"id": "new-figure", "label": "New figure", "icon": "plus"},
-    {"id": "refresh", "label": "Refresh", "icon": "rotate"},
+    {"id": "new-figure", "label": "New figure", "icon": "AddContent"},
+    {"id": "refresh", "label": "Refresh", "icon": "RotateRight"},
 ]
 
 callbacks = {
@@ -50,9 +50,12 @@ controls = VBox({"menu": menu, "toolbar": toolbar, "palette": palette})
 SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 ```
 
-Icons render through Web Awesome's `wa-icon` element, the same convention used
-by native anylumino controls. Use `icon_family`, `icon_variant`, and
-`icon_library` when a command needs non-default Web Awesome icon metadata.
+Icons render through Spectrum workflow icons, the same convention used by
+Spectrum-backed anylumino controls. Use `icon_src` for custom SVG/image icons and
+`icon_size` for Spectrum icon sizing.
+
+The frontend bundles are shipped with anylumino, so these examples do not
+require CDN access for Lumino, Spectrum components, or bundled workflow icons.
 
 ## Local notebooks
 
@@ -62,8 +65,13 @@ The repository includes Jupytext notebooks for smoke testing:
   figures.
 - `notebooks/plotly_dashboard.py` exercises all layout and action widgets with
   Plotly figure updates.
-- `notebooks/input_controls_hbox.py` shows native anylumino controls inside
-  `ScrollBox`.
+- `notebooks/input_controls_hbox.py` shows Spectrum-backed controls and native
+  date/time controls inside `ScrollBox`.
+- `notebooks/spectrum_components.py` focuses on Spectrum-backed controls,
+  workflow icons, variants, and per-widget theme knobs.
+- `notebooks/spectrum_remaining_components.py` demonstrates surface widgets,
+  display helpers, dialogs, popovers, trays, tooltips, field groups, progress
+  circles, color handles, and button variants.
 - `notebooks/itables_tabs.py` places an `itables.widget.ITable` inside a tab,
   appends rows to a pandas DataFrame, and refreshes the displayed table with
   `ITable.update(...)`.

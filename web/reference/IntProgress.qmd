@@ -1,13 +1,7 @@
 # IntProgress { #anylumino.IntProgress }
 
 ```python
-IntProgress(
-    value=0,
-    min=0,
-    max=100,
-    description='',
-    bar_style='',
-)
+IntProgress(value=0, min=0, max=100, description='', bar_style='', **kwargs)
 ```
 
 Integer progress bar control.
@@ -16,11 +10,11 @@ Integer progress bar control.
 
 | Name        | Type     | Description                                                     | Default   |
 |-------------|----------|-----------------------------------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `0` |
-| min | optional | Minimum numeric, date, or time value. | `0` |
-| max | optional | Maximum numeric, date, or time value. | `100` |
-| description | optional | Label shown above the control. | `''` |
-| bar_style | optional | Progress-bar style name such as ``'success'`` or ``'warning'``. | `''` |
+| value       | optional | Initial value and synced Python value.                          | `0`       |
+| min         | optional | Minimum numeric, date, or time value.                           | `0`       |
+| max         | optional | Maximum numeric, date, or time value.                           | `100`     |
+| description | optional | Label shown above the control.                                  | `''`      |
+| bar_style   | optional | Progress-bar style name such as ``'success'`` or ``'warning'``. | `''`      |
 
 ## Attributes
 

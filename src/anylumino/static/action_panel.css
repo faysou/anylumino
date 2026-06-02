@@ -1,7 +1,13 @@
+.anylumino-ActionTheme {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  font: var(--spectrum-body-size-s, 13px) / 1.35 var(--spectrum-sans-font-family-stack, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
+
 .anylumino-ActionHost {
   min-width: 220px;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .anylumino-ActionHost *,
@@ -19,55 +25,43 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  padding: 6px;
-  background: #f8fafc;
-  border: 1px solid #d8dee9;
+  gap: 4px;
+  padding: 4px;
+  background: var(--spectrum-gray-75, #f8f8f8);
+  border: 1px solid var(--spectrum-gray-300, #d5d5d5);
 }
 
 .anylumino-ToolbarButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  padding: 5px 10px;
-  color: #172033;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 5px;
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
+  max-width: 100%;
+}
+
+.anylumino-ToolbarButton:not([disabled]) {
+  transition:
+    transform 80ms ease,
+    filter 80ms ease;
+  will-change: transform;
+}
+
+.anylumino-ToolbarButton:not([disabled]):active {
+  transform: translateY(1px);
+  filter: brightness(0.96);
 }
 
 .anylumino-ToolbarButtonIconOnly {
-  width: 32px;
-  padding: 5px;
+  min-width: 28px;
 }
 
 .anylumino-ToolbarIcon {
   display: inline-flex;
-  width: 1em;
-  height: 1em;
   flex: 0 0 auto;
-  font-size: 14px;
-  line-height: 1;
-}
-
-.anylumino-ToolbarButton:hover {
-  background: #eef2f7;
-}
-
-.anylumino-ToolbarButton:disabled {
-  color: #94a3b8;
-  cursor: default;
+  color: currentColor;
 }
 
 .anylumino-MenuBar {
   min-height: 32px;
-  color: #172033;
-  background: #f8fafc;
-  border: 1px solid #d8dee9;
+  color: var(--spectrum-gray-900, #222222);
+  background: var(--spectrum-gray-75, #f8f8f8);
+  border: 1px solid var(--spectrum-gray-300, #d5d5d5);
 }
 
 .anylumino-MenuBar .lm-MenuBar-content {
@@ -88,15 +82,15 @@
 }
 
 .anylumino-MenuBar .lm-MenuBar-item.lm-mod-active {
-  background: #eef2f7;
+  background: var(--spectrum-gray-200, #e8e8e8);
 }
 
 .lm-Menu {
   min-width: 160px;
   padding: 4px 0;
-  color: #172033;
-  background: #ffffff;
-  border: 1px solid #d8dee9;
+  color: var(--spectrum-gray-900, #222222);
+  background: var(--spectrum-gray-50, #ffffff);
+  border: 1px solid var(--spectrum-gray-300, #d5d5d5);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
 }
 
@@ -113,33 +107,33 @@
 }
 
 .lm-Menu-item.lm-mod-active {
-  background: #eef2f7;
+  background: var(--spectrum-gray-200, #e8e8e8);
 }
 
 .anylumino-CommandPalette {
   overflow: auto;
-  color: #172033;
-  background: #ffffff;
-  border: 1px solid #d8dee9;
+  color: var(--spectrum-gray-900, #222222);
+  background: var(--spectrum-gray-50, #ffffff);
+  border: 1px solid var(--spectrum-gray-300, #d5d5d5);
 }
 
 .anylumino-CommandPalette .lm-CommandPalette-search {
   padding: 6px;
-  background: #f8fafc;
-  border-bottom: 1px solid #d8dee9;
+  background: var(--spectrum-gray-75, #f8f8f8);
+  border-bottom: 1px solid var(--spectrum-gray-300, #d5d5d5);
 }
 
 .anylumino-CommandPalette input {
   width: 100%;
   min-height: 30px;
   padding: 4px 8px;
-  border: 1px solid #cbd5e1;
-  border-radius: 5px;
+  border: 1px solid var(--spectrum-gray-400, #b7b7b7);
+  border-radius: 4px;
 }
 
 .anylumino-CommandPalette .lm-CommandPalette-header {
   padding: 7px 10px 4px;
-  color: #64748b;
+  color: var(--spectrum-gray-700, #6d6d6d);
   font-size: 12px;
   font-weight: 600;
 }
@@ -150,5 +144,5 @@
 }
 
 .anylumino-CommandPalette .lm-CommandPalette-item.lm-mod-active {
-  background: #eef2f7;
+  background: var(--spectrum-gray-200, #e8e8e8);
 }

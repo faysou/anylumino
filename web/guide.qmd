@@ -10,7 +10,7 @@ composition API: keyed children, child lookup, dynamic mutation, and method
 forwarding.
 
 The goal is to make bigger widgets from existing widgets. A composed widget can
-combine anywidgets, native anylumino controls, charts, tables, and outputs into one
+combine anywidgets, anylumino controls, charts, tables, and outputs into one
 reusable object. Because that object is still an anywidget, it can be nested
 again inside tabs, split panes, dock panels, or another domain-specific
 component.
@@ -129,7 +129,7 @@ The `scroll=True` convenience follows the natural axis:
 ```python
 from anylumino import HBox, ScrollBox
 
-wide = HBox(children, scroll=True, height=160)
+wide = HBox(children, scroll=True, child_min_width=180, spacing=12, height=160)
 vertical = ScrollBox(children, height=420)
 ```
 
@@ -140,9 +140,14 @@ HBox(
     children,
     scroll_x=True,
     scroll_y=False,
+    spacing=12,
     child_min_width=220,
 )
 ```
+
+`spacing` controls the gap between children. `child_min_width` and
+`child_min_height` reserve enough room for each child, and `scroll=True` lets a
+row scroll instead of compressing controls until labels or inputs clip.
 
 ## Resizing
 
@@ -171,8 +176,8 @@ from anylumino import Toolbar
 
 toolbar = Toolbar(
     [
-        {"id": "refresh", "label": "Refresh", "icon": "rotate"},
-        {"id": "note", "label": "Note", "icon": "comment", "icon_variant": "regular"},
+        {"id": "refresh", "label": "Refresh", "icon": "RotateRight"},
+        {"id": "note", "label": "Note", "icon": "Comment"},
     ],
     callbacks={
         "refresh": lambda _id: figure_panel.refresh(),
@@ -181,8 +186,14 @@ toolbar = Toolbar(
 )
 ```
 
-Action widget icons render through Web Awesome's `wa-icon` element, matching
-native anylumino controls such as `Button(icon="check")`. Use Web Awesome icon
-names and add `icon_family`, `icon_variant`, or `icon_library` for non-default
-icon sources. Common names include `plus`, `rotate`, `comment`, `chart-line`,
-`forward-step`, `expand`, `circle-half-stroke`, `check`, and `xmark`.
+Action widget icons render through Spectrum workflow icons, matching
+Spectrum-backed anylumino controls such as `Button(icon="CheckmarkCircle")`.
+Use Spectrum icon
+names such as `AddContent`, `RotateRight`, `Comment`, `GraphTrend`,
+`StepForward`, `FullScreen`, and `HelpCircle`. Pass `icon_src` for a custom
+image or SVG icon and `icon_size` to control Spectrum icon sizing.
+
+Lumino, Spectrum components, and the bundled workflow icon set are compiled
+into anylumino's frontend bundles, so notebooks do not need CDN access at
+runtime. Use `icon_src` for local or data URI icons outside the bundled workflow
+icon set.

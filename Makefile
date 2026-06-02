@@ -7,7 +7,13 @@ DOCS_URL = http://127.0.0.1:$(DOCS_PORT)/
 .PHONY: install-dev
 install-dev:
 	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) sync --group dev
+	npm ci
+	npm run build
 	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run --no-sync jupytext-config set-default-viewer
+
+.PHONY: frontend
+frontend:
+	npm run build
 
 .PHONY: lab
 lab:

@@ -1,12 +1,7 @@
 # Checkbox { #anylumino.Checkbox }
 
 ```python
-Checkbox(
-    value=False,
-    description='',
-    disabled=False,
-    indent=True,
-)
+Checkbox(value=False, description='', disabled=False, indent=True, **kwargs)
 ```
 
 Boolean checkbox control.
@@ -15,7 +10,7 @@ Boolean checkbox control.
 
 | Name        | Type     | Description                            | Default   |
 |-------------|----------|----------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `False` |
-| description | optional | Label shown above the control. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-| indent | optional | Whether checkbox labels are indented. | `True` |
+| value       | optional | Initial value and synced Python value. | `False`   |
+| description | optional | Label shown above the control.         | `''`      |
+| disabled    | optional | Whether user interaction is disabled.  | `False`   |
+| indent      | optional | Whether checkbox labels are indented.  | `True`    |

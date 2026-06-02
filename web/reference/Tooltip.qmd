@@ -1,0 +1,25 @@
+# Tooltip { #anylumino.Tooltip }
+
+```python
+Tooltip(
+    text,
+    children=None,
+    *,
+    open=False,
+    placement='top',
+    variant='',
+    **kwargs,
+)
+```
+
+Display tooltip text with an optional trigger child.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type     | Description                                                                              | Default    |
+|-----------|----------|------------------------------------------------------------------------------------------|------------|
+| text      | required | Visible text content.                                                                    | _required_ |
+| children  | optional | Child anywidgets or keyed child mapping rendered inside the component.                   | `None`     |
+| open      | optional | Whether an overlay-like component starts open.                                           | `False`    |
+| placement | optional | Preferred overlay placement such as ``'top'``, ``'bottom'``, ``'left'``, or ``'right'``. | `'top'`    |
+| variant   | optional | Spectrum visual variant.                                                                 | `''`       |

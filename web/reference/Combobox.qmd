@@ -3,12 +3,13 @@
 ```python
 Combobox(
     value='',
+    options=(),
     description='',
     placeholder='',
+    ensure_option=False,
     disabled=False,
     continuous_update=True,
-    options=(),
-    ensure_option=False,
+    **kwargs,
 )
 ```
 
@@ -18,13 +19,13 @@ Text input with dropdown suggestions.
 
 | Name              | Type     | Description                                                           | Default   |
 |-------------------|----------|-----------------------------------------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `''` |
-| description | optional | Label shown above the control. | `''` |
-| placeholder | optional | Text shown while the input is empty. | `''` |
-| disabled | optional | Whether user interaction is disabled. | `False` |
-| continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
-| options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
-| ensure_option | optional | Whether combobox values must be present in ``options``. | `False` |
+| value             | optional | Initial value and synced Python value.                                | `''`      |
+| description       | optional | Label shown above the control.                                        | `''`      |
+| placeholder       | optional | Text shown while the input is empty.                                  | `''`      |
+| disabled          | optional | Whether user interaction is disabled.                                 | `False`   |
+| continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True`    |
+| options           | optional | Selectable values or ``(label, value)`` pairs.                        | `()`      |
+| ensure_option     | optional | Whether combobox values must be present in ``options``.               | `False`   |
 
 ## Attributes
 

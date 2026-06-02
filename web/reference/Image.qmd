@@ -1,12 +1,7 @@
 # Image { #anylumino.Image }
 
 ```python
-Image(
-    value='',
-    format='png',
-    width='',
-    height='',
-)
+Image(value='', format='png', width='', height='', **kwargs)
 ```
 
 Image display widget.
@@ -15,7 +10,7 @@ Image display widget.
 
 | Name   | Type     | Description                                              | Default   |
 |--------|----------|----------------------------------------------------------|-----------|
-| value | optional | Initial value and synced Python value. | `''` |
-| format | optional | Media format such as ``'png'``, ``'mp3'``, or ``'mp4'``. | `'png'` |
-| width | optional | CSS width for media widgets. | `''` |
-| height | optional | CSS height for media widgets. | `''` |
+| value  | optional | Initial value and synced Python value.                   | `''`      |
+| format | optional | Media format such as ``'png'``, ``'mp3'``, or ``'mp4'``. | `'png'`   |
+| width  | optional | CSS width for media widgets.                             | `''`      |
+| height | optional | CSS height for media widgets.                            | `''`      |

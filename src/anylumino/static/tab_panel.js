@@ -1,4 +1,4 @@
-import { TabPanel, Widget } from "https://esm.sh/@lumino/widgets@2.8.0?bundle";
+import { TabPanel, Widget } from "@lumino/widgets";
 import {
   combineSignals,
   cssSize,

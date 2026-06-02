@@ -1,0 +1,16 @@
+# Icon { #anylumino.Icon }
+
+```python
+Icon(icon='', *, icon_src='', icon_size='m', label='', **kwargs)
+```
+
+Display a Spectrum workflow icon.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type     | Description                                                                   | Default   |
+|-----------|----------|-------------------------------------------------------------------------------|-----------|
+| icon      | optional | Spectrum workflow icon name.                                                  | `''`      |
+| icon_src  | optional | Custom icon image URL or data URI.                                            | `''`      |
+| icon_size | optional | Spectrum icon size such as ``'s'``, ``'m'``, ``'l'``, ``'xl'``, or ``'xxl'``. | `'m'`     |
+| label     | optional | Accessible label or visible label, depending on the component.                | `''`      |
