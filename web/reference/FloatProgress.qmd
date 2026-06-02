@@ -14,8 +14,8 @@ Float progress bar control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                                     | Default    |
-|-------------|----------|-----------------------------------------------------------------|------------|
+| Name        | Type     | Description                                                     | Default   |
+|-------------|----------|-----------------------------------------------------------------|-----------|
 | value | optional | Initial value and synced Python value. | `0.0` |
 | min | optional | Minimum numeric, date, or time value. | `0.0` |
 | max | optional | Maximum numeric, date, or time value. | `100.0` |

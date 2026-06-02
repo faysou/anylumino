@@ -14,8 +14,8 @@ List input for integer values.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name             | Type     | Description                                   | Default    |
-|------------------|----------|-----------------------------------------------|------------|
+| Name             | Type     | Description                                   | Default   |
+|------------------|----------|-----------------------------------------------|-----------|
 | value | optional | Initial value and synced Python value. | `()` |
 | allowed_tags | optional | Optional allowed values for tag-style inputs. | `None` |
 | allow_duplicates | optional | Whether duplicate entries are allowed. | `False` |

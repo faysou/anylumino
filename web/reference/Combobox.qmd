@@ -3,13 +3,12 @@
 ```python
 Combobox(
     value='',
-    options=(),
     description='',
     placeholder='',
-    ensure_option=False,
     disabled=False,
     continuous_update=True,
-    **kwargs,
+    options=(),
+    ensure_option=False,
 )
 ```
 

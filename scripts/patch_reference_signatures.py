@@ -62,8 +62,7 @@ def _control_signatures() -> dict[str, inspect.Signature]:
 
 def _replace_signature(text: str, name: str, signature: inspect.Signature) -> str:
     pattern = re.compile(
-        r"```python\n(?P<display_name>[A-Za-z_][A-Za-z0-9_]*)\([^\n]*\)\n```",
-        re.MULTILINE,
+        r"```python\n(?P<display_name>[A-Za-z_][A-Za-z0-9_]*)\([\s\S]*?\)\n```",
     )
 
     def replace(match: re.Match[str]) -> str:

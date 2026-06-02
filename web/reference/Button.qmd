@@ -10,7 +10,6 @@ Button(
     icon_family='classic',
     icon_variant='solid',
     icon_library='default',
-    **kwargs,
 )
 ```
 

@@ -19,8 +19,8 @@ before syncing to the frontend.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                            | Default    |
-|-------------|----------|----------------------------------------|------------|
+| Name        | Type     | Description                            | Default   |
+|-------------|----------|----------------------------------------|-----------|
 | value | `datetime.time`, `str`, or `None` | Initial value and synced Python value. Strings should use `HH:MM` or another browser-compatible time value. | `None` |
 | description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |

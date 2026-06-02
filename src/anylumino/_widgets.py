@@ -521,13 +521,61 @@ class HBox(BoxPanel):
     ----------
     widgets : iterable or mapping, optional
         Child widgets or keyed child mapping.
-    **kwargs
-        Forwarded to ``BoxPanel`` except ``direction``, which is fixed to
-        ``"left-to-right"``.
+    titles : iterable or mapping, optional
+        Optional labels associated with children.
+    keys : iterable of str, optional
+        Stable child keys for iterable ``widgets``.
+    spacing : int, default 8
+        Pixel spacing between children.
+    stretches : iterable of int, optional
+        Lumino stretch factors, one per child when provided.
+    width : int, float, str, or None
+        Widget width. Numeric values use the shared anylumino size rules.
+    height : int, float, str, or None
+        Widget height. Numeric values use the shared anylumino size rules.
+    resizable : bool, default True
+        Whether the panel receives a notebook-friendly resize handle.
+    scroll : bool, default False
+        Enables horizontal scrolling by default.
+    scroll_x, scroll_y : bool, optional
+        Explicit horizontal or vertical overflow controls.
+    child_min_width, child_min_height : int, float, str, or None
+        Minimum child sizes used when scrolling is enabled.
     """
 
-    def __init__(self, widgets: ChildInput = None, **kwargs: Any) -> None:
-        super().__init__(widgets, direction="left-to-right", **kwargs)
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        spacing: int = 8,
+        stretches: Iterable[int] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        scroll: bool = False,
+        scroll_x: bool | None = None,
+        scroll_y: bool | None = None,
+        child_min_width: int | float | str | None = None,
+        child_min_height: int | float | str | None = None,
+    ) -> None:
+        super().__init__(
+            widgets,
+            titles=titles,
+            keys=keys,
+            direction="left-to-right",
+            spacing=spacing,
+            stretches=stretches,
+            width=width,
+            height=height,
+            resizable=resizable,
+            scroll=scroll,
+            scroll_x=scroll_x,
+            scroll_y=scroll_y,
+            child_min_width=child_min_width,
+            child_min_height=child_min_height,
+        )
 
 
 class VBox(BoxPanel):
@@ -537,13 +585,61 @@ class VBox(BoxPanel):
     ----------
     widgets : iterable or mapping, optional
         Child widgets or keyed child mapping.
-    **kwargs
-        Forwarded to ``BoxPanel`` except ``direction``, which is fixed to
-        ``"top-to-bottom"``.
+    titles : iterable or mapping, optional
+        Optional labels associated with children.
+    keys : iterable of str, optional
+        Stable child keys for iterable ``widgets``.
+    spacing : int, default 8
+        Pixel spacing between children.
+    stretches : iterable of int, optional
+        Lumino stretch factors, one per child when provided.
+    width : int, float, str, or None
+        Widget width. Numeric values use the shared anylumino size rules.
+    height : int, float, str, or None
+        Widget height. Numeric values use the shared anylumino size rules.
+    resizable : bool, default True
+        Whether the panel receives a notebook-friendly resize handle.
+    scroll : bool, default False
+        Enables vertical scrolling by default.
+    scroll_x, scroll_y : bool, optional
+        Explicit horizontal or vertical overflow controls.
+    child_min_width, child_min_height : int, float, str, or None
+        Minimum child sizes used when scrolling is enabled.
     """
 
-    def __init__(self, widgets: ChildInput = None, **kwargs: Any) -> None:
-        super().__init__(widgets, direction="top-to-bottom", **kwargs)
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        spacing: int = 8,
+        stretches: Iterable[int] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        scroll: bool = False,
+        scroll_x: bool | None = None,
+        scroll_y: bool | None = None,
+        child_min_width: int | float | str | None = None,
+        child_min_height: int | float | str | None = None,
+    ) -> None:
+        super().__init__(
+            widgets,
+            titles=titles,
+            keys=keys,
+            direction="top-to-bottom",
+            spacing=spacing,
+            stretches=stretches,
+            width=width,
+            height=height,
+            resizable=resizable,
+            scroll=scroll,
+            scroll_x=scroll_x,
+            scroll_y=scroll_y,
+            child_min_width=child_min_width,
+            child_min_height=child_min_height,
+        )
 
 
 class ScrollBox(VBox):
@@ -553,15 +649,60 @@ class ScrollBox(VBox):
     ----------
     widgets : iterable or mapping, optional
         Child widgets or keyed child mapping.
-    **kwargs
-        Forwarded to ``VBox``. ``scroll`` defaults to ``True`` and ``height``
-        defaults to ``420``.
+    titles : iterable or mapping, optional
+        Optional labels associated with children.
+    keys : iterable of str, optional
+        Stable child keys for iterable ``widgets``.
+    spacing : int, default 8
+        Pixel spacing between children.
+    stretches : iterable of int, optional
+        Lumino stretch factors, one per child when provided.
+    width : int, float, str, or None
+        Widget width. Numeric values use the shared anylumino size rules.
+    height : int, float, str, or None
+        Widget height. Numeric values use the shared anylumino size rules.
+    resizable : bool, default True
+        Whether the panel receives a notebook-friendly resize handle.
+    scroll : bool, default True
+        Enables vertical scrolling by default.
+    scroll_x, scroll_y : bool, optional
+        Explicit horizontal or vertical overflow controls.
+    child_min_width, child_min_height : int, float, str, or None
+        Minimum child sizes used when scrolling is enabled.
     """
 
-    def __init__(self, widgets: ChildInput = None, **kwargs: Any) -> None:
-        kwargs.setdefault("scroll", True)
-        kwargs.setdefault("height", 420)
-        super().__init__(widgets, **kwargs)
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        spacing: int = 8,
+        stretches: Iterable[int] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        scroll: bool = True,
+        scroll_x: bool | None = None,
+        scroll_y: bool | None = None,
+        child_min_width: int | float | str | None = None,
+        child_min_height: int | float | str | None = None,
+    ) -> None:
+        super().__init__(
+            widgets,
+            titles=titles,
+            keys=keys,
+            spacing=spacing,
+            stretches=stretches,
+            width=width,
+            height=height,
+            resizable=resizable,
+            scroll=scroll,
+            scroll_x=scroll_x,
+            scroll_y=scroll_y,
+            child_min_width=child_min_width,
+            child_min_height=child_min_height,
+        )
 
 
 class SplitPanel(LayoutWidget):

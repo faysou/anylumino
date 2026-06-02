@@ -11,8 +11,8 @@ Audio display widget.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name   | Type     | Description                                              | Default    |
-|--------|----------|----------------------------------------------------------|------------|
+| Name   | Type     | Description                                              | Default   |
+|--------|----------|----------------------------------------------------------|-----------|
 | value | optional | Initial value and synced Python value. | `''` |
 | format | optional | Media format such as ``'png'``, ``'mp3'``, or ``'mp4'``. | `'mp3'` |
 

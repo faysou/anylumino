@@ -212,8 +212,23 @@ class Textarea(ControlWidget):
 class Password(Text):
     """Password text input control."""
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        value: str = "",
+        description: str = "",
+        placeholder: str = "",
+        disabled: bool = False,
+        continuous_update: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            value=value,
+            description=description,
+            placeholder=placeholder,
+            disabled=disabled,
+            continuous_update=continuous_update,
+            **kwargs,
+        )
         self.control_kind = "password"
 
 
@@ -270,24 +285,69 @@ class TagsInput(ControlWidget):
 class ColorsInput(TagsInput):
     """List input for color tags."""
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        value: Iterable[Any] = (),
+        allowed_tags: Iterable[str] | None = None,
+        allow_duplicates: bool = False,
+        description: str = "",
+        disabled: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            value=value,
+            allowed_tags=allowed_tags,
+            allow_duplicates=allow_duplicates,
+            description=description,
+            disabled=disabled,
+            **kwargs,
+        )
         self.control_kind = "colors"
 
 
 class FloatsInput(TagsInput):
     """List input for float values."""
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        value: Iterable[Any] = (),
+        allowed_tags: Iterable[str] | None = None,
+        allow_duplicates: bool = False,
+        description: str = "",
+        disabled: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            value=value,
+            allowed_tags=allowed_tags,
+            allow_duplicates=allow_duplicates,
+            description=description,
+            disabled=disabled,
+            **kwargs,
+        )
         self.control_kind = "floats"
 
 
 class IntsInput(TagsInput):
     """List input for integer values."""
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        value: Iterable[Any] = (),
+        allowed_tags: Iterable[str] | None = None,
+        allow_duplicates: bool = False,
+        description: str = "",
+        disabled: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            value=value,
+            allowed_tags=allowed_tags,
+            allow_duplicates=allow_duplicates,
+            description=description,
+            disabled=disabled,
+            **kwargs,
+        )
         self.control_kind = "ints"
 
 
@@ -320,8 +380,23 @@ class Dropdown(ControlWidget):
 class RadioButtons(Dropdown):
     """Radio-button selection control."""
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        options: Iterable[Any] = (),
+        value: Any = None,
+        index: int | None = None,
+        description: str = "",
+        disabled: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            options=options,
+            value=value,
+            index=index,
+            description=description,
+            disabled=disabled,
+            **kwargs,
+        )
         self.control_kind = "radio"
 
 
@@ -363,8 +438,25 @@ class ToggleButtons(Dropdown):
 class Select(Dropdown):
     """List-box single-selection control."""
 
-    def __init__(self, rows: int = 5, **kwargs: Any) -> None:
-        super().__init__(rows=rows, **kwargs)
+    def __init__(
+        self,
+        options: Iterable[Any] = (),
+        value: Any = None,
+        index: int | None = None,
+        description: str = "",
+        disabled: bool = False,
+        rows: int = 5,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            options=options,
+            value=value,
+            index=index,
+            description=description,
+            disabled=disabled,
+            rows=rows,
+            **kwargs,
+        )
         self.control_kind = "select"
 
 
@@ -374,7 +466,8 @@ class SelectMultiple(Dropdown):
     def __init__(
         self,
         options: Iterable[Any] = (),
-        value: Iterable[Any] = (),
+        value: Iterable[Any] | None = (),
+        index: int | Iterable[int] | None = None,
         rows: int = 5,
         description: str = "",
         disabled: bool = False,
@@ -382,7 +475,8 @@ class SelectMultiple(Dropdown):
     ) -> None:
         super().__init__(
             options=options,
-            value=list(value),
+            value=list(value or []),
+            index=index,
             rows=rows,
             description=description,
             disabled=disabled,
@@ -426,13 +520,26 @@ class SelectionRangeSlider(SelectionSlider):
         options: Iterable[Any] = (),
         value: Iterable[Any] | None = None,
         index: Iterable[int] | None = None,
+        description: str = "",
+        disabled: bool = False,
+        orientation: str = "horizontal",
+        readout: bool = True,
         **kwargs: Any,
     ) -> None:
         option_tuple = _options_tuple(options)
         if value is None and index is not None and option_tuple:
             index_list = list(index)
             value = [_option_value(option_tuple[index_list[0]]), _option_value(option_tuple[index_list[1]])]
-        super().__init__(options=option_tuple, value=list(value or []), index=index, **kwargs)
+        super().__init__(
+            options=option_tuple,
+            value=list(value or []),
+            index=index,
+            description=description,
+            disabled=disabled,
+            orientation=orientation,
+            readout=readout,
+            **kwargs,
+        )
         self.control_kind = "selection-range-slider"
 
 
@@ -493,6 +600,7 @@ class ToggleButton(Checkbox):
         self,
         value: bool = False,
         description: str = "",
+        indent: bool = True,
         icon: str = "",
         disabled: bool = False,
         button_style: str = "",
@@ -506,6 +614,7 @@ class ToggleButton(Checkbox):
             value=value,
             description=description,
             disabled=disabled,
+            indent=indent,
             icon=icon,
             button_style=button_style,
             tooltip=tooltip,
@@ -568,9 +677,27 @@ class IntRangeSlider(IntSlider):
         min: int = 0,
         max: int = 100,
         step: int = 1,
+        description: str = "",
+        disabled: bool = False,
+        continuous_update: bool = True,
+        orientation: str = "horizontal",
+        readout: bool = True,
+        readout_format: str = "d",
         **kwargs: Any,
     ) -> None:
-        super().__init__(value=_range_value(value, min, max), min=min, max=max, step=step, **kwargs)
+        super().__init__(
+            value=_range_value(value, min, max),
+            min=min,
+            max=max,
+            step=step,
+            description=description,
+            disabled=disabled,
+            continuous_update=continuous_update,
+            orientation=orientation,
+            readout=readout,
+            readout_format=readout_format,
+            **kwargs,
+        )
         self.control_kind = "int-range-slider"
 
 
@@ -604,8 +731,27 @@ class IntText(ControlWidget):
 class BoundedIntText(IntText):
     """Bounded integer text input control."""
 
-    def __init__(self, value: int = 0, min: int = 0, max: int = 100, step: int = 1, **kwargs: Any) -> None:
-        super().__init__(value=value, min=min, max=max, step=step, **kwargs)
+    def __init__(
+        self,
+        value: int = 0,
+        min: int = 0,
+        max: int = 100,
+        step: int = 1,
+        description: str = "",
+        disabled: bool = False,
+        continuous_update: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            value=value,
+            min=min,
+            max=max,
+            step=step,
+            description=description,
+            disabled=disabled,
+            continuous_update=continuous_update,
+            **kwargs,
+        )
         self.control_kind = "bounded-int-text"
 
 
@@ -618,10 +764,27 @@ class FloatSlider(IntSlider):
         min: float = 0.0,
         max: float = 100.0,
         step: float = 0.1,
+        description: str = "",
+        disabled: bool = False,
+        continuous_update: bool = True,
+        orientation: str = "horizontal",
+        readout: bool = True,
         readout_format: str = ".2f",
         **kwargs: Any,
     ) -> None:
-        super().__init__(value=value, min=min, max=max, step=step, readout_format=readout_format, **kwargs)
+        super().__init__(
+            value=value,
+            min=min,
+            max=max,
+            step=step,
+            description=description,
+            disabled=disabled,
+            continuous_update=continuous_update,
+            orientation=orientation,
+            readout=readout,
+            readout_format=readout_format,
+            **kwargs,
+        )
         self.control_kind = "float-slider"
 
 
@@ -634,9 +797,27 @@ class FloatRangeSlider(FloatSlider):
         min: float = 0.0,
         max: float = 100.0,
         step: float = 0.1,
+        description: str = "",
+        disabled: bool = False,
+        continuous_update: bool = True,
+        orientation: str = "horizontal",
+        readout: bool = True,
+        readout_format: str = ".2f",
         **kwargs: Any,
     ) -> None:
-        super().__init__(value=_range_value(value, min, max), min=min, max=max, step=step, **kwargs)
+        super().__init__(
+            value=_range_value(value, min, max),
+            min=min,
+            max=max,
+            step=step,
+            description=description,
+            disabled=disabled,
+            continuous_update=continuous_update,
+            orientation=orientation,
+            readout=readout,
+            readout_format=readout_format,
+            **kwargs,
+        )
         self.control_kind = "float-range-slider"
 
 
@@ -650,6 +831,11 @@ class FloatLogSlider(FloatSlider):
         min: float = 0.0,
         max: float = 4.0,
         step: float = 0.1,
+        description: str = "",
+        disabled: bool = False,
+        continuous_update: bool = True,
+        orientation: str = "horizontal",
+        readout: bool = True,
         readout_format: str = ".3g",
         **kwargs: Any,
     ) -> None:
@@ -659,6 +845,11 @@ class FloatLogSlider(FloatSlider):
             min=min,
             max=max,
             step=step,
+            description=description,
+            disabled=disabled,
+            continuous_update=continuous_update,
+            orientation=orientation,
+            readout=readout,
             readout_format=readout_format,
             **kwargs,
         )
@@ -668,9 +859,27 @@ class FloatLogSlider(FloatSlider):
 class FloatText(IntText):
     """Float text input control."""
 
-    def __init__(self, value: float = 0.0, **kwargs: Any) -> None:
-        kwargs.setdefault("step", "any")
-        super().__init__(value=value, **kwargs)
+    def __init__(
+        self,
+        value: float = 0.0,
+        description: str = "",
+        disabled: bool = False,
+        continuous_update: bool = True,
+        min: int | float | None = None,
+        max: int | float | None = None,
+        step: int | float | str = "any",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            value=value,
+            description=description,
+            disabled=disabled,
+            continuous_update=continuous_update,
+            min=min,
+            max=max,
+            step=step,
+            **kwargs,
+        )
         self.control_kind = "float-text"
 
 
@@ -683,17 +892,37 @@ class BoundedFloatText(FloatText):
         min: float = 0.0,
         max: float = 100.0,
         step: float = 0.1,
+        description: str = "",
+        disabled: bool = False,
+        continuous_update: bool = True,
         **kwargs: Any,
     ) -> None:
-        super().__init__(value=value, min=min, max=max, step=step, **kwargs)
+        super().__init__(
+            value=value,
+            min=min,
+            max=max,
+            step=step,
+            description=description,
+            disabled=disabled,
+            continuous_update=continuous_update,
+            **kwargs,
+        )
         self.control_kind = "bounded-float-text"
 
 
 class IntProgress(IntSlider):
     """Integer progress bar control."""
 
-    def __init__(self, value: int = 0, min: int = 0, max: int = 100, bar_style: str = "", **kwargs: Any) -> None:
-        super().__init__(value=value, min=min, max=max, button_style=bar_style, **kwargs)
+    def __init__(
+        self,
+        value: int = 0,
+        min: int = 0,
+        max: int = 100,
+        description: str = "",
+        bar_style: str = "",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(value=value, min=min, max=max, description=description, button_style=bar_style, **kwargs)
         self.control_kind = "int-progress"
 
 
@@ -705,18 +934,28 @@ class FloatProgress(FloatSlider):
         value: float = 0.0,
         min: float = 0.0,
         max: float = 100.0,
+        description: str = "",
         bar_style: str = "",
         **kwargs: Any,
     ) -> None:
-        super().__init__(value=value, min=min, max=max, button_style=bar_style, **kwargs)
+        super().__init__(value=value, min=min, max=max, description=description, button_style=bar_style, **kwargs)
         self.control_kind = "float-progress"
 
 
 class Play(IntSlider):
     """Playback stepper control."""
 
-    def __init__(self, interval: int = 100, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        value: int = 0,
+        min: int = 0,
+        max: int = 100,
+        step: int = 1,
+        interval: int = 100,
+        disabled: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(value=value, min=min, max=max, step=step, disabled=disabled, **kwargs)
         self.control_kind = "play"
         self.rows = interval
 
@@ -743,8 +982,8 @@ class TimePicker(DatePicker):
     are serialized with ``isoformat()`` before syncing to the frontend.
     """
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, value: Any = None, description: str = "", disabled: bool = False, **kwargs: Any) -> None:
+        super().__init__(value=value, description=description, disabled=disabled, **kwargs)
         self.control_kind = "time"
 
 
@@ -757,16 +996,23 @@ class DatetimePicker(DatePicker):
     before syncing to the frontend.
     """
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, value: Any = None, description: str = "", disabled: bool = False, **kwargs: Any) -> None:
+        super().__init__(value=value, description=description, disabled=disabled, **kwargs)
         self.control_kind = "datetime"
 
 
 class ColorPicker(DatePicker):
     """Color picker control."""
 
-    def __init__(self, value: str = "black", concise: bool = False, **kwargs: Any) -> None:
-        super().__init__(value=value, concise=concise, **kwargs)
+    def __init__(
+        self,
+        value: str = "black",
+        description: str = "",
+        concise: bool = False,
+        disabled: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(value=value, description=description, concise=concise, disabled=disabled, **kwargs)
         self.control_kind = "color"
 
 
@@ -829,16 +1075,23 @@ class Image(ControlWidget):
 class Audio(Image):
     """Audio display widget."""
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, value: bytes | str = "", format: str = "mp3", **kwargs: Any) -> None:
+        super().__init__(value=value, format=format, **kwargs)
         self.control_kind = "audio"
 
 
 class Video(Image):
     """Video display widget."""
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        value: bytes | str = "",
+        format: str = "mp4",
+        width: str = "",
+        height: str = "",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(value=value, format=format, width=width, height=height, **kwargs)
         self.control_kind = "video"
 
 
@@ -1077,7 +1330,15 @@ for _cls, _summary, _params in [
     (
         IntText,
         "Integer text input control.",
-        [("value", 0), ("description", ""), ("disabled", False), ("continuous_update", True)],
+        [
+            ("value", 0),
+            ("description", ""),
+            ("disabled", False),
+            ("continuous_update", True),
+            ("min", None),
+            ("max", None),
+            ("step", 1),
+        ],
     ),
     (
         BoundedIntText,
@@ -1114,7 +1375,15 @@ for _cls, _summary, _params in [
     (
         FloatText,
         "Float text input control.",
-        [("value", 0.0), ("description", ""), ("disabled", False), ("continuous_update", True)],
+        [
+            ("value", 0.0),
+            ("description", ""),
+            ("disabled", False),
+            ("continuous_update", True),
+            ("min", None),
+            ("max", None),
+            ("step", "any"),
+        ],
     ),
     (
         BoundedFloatText,

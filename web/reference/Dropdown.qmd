@@ -7,7 +7,6 @@ Dropdown(
     index=None,
     description='',
     disabled=False,
-    **kwargs,
 )
 ```
 

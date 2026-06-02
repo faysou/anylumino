@@ -12,7 +12,6 @@ IntegerSlider(
     orientation='horizontal',
     readout=True,
     readout_format='d',
-    **kwargs,
 )
 ```
 

@@ -5,10 +5,9 @@ Textarea(
     value='',
     description='',
     placeholder='',
-    rows=4,
     disabled=False,
     continuous_update=True,
-    **kwargs,
+    rows=4,
 )
 ```
 

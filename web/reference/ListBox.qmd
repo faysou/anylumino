@@ -15,8 +15,8 @@ List-box single-selection control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                    | Default    |
-|-------------|----------|------------------------------------------------|------------|
+| Name        | Type     | Description                                    | Default   |
+|-------------|----------|------------------------------------------------|-----------|
 | options | optional | Selectable values or ``(label, value)`` pairs. | `()` |
 | value | optional | Initial value and synced Python value. | `None` |
 | index | optional | Selected option index. | `None` |

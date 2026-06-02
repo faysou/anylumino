@@ -9,7 +9,6 @@ IntText(
     min=None,
     max=None,
     step=1,
-    **kwargs,
 )
 ```
 
@@ -23,3 +22,6 @@ Integer text input control.
 | description | optional | Label shown above the control. | `''` |
 | disabled | optional | Whether user interaction is disabled. | `False` |
 | continuous_update | optional | Whether Python receives updates while the user is typing or dragging. | `True` |
+| min | optional | Minimum numeric, date, or time value. | `None` |
+| max | optional | Maximum numeric, date, or time value. | `None` |
+| step | optional | Increment size. | `1` |

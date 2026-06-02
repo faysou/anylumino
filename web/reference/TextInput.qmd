@@ -7,7 +7,6 @@ TextInput(
     placeholder='',
     disabled=False,
     continuous_update=True,
-    **kwargs,
 )
 ```
 

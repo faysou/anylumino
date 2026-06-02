@@ -13,8 +13,8 @@ Color picker control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type     | Description                                    | Default    |
-|-------------|----------|------------------------------------------------|------------|
+| Name        | Type     | Description                                    | Default   |
+|-------------|----------|------------------------------------------------|-----------|
 | value | optional | Initial value and synced Python value. | `'black'` |
 | description | optional | Label shown above the control. | `''` |
 | concise | optional | Whether to use a compact color-picker display. | `False` |

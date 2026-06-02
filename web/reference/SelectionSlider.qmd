@@ -9,7 +9,6 @@ SelectionSlider(
     disabled=False,
     orientation='horizontal',
     readout=True,
-    **kwargs,
 )
 ```
 

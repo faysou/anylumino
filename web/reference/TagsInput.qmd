@@ -7,7 +7,6 @@ TagsInput(
     allow_duplicates=False,
     description='',
     disabled=False,
-    **kwargs,
 )
 ```
 

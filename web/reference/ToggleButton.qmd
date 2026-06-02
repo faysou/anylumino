@@ -4,14 +4,14 @@
 ToggleButton(
     value=False,
     description='',
-    icon='',
     disabled=False,
+    indent=True,
+    icon='',
     button_style='',
     tooltip='',
     icon_family='classic',
     icon_variant='solid',
     icon_library='default',
-    **kwargs,
 )
 ```
 
