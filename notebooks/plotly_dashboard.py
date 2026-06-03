@@ -411,9 +411,9 @@ input_controls = ScrollBox(
         "auto-focus": auto_focus_input,
         "apply": apply_inputs_button,
     },
-    spacing=14,
+    spacing=8,
     height=430,
-    child_min_height=68,
+    child_min_height=56,
 )
 control_panel = VBox(
     {

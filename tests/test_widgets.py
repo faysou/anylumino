@@ -99,6 +99,13 @@ def test_composed_widget_resizing_can_be_disabled() -> None:
     assert panel.resizable is False
 
 
+def test_layout_widgets_can_fit_content() -> None:
+    panel = VBox({"child": TextWidget("Child")}, fit_content=True)
+
+    assert panel.fit_content is True
+    assert panel.get_state(key=["fit_content"]) == {"fit_content": True}
+
+
 def test_dict_children_use_keys_as_default_titles() -> None:
     first = TextWidget("First")
     second = TextWidget("Second")

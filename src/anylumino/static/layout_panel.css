@@ -7,6 +7,10 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+.anylumino-LayoutHost.anylumino-mod-fitContent {
+  overflow: visible;
+}
+
 .anylumino-LayoutHost *,
 .anylumino-LayoutHost *::before,
 .anylumino-LayoutHost *::after {
@@ -72,6 +76,10 @@
   background: #ffffff;
 }
 
+.anylumino-LayoutHost.anylumino-mod-fitContent .anylumino-LayoutChild {
+  overflow: visible;
+}
+
 .anylumino-LayoutChild > .lm-Widget,
 .anylumino-LayoutChild > div,
 .anylumino-LayoutChild iframe {
@@ -94,6 +102,48 @@
   display: grid;
   padding: 8px;
   overflow: auto;
+}
+
+.anylumino-scrollBox {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  min-height: 0;
+  padding: 8px;
+}
+
+.anylumino-scrollBox-left-to-right,
+.anylumino-scrollBox-right-to-left {
+  flex-direction: row;
+  width: max-content;
+  min-width: 100%;
+}
+
+.anylumino-scrollBox-right-to-left {
+  flex-direction: row-reverse;
+}
+
+.anylumino-scrollBox-top-to-bottom,
+.anylumino-scrollBox-bottom-to-top {
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.anylumino-scrollBox-bottom-to-top {
+  flex-direction: column-reverse;
+}
+
+.anylumino-scrollBox .anylumino-LayoutChild {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: max(var(--anylumino-child-min-height, 0px), 32px);
+  overflow: visible;
+}
+
+.anylumino-scrollBox-left-to-right .anylumino-LayoutChild,
+.anylumino-scrollBox-right-to-left .anylumino-LayoutChild {
+  width: auto;
+  min-width: max(var(--anylumino-child-min-width, 0px), 32px);
 }
 
 .anylumino-grid .anylumino-LayoutChild {

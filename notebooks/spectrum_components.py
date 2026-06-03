@@ -126,6 +126,7 @@ summary = HBox(
     spacing=12,
     scroll=True,
     child_min_width=180,
+    fit_content=True,
 )
 
 form = VBox(
@@ -141,6 +142,7 @@ form = VBox(
             spacing=12,
             scroll=True,
             child_min_width=170,
+            fit_content=True,
         ),
         "view-mode": view_mode,
         "divider": Divider(),
@@ -152,11 +154,13 @@ form = VBox(
             spacing=8,
             scroll=True,
             child_min_width=120,
+            fit_content=True,
         ),
         "log": log,
     },
     spacing=12,
     child_min_height=58,
+    fit_content=True,
 )
 
 
@@ -168,6 +172,7 @@ VBox(
     spacing=12,
     width="100%",
     height=540,
+    fit_content=True,
 )
 
 # %%

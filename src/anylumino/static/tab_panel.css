@@ -7,6 +7,10 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+.anylumino-TabPanelHost.anylumino-mod-fitContent {
+  overflow: visible;
+}
+
 .anylumino-TabPanelHost *,
 .anylumino-TabPanelHost *::before,
 .anylumino-TabPanelHost *::after {
@@ -139,6 +143,10 @@
   min-height: 0;
   overflow: hidden;
   background: #ffffff;
+}
+
+.anylumino-TabPanelHost.anylumino-mod-fitContent .anylumino-TabPanelChild {
+  overflow: visible;
 }
 
 .anylumino-TabPanelHost .anylumino-TabPanelChild > .lm-Widget,

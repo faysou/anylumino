@@ -183,6 +183,18 @@ export function notifyLuminoWidgetVisible(widget, options = {}) {
     if (options.dispatchWindowResize) {
       dispatchResize(window);
     }
+    const plotly = window.Plotly;
+    for (const plot of widget.node.querySelectorAll(".js-plotly-plot")) {
+      try {
+        if (typeof plotly?.Plots?.resize === "function") {
+          plotly.Plots.resize(plot);
+        } else {
+          dispatchResize(plot);
+        }
+      } catch {
+        dispatchResize(plot);
+      }
+    }
     for (const iframe of widget.node.querySelectorAll("iframe")) {
       if (iframe.contentWindow) {
         resizeEmbeddedDocument(iframe.contentWindow);

@@ -77,6 +77,7 @@ buttons = HBox(
     scroll=True,
     child_min_width=130,
     height=56,
+    fit_content=True,
 )
 
 field_group = FieldGroup(
@@ -130,6 +131,7 @@ visuals = HBox(
     scroll=True,
     child_min_width=110,
     height=96,
+    fit_content=True,
 )
 
 app = VBox(
@@ -145,6 +147,7 @@ app = VBox(
     spacing=10,
     stretches=[0, 0, 0, 0, 0, 1, 0],
     height=680,
+    fit_content=True,
 )
 
 app

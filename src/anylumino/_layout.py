@@ -157,6 +157,7 @@ class LayoutWidget(anywidget.AnyWidget):
     scroll_y = t.Bool(False).tag(sync=True)
     child_min_width = t.Unicode("0px").tag(sync=True)
     child_min_height = t.Unicode("0px").tag(sync=True)
+    fit_content = t.Bool(False).tag(sync=True)
 
     def _init_composed(
         self,
@@ -170,6 +171,7 @@ class LayoutWidget(anywidget.AnyWidget):
         scroll_y: bool = False,
         child_min_width: int | float | str | None = None,
         child_min_height: int | float | str | None = None,
+        fit_content: bool = False,
         **kwargs: Any,
     ) -> None:
         widget_list, owner_list, key_list, title_list = _normalize_children(widgets, titles, keys)
@@ -185,6 +187,7 @@ class LayoutWidget(anywidget.AnyWidget):
             scroll_y=scroll_y,
             child_min_width=_size_to_css(child_min_width, "0px"),
             child_min_height=_size_to_css(child_min_height, "0px"),
+            fit_content=fit_content,
             **kwargs,
         )
 
@@ -384,6 +387,7 @@ class TabPanel(LayoutWidget):
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
+        fit_content: bool = False,
     ) -> None:
         self._init_composed(
             widgets,
@@ -392,6 +396,7 @@ class TabPanel(LayoutWidget):
             width,
             height,
             resizable,
+            fit_content=fit_content,
             selected_index=selected_index,
             tab_placement=tab_placement,
             tabs_movable=tabs_movable,
@@ -474,6 +479,7 @@ class BoxPanel(LayoutWidget):
         scroll_y: bool | None = None,
         child_min_width: int | float | str | None = None,
         child_min_height: int | float | str | None = None,
+        fit_content: bool = False,
     ) -> None:
         horizontal = direction in ("left-to-right", "right-to-left")
         resolved_scroll_x = bool(scroll_x if scroll_x is not None else scroll and horizontal)
@@ -491,6 +497,7 @@ class BoxPanel(LayoutWidget):
             resolved_scroll_y,
             child_min_width if child_min_width is not None else default_child_min_width,
             child_min_height if child_min_height is not None else default_child_min_height,
+            fit_content=fit_content,
             direction=direction,
             spacing=spacing,
             stretches=_as_list(stretches),
@@ -542,6 +549,7 @@ class HBox(BoxPanel):
         scroll_y: bool | None = None,
         child_min_width: int | float | str | None = None,
         child_min_height: int | float | str | None = None,
+        fit_content: bool = False,
     ) -> None:
         super().__init__(
             widgets,
@@ -558,6 +566,7 @@ class HBox(BoxPanel):
             scroll_y=scroll_y,
             child_min_width=child_min_width,
             child_min_height=child_min_height,
+            fit_content=fit_content,
         )
 
 
@@ -606,6 +615,7 @@ class VBox(BoxPanel):
         scroll_y: bool | None = None,
         child_min_width: int | float | str | None = None,
         child_min_height: int | float | str | None = None,
+        fit_content: bool = False,
     ) -> None:
         super().__init__(
             widgets,
@@ -622,6 +632,7 @@ class VBox(BoxPanel):
             scroll_y=scroll_y,
             child_min_width=child_min_width,
             child_min_height=child_min_height,
+            fit_content=fit_content,
         )
 
 
@@ -670,6 +681,7 @@ class ScrollBox(VBox):
         scroll_y: bool | None = None,
         child_min_width: int | float | str | None = None,
         child_min_height: int | float | str | None = None,
+        fit_content: bool = False,
     ) -> None:
         super().__init__(
             widgets,
@@ -685,6 +697,7 @@ class ScrollBox(VBox):
             scroll_y=scroll_y,
             child_min_width=child_min_width,
             child_min_height=child_min_height,
+            fit_content=fit_content,
         )
 
 
@@ -736,6 +749,7 @@ class SplitPanel(LayoutWidget):
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
+        fit_content: bool = False,
     ) -> None:
         self._init_composed(
             widgets,
@@ -744,6 +758,7 @@ class SplitPanel(LayoutWidget):
             width,
             height,
             resizable,
+            fit_content=fit_content,
             orientation=orientation,
             spacing=spacing,
             sizes=_as_list(sizes),
@@ -788,8 +803,9 @@ class DockPanel(LayoutWidget):
         width: int | float | str | None = "100%",
         height: int | float | str | None = 520,
         resizable: bool = True,
+        fit_content: bool = False,
     ) -> None:
-        self._init_composed(widgets, titles, keys, width, height, resizable, mode=mode)
+        self._init_composed(widgets, titles, keys, width, height, resizable, fit_content=fit_content, mode=mode)
 
 
 class AccordionPanel(LayoutWidget):
@@ -826,8 +842,9 @@ class AccordionPanel(LayoutWidget):
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
+        fit_content: bool = False,
     ) -> None:
-        self._init_composed(widgets, titles, keys, width, height, resizable)
+        self._init_composed(widgets, titles, keys, width, height, resizable, fit_content=fit_content)
 
 
 class StackedPanel(LayoutWidget):
@@ -867,8 +884,18 @@ class StackedPanel(LayoutWidget):
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
+        fit_content: bool = False,
     ) -> None:
-        self._init_composed(widgets, titles, keys, width, height, resizable, selected_index=selected_index)
+        self._init_composed(
+            widgets,
+            titles,
+            keys,
+            width,
+            height,
+            resizable,
+            fit_content=fit_content,
+            selected_index=selected_index,
+        )
 
     def select(self, index: int) -> None:
         self.selected_index = index
@@ -925,6 +952,7 @@ class GridPanel(LayoutWidget):
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
+        fit_content: bool = False,
     ) -> None:
         self._init_composed(
             widgets,
@@ -933,6 +961,7 @@ class GridPanel(LayoutWidget):
             width,
             height,
             resizable,
+            fit_content=fit_content,
             columns=columns,
             rows=rows,
             gap=_size_to_css(gap, "8px"),
@@ -989,6 +1018,7 @@ class ResponsivePanel(LayoutWidget):
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
+        fit_content: bool = False,
     ) -> None:
         self._init_composed(
             widgets,
@@ -997,6 +1027,7 @@ class ResponsivePanel(LayoutWidget):
             width,
             height,
             resizable,
+            fit_content=fit_content,
             breakpoint=breakpoint,
             wide_direction=wide_direction,
             narrow_direction=narrow_direction,

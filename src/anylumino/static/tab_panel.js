@@ -27,6 +27,25 @@ function titleFor(index, titles) {
   return `Tab ${index + 1}`;
 }
 
+function fitContentEnabled(model) {
+  return Boolean(model.get("fit_content"));
+}
+
+function measuredContentHeight(node, options = {}) {
+  if (!node) {
+    return 0;
+  }
+
+  const includeSelf = options.includeSelf ?? true;
+  const nodeRect = node.getBoundingClientRect();
+  let height = includeSelf ? Math.max(node.scrollHeight, node.offsetHeight, nodeRect.height) : 0;
+  for (const child of node.children) {
+    const childRect = child.getBoundingClientRect();
+    height = Math.max(height, child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
+  }
+  return Math.ceil(height);
+}
+
 export default {
   initialize({ model }) {
     return {
@@ -58,6 +77,7 @@ export default {
     root.className = "anylumino-TabPanelHost";
     root.style.width = cssSize(model.get("width"), "100%");
     root.style.height = cssSize(model.get("height"), "420px");
+    root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
     el.replaceChildren(root);
 
     const panel = new TabPanel({ tabPlacement: model.get("tab_placement") || "top" });
@@ -68,9 +88,42 @@ export default {
     let childController = new AbortController();
     let selectionFromFrontend = false;
     let syncingFromModel = false;
+    let lastFitHeight = 0;
 
     const updatePanel = () => {
       panel.update();
+      scheduleFitContent();
+    };
+
+    const fitContentNow = () => {
+      if (!fitContentEnabled(model)) {
+        return;
+      }
+
+      const currentWidget = panel.currentWidget;
+      if (!currentWidget) {
+        return;
+      }
+
+      const tabBar = root.querySelector(".lm-TabBar");
+      const tabBarHeight = tabBar?.getBoundingClientRect().height ?? 0;
+      const childHeight = measuredContentHeight(currentWidget.node, { includeSelf: false });
+      const nextHeight = Math.max(180, Math.ceil(tabBarHeight + childHeight));
+      if (!Number.isFinite(nextHeight) || Math.abs(nextHeight - lastFitHeight) < 2) {
+        return;
+      }
+
+      lastFitHeight = nextHeight;
+      root.style.height = `${nextHeight}px`;
+      panel.update();
+      notifyCurrentWidgetVisible();
+    };
+
+    const scheduleFitContent = () => {
+      if (!fitContentEnabled(model)) {
+        return;
+      }
+      requestAnimationFrame(() => requestAnimationFrame(fitContentNow));
     };
 
     const notifyCurrentWidgetVisible = () => {
@@ -85,7 +138,13 @@ export default {
 
     const syncSize = () => {
       root.style.width = cssSize(model.get("width"), "100%");
-      root.style.height = cssSize(model.get("height"), "420px");
+      if (fitContentEnabled(model)) {
+        root.style.height = cssSize(model.get("height"), "420px");
+      } else {
+        root.style.height = cssSize(model.get("height"), "420px");
+        lastFitHeight = 0;
+      }
+      root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
       notifyCurrentWidgetVisible();
     };
 
@@ -157,6 +216,7 @@ export default {
       currentWidget.node.dataset.anyluminoRendered = "true";
       currentWidget.node.dataset.anyluminoRendering = "false";
       notifyCurrentWidgetVisible();
+      scheduleFitContent();
     };
 
     const renderChildren = async () => {
@@ -228,6 +288,7 @@ export default {
     model.on("change:selected_index", syncSelectedIndex);
     model.on("change:tab_placement", syncPlacement);
     model.on("change:tabs_movable", syncMovable);
+    model.on("change:fit_content", syncSize);
     model.on("change:width", syncSize);
     model.on("change:height", syncSize);
 
@@ -242,6 +303,7 @@ export default {
         removeModelListener(model, "change:selected_index", syncSelectedIndex);
         removeModelListener(model, "change:tab_placement", syncPlacement);
         removeModelListener(model, "change:tabs_movable", syncMovable);
+        removeModelListener(model, "change:fit_content", syncSize);
         removeModelListener(model, "change:width", syncSize);
         removeModelListener(model, "change:height", syncSize);
         panel.dispose();

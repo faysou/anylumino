@@ -62,6 +62,29 @@ function syncScroll(root, slots, model) {
   }
 }
 
+function fitContentEnabled(model) {
+  return Boolean(model.get("fit_content"));
+}
+
+function measuredContentHeight(node, options = {}) {
+  if (!node) {
+    return 0;
+  }
+
+  const includeSelf = options.includeSelf ?? true;
+  const nodeRect = node.getBoundingClientRect();
+  let height = includeSelf ? Math.max(node.scrollHeight, node.offsetHeight, nodeRect.height) : 0;
+  for (const child of node.children) {
+    const childRect = child.getBoundingClientRect();
+    height = Math.max(height, child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
+  }
+  return Math.ceil(height);
+}
+
+function measureSlotHeight(slot) {
+  return measuredContentHeight(slot?.node, { includeSelf: false });
+}
+
 function createSlot(index, ref, titles, keys, model) {
   const node = document.createElement("div");
   node.className = "anylumino-LayoutChild";
@@ -87,6 +110,16 @@ function createPanel(model, root, slots, onSplitSizesChanged) {
       kind === "responsive"
         ? model.get("wide_direction") || "left-to-right"
         : model.get("direction") || "left-to-right";
+    if (kind === "box" && (model.get("scroll_x") || model.get("scroll_y"))) {
+      const panel = new Panel();
+      panel.addClass("anylumino-box");
+      panel.addClass("anylumino-scrollBox");
+      panel.addClass(`anylumino-scrollBox-${direction}`);
+      panel.node.style.gap = cssSize(model.get("spacing"), "8px");
+      slots.forEach((slot) => panel.addWidget(slot));
+      return panel;
+    }
+
     const panel = new BoxPanel({ direction, spacing: Number(model.get("spacing") ?? 8) });
     panel.addClass(`anylumino-${kind}`);
 
@@ -214,6 +247,7 @@ export default {
     let slots = [];
     let childController = new AbortController();
     let splitSizesFromFrontend = false;
+    let lastFitHeight = 0;
 
     const saveSplitSizes = (sizes) => {
       if (!Array.isArray(sizes) || sizes.length === 0) {
@@ -232,13 +266,76 @@ export default {
         panel.update();
       }
       void renderVisibleChildren();
+      scheduleFitContent();
     };
 
     const syncSize = () => {
       root.style.width = cssSize(model.get("width"), "100%");
-      root.style.height = cssSize(model.get("height"), "420px");
+      if (fitContentEnabled(model)) {
+        root.style.height = cssSize(model.get("height"), "420px");
+      } else {
+        root.style.height = cssSize(model.get("height"), "420px");
+        lastFitHeight = 0;
+      }
+      root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
       syncScroll(root, slots, model);
       notifyResize();
+    };
+
+    const fitContentNow = () => {
+      if (!fitContentEnabled(model) || !panel || slots.length === 0) {
+        return;
+      }
+
+      const kind = model.get("layout_kind");
+      const visibleSlots = slots.filter(slotIsVisible);
+      if (visibleSlots.length === 0) {
+        return;
+      }
+
+      for (const slot of visibleSlots) {
+        const height = measureSlotHeight(slot);
+        if (height > 0) {
+          slot.node.style.minHeight = `${height}px`;
+        }
+      }
+      panel.update();
+
+      requestAnimationFrame(() => {
+        let nextHeight = measuredContentHeight(panel.node);
+        if (kind === "box" || kind === "responsive") {
+          const direction = panel.direction || model.get("direction") || "top-to-bottom";
+          const horizontal = direction === "left-to-right" || direction === "right-to-left";
+          const spacing = Number(model.get("spacing") ?? 8);
+          const childHeights = visibleSlots.map(measureSlotHeight).filter((height) => height > 0);
+          if (childHeights.length > 0) {
+            nextHeight = horizontal
+              ? Math.max(...childHeights)
+              : childHeights.reduce((total, height) => total + height, 0) + spacing * Math.max(0, childHeights.length - 1);
+          }
+        } else if (kind === "stacked") {
+          const selected = visibleSlots.find((slot) => !slot.isHidden) ?? visibleSlots[0];
+          nextHeight = measureSlotHeight(selected);
+        }
+
+        nextHeight = Math.max(160, Math.ceil(nextHeight));
+        if (!Number.isFinite(nextHeight) || Math.abs(nextHeight - lastFitHeight) < 2) {
+          return;
+        }
+        lastFitHeight = nextHeight;
+        root.style.height = `${nextHeight}px`;
+        panel.update();
+        for (const slot of visibleSlots) {
+          notifySlotVisible(slot);
+        }
+      });
+    };
+
+    const scheduleFitContent = () => {
+      if (!fitContentEnabled(model)) {
+        return;
+      }
+      requestAnimationFrame(() => requestAnimationFrame(fitContentNow));
     };
 
     const syncSplitSizesFromModel = () => {
@@ -289,6 +386,7 @@ export default {
       slot.node.dataset.anyluminoRendered = "true";
       slot.node.dataset.anyluminoRendering = "false";
       notifySlotVisible(slot);
+      scheduleFitContent();
     };
 
     const renderVisibleChildren = async () => {
@@ -335,9 +433,11 @@ export default {
       syncScroll(root, slots, model);
       panel = createPanel(model, root, slots, saveSplitSizes);
       Widget.attach(panel, root);
+      root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
       syncStackedIndex();
       panel.update();
       await renderVisibleChildren();
+      scheduleFitContent();
     };
 
     const rerender = () => {
@@ -367,6 +467,7 @@ export default {
     model.on("change:scroll_y", syncSize);
     model.on("change:child_min_width", syncSize);
     model.on("change:child_min_height", syncSize);
+    model.on("change:fit_content", syncSize);
     model.on("change:selected_index", syncStackedIndex);
     model.on("change:width", syncSize);
     model.on("change:height", syncSize);
@@ -396,6 +497,7 @@ export default {
         removeModelListener(model, "change:scroll_y", syncSize);
         removeModelListener(model, "change:child_min_width", syncSize);
         removeModelListener(model, "change:child_min_height", syncSize);
+        removeModelListener(model, "change:fit_content", syncSize);
         removeModelListener(model, "change:selected_index", syncStackedIndex);
         removeModelListener(model, "change:width", syncSize);
         removeModelListener(model, "change:height", syncSize);
