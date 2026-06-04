@@ -4,7 +4,7 @@
 HTMLMath(value='', description='', **kwargs)
 ```
 
-HTML and math display widget.
+HTML display alias matching the ipywidgets HTMLMath API.
 
 ## Parameters {.doc-section .doc-section-parameters}
 

@@ -84,8 +84,9 @@ class ComponentWidget(anywidget.AnyWidget):
         return self.get_owner(key)
 
     def get_owner(self, key_or_index: str | int) -> object:
-        key = self.child_keys[self._resolve_index(key_or_index)]
-        return self._owners_by_key.get(key, self.widgets[self._resolve_index(key_or_index)])
+        index = self._resolve_index(key_or_index)
+        key = self.child_keys[index]
+        return self._owners_by_key.get(key, self.widgets[index])
 
     def show(self) -> None:
         """Open overlay-like components."""

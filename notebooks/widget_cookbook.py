@@ -3286,20 +3286,20 @@ display(wrapper)
 # %% [markdown]
 # ## HTMLMath
 #
-# HTMLMath is a public anylumino widget. The examples below separate construction, state access, composition, and appearance.
+# HTMLMath is an HTML compatibility alias. The examples below separate construction, state access, composition, and appearance.
 
 # %% [markdown]
 # ### Basic example
 
 # %%
-widget = al.HTMLMath(value=r'\(x^2 + y^2 = z^2\)', description='Math')
+widget = al.HTMLMath(value='<strong>Rich HTML</strong>', description='HTML')
 display(widget)
 
 # %% [markdown]
 # ### Access state and react to changes
 
 # %%
-widget = al.HTMLMath(value=r'\(x^2 + y^2 = z^2\)', description='Math')
+widget = al.HTMLMath(value='<strong>Rich HTML</strong>', description='HTML')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
@@ -3312,7 +3312,7 @@ display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
 # ### Use as a keyed child in a layout
 
 # %%
-widget = al.HTMLMath(value=r'\(x^2 + y^2 = z^2\)', description='Math')
+widget = al.HTMLMath(value='<strong>Rich HTML</strong>', description='HTML')
 container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
@@ -3323,7 +3323,7 @@ display(container)
 # ### Customize appearance
 
 # %%
-widget = al.HTMLMath(value=r'\(x^2 + y^2 = z^2\)', description='Math')
+widget = al.HTMLMath(value='<strong>Rich HTML</strong>', description='HTML')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
 display(wrapper)
 

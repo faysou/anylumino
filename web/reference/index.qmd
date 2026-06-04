@@ -131,7 +131,7 @@ Specialized input and display widgets.
 | [Video](Video.qmd#anylumino.Video) | Video display widget. |
 | [Output](Output.qmd#anylumino.Output) | Simple output display widget. |
 | [HTML](HTML.qmd#anylumino.HTML) | HTML display widget. |
-| [HTMLMath](HTMLMath.qmd#anylumino.HTMLMath) | HTML and math display widget. |
+| [HTMLMath](HTMLMath.qmd#anylumino.HTMLMath) | HTML display alias matching the ipywidgets HTMLMath API. |
 | [Label](Label.qmd#anylumino.Label) | Plain text label widget. |
 | [TextWidget](TextWidget.qmd#anylumino.TextWidget) | Small synced text display widget used in examples and tests. |
 | [Badge](Badge.qmd#anylumino.Badge) | Spectrum badge display control. |

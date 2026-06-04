@@ -3,36 +3,21 @@ from __future__ import annotations
 from datetime import date
 from datetime import datetime
 from datetime import time
-from inspect import Parameter
-from inspect import Signature
-from pathlib import Path
 from typing import Any
 
 import anywidget
 import traitlets as t
 
-
-PACKAGE_DIR = Path(__file__).resolve().parent
-STATIC_DIR = PACKAGE_DIR / "static"
-
-
-def _load_static(filename: str) -> str:
-    return (STATIC_DIR / filename).read_text()
-
-
-def _json_value(value: Any) -> Any:
-    if isinstance(value, datetime):
-        return value.replace(microsecond=0).isoformat()
-    if isinstance(value, date | time):
-        return value.isoformat()
-    return value
+from ._common import document_control as _document_control
+from ._common import json_value as _json_value
+from ._common import static_asset
 
 
 class _NativeControlWidget(anywidget.AnyWidget):
     """Base class for browser-native anylumino controls."""
 
-    _esm = _load_static("native_control_widget.bundle.js")
-    _css = _load_static("native_control_widget.css")
+    _esm = static_asset("native_control_widget.bundle.js")
+    _css = static_asset("native_control_widget.css")
 
     control_family = t.Unicode("native").tag(sync=True)
     control_kind = t.Unicode("date").tag(sync=True)
@@ -145,25 +130,6 @@ class DatetimePicker(DatePicker):
         self.control_kind = "datetime"
 
 
-def _parameter(name: str, default: Any) -> Parameter:
-    return Parameter(name, Parameter.POSITIONAL_OR_KEYWORD, default=default)
-
-
-def _document_control(cls: type[Any], summary: str, params: list[tuple[str, Any]]) -> None:
-    signature_params = [_parameter(name, default) for name, default in params]
-    cls.__signature__ = Signature(signature_params)  # type: ignore[attr-defined]
-    arguments = "\n".join(
-        f"{name} : optional\n    {_CONTROL_PARAM_DOCS.get(name, 'Control option.')}"
-        for name, _default in params
-    )
-    cls.__doc__ = f"""{summary}
-
-    Parameters
-    ----------
-{arguments}
-    """
-
-
 _CONTROL_PARAM_DOCS = {
     "continuous_update": "Whether Python receives updates while the user edits the input.",
     "description": "Label shown above the control.",
@@ -220,7 +186,7 @@ for _cls, _summary, _params in [
         ],
     ),
 ]:
-    _document_control(_cls, _summary, _params)
+    _document_control(_cls, _summary, _params, _CONTROL_PARAM_DOCS)
 
 
 __all__ = ["DatePicker", "DatetimePicker", "TimePicker"]

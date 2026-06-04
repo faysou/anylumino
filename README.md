@@ -48,7 +48,7 @@ The current prototype provides:
   `Checkbox`, `Dropdown`, `ListBox`, `MultiSelect`, `RadioButtons`,
   `ToggleButton`, `ToggleButtons`, sliders, numeric inputs, progress bars,
   color picker, file upload metadata, media widgets, `Output`, `HTML`,
-  `HTMLMath`, and `Label`.
+  `HTMLMath` as an `HTML` compatibility alias, and `Label`.
 - Native controls: `DatePicker`, `TimePicker`, and `DatetimePicker`.
 - Surfaces and display helpers: `FieldGroup`, `HelpText`, `ProgressCircle`,
   `Popover`, `Tooltip`, `Tray`, `DialogBox`, `Modal`, `ClearButton`,

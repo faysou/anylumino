@@ -3,48 +3,22 @@ from __future__ import annotations
 from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Mapping
-from datetime import date
-from datetime import datetime
-from datetime import time
-from inspect import Parameter
-from inspect import Signature
-from pathlib import Path
 from typing import Any
 
 import anywidget
 import traitlets as t
 
+from ._common import REQUIRED as _REQUIRED
+from ._common import doc as _doc
+from ._common import document_control as _document_control
+from ._common import json_value as _json_value
+from ._common import option_value as _option_value
+from ._common import options_tuple as _options_tuple
+from ._common import signature as _signature
+from ._common import static_asset
 from ._components import ComponentWidget
 from ._layout import ChildInput
 from ._layout import TitleInput
-
-
-PACKAGE_DIR = Path(__file__).resolve().parent
-STATIC_DIR = PACKAGE_DIR / "static"
-
-
-def _load_static(filename: str) -> str:
-    return (STATIC_DIR / filename).read_text()
-
-
-def _json_value(value: Any) -> Any:
-    if isinstance(value, datetime):
-        return value.isoformat()
-    if isinstance(value, (date, time)):
-        return value.isoformat()
-    if isinstance(value, tuple):
-        return [_json_value(item) for item in value]
-    if isinstance(value, list):
-        return [_json_value(item) for item in value]
-    return value
-
-
-def _options_tuple(options: Iterable[Any] | None) -> tuple[Any, ...]:
-    if options is None:
-        return ()
-    if isinstance(options, dict):
-        return tuple((str(label), _json_value(value)) for label, value in options.items())
-    return tuple(_json_value(option) for option in options)
 
 
 def _range_value(value: Any, min_value: int | float, max_value: int | float) -> list[Any]:
@@ -61,8 +35,8 @@ class ControlWidget(anywidget.AnyWidget):
     controls frontend.
     """
 
-    _esm = _load_static("control_widget.bundle.js")
-    _css = _load_static("control_widget.css")
+    _esm = static_asset("control_widget.bundle.js")
+    _css = static_asset("control_widget.css")
 
     control_kind = t.Unicode("text").tag(sync=True)
     value = t.Any(None, allow_none=True).tag(sync=True)
@@ -1182,7 +1156,7 @@ class HTML(ControlWidget):
 
 
 class HTMLMath(HTML):
-    """HTML and math display widget."""
+    """HTML display alias matching the ipywidgets HTMLMath API."""
 
 
 class Label(ControlWidget):
@@ -1249,12 +1223,6 @@ class Divider(ControlWidget):
         )
 
 
-def _option_value(option: Any) -> Any:
-    if isinstance(option, (list, tuple)) and len(option) == 2:
-        return option[1]
-    return option
-
-
 TextInput = Text
 TextArea = Textarea
 PasswordInput = Password
@@ -1263,33 +1231,6 @@ MultiSelect = SelectMultiple
 IntegerInput = IntText
 IntegerSlider = IntSlider
 IntegerRangeSlider = IntRangeSlider
-
-
-_REQUIRED = object()
-
-
-def _parameter(name: str, default: object = None) -> Parameter:
-    if default is _REQUIRED:
-        return Parameter(name, Parameter.POSITIONAL_OR_KEYWORD)
-    return Parameter(name, Parameter.POSITIONAL_OR_KEYWORD, default=default)
-
-
-def _signature(parameters: list[tuple[str, object]]) -> Signature:
-    return Signature([_parameter(name, default) for name, default in parameters])
-
-
-def _doc(summary: str, parameters: list[tuple[str, object]]) -> str:
-    lines = [summary, "", "Parameters", "----------"]
-    for name, _default in parameters:
-        qualifier = "required" if _default is _REQUIRED else "optional"
-        lines.append(f"{name} : {qualifier}")
-        lines.append(f"    {_CONTROL_PARAM_DOCS.get(name, 'Control option.')}")
-    return "\n".join(lines)
-
-
-def _document_control(cls: type, summary: str, parameters: list[tuple[str, object]]) -> None:
-    cls.__signature__ = _signature(parameters)
-    cls.__doc__ = _doc(summary, parameters)
 
 
 _CONTROL_PARAM_DOCS = {
@@ -1584,7 +1525,7 @@ for _cls, _summary, _params in [
     (Video, "Video display widget.", [("value", ""), ("format", "mp4"), ("width", ""), ("height", "")]),
     (Output, "Simple output display widget.", [("value", "")]),
     (HTML, "HTML display widget.", [("value", ""), ("description", "")]),
-    (HTMLMath, "HTML and math display widget.", [("value", ""), ("description", "")]),
+    (HTMLMath, "HTML display alias matching the ipywidgets HTMLMath API.", [("value", ""), ("description", "")]),
     (Label, "Plain text label widget.", [("value", ""), ("description", "")]),
     (
         Link,
@@ -1593,7 +1534,7 @@ for _cls, _summary, _params in [
     ),
     (Divider, "Spectrum divider display control.", [("orientation", "horizontal"), ("spectrum_size", "m")]),
 ]:
-    _document_control(_cls, _summary, _params)
+    _document_control(_cls, _summary, _params, _CONTROL_PARAM_DOCS, required_marker=_REQUIRED)
 
 
 class SpectrumWidget(ComponentWidget):
@@ -1604,8 +1545,8 @@ class SpectrumWidget(ComponentWidget):
     such as dialogs, popovers, trays, and field groups composable.
     """
 
-    _esm = _load_static("spectrum_widget.bundle.js")
-    _css = _load_static("spectrum_widget.css")
+    _esm = static_asset("spectrum_widget.bundle.js")
+    _css = static_asset("spectrum_widget.css")
 
     component_family = t.Unicode("spectrum").tag(sync=True)
     spectrum_color = t.Unicode("light").tag(sync=True)
@@ -1974,12 +1915,13 @@ _COMPONENT_PARAM_DOCS = {
 
 
 def _component_doc(summary: str, parameters: list[tuple[str, object]]) -> str:
-    lines = [summary, "", "Parameters", "----------"]
-    for name, default in parameters:
-        qualifier = "required" if default is _REQUIRED else "optional"
-        lines.append(f"{name} : {qualifier}")
-        lines.append(f"    {_COMPONENT_PARAM_DOCS.get(name, 'Component option.')}")
-    return "\n".join(lines)
+    return _doc(
+        summary,
+        parameters,
+        _COMPONENT_PARAM_DOCS,
+        fallback="Component option.",
+        required_marker=_REQUIRED,
+    )
 
 
 def _document_component(cls: type, summary: str, parameters: list[tuple[str, object]]) -> None:

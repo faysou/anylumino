@@ -1,7 +1,11 @@
+from datetime import datetime
+from pathlib import Path
+
 import pytest
 import traitlets as t
 
 from anylumino import (
+    AccordionPanel,
     Badge,
     BoxPanel,
     Button,
@@ -12,13 +16,14 @@ from anylumino import (
     ComponentWidget,
     ControlWidget,
     DatePicker,
+    DatetimePicker,
     DialogBox,
     Divider,
     Dropdown,
     FieldGroup,
     GridPanel,
-    AccordionPanel,
     HBox,
+    HTMLMath,
     IntSlider,
     Link,
     ListBox,
@@ -45,6 +50,13 @@ from anylumino import (
     Switch,
     VBox,
 )
+from anylumino._common import static_asset
+
+
+def _asset_path(asset: object) -> Path:
+    path = getattr(asset, "_path", None)
+    assert isinstance(path, Path)
+    return path
 
 
 def test_tab_panel_serializes_child_widgets_as_anywidget_refs() -> None:
@@ -83,7 +95,7 @@ def test_layout_widgets_share_public_base_class() -> None:
 def test_tab_panel_size_inputs_are_normalized_to_css_values() -> None:
     panel = TabPanel([TextWidget("Only")], width=0.5, height=240)
 
-    assert panel.width == "50.0%"
+    assert panel.width == "50%"
     assert panel.height == "240px"
 
 
@@ -240,7 +252,7 @@ def test_box_panel_exposes_lumino_direction_and_stretches() -> None:
     assert panel.layout_kind == "box"
     assert panel.direction == "top-to-bottom"
     assert panel.stretches == [1, 3]
-    assert panel.height == "50.0%"
+    assert panel.height == "50%"
 
 
 def test_vbox_uses_vertical_box_direction() -> None:
@@ -433,6 +445,44 @@ def test_date_controls_are_native_family_not_spectrum_controls() -> None:
 
     assert picker.control_family == "native"
     assert isinstance(picker, ControlWidget) is False
+
+
+def test_widget_frontend_assets_are_lazy_paths() -> None:
+    assert _asset_path(ControlWidget._esm).name == "control_widget.bundle.js"
+    assert _asset_path(ControlWidget._css).name == "control_widget.css"
+    assert _asset_path(DatePicker._esm).name == "native_control_widget.bundle.js"
+    assert _asset_path(DatePicker._css).name == "native_control_widget.css"
+    assert _asset_path(SpectrumWidget._esm).name == "spectrum_widget.bundle.js"
+    assert _asset_path(SpectrumWidget._css).name == "spectrum_widget.css"
+
+
+def test_missing_static_asset_is_import_safe_until_loaded() -> None:
+    asset = static_asset("__missing_anylumino_asset__.js")
+
+    assert _asset_path(asset).name == "__missing_anylumino_asset__.js"
+    with pytest.raises(FileNotFoundError, match="npm run build"):
+        str(asset)
+
+
+def test_datetime_picker_preserves_iso_precision() -> None:
+    picker = DatetimePicker(value=datetime(2026, 6, 4, 12, 30, 15, 123456))
+
+    assert picker.value == "2026-06-04T12:30:15.123456"
+
+
+def test_dropdown_option_pairs_are_normalized_once() -> None:
+    control = Dropdown(options=[("One", 1), ("Two", 2)], index=1)
+
+    assert control.options == (("One", 1), ("Two", 2))
+    assert control.value == 2
+
+
+def test_html_math_is_html_alias() -> None:
+    widget = HTMLMath(value="<strong>x</strong>", description="Value")
+
+    assert widget.control_kind == "html"
+    assert widget.html is True
+    assert widget.value == "<strong>x</strong>"
 
 
 def test_spectrum_component_wrappers_sync_kind_and_metadata() -> None:
