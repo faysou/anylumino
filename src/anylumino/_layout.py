@@ -1169,18 +1169,18 @@ class CommandPalette(_ActionWidget):
 
 
 class TextWidget(anywidget.AnyWidget):
-    """Small synced text display widget used in examples and tests.
+    """Small synced value display widget used in examples and tests.
 
     Parameters
     ----------
-    text : str, default ""
-        Initial text displayed by the widget.
+    value : str, default ""
+        Initial value displayed by the widget.
     """
 
     _esm = static_asset("text_widget.js")
     _css = static_asset("text_widget.css")
 
-    text = t.Unicode("").tag(sync=True)
+    value = t.Unicode("").tag(sync=True)
 
-    def __init__(self, text: str = "") -> None:
-        super().__init__(text=text)
+    def __init__(self, value: str = "") -> None:
+        super().__init__(value=value)

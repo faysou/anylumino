@@ -17,6 +17,7 @@ layout that displays those children.
 | [child_keys](#anylumino.LayoutWidget.child_keys) | An instance of a Python list. |
 | [child_min_height](#anylumino.LayoutWidget.child_min_height) | A trait for unicode strings. |
 | [child_min_width](#anylumino.LayoutWidget.child_min_width) | A trait for unicode strings. |
+| [fit_content](#anylumino.LayoutWidget.fit_content) | A boolean (True, False) trait. |
 | [height](#anylumino.LayoutWidget.height) | A trait for unicode strings. |
 | [resizable](#anylumino.LayoutWidget.resizable) | A boolean (True, False) trait. |
 | [scroll_x](#anylumino.LayoutWidget.scroll_x) | A boolean (True, False) trait. |

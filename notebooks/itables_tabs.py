@@ -94,7 +94,7 @@ def refresh_table(selected_row: int | None = None) -> None:
         caption=f"Plant samples ({len(state['df'])} rows)",
         selected_rows=selected_rows,
     )
-    summary.text = make_summary(state["df"])
+    summary.value = make_summary(state["df"])
 
 
 def append_sample(_event: object | None = None) -> None:
@@ -109,14 +109,14 @@ def append_sample(_event: object | None = None) -> None:
     state["df"] = pd.concat([state["df"], pd.DataFrame([row])], ignore_index=True)
     state["next_sample_id"] = sample_id + 1
     refresh_table(selected_row=len(state["df"]) - 1)
-    status.text = f"Added sample {sample_id} to the DataFrame and refreshed the table."
+    status.value = f"Added sample {sample_id} to the DataFrame and refreshed the table."
 
 
 def reset_samples(_event: object | None = None) -> None:
     state["df"] = initial_samples()
     state["next_sample_id"] = 4
     refresh_table(selected_row=len(state["df"]) - 1)
-    status.text = "Reset the DataFrame and refreshed the table."
+    status.value = "Reset the DataFrame and refreshed the table."
 
 
 add_button.on_click(append_sample)

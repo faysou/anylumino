@@ -10,6 +10,7 @@ StackedPanel(
     width='100%',
     height=420,
     resizable=True,
+    fit_content=False,
 )
 ```
 

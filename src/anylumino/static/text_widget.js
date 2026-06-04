@@ -1,7 +1,7 @@
 export default {
   initialize({ model }) {
     return {
-      getText: () => model.get("text"),
+      getValue: () => model.get("value"),
     };
   },
 
@@ -9,13 +9,13 @@ export default {
     const node = document.createElement("div");
     node.className = "anylumino-TextWidget";
 
-    const syncText = () => {
-      node.textContent = model.get("text");
+    const syncValue = () => {
+      node.textContent = model.get("value");
     };
 
-    syncText();
-    model.on("change:text", syncText);
-    signal.addEventListener("abort", () => model.off("change:text", syncText));
+    syncValue();
+    model.on("change:value", syncValue);
+    signal.addEventListener("abort", () => model.off("change:value", syncValue));
     el.replaceChildren(node);
   },
 };

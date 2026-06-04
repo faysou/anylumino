@@ -89,7 +89,18 @@ def test_layout_widgets_share_public_base_class() -> None:
     ]
 
     assert [isinstance(panel, LayoutWidget) for panel in panels] == [True] * len(panels)
-    assert [panel["child"].text for panel in panels] == ["Child"] * len(panels)
+    assert [panel["child"].value for panel in panels] == ["Child"] * len(panels)
+
+
+def test_text_widget_uses_value_without_text_alias() -> None:
+    widget = TextWidget("Status")
+
+    widget.value = "Updated"
+
+    assert widget.value == "Updated"
+    assert widget.get_state(key=["value"]) == {"value": "Updated"}
+    with pytest.raises(AttributeError):
+        _ = widget.text
 
 
 def test_tab_panel_size_inputs_are_normalized_to_css_values() -> None:

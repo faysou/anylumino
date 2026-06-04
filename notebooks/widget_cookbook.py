@@ -26,26 +26,13 @@ from __future__ import annotations
 from datetime import date, datetime, time
 from urllib.parse import quote
 
-from IPython.display import HTML, display
-
 import anylumino as al
 
 
-display(HTML(
-    """
-    <style>
-      .cookbook-accent-box {
-        display: inline-block;
-        padding: 10px 12px;
-        border: 1px solid #1473e6;
-        border-radius: 6px;
-        background: #eef5ff;
-        color: #123b6d;
-        font-weight: 600;
-      }
-    </style>
-    """
-))
+ACCENT_STYLE = (
+    "display: inline-block; padding: 10px 12px; border: 1px solid #1473e6; "
+    "border-radius: 6px; background: #eef5ff; color: #123b6d; font-weight: 600;"
+)
 
 SVG_DATA_URI = "data:image/svg+xml;utf8," + quote(
     """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 80'>
@@ -64,11 +51,11 @@ SVG_DATA_URI = "data:image/svg+xml;utf8," + quote(
 # %%
 text = al.TextInput(value='Iris', description='Name')
 status = al.TextWidget(f'initial value: {text.value!r}')
-text.observe(lambda change: setattr(status, 'text', f"changed to: {change['new']!r}"), names='value')
+text.observe(lambda change: setattr(status, 'value', f"changed to: {change['new']!r}"), names='value')
 button = al.Button(description='Set Rose', icon='Edit')
 button.on_click(lambda _button: setattr(text, 'value', 'Rose'))
 layout = al.VBox({'field': text, 'button': button, 'status': status}, height=180, spacing=8)
-display(layout)
+layout
 
 # %% [markdown]
 # # Layout widgets
@@ -83,42 +70,64 @@ display(layout)
 
 # %%
 panel = al.TabPanel({'input': al.TextInput(value='Iris', description='Input'), 'status': al.TextWidget('Status child')}, titles={'input': 'Input', 'status': 'Status'}, height=180)
-display(panel)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
-panel = al.TabPanel({'input': al.TextInput(value='Iris', description='Input'), 'status': al.TextWidget('Status child')}, titles={'input': 'Input', 'status': 'Status'}, height=180)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-panel
+panel = al.TabPanel({'input': al.TextInput(value='Iris', description='Input'), 'status': al.TextWidget('Status child')}, titles={'input': 'Input', 'status': 'Status'}, width='520px', height=220)
+status = al.TextWidget('Click Edit input to update the keyed child.')
+edit = al.Button(description='Edit input', icon='Edit')
+
+def edit_input(_button, panel=panel, status=status):
+    input_widget = panel.get_owner('input')
+    input_widget.value = 'Edited through get_owner()'
+    status.value = f"input value: {input_widget.value!r}"
+
+edit.on_click(edit_input)
+input_widget = panel.get_owner('input')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, width='540px', height=320, spacing=8, resizable=False)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
 panel = al.TabPanel({'input': al.TextInput(value='Iris', description='Input'), 'status': al.TextWidget('Status child')}, titles={'input': 'Input', 'status': 'Status'}, height=180)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-panel.select_key('extra')
-display(panel)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove input', icon='Delete')
+select = al.Button(description='Select extra', icon='ChevronRight')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}; selected: {panel.selected_key!r}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra', select=True)
+    update_status()
+
+def remove_input(_button, panel=panel, update_status=update_status):
+    if 'input' in panel:
+        panel.remove_widget('input')
+    update_status()
+
+def select_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' in panel:
+        panel.select_key('extra')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_input)
+select.on_click(select_extra)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove, 'select': select}, height=64, spacing=8), 'status': status}, height=300, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.TabPanel({'input': al.TextInput(value='Iris', description='Input'), 'status': al.TextWidget('Status child')}, titles={'input': 'Input', 'status': 'Status'}, height=180)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.TabPanel({'input': al.TextInput(value='Iris', description='Input'), 'status': al.TextWidget('Status child')}, titles={'input': 'Input', 'status': 'Status'}, width='420px', height=180, resizable=False)
+panel
 
 # %% [markdown]
 # ## TabPanel
@@ -129,43 +138,65 @@ display(panel)
 # ### Basic example
 
 # %%
-panel = al.TabPanel({'first': al.TextWidget('First tab'), 'second': al.TextInput(value='Second', description='Value')}, titles={'first': 'First', 'second': 'Second'}, selected_index=0, height=180)
-display(panel)
+panel = al.TabPanel({'first': al.TextInput(value='First tab', description='First'), 'second': al.TextInput(value='Second', description='Value')}, titles={'first': 'First', 'second': 'Second'}, selected_index=0, height=180)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
-panel = al.TabPanel({'first': al.TextWidget('First tab'), 'second': al.TextInput(value='Second', description='Value')}, titles={'first': 'First', 'second': 'Second'}, selected_index=0, height=180)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+panel = al.TabPanel({'first': al.TextInput(value='First tab', description='First'), 'second': al.TextInput(value='Second', description='Value')}, titles={'first': 'First', 'second': 'Second'}, selected_index=0, width='520px', height=220)
+status = al.TextWidget('Click Edit first to update the keyed child.')
+edit = al.Button(description='Edit first', icon='Edit')
+
+def edit_first(_button, panel=panel, status=status):
+    first_widget = panel.get_owner('first')
+    first_widget.value = 'Edited through get_owner()'
+    status.value = f"first value: {first_widget.value!r}"
+
+edit.on_click(edit_first)
+first_widget = panel.get_owner('first')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, width='540px', height=320, spacing=8, resizable=False)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
-panel = al.TabPanel({'first': al.TextWidget('First tab'), 'second': al.TextInput(value='Second', description='Value')}, titles={'first': 'First', 'second': 'Second'}, selected_index=0, height=180)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-panel.select_key('extra')
-display(panel)
+panel = al.TabPanel({'first': al.TextInput(value='First tab', description='First'), 'second': al.TextInput(value='Second', description='Value')}, titles={'first': 'First', 'second': 'Second'}, selected_index=0, height=180)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove first', icon='Delete')
+select = al.Button(description='Select extra', icon='ChevronRight')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}; selected: {panel.selected_key!r}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra', select=True)
+    update_status()
+
+def remove_first(_button, panel=panel, update_status=update_status):
+    if 'first' in panel:
+        panel.remove_widget('first')
+    update_status()
+
+def select_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' in panel:
+        panel.select_key('extra')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_first)
+select.on_click(select_extra)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove, 'select': select}, height=64, spacing=8), 'status': status}, height=300, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.TabPanel({'first': al.TextWidget('First tab'), 'second': al.TextInput(value='Second', description='Value')}, titles={'first': 'First', 'second': 'Second'}, selected_index=0, height=180)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.TabPanel({'first': al.TextInput(value='First tab', description='First'), 'second': al.TextInput(value='Second', description='Value')}, titles={'first': 'First', 'second': 'Second'}, selected_index=0, width='420px', height=180, resizable=False)
+panel
 
 # %% [markdown]
 # ## BoxPanel
@@ -177,42 +208,57 @@ display(panel)
 
 # %%
 panel = al.BoxPanel({'left': al.TextInput(value='Left', description='Left'), 'right': al.Button(description='Right')}, direction='left-to-right', spacing=12, stretches=[2, 1], height=150)
-display(panel)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
 panel = al.BoxPanel({'left': al.TextInput(value='Left', description='Left'), 'right': al.Button(description='Right')}, direction='left-to-right', spacing=12, stretches=[2, 1], height=150)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+status = al.TextWidget('Click Edit left to update the keyed child.')
+edit = al.Button(description='Edit left', icon='Edit')
+
+def edit_left(_button, panel=panel, status=status):
+    left_widget = panel.get_owner('left')
+    left_widget.value = 'Edited through get_owner()'
+    status.value = f"left value: {left_widget.value!r}"
+
+edit.on_click(edit_left)
+left_widget = panel.get_owner('left')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=240, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
 panel = al.BoxPanel({'left': al.TextInput(value='Left', description='Left'), 'right': al.Button(description='Right')}, direction='left-to-right', spacing=12, stretches=[2, 1], height=150)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove left', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_left(_button, panel=panel, update_status=update_status):
+    if 'left' in panel:
+        panel.remove_widget('left')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_left)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=280, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.BoxPanel({'left': al.TextInput(value='Left', description='Left'), 'right': al.Button(description='Right')}, direction='left-to-right', spacing=12, stretches=[2, 1], height=150)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.BoxPanel({'left': al.TextInput(value='Left', description='Left'), 'right': al.Button(description='Right')}, direction='left-to-right', spacing=12, stretches=[2, 1], width='420px', height=180, resizable=False, child_min_width='160px', child_min_height='44px')
+panel
 
 # %% [markdown]
 # ## HBox
@@ -224,42 +270,57 @@ display(panel)
 
 # %%
 panel = al.HBox({'name': al.TextInput(value='Iris', description='Name'), 'apply': al.Button(description='Apply')}, spacing=12, child_min_width=180, height=130)
-display(panel)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
 panel = al.HBox({'name': al.TextInput(value='Iris', description='Name'), 'apply': al.Button(description='Apply')}, spacing=12, child_min_width=180, height=130)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+status = al.TextWidget('Click Edit name to update the keyed child.')
+edit = al.Button(description='Edit name', icon='Edit')
+
+def edit_name(_button, panel=panel, status=status):
+    name_widget = panel.get_owner('name')
+    name_widget.value = 'Edited through get_owner()'
+    status.value = f"name value: {name_widget.value!r}"
+
+edit.on_click(edit_name)
+name_widget = panel.get_owner('name')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=230, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
 panel = al.HBox({'name': al.TextInput(value='Iris', description='Name'), 'apply': al.Button(description='Apply')}, spacing=12, child_min_width=180, height=130)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove name', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_name(_button, panel=panel, update_status=update_status):
+    if 'name' in panel:
+        panel.remove_widget('name')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_name)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.HBox({'name': al.TextInput(value='Iris', description='Name'), 'apply': al.Button(description='Apply')}, spacing=12, child_min_width=180, height=130)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.HBox({'name': al.TextInput(value='Iris', description='Name'), 'apply': al.Button(description='Apply')}, spacing=12, width='420px', height=180, resizable=False, child_min_width='160px', child_min_height='44px')
+panel
 
 # %% [markdown]
 # ## VBox
@@ -271,42 +332,57 @@ display(panel)
 
 # %%
 panel = al.VBox({'name': al.TextInput(value='Iris', description='Name'), 'notes': al.TextArea(value='Notes', description='Notes')}, spacing=10, height=190)
-display(panel)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
 panel = al.VBox({'name': al.TextInput(value='Iris', description='Name'), 'notes': al.TextArea(value='Notes', description='Notes')}, spacing=10, height=190)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+status = al.TextWidget('Click Edit name to update the keyed child.')
+edit = al.Button(description='Edit name', icon='Edit')
+
+def edit_name(_button, panel=panel, status=status):
+    name_widget = panel.get_owner('name')
+    name_widget.value = 'Edited through get_owner()'
+    status.value = f"name value: {name_widget.value!r}"
+
+edit.on_click(edit_name)
+name_widget = panel.get_owner('name')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=290, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
 panel = al.VBox({'name': al.TextInput(value='Iris', description='Name'), 'notes': al.TextArea(value='Notes', description='Notes')}, spacing=10, height=190)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove name', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_name(_button, panel=panel, update_status=update_status):
+    if 'name' in panel:
+        panel.remove_widget('name')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_name)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=330, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.VBox({'name': al.TextInput(value='Iris', description='Name'), 'notes': al.TextArea(value='Notes', description='Notes')}, spacing=10, height=190)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.VBox({'name': al.TextInput(value='Iris', description='Name'), 'notes': al.TextArea(value='Notes', description='Notes')}, spacing=10, width='420px', height=180, resizable=False, child_min_width='160px', child_min_height='44px')
+panel
 
 # %% [markdown]
 # ## ScrollBox
@@ -318,42 +394,57 @@ display(panel)
 
 # %%
 panel = al.ScrollBox({'one': al.TextInput(value='One', description='One'), 'two': al.TextInput(value='Two', description='Two'), 'three': al.TextInput(value='Three', description='Three'), 'four': al.TextInput(value='Four', description='Four')}, height=150, child_min_height=54)
-display(panel)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
 panel = al.ScrollBox({'one': al.TextInput(value='One', description='One'), 'two': al.TextInput(value='Two', description='Two'), 'three': al.TextInput(value='Three', description='Three'), 'four': al.TextInput(value='Four', description='Four')}, height=150, child_min_height=54)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+status = al.TextWidget('Click Edit one to update the keyed child.')
+edit = al.Button(description='Edit one', icon='Edit')
+
+def edit_one(_button, panel=panel, status=status):
+    one_widget = panel.get_owner('one')
+    one_widget.value = 'Edited through get_owner()'
+    status.value = f"one value: {one_widget.value!r}"
+
+edit.on_click(edit_one)
+one_widget = panel.get_owner('one')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=250, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
 panel = al.ScrollBox({'one': al.TextInput(value='One', description='One'), 'two': al.TextInput(value='Two', description='Two'), 'three': al.TextInput(value='Three', description='Three'), 'four': al.TextInput(value='Four', description='Four')}, height=150, child_min_height=54)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove one', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_one(_button, panel=panel, update_status=update_status):
+    if 'one' in panel:
+        panel.remove_widget('one')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_one)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=290, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.ScrollBox({'one': al.TextInput(value='One', description='One'), 'two': al.TextInput(value='Two', description='Two'), 'three': al.TextInput(value='Three', description='Three'), 'four': al.TextInput(value='Four', description='Four')}, height=150, child_min_height=54)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.ScrollBox({'one': al.TextInput(value='One', description='One'), 'two': al.TextInput(value='Two', description='Two'), 'three': al.TextInput(value='Three', description='Three'), 'four': al.TextInput(value='Four', description='Four')}, width='420px', height=180, resizable=False, child_min_width='160px', child_min_height='44px')
+panel
 
 # %% [markdown]
 # ## SplitPanel
@@ -364,43 +455,58 @@ display(panel)
 # ### Basic example
 
 # %%
-panel = al.SplitPanel({'left': al.TextWidget('Left pane'), 'right': al.TextInput(value='Right pane', description='Right')}, orientation='horizontal', sizes=[0.35, 0.65], height=180)
-display(panel)
+panel = al.SplitPanel({'left': al.TextInput(value='Left pane', description='Left'), 'right': al.TextInput(value='Right pane', description='Right')}, orientation='horizontal', sizes=[0.35, 0.65], height=180)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
-panel = al.SplitPanel({'left': al.TextWidget('Left pane'), 'right': al.TextInput(value='Right pane', description='Right')}, orientation='horizontal', sizes=[0.35, 0.65], height=180)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+panel = al.SplitPanel({'left': al.TextInput(value='Left pane', description='Left'), 'right': al.TextInput(value='Right pane', description='Right')}, orientation='horizontal', sizes=[0.35, 0.65], height=180)
+status = al.TextWidget('Click Edit left to update the keyed child.')
+edit = al.Button(description='Edit left', icon='Edit')
+
+def edit_left(_button, panel=panel, status=status):
+    left_widget = panel.get_owner('left')
+    left_widget.value = 'Edited through get_owner()'
+    status.value = f"left value: {left_widget.value!r}"
+
+edit.on_click(edit_left)
+left_widget = panel.get_owner('left')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=280, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
-panel = al.SplitPanel({'left': al.TextWidget('Left pane'), 'right': al.TextInput(value='Right pane', description='Right')}, orientation='horizontal', sizes=[0.35, 0.65], height=180)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+panel = al.SplitPanel({'left': al.TextInput(value='Left pane', description='Left'), 'right': al.TextInput(value='Right pane', description='Right')}, orientation='horizontal', sizes=[0.35, 0.65], height=180)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove left', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_left(_button, panel=panel, update_status=update_status):
+    if 'left' in panel:
+        panel.remove_widget('left')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_left)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=320, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.SplitPanel({'left': al.TextWidget('Left pane'), 'right': al.TextInput(value='Right pane', description='Right')}, orientation='horizontal', sizes=[0.35, 0.65], height=180)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.SplitPanel({'left': al.TextInput(value='Left pane', description='Left'), 'right': al.TextInput(value='Right pane', description='Right')}, orientation='horizontal', sizes=[0.35, 0.65], width='420px', height=180, resizable=False)
+panel
 
 # %% [markdown]
 # ## DockPanel
@@ -412,42 +518,57 @@ display(panel)
 
 # %%
 panel = al.DockPanel({'table': al.TextWidget('Table dock'), 'details': al.TextArea(value='Details', description='Details')}, titles={'table': 'Table', 'details': 'Details'}, mode='split-right', height=220)
-display(panel)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
 panel = al.DockPanel({'table': al.TextWidget('Table dock'), 'details': al.TextArea(value='Details', description='Details')}, titles={'table': 'Table', 'details': 'Details'}, mode='split-right', height=220)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+status = al.TextWidget('Click Edit details to update the keyed child.')
+edit = al.Button(description='Edit details', icon='Edit')
+
+def edit_details(_button, panel=panel, status=status):
+    details_widget = panel.get_owner('details')
+    details_widget.value = 'Edited through get_owner()'
+    status.value = f"details value: {details_widget.value!r}"
+
+edit.on_click(edit_details)
+details_widget = panel.get_owner('details')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=340, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
 panel = al.DockPanel({'table': al.TextWidget('Table dock'), 'details': al.TextArea(value='Details', description='Details')}, titles={'table': 'Table', 'details': 'Details'}, mode='split-right', height=220)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove table', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_table(_button, panel=panel, update_status=update_status):
+    if 'table' in panel:
+        panel.remove_widget('table')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_table)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=360, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.DockPanel({'table': al.TextWidget('Table dock'), 'details': al.TextArea(value='Details', description='Details')}, titles={'table': 'Table', 'details': 'Details'}, mode='split-right', height=220)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.DockPanel({'table': al.TextWidget('Table dock'), 'details': al.TextArea(value='Details', description='Details')}, titles={'table': 'Table', 'details': 'Details'}, mode='split-right', width='420px', height=180, resizable=False)
+panel
 
 # %% [markdown]
 # ## AccordionPanel
@@ -459,42 +580,57 @@ display(panel)
 
 # %%
 panel = al.AccordionPanel({'settings': al.TextInput(value='Iris', description='Name'), 'details': al.TextWidget('Details panel')}, titles={'settings': 'Settings', 'details': 'Details'}, height=220)
-display(panel)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
 panel = al.AccordionPanel({'settings': al.TextInput(value='Iris', description='Name'), 'details': al.TextWidget('Details panel')}, titles={'settings': 'Settings', 'details': 'Details'}, height=220)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+status = al.TextWidget('Click Edit settings to update the keyed child.')
+edit = al.Button(description='Edit settings', icon='Edit')
+
+def edit_settings(_button, panel=panel, status=status):
+    settings_widget = panel.get_owner('settings')
+    settings_widget.value = 'Edited through get_owner()'
+    status.value = f"settings value: {settings_widget.value!r}"
+
+edit.on_click(edit_settings)
+settings_widget = panel.get_owner('settings')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=340, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
 panel = al.AccordionPanel({'settings': al.TextInput(value='Iris', description='Name'), 'details': al.TextWidget('Details panel')}, titles={'settings': 'Settings', 'details': 'Details'}, height=220)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove settings', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_settings(_button, panel=panel, update_status=update_status):
+    if 'settings' in panel:
+        panel.remove_widget('settings')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_settings)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=360, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.AccordionPanel({'settings': al.TextInput(value='Iris', description='Name'), 'details': al.TextWidget('Details panel')}, titles={'settings': 'Settings', 'details': 'Details'}, height=220)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.AccordionPanel({'settings': al.TextInput(value='Iris', description='Name'), 'details': al.TextWidget('Details panel')}, titles={'settings': 'Settings', 'details': 'Details'}, width='420px', height=180, resizable=False)
+panel
 
 # %% [markdown]
 # ## StackedPanel
@@ -505,43 +641,65 @@ display(panel)
 # ### Basic example
 
 # %%
-panel = al.StackedPanel({'summary': al.TextWidget('Summary view'), 'details': al.TextInput(value='Details', description='Details')}, selected_index=0, height=160)
-display(panel)
+panel = al.StackedPanel({'summary': al.TextInput(value='Summary view', description='Summary'), 'details': al.TextInput(value='Details', description='Details')}, selected_index=0, height=160)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
-panel = al.StackedPanel({'summary': al.TextWidget('Summary view'), 'details': al.TextInput(value='Details', description='Details')}, selected_index=0, height=160)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+panel = al.StackedPanel({'summary': al.TextInput(value='Summary view', description='Summary'), 'details': al.TextInput(value='Details', description='Details')}, selected_index=0, height=160)
+status = al.TextWidget('Click Edit summary to update the keyed child.')
+edit = al.Button(description='Edit summary', icon='Edit')
+
+def edit_summary(_button, panel=panel, status=status):
+    summary_widget = panel.get_owner('summary')
+    summary_widget.value = 'Edited through get_owner()'
+    status.value = f"summary value: {summary_widget.value!r}"
+
+edit.on_click(edit_summary)
+summary_widget = panel.get_owner('summary')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
-panel = al.StackedPanel({'summary': al.TextWidget('Summary view'), 'details': al.TextInput(value='Details', description='Details')}, selected_index=0, height=160)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-panel.select_key('extra')
-display(panel)
+panel = al.StackedPanel({'summary': al.TextInput(value='Summary view', description='Summary'), 'details': al.TextInput(value='Details', description='Details')}, selected_index=0, height=160)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove summary', icon='Delete')
+select = al.Button(description='Select extra', icon='ChevronRight')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}; selected: {panel.selected_key!r}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra', select=True)
+    update_status()
+
+def remove_summary(_button, panel=panel, update_status=update_status):
+    if 'summary' in panel:
+        panel.remove_widget('summary')
+    update_status()
+
+def select_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' in panel:
+        panel.select_key('extra')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_summary)
+select.on_click(select_extra)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove, 'select': select}, height=64, spacing=8), 'status': status}, height=300, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.StackedPanel({'summary': al.TextWidget('Summary view'), 'details': al.TextInput(value='Details', description='Details')}, selected_index=0, height=160)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.StackedPanel({'summary': al.TextInput(value='Summary view', description='Summary'), 'details': al.TextInput(value='Details', description='Details')}, selected_index=0, width='420px', height=180, resizable=False)
+panel
 
 # %% [markdown]
 # ## GridPanel
@@ -552,43 +710,58 @@ display(panel)
 # ### Basic example
 
 # %%
-panel = al.GridPanel({'a': al.TextWidget('A'), 'b': al.TextWidget('B'), 'c': al.Button(description='Action')}, columns='1fr 1fr', rows='80px 80px', gap=8, height=180)
-display(panel)
+panel = al.GridPanel({'a': al.TextInput(value='A', description='A'), 'b': al.TextWidget('B'), 'c': al.Button(description='Action')}, columns='1fr 1fr', rows='80px 80px', gap=8, height=180)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
-panel = al.GridPanel({'a': al.TextWidget('A'), 'b': al.TextWidget('B'), 'c': al.Button(description='Action')}, columns='1fr 1fr', rows='80px 80px', gap=8, height=180)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+panel = al.GridPanel({'a': al.TextInput(value='A', description='A'), 'b': al.TextWidget('B'), 'c': al.Button(description='Action')}, columns='1fr 1fr', rows='80px 80px', gap=8, height=180)
+status = al.TextWidget('Click Edit A to update the keyed child.')
+edit = al.Button(description='Edit A', icon='Edit')
+
+def edit_a(_button, panel=panel, status=status):
+    a_widget = panel.get_owner('a')
+    a_widget.value = 'Edited through get_owner()'
+    status.value = f"a value: {a_widget.value!r}"
+
+edit.on_click(edit_a)
+a_widget = panel.get_owner('a')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=280, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
-panel = al.GridPanel({'a': al.TextWidget('A'), 'b': al.TextWidget('B'), 'c': al.Button(description='Action')}, columns='1fr 1fr', rows='80px 80px', gap=8, height=180)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+panel = al.GridPanel({'a': al.TextInput(value='A', description='A'), 'b': al.TextWidget('B'), 'c': al.Button(description='Action')}, columns='1fr 1fr', rows='80px 80px', gap=8, height=180)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove A', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_a(_button, panel=panel, update_status=update_status):
+    if 'a' in panel:
+        panel.remove_widget('a')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_a)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=320, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.GridPanel({'a': al.TextWidget('A'), 'b': al.TextWidget('B'), 'c': al.Button(description='Action')}, columns='1fr 1fr', rows='80px 80px', gap=8, height=180)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.GridPanel({'a': al.TextInput(value='A', description='A'), 'b': al.TextWidget('B'), 'c': al.Button(description='Action')}, columns='1fr 1fr', rows='80px 80px', gap=8, width='420px', height=180, resizable=False)
+panel
 
 # %% [markdown]
 # ## ResponsivePanel
@@ -600,42 +773,57 @@ display(panel)
 
 # %%
 panel = al.ResponsivePanel({'filters': al.TextInput(value='Filter', description='Filter'), 'content': al.TextWidget('Responsive content')}, breakpoint=640, wide_direction='left-to-right', narrow_direction='top-to-bottom', spacing=10, height=170)
-display(panel)
+panel
 
 # %% [markdown]
 # ### Access child widgets by key
 
 # %%
 panel = al.ResponsivePanel({'filters': al.TextInput(value='Filter', description='Filter'), 'content': al.TextWidget('Responsive content')}, breakpoint=640, wide_direction='left-to-right', narrow_direction='top-to-bottom', spacing=10, height=170)
-first_key = panel.child_keys[0]
-first_owner = panel.get_owner(first_key)
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through get_owner()'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through get_owner()'
-display(panel)
+status = al.TextWidget('Click Edit filters to update the keyed child.')
+edit = al.Button(description='Edit filters', icon='Edit')
+
+def edit_filters(_button, panel=panel, status=status):
+    filters_widget = panel.get_owner('filters')
+    filters_widget.value = 'Edited through get_owner()'
+    status.value = f"filters value: {filters_widget.value!r}"
+
+edit.on_click(edit_filters)
+filters_widget = panel.get_owner('filters')
+al.VBox({'panel': panel, 'edit': edit, 'status': status}, height=270, spacing=8)
 
 # %% [markdown]
 # ### Add, remove, or select a child
 
 # %%
 panel = al.ResponsivePanel({'filters': al.TextInput(value='Filter', description='Filter'), 'content': al.TextWidget('Responsive content')}, breakpoint=640, wide_direction='left-to-right', narrow_direction='top-to-bottom', spacing=10, height=170)
-panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
-removed = panel.remove_widget(panel.child_keys[0])
-# This layout has no active selection API; add/remove still works.
-display(panel)
+status = al.TextWidget(f'children: {panel.child_keys}')
+add = al.Button(description='Add extra', icon='Add')
+remove = al.Button(description='Remove filters', icon='Delete')
+
+def update_status(panel=panel, status=status):
+    status.value = f'children: {panel.child_keys}'
+
+def add_extra(_button, panel=panel, update_status=update_status):
+    if 'extra' not in panel:
+        panel.add('extra', al.TextWidget('Added after construction'), title='Extra')
+    update_status()
+
+def remove_filters(_button, panel=panel, update_status=update_status):
+    if 'filters' in panel:
+        panel.remove_widget('filters')
+    update_status()
+
+add.on_click(add_extra)
+remove.on_click(remove_filters)
+al.VBox({'panel': panel, 'controls': al.HBox({'add': add, 'remove': remove}, height=64, spacing=8), 'status': status}, height=310, spacing=8)
 
 # %% [markdown]
 # ### Customize size and layout behavior
 
 # %%
-panel = al.ResponsivePanel({'filters': al.TextInput(value='Filter', description='Filter'), 'content': al.TextWidget('Responsive content')}, breakpoint=640, wide_direction='left-to-right', narrow_direction='top-to-bottom', spacing=10, height=170)
-panel.width = '420px'
-panel.height = '180px'
-panel.resizable = False
-panel.child_min_width = '160px'
-panel.child_min_height = '44px'
-display(panel)
+panel = al.ResponsivePanel({'filters': al.TextInput(value='Filter', description='Filter'), 'content': al.TextWidget('Responsive content')}, breakpoint=640, wide_direction='left-to-right', narrow_direction='top-to-bottom', spacing=10, width='420px', height=180, resizable=False)
+panel
 
 # %% [markdown]
 # # Action widgets
@@ -650,7 +838,7 @@ display(panel)
 
 # %%
 widget = al.Toolbar([{'id': 'refresh', 'label': 'Refresh', 'icon': 'RotateRight'}, {'id': 'add', 'label': 'Add', 'icon': 'AddContent'}, {'id': 'clear', 'label': 'Clear', 'icon': 'Close'}])
-display(widget)
+widget
 
 # %% [markdown]
 # ### Pass callbacks by action id
@@ -658,12 +846,12 @@ display(widget)
 # %%
 status = al.TextWidget('Toolbar: no action yet')
 callbacks = {
-    'refresh': lambda action_id: setattr(status, 'text', f'Toolbar: {action_id}'),
-    'add': lambda action_id: setattr(status, 'text', f'Toolbar: {action_id}'),
-    'clear': lambda action_id: setattr(status, 'text', f'Toolbar: {action_id}'),
+    'refresh': lambda action_id: setattr(status, 'value', f'Toolbar: {action_id}'),
+    'add': lambda action_id: setattr(status, 'value', f'Toolbar: {action_id}'),
+    'clear': lambda action_id: setattr(status, 'value', f'Toolbar: {action_id}'),
 }
 widget = al.Toolbar([{'id': 'refresh', 'label': 'Refresh', 'icon': 'RotateRight'}, {'id': 'add', 'label': 'Add', 'icon': 'AddContent'}, {'id': 'clear', 'label': 'Clear', 'icon': 'Close'}], callbacks=callbacks)
-display(al.VBox({'actions': widget, 'status': status}, height=180, spacing=8))
+al.VBox({'actions': widget, 'status': status}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Use as a child in a layout
@@ -671,7 +859,7 @@ display(al.VBox({'actions': widget, 'status': status}, height=180, spacing=8))
 # %%
 widget = al.Toolbar([{'id': 'refresh', 'label': 'Refresh', 'icon': 'RotateRight'}, {'id': 'add', 'label': 'Add', 'icon': 'AddContent'}, {'id': 'clear', 'label': 'Clear', 'icon': 'Close'}])
 container = al.VBox({'commands': widget, 'content': al.TextWidget('Action output area')}, height=180, spacing=8)
-display(container)
+container
 
 # %% [markdown]
 # ### Customize labels, icons, and size
@@ -680,7 +868,7 @@ display(container)
 widget = al.Toolbar([{'id': 'refresh', 'label': 'Refresh', 'icon': 'RotateRight'}, {'id': 'add', 'label': 'Add', 'icon': 'AddContent'}, {'id': 'clear', 'label': 'Clear', 'icon': 'Close'}])
 widget.width = '420px'
 widget.height = 'auto'
-display(widget)
+widget
 
 # %% [markdown]
 # ## MenuBar
@@ -692,7 +880,7 @@ display(widget)
 
 # %%
 widget = al.MenuBar([{'id': 'file', 'label': 'File', 'items': [{'id': 'refresh', 'label': 'Refresh'}, {'id': 'clear', 'label': 'Clear'}]}, {'id': 'edit', 'label': 'Edit', 'items': [{'id': 'add', 'label': 'Add'}]}])
-display(widget)
+widget
 
 # %% [markdown]
 # ### Pass callbacks by action id
@@ -700,12 +888,12 @@ display(widget)
 # %%
 status = al.TextWidget('MenuBar: no action yet')
 callbacks = {
-    'refresh': lambda action_id: setattr(status, 'text', f'MenuBar: {action_id}'),
-    'add': lambda action_id: setattr(status, 'text', f'MenuBar: {action_id}'),
-    'clear': lambda action_id: setattr(status, 'text', f'MenuBar: {action_id}'),
+    'refresh': lambda action_id: setattr(status, 'value', f'MenuBar: {action_id}'),
+    'add': lambda action_id: setattr(status, 'value', f'MenuBar: {action_id}'),
+    'clear': lambda action_id: setattr(status, 'value', f'MenuBar: {action_id}'),
 }
 widget = al.MenuBar([{'id': 'file', 'label': 'File', 'items': [{'id': 'refresh', 'label': 'Refresh'}, {'id': 'clear', 'label': 'Clear'}]}, {'id': 'edit', 'label': 'Edit', 'items': [{'id': 'add', 'label': 'Add'}]}], callbacks=callbacks)
-display(al.VBox({'menus': widget, 'status': status}, height=180, spacing=8))
+al.VBox({'menus': widget, 'status': status}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Use as a child in a layout
@@ -713,7 +901,7 @@ display(al.VBox({'menus': widget, 'status': status}, height=180, spacing=8))
 # %%
 widget = al.MenuBar([{'id': 'file', 'label': 'File', 'items': [{'id': 'refresh', 'label': 'Refresh'}, {'id': 'clear', 'label': 'Clear'}]}, {'id': 'edit', 'label': 'Edit', 'items': [{'id': 'add', 'label': 'Add'}]}])
 container = al.VBox({'commands': widget, 'content': al.TextWidget('Action output area')}, height=180, spacing=8)
-display(container)
+container
 
 # %% [markdown]
 # ### Customize labels, icons, and size
@@ -722,7 +910,7 @@ display(container)
 widget = al.MenuBar([{'id': 'file', 'label': 'File', 'items': [{'id': 'refresh', 'label': 'Refresh'}, {'id': 'clear', 'label': 'Clear'}]}, {'id': 'edit', 'label': 'Edit', 'items': [{'id': 'add', 'label': 'Add'}]}])
 widget.width = '420px'
 widget.height = 'auto'
-display(widget)
+widget
 
 # %% [markdown]
 # ## CommandPalette
@@ -734,7 +922,7 @@ display(widget)
 
 # %%
 widget = al.CommandPalette([{'id': 'refresh', 'label': 'Refresh', 'category': 'Data'}, {'id': 'add', 'label': 'Add item', 'category': 'Data'}, {'id': 'clear', 'label': 'Clear', 'category': 'View'}], height=220)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Pass callbacks by action id
@@ -742,12 +930,12 @@ display(widget)
 # %%
 status = al.TextWidget('CommandPalette: no action yet')
 callbacks = {
-    'refresh': lambda action_id: setattr(status, 'text', f'CommandPalette: {action_id}'),
-    'add': lambda action_id: setattr(status, 'text', f'CommandPalette: {action_id}'),
-    'clear': lambda action_id: setattr(status, 'text', f'CommandPalette: {action_id}'),
+    'refresh': lambda action_id: setattr(status, 'value', f'CommandPalette: {action_id}'),
+    'add': lambda action_id: setattr(status, 'value', f'CommandPalette: {action_id}'),
+    'clear': lambda action_id: setattr(status, 'value', f'CommandPalette: {action_id}'),
 }
 widget = al.CommandPalette([{'id': 'refresh', 'label': 'Refresh', 'category': 'Data'}, {'id': 'add', 'label': 'Add item', 'category': 'Data'}, {'id': 'clear', 'label': 'Clear', 'category': 'View'}], callbacks=callbacks, height=220)
-display(al.VBox({'commands': widget, 'status': status}, height=180, spacing=8))
+al.VBox({'commands': widget, 'status': status}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Use as a child in a layout
@@ -755,7 +943,7 @@ display(al.VBox({'commands': widget, 'status': status}, height=180, spacing=8))
 # %%
 widget = al.CommandPalette([{'id': 'refresh', 'label': 'Refresh', 'category': 'Data'}, {'id': 'add', 'label': 'Add item', 'category': 'Data'}, {'id': 'clear', 'label': 'Clear', 'category': 'View'}], height=220)
 container = al.VBox({'commands': widget, 'content': al.TextWidget('Action output area')}, height=180, spacing=8)
-display(container)
+container
 
 # %% [markdown]
 # ### Customize labels, icons, and size
@@ -764,7 +952,7 @@ display(container)
 widget = al.CommandPalette([{'id': 'refresh', 'label': 'Refresh', 'category': 'Data'}, {'id': 'add', 'label': 'Add item', 'category': 'Data'}, {'id': 'clear', 'label': 'Clear', 'category': 'View'}], height=220)
 widget.width = '420px'
 widget.height = 'auto'
-display(widget)
+widget
 
 # %% [markdown]
 # # Controls and display widgets
@@ -779,7 +967,7 @@ display(widget)
 
 # %%
 widget = al.TextInput(value='Iris', description='Name', placeholder='Enter a name')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -789,10 +977,10 @@ widget = al.TextInput(value='Iris', description='Name', placeholder='Enter a nam
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -803,7 +991,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -811,7 +999,7 @@ display(container)
 # %%
 widget = al.TextInput(value='Iris', description='Name', placeholder='Enter a name')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Text
@@ -823,7 +1011,7 @@ display(wrapper)
 
 # %%
 widget = al.Text(value='Iris', description='Name', placeholder='Enter a name')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -833,10 +1021,10 @@ widget = al.Text(value='Iris', description='Name', placeholder='Enter a name')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -847,7 +1035,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -855,7 +1043,7 @@ display(container)
 # %%
 widget = al.Text(value='Iris', description='Name', placeholder='Enter a name')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## TextArea
@@ -867,7 +1055,7 @@ display(wrapper)
 
 # %%
 widget = al.TextArea(value='Line one\nLine two', description='Notes', rows=4)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -877,10 +1065,10 @@ widget = al.TextArea(value='Line one\nLine two', description='Notes', rows=4)
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -891,7 +1079,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -899,7 +1087,7 @@ display(container)
 # %%
 widget = al.TextArea(value='Line one\nLine two', description='Notes', rows=4)
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Textarea
@@ -911,7 +1099,7 @@ display(wrapper)
 
 # %%
 widget = al.Textarea(value='Line one\nLine two', description='Notes', rows=4)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -921,10 +1109,10 @@ widget = al.Textarea(value='Line one\nLine two', description='Notes', rows=4)
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -935,7 +1123,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -943,7 +1131,7 @@ display(container)
 # %%
 widget = al.Textarea(value='Line one\nLine two', description='Notes', rows=4)
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## PasswordInput
@@ -955,7 +1143,7 @@ display(wrapper)
 
 # %%
 widget = al.PasswordInput(value='secret', description='Password', placeholder='Password')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -965,10 +1153,10 @@ widget = al.PasswordInput(value='secret', description='Password', placeholder='P
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -979,7 +1167,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -987,7 +1175,7 @@ display(container)
 # %%
 widget = al.PasswordInput(value='secret', description='Password', placeholder='Password')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Password
@@ -999,7 +1187,7 @@ display(wrapper)
 
 # %%
 widget = al.Password(value='secret', description='Password', placeholder='Password')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1009,10 +1197,10 @@ widget = al.Password(value='secret', description='Password', placeholder='Passwo
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1023,7 +1211,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1031,7 +1219,7 @@ display(container)
 # %%
 widget = al.Password(value='secret', description='Password', placeholder='Password')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Combobox
@@ -1043,7 +1231,7 @@ display(wrapper)
 
 # %%
 widget = al.Combobox(options=['Iris', 'Orchid', 'Rose'], value='Iris', description='Flower')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1053,10 +1241,10 @@ widget = al.Combobox(options=['Iris', 'Orchid', 'Rose'], value='Iris', descripti
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1067,7 +1255,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1075,7 +1263,7 @@ display(container)
 # %%
 widget = al.Combobox(options=['Iris', 'Orchid', 'Rose'], value='Iris', description='Flower')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## SearchInput
@@ -1087,7 +1275,7 @@ display(wrapper)
 
 # %%
 widget = al.SearchInput(value='orchid', description='Search', placeholder='Search')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1097,10 +1285,10 @@ widget = al.SearchInput(value='orchid', description='Search', placeholder='Searc
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1111,7 +1299,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1119,7 +1307,7 @@ display(container)
 # %%
 widget = al.SearchInput(value='orchid', description='Search', placeholder='Search')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## TagsInput
@@ -1131,7 +1319,7 @@ display(wrapper)
 
 # %%
 widget = al.TagsInput(value=['alpha', 'beta'], allowed_tags=['alpha', 'beta', 'gamma'], description='Tags')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1141,10 +1329,10 @@ widget = al.TagsInput(value=['alpha', 'beta'], allowed_tags=['alpha', 'beta', 'g
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1155,7 +1343,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1163,7 +1351,7 @@ display(container)
 # %%
 widget = al.TagsInput(value=['alpha', 'beta'], allowed_tags=['alpha', 'beta', 'gamma'], description='Tags')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## ColorsInput
@@ -1175,7 +1363,7 @@ display(wrapper)
 
 # %%
 widget = al.ColorsInput(value=['#1473e6', '#d31510'], description='Colors')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1185,10 +1373,10 @@ widget = al.ColorsInput(value=['#1473e6', '#d31510'], description='Colors')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1199,7 +1387,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1207,7 +1395,7 @@ display(container)
 # %%
 widget = al.ColorsInput(value=['#1473e6', '#d31510'], description='Colors')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## FloatsInput
@@ -1219,7 +1407,7 @@ display(wrapper)
 
 # %%
 widget = al.FloatsInput(value=[1.5, 2.25], description='Floats')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1229,10 +1417,10 @@ widget = al.FloatsInput(value=[1.5, 2.25], description='Floats')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1243,7 +1431,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1251,7 +1439,7 @@ display(container)
 # %%
 widget = al.FloatsInput(value=[1.5, 2.25], description='Floats')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## IntsInput
@@ -1263,7 +1451,7 @@ display(wrapper)
 
 # %%
 widget = al.IntsInput(value=[1, 2, 3], description='Integers')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1273,10 +1461,10 @@ widget = al.IntsInput(value=[1, 2, 3], description='Integers')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1287,7 +1475,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1295,7 +1483,7 @@ display(container)
 # %%
 widget = al.IntsInput(value=[1, 2, 3], description='Integers')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Dropdown
@@ -1307,7 +1495,7 @@ display(wrapper)
 
 # %%
 widget = al.Dropdown(options=['Small', 'Medium', 'Large'], value='Medium', description='Size')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1317,10 +1505,10 @@ widget = al.Dropdown(options=['Small', 'Medium', 'Large'], value='Medium', descr
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1331,7 +1519,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1339,7 +1527,7 @@ display(container)
 # %%
 widget = al.Dropdown(options=['Small', 'Medium', 'Large'], value='Medium', description='Size')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## RadioButtons
@@ -1351,7 +1539,7 @@ display(wrapper)
 
 # %%
 widget = al.RadioButtons(options=['Daily', 'Weekly', 'Monthly'], value='Weekly', description='Cadence')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1361,10 +1549,10 @@ widget = al.RadioButtons(options=['Daily', 'Weekly', 'Monthly'], value='Weekly',
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1375,7 +1563,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1383,7 +1571,7 @@ display(container)
 # %%
 widget = al.RadioButtons(options=['Daily', 'Weekly', 'Monthly'], value='Weekly', description='Cadence')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## ToggleButtons
@@ -1395,7 +1583,7 @@ display(wrapper)
 
 # %%
 widget = al.ToggleButtons(options=['Table', 'Chart', 'Text'], value='Chart', description='View', icons={'Table': 'Table', 'Chart': 'GraphBarVertical', 'Text': 'Text'})
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1405,10 +1593,10 @@ widget = al.ToggleButtons(options=['Table', 'Chart', 'Text'], value='Chart', des
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1419,7 +1607,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1427,7 +1615,7 @@ display(container)
 # %%
 widget = al.ToggleButtons(options=['Table', 'Chart', 'Text'], value='Chart', description='View', icons={'Table': 'Table', 'Chart': 'GraphBarVertical', 'Text': 'Text'})
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## ListBox
@@ -1439,7 +1627,7 @@ display(wrapper)
 
 # %%
 widget = al.ListBox(options=['North', 'South', 'East', 'West'], value='North', description='Region', rows=4)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1449,10 +1637,10 @@ widget = al.ListBox(options=['North', 'South', 'East', 'West'], value='North', d
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1463,7 +1651,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1471,7 +1659,7 @@ display(container)
 # %%
 widget = al.ListBox(options=['North', 'South', 'East', 'West'], value='North', description='Region', rows=4)
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Select
@@ -1483,7 +1671,7 @@ display(wrapper)
 
 # %%
 widget = al.Select(options=['North', 'South', 'East', 'West'], value='North', description='Region', rows=4)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1493,10 +1681,10 @@ widget = al.Select(options=['North', 'South', 'East', 'West'], value='North', de
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1507,7 +1695,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1515,7 +1703,7 @@ display(container)
 # %%
 widget = al.Select(options=['North', 'South', 'East', 'West'], value='North', description='Region', rows=4)
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## MultiSelect
@@ -1527,7 +1715,7 @@ display(wrapper)
 
 # %%
 widget = al.MultiSelect(options=['A', 'B', 'C'], value=['A', 'C'], description='Letters', rows=3)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1537,10 +1725,10 @@ widget = al.MultiSelect(options=['A', 'B', 'C'], value=['A', 'C'], description='
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1551,7 +1739,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1559,7 +1747,7 @@ display(container)
 # %%
 widget = al.MultiSelect(options=['A', 'B', 'C'], value=['A', 'C'], description='Letters', rows=3)
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## SelectMultiple
@@ -1571,7 +1759,7 @@ display(wrapper)
 
 # %%
 widget = al.SelectMultiple(options=['A', 'B', 'C'], value=['A', 'C'], description='Letters', rows=3)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1581,10 +1769,10 @@ widget = al.SelectMultiple(options=['A', 'B', 'C'], value=['A', 'C'], descriptio
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1595,7 +1783,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1603,7 +1791,7 @@ display(container)
 # %%
 widget = al.SelectMultiple(options=['A', 'B', 'C'], value=['A', 'C'], description='Letters', rows=3)
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## SelectionSlider
@@ -1615,7 +1803,7 @@ display(wrapper)
 
 # %%
 widget = al.SelectionSlider(options=['Low', 'Medium', 'High'], value='Medium', description='Level')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1625,10 +1813,10 @@ widget = al.SelectionSlider(options=['Low', 'Medium', 'High'], value='Medium', d
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1639,7 +1827,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1647,7 +1835,7 @@ display(container)
 # %%
 widget = al.SelectionSlider(options=['Low', 'Medium', 'High'], value='Medium', description='Level')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## SelectionRangeSlider
@@ -1659,7 +1847,7 @@ display(wrapper)
 
 # %%
 widget = al.SelectionRangeSlider(options=['A', 'B', 'C', 'D'], value=['B', 'D'], description='Range')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1669,10 +1857,10 @@ widget = al.SelectionRangeSlider(options=['A', 'B', 'C', 'D'], value=['B', 'D'],
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1683,7 +1871,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1691,7 +1879,7 @@ display(container)
 # %%
 widget = al.SelectionRangeSlider(options=['A', 'B', 'C', 'D'], value=['B', 'D'], description='Range')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Button
@@ -1703,7 +1891,7 @@ display(wrapper)
 
 # %%
 widget = al.Button(description='Apply', icon='CheckmarkCircle', variant='accent', tooltip='Run')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1713,10 +1901,10 @@ widget = al.Button(description='Apply', icon='CheckmarkCircle', variant='accent'
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Pass a callback
@@ -1726,10 +1914,10 @@ widget = al.Button(description='Apply', icon='CheckmarkCircle', variant='accent'
 status = al.TextWidget('Button: waiting')
 
 def on_click(clicked_widget):
-    status.text = f'Button: clicked; current value={getattr(clicked_widget, "value", None)!r}'
+    status.value = f'Button: clicked; current value={getattr(clicked_widget, "value", None)!r}'
 
 widget.on_click(on_click)
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -1737,7 +1925,7 @@ display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
 # %%
 widget = al.Button(description='Apply', icon='CheckmarkCircle', variant='accent', tooltip='Run')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Checkbox
@@ -1749,7 +1937,7 @@ display(wrapper)
 
 # %%
 widget = al.Checkbox(value=True, description='Enabled')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1759,10 +1947,10 @@ widget = al.Checkbox(value=True, description='Enabled')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1773,7 +1961,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1781,7 +1969,7 @@ display(container)
 # %%
 widget = al.Checkbox(value=True, description='Enabled')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## ToggleButton
@@ -1793,7 +1981,7 @@ display(wrapper)
 
 # %%
 widget = al.ToggleButton(value=False, description='Pin', icon='Star', variant='secondary')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1803,10 +1991,10 @@ widget = al.ToggleButton(value=False, description='Pin', icon='Star', variant='s
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Pass a callback
@@ -1816,10 +2004,10 @@ widget = al.ToggleButton(value=False, description='Pin', icon='Star', variant='s
 status = al.TextWidget('ToggleButton: waiting')
 
 def on_click(clicked_widget):
-    status.text = f'ToggleButton: clicked; current value={getattr(clicked_widget, "value", None)!r}'
+    status.value = f'ToggleButton: clicked; current value={getattr(clicked_widget, "value", None)!r}'
 
 widget.on_click(on_click)
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -1827,7 +2015,7 @@ display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
 # %%
 widget = al.ToggleButton(value=False, description='Pin', icon='Star', variant='secondary')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Switch
@@ -1839,7 +2027,7 @@ display(wrapper)
 
 # %%
 widget = al.Switch(value=True, description='Active')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1849,10 +2037,10 @@ widget = al.Switch(value=True, description='Active')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1863,7 +2051,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1871,7 +2059,7 @@ display(container)
 # %%
 widget = al.Switch(value=True, description='Active')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Valid
@@ -1883,7 +2071,7 @@ display(wrapper)
 
 # %%
 widget = al.Valid(value=True, description='Status', readout='Valid')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1893,10 +2081,10 @@ widget = al.Valid(value=True, description='Status', readout='Valid')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1907,7 +2095,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1915,7 +2103,7 @@ display(container)
 # %%
 widget = al.Valid(value=True, description='Status', readout='Valid')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## StatusLight
@@ -1927,7 +2115,7 @@ display(wrapper)
 
 # %%
 widget = al.StatusLight(value=True, description='Online', variant='positive')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1937,10 +2125,10 @@ widget = al.StatusLight(value=True, description='Online', variant='positive')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1951,7 +2139,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -1959,7 +2147,7 @@ display(container)
 # %%
 widget = al.StatusLight(value=True, description='Online', variant='positive')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## IntSlider
@@ -1971,7 +2159,7 @@ display(wrapper)
 
 # %%
 widget = al.IntSlider(value=25, min=0, max=100, step=5, description='Count')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -1981,10 +2169,10 @@ widget = al.IntSlider(value=25, min=0, max=100, step=5, description='Count')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -1995,7 +2183,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2003,7 +2191,7 @@ display(container)
 # %%
 widget = al.IntSlider(value=25, min=0, max=100, step=5, description='Count')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## IntegerSlider
@@ -2015,7 +2203,7 @@ display(wrapper)
 
 # %%
 widget = al.IntegerSlider(value=30, min=0, max=100, step=10, description='Integer')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2025,10 +2213,10 @@ widget = al.IntegerSlider(value=30, min=0, max=100, step=10, description='Intege
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2039,7 +2227,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2047,7 +2235,7 @@ display(container)
 # %%
 widget = al.IntegerSlider(value=30, min=0, max=100, step=10, description='Integer')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## IntRangeSlider
@@ -2059,7 +2247,7 @@ display(wrapper)
 
 # %%
 widget = al.IntRangeSlider(value=[20, 80], min=0, max=100, step=5, description='Range')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2069,10 +2257,10 @@ widget = al.IntRangeSlider(value=[20, 80], min=0, max=100, step=5, description='
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2083,7 +2271,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2091,7 +2279,7 @@ display(container)
 # %%
 widget = al.IntRangeSlider(value=[20, 80], min=0, max=100, step=5, description='Range')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## IntegerRangeSlider
@@ -2103,7 +2291,7 @@ display(wrapper)
 
 # %%
 widget = al.IntegerRangeSlider(value=[10, 90], min=0, max=100, step=5, description='Integer range')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2113,10 +2301,10 @@ widget = al.IntegerRangeSlider(value=[10, 90], min=0, max=100, step=5, descripti
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2127,7 +2315,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2135,7 +2323,7 @@ display(container)
 # %%
 widget = al.IntegerRangeSlider(value=[10, 90], min=0, max=100, step=5, description='Integer range')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## IntText
@@ -2147,7 +2335,7 @@ display(wrapper)
 
 # %%
 widget = al.IntText(value=10, min=0, max=100, description='Count')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2157,10 +2345,10 @@ widget = al.IntText(value=10, min=0, max=100, description='Count')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2171,7 +2359,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2179,7 +2367,7 @@ display(container)
 # %%
 widget = al.IntText(value=10, min=0, max=100, description='Count')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## IntegerInput
@@ -2191,7 +2379,7 @@ display(wrapper)
 
 # %%
 widget = al.IntegerInput(value=10, min=0, max=100, description='Integer')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2201,10 +2389,10 @@ widget = al.IntegerInput(value=10, min=0, max=100, description='Integer')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2215,7 +2403,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2223,7 +2411,7 @@ display(container)
 # %%
 widget = al.IntegerInput(value=10, min=0, max=100, description='Integer')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## BoundedIntText
@@ -2235,7 +2423,7 @@ display(wrapper)
 
 # %%
 widget = al.BoundedIntText(value=10, min=0, max=100, description='Bounded')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2245,10 +2433,10 @@ widget = al.BoundedIntText(value=10, min=0, max=100, description='Bounded')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2259,7 +2447,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2267,7 +2455,7 @@ display(container)
 # %%
 widget = al.BoundedIntText(value=10, min=0, max=100, description='Bounded')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## FloatSlider
@@ -2279,7 +2467,7 @@ display(wrapper)
 
 # %%
 widget = al.FloatSlider(value=0.5, min=0.0, max=1.0, step=0.05, description='Ratio')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2289,10 +2477,10 @@ widget = al.FloatSlider(value=0.5, min=0.0, max=1.0, step=0.05, description='Rat
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2303,7 +2491,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2311,7 +2499,7 @@ display(container)
 # %%
 widget = al.FloatSlider(value=0.5, min=0.0, max=1.0, step=0.05, description='Ratio')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## FloatRangeSlider
@@ -2323,7 +2511,7 @@ display(wrapper)
 
 # %%
 widget = al.FloatRangeSlider(value=[0.2, 0.8], min=0.0, max=1.0, step=0.05, description='Range')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2333,10 +2521,10 @@ widget = al.FloatRangeSlider(value=[0.2, 0.8], min=0.0, max=1.0, step=0.05, desc
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2347,7 +2535,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2355,7 +2543,7 @@ display(container)
 # %%
 widget = al.FloatRangeSlider(value=[0.2, 0.8], min=0.0, max=1.0, step=0.05, description='Range')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## FloatLogSlider
@@ -2367,7 +2555,7 @@ display(wrapper)
 
 # %%
 widget = al.FloatLogSlider(value=10.0, min=0.0, max=3.0, step=0.1, description='Log')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2377,10 +2565,10 @@ widget = al.FloatLogSlider(value=10.0, min=0.0, max=3.0, step=0.1, description='
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2391,7 +2579,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2399,7 +2587,7 @@ display(container)
 # %%
 widget = al.FloatLogSlider(value=10.0, min=0.0, max=3.0, step=0.1, description='Log')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## FloatText
@@ -2411,7 +2599,7 @@ display(wrapper)
 
 # %%
 widget = al.FloatText(value=3.14, min=0.0, max=10.0, description='Float')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2421,10 +2609,10 @@ widget = al.FloatText(value=3.14, min=0.0, max=10.0, description='Float')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2435,7 +2623,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2443,7 +2631,7 @@ display(container)
 # %%
 widget = al.FloatText(value=3.14, min=0.0, max=10.0, description='Float')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## BoundedFloatText
@@ -2455,7 +2643,7 @@ display(wrapper)
 
 # %%
 widget = al.BoundedFloatText(value=3.14, min=0.0, max=10.0, description='Bounded')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2465,10 +2653,10 @@ widget = al.BoundedFloatText(value=3.14, min=0.0, max=10.0, description='Bounded
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2479,7 +2667,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2487,7 +2675,7 @@ display(container)
 # %%
 widget = al.BoundedFloatText(value=3.14, min=0.0, max=10.0, description='Bounded')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## IntProgress
@@ -2499,7 +2687,7 @@ display(wrapper)
 
 # %%
 widget = al.IntProgress(value=65, min=0, max=100, description='Progress')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2509,10 +2697,10 @@ widget = al.IntProgress(value=65, min=0, max=100, description='Progress')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2523,7 +2711,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2531,7 +2719,7 @@ display(container)
 # %%
 widget = al.IntProgress(value=65, min=0, max=100, description='Progress')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## FloatProgress
@@ -2543,7 +2731,7 @@ display(wrapper)
 
 # %%
 widget = al.FloatProgress(value=0.65, min=0.0, max=1.0, description='Progress')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2553,10 +2741,10 @@ widget = al.FloatProgress(value=0.65, min=0.0, max=1.0, description='Progress')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2567,7 +2755,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2575,7 +2763,7 @@ display(container)
 # %%
 widget = al.FloatProgress(value=0.65, min=0.0, max=1.0, description='Progress')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Meter
@@ -2587,7 +2775,7 @@ display(wrapper)
 
 # %%
 widget = al.Meter(value=72, description='Quality', variant='positive', readout=True)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2597,10 +2785,10 @@ widget = al.Meter(value=72, description='Quality', variant='positive', readout=T
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2611,7 +2799,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2619,7 +2807,7 @@ display(container)
 # %%
 widget = al.Meter(value=72, description='Quality', variant='positive', readout=True)
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## ProgressCircle
@@ -2631,7 +2819,7 @@ display(wrapper)
 
 # %%
 widget = al.ProgressCircle(value=45, label='Loading', spectrum_size='l')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2641,10 +2829,10 @@ widget = al.ProgressCircle(value=45, label='Loading', spectrum_size='l')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2655,7 +2843,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2663,7 +2851,7 @@ display(container)
 # %%
 widget = al.ProgressCircle(value=45, label='Loading', spectrum_size='l')
 wrapper = al.VBox({'component': widget}, width='320px', height=120, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Play
@@ -2675,7 +2863,7 @@ display(wrapper)
 
 # %%
 widget = al.Play(value=0, min=0, max=10, step=1, interval=250)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2685,10 +2873,10 @@ widget = al.Play(value=0, min=0, max=10, step=1, interval=250)
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2699,7 +2887,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2707,7 +2895,7 @@ display(container)
 # %%
 widget = al.Play(value=0, min=0, max=10, step=1, interval=250)
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## DatePicker
@@ -2719,7 +2907,7 @@ display(wrapper)
 
 # %%
 widget = al.DatePicker(value=date(2026, 6, 2), description='Date', width='260px')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2729,10 +2917,10 @@ widget = al.DatePicker(value=date(2026, 6, 2), description='Date', width='260px'
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2743,7 +2931,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2751,7 +2939,7 @@ display(container)
 # %%
 widget = al.DatePicker(value=date(2026, 6, 2), description='Date', width='260px')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## TimePicker
@@ -2763,7 +2951,7 @@ display(wrapper)
 
 # %%
 widget = al.TimePicker(value=time(9, 30), description='Time', step=60, width='260px')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2773,10 +2961,10 @@ widget = al.TimePicker(value=time(9, 30), description='Time', step=60, width='26
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2787,7 +2975,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2795,7 +2983,7 @@ display(container)
 # %%
 widget = al.TimePicker(value=time(9, 30), description='Time', step=60, width='260px')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## DatetimePicker
@@ -2817,10 +3005,10 @@ widget = al.DatetimePicker(value=datetime(2026, 6, 2, 9, 30), description='Date 
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2831,7 +3019,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2839,7 +3027,7 @@ display(container)
 # %%
 widget = al.DatetimePicker(value=datetime(2026, 6, 2, 9, 30), description='Date and time', step=60, width='320px')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## ColorPicker
@@ -2861,10 +3049,10 @@ widget = al.ColorPicker(value='#1473e6', description='Accent')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2875,7 +3063,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2883,7 +3071,7 @@ display(container)
 # %%
 widget = al.ColorPicker(value='#1473e6', description='Accent')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## ColorHandle
@@ -2895,7 +3083,7 @@ display(wrapper)
 
 # %%
 widget = al.ColorHandle(value='#1473e6')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2905,10 +3093,10 @@ widget = al.ColorHandle(value='#1473e6')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2919,7 +3107,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2927,7 +3115,7 @@ display(container)
 # %%
 widget = al.ColorHandle(value='#1473e6')
 wrapper = al.VBox({'component': widget}, width='320px', height=120, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## ColorLoupe
@@ -2939,7 +3127,7 @@ display(wrapper)
 
 # %%
 widget = al.ColorLoupe(value='#1473e6', open=True)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2949,10 +3137,10 @@ widget = al.ColorLoupe(value='#1473e6', open=True)
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -2963,7 +3151,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -2971,7 +3159,7 @@ display(container)
 # %%
 widget = al.ColorLoupe(value='#1473e6', open=True)
 wrapper = al.VBox({'component': widget}, width='320px', height=120, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## OpacityCheckerboard
@@ -2983,7 +3171,7 @@ display(wrapper)
 
 # %%
 widget = al.OpacityCheckerboard(width=160, height=48)
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -2993,10 +3181,10 @@ widget = al.OpacityCheckerboard(width=160, height=48)
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3007,7 +3195,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3015,7 +3203,7 @@ display(container)
 # %%
 widget = al.OpacityCheckerboard(width=160, height=48)
 wrapper = al.VBox({'component': widget}, width='320px', height=120, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## FileUpload
@@ -3027,7 +3215,7 @@ display(wrapper)
 
 # %%
 widget = al.FileUpload(description='Upload file', accept='.csv,.txt', multiple=True, icon='Upload')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3037,10 +3225,10 @@ widget = al.FileUpload(description='Upload file', accept='.csv,.txt', multiple=T
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Pass a callback
@@ -3050,10 +3238,10 @@ widget = al.FileUpload(description='Upload file', accept='.csv,.txt', multiple=T
 status = al.TextWidget('FileUpload: waiting')
 
 def on_click(clicked_widget):
-    status.text = f'FileUpload: clicked; current value={getattr(clicked_widget, "value", None)!r}'
+    status.value = f'FileUpload: clicked; current value={getattr(clicked_widget, "value", None)!r}'
 
 widget.on_click(on_click)
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -3061,7 +3249,7 @@ display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
 # %%
 widget = al.FileUpload(description='Upload file', accept='.csv,.txt', multiple=True, icon='Upload')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Image
@@ -3073,7 +3261,7 @@ display(wrapper)
 
 # %%
 widget = al.Image(value=SVG_DATA_URI, format='svg+xml', width='180px', height='80px')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3083,10 +3271,10 @@ widget = al.Image(value=SVG_DATA_URI, format='svg+xml', width='180px', height='8
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3097,7 +3285,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3105,7 +3293,7 @@ display(container)
 # %%
 widget = al.Image(value=SVG_DATA_URI, format='svg+xml', width='180px', height='80px')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Audio
@@ -3117,7 +3305,7 @@ display(wrapper)
 
 # %%
 widget = al.Audio(value='', format='mp3')
-display(al.VBox({'audio': widget, 'label': al.TextWidget('Audio control placeholder')}, height=110, spacing=8))
+al.VBox({'audio': widget, 'label': al.TextWidget('Audio control placeholder')}, height=110, spacing=8)
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3127,10 +3315,10 @@ widget = al.Audio(value='', format='mp3')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3141,7 +3329,7 @@ container = al.VBox({'control': widget, 'label': al.TextWidget('Audio control pl
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3149,7 +3337,7 @@ display(container)
 # %%
 widget = al.Audio(value='', format='mp3')
 wrapper = al.VBox({'control': widget, 'label': al.TextWidget('Audio control placeholder')}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Video
@@ -3161,7 +3349,7 @@ display(wrapper)
 
 # %%
 widget = al.Video(value='', format='mp4', width='260px', height='120px')
-display(al.VBox({'video': widget, 'label': al.TextWidget('Video control placeholder')}, height=180, spacing=8))
+al.VBox({'video': widget, 'label': al.TextWidget('Video control placeholder')}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3171,10 +3359,10 @@ widget = al.Video(value='', format='mp4', width='260px', height='120px')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3185,7 +3373,7 @@ container = al.VBox({'control': widget, 'label': al.TextWidget('Video control pl
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3193,7 +3381,7 @@ display(container)
 # %%
 widget = al.Video(value='', format='mp4', width='260px', height='120px')
 wrapper = al.VBox({'control': widget, 'label': al.TextWidget('Video control placeholder')}, width='380px', height=180, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Output
@@ -3205,7 +3393,7 @@ display(wrapper)
 
 # %%
 widget = al.Output(value='Output text')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3215,10 +3403,10 @@ widget = al.Output(value='Output text')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3229,7 +3417,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3237,7 +3425,7 @@ display(container)
 # %%
 widget = al.Output(value='Output text')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## HTML
@@ -3249,7 +3437,7 @@ display(wrapper)
 
 # %%
 widget = al.HTML(value='<strong>Rich HTML</strong>', description='HTML')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3259,10 +3447,10 @@ widget = al.HTML(value='<strong>Rich HTML</strong>', description='HTML')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3273,7 +3461,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3281,7 +3469,7 @@ display(container)
 # %%
 widget = al.HTML(value='<strong>Rich HTML</strong>', description='HTML')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## HTMLMath
@@ -3293,7 +3481,7 @@ display(wrapper)
 
 # %%
 widget = al.HTMLMath(value='<strong>Rich HTML</strong>', description='HTML')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3303,10 +3491,10 @@ widget = al.HTMLMath(value='<strong>Rich HTML</strong>', description='HTML')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3317,7 +3505,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3325,7 +3513,7 @@ display(container)
 # %%
 widget = al.HTMLMath(value='<strong>Rich HTML</strong>', description='HTML')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Label
@@ -3337,7 +3525,7 @@ display(wrapper)
 
 # %%
 widget = al.Label(value='Plain label', description='Label')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3347,10 +3535,10 @@ widget = al.Label(value='Plain label', description='Label')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3361,7 +3549,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3369,7 +3557,7 @@ display(container)
 # %%
 widget = al.Label(value='Plain label', description='Label')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## TextWidget
@@ -3388,13 +3576,13 @@ widget
 
 # %%
 widget = al.TextWidget('Plain anylumino text')
-status = al.TextWidget(f"initial text: {getattr(widget, 'text', None)!r}")
+status = al.TextWidget(f"initial value: {widget.value!r}")
 
 def update(change):
-    status.text = f"changed text: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
-widget.observe(update, names='text')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+widget.observe(update, names='value')
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3403,9 +3591,8 @@ display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
 widget = al.TextWidget('Plain anylumino text')
 container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
-if hasattr(accessed, 'text'):
-    accessed.text = widget.text
-display(container)
+accessed.value = widget.value
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3413,7 +3600,7 @@ display(container)
 # %%
 widget = al.TextWidget('Plain anylumino text')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Badge
@@ -3425,7 +3612,7 @@ display(wrapper)
 
 # %%
 widget = al.Badge(value='Ready', variant='positive', icon='CheckmarkCircle')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3435,10 +3622,10 @@ widget = al.Badge(value='Ready', variant='positive', icon='CheckmarkCircle')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3449,7 +3636,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3457,7 +3644,7 @@ display(container)
 # %%
 widget = al.Badge(value='Ready', variant='positive', icon='CheckmarkCircle')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Link
@@ -3469,7 +3656,7 @@ display(wrapper)
 
 # %%
 widget = al.Link('https://example.com', description='Example link', variant='primary')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3479,10 +3666,10 @@ widget = al.Link('https://example.com', description='Example link', variant='pri
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3493,7 +3680,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3501,7 +3688,7 @@ display(container)
 # %%
 widget = al.Link('https://example.com', description='Example link', variant='primary')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Divider
@@ -3513,7 +3700,7 @@ display(wrapper)
 
 # %%
 widget = al.Divider(orientation='horizontal', spectrum_size='l')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3523,10 +3710,10 @@ widget = al.Divider(orientation='horizontal', spectrum_size='l')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3537,7 +3724,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3545,7 +3732,7 @@ display(container)
 # %%
 widget = al.Divider(orientation='horizontal', spectrum_size='l')
 wrapper = al.VBox({'control': widget}, width='380px', height=140, spacing=10, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Icon
@@ -3557,7 +3744,7 @@ display(wrapper)
 
 # %%
 widget = al.Icon('AddContent', icon_size='l', label='Add')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3567,10 +3754,10 @@ widget = al.Icon('AddContent', icon_size='l', label='Add')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3581,7 +3768,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3589,7 +3776,7 @@ display(container)
 # %%
 widget = al.Icon('AddContent', icon_size='l', label='Add')
 wrapper = al.VBox({'component': widget}, width='320px', height=120, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## UIIcon
@@ -3601,7 +3788,7 @@ display(wrapper)
 
 # %%
 widget = al.UIIcon('checkmark100', label='Check')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3611,10 +3798,10 @@ widget = al.UIIcon('checkmark100', label='Check')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3625,7 +3812,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3633,7 +3820,7 @@ display(container)
 # %%
 widget = al.UIIcon('checkmark100', label='Check')
 wrapper = al.VBox({'component': widget}, width='320px', height=120, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## HelpText
@@ -3645,7 +3832,7 @@ display(wrapper)
 
 # %%
 widget = al.HelpText('Use this field for a short label.', variant='neutral')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3655,10 +3842,10 @@ widget = al.HelpText('Use this field for a short label.', variant='neutral')
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3669,7 +3856,7 @@ container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3677,7 +3864,7 @@ display(container)
 # %%
 widget = al.HelpText('Use this field for a short label.', variant='neutral')
 wrapper = al.VBox({'component': widget}, width='320px', height=120, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Underlay
@@ -3689,7 +3876,7 @@ display(wrapper)
 
 # %%
 widget = al.Underlay(open=False)
-display(al.VBox({'underlay': widget, 'label': al.TextWidget('Underlay widget placeholder')}, height=100, spacing=8))
+al.VBox({'underlay': widget, 'label': al.TextWidget('Underlay widget placeholder')}, height=100, spacing=8)
 
 # %% [markdown]
 # ### Access state and react to changes
@@ -3699,10 +3886,10 @@ widget = al.Underlay(open=False)
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3713,7 +3900,7 @@ container = al.VBox({'control': widget, 'label': al.TextWidget('Underlay widget 
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3721,7 +3908,7 @@ display(container)
 # %%
 widget = al.Underlay(open=False)
 wrapper = al.VBox({'component': widget, 'label': al.TextWidget('Underlay widget placeholder')}, width='320px', height=120, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## SpectrumElement
@@ -3732,32 +3919,32 @@ display(wrapper)
 # ### Basic example
 
 # %%
-widget = al.SpectrumElement('div', text='Custom SpectrumElement content', attributes={'class': 'cookbook-accent-box'})
-display(widget)
+widget = al.SpectrumElement('div', text='Custom SpectrumElement content', attributes={'style': ACCENT_STYLE})
+widget
 
 # %% [markdown]
 # ### Access state and react to changes
 
 # %%
-widget = al.SpectrumElement('div', text='Custom SpectrumElement content', attributes={'class': 'cookbook-accent-box'})
+widget = al.SpectrumElement('div', text='Custom SpectrumElement content', attributes={'style': ACCENT_STYLE})
 status = al.TextWidget(f"initial value: {getattr(widget, 'value', None)!r}")
 
 def update(change):
-    status.text = f"changed value: {change['new']!r}"
+    status.value = f"changed value: {change['new']!r}"
 
 widget.observe(update, names='value')
-display(al.VBox({'widget': widget, 'status': status}, height=150, spacing=8))
+al.VBox({'widget': widget, 'status': status}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
 
 # %%
-widget = al.SpectrumElement('div', text='Custom SpectrumElement content', attributes={'class': 'cookbook-accent-box'})
+widget = al.SpectrumElement('div', text='Custom SpectrumElement content', attributes={'style': ACCENT_STYLE})
 container = al.VBox({'control': widget}, height=150, spacing=8)
 accessed = container['control']
 if hasattr(accessed, 'value'):
     accessed.value = widget.value
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3766,9 +3953,9 @@ display(container)
 widget = al.SpectrumElement(
     'div',
     text='Styled with a CSS class passed through attributes',
-    attributes={'class': 'cookbook-accent-box'},
+    attributes={'style': ACCENT_STYLE},
 )
-display(widget)
+widget
 
 # %% [markdown]
 # # Spectrum action components
@@ -3783,7 +3970,7 @@ display(widget)
 
 # %%
 widget = al.ClearButton(label='Clear')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Pass a callback
@@ -3793,10 +3980,10 @@ widget = al.ClearButton(label='Clear')
 status = al.TextWidget('ClearButton: waiting')
 
 def on_click(clicked_widget):
-    status.text = f'ClearButton: clicked; disabled={clicked_widget.disabled!r}'
+    status.value = f'ClearButton: clicked; disabled={clicked_widget.disabled!r}'
 
 widget.on_click(on_click)
-display(al.VBox({'button': widget, 'status': status}, height=140, spacing=8))
+al.VBox({'button': widget, 'status': status}, height=140, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3804,7 +3991,7 @@ display(al.VBox({'button': widget, 'status': status}, height=140, spacing=8))
 # %%
 widget = al.ClearButton(label='Clear')
 container = al.HBox({'button': widget, 'status': al.TextWidget('Ready')}, height=100, spacing=8)
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3813,7 +4000,7 @@ display(container)
 widget = al.ClearButton(label='Clear')
 widget.disabled = False
 wrapper = al.VBox({'button': widget}, width='260px', height=100, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## CloseButton
@@ -3825,7 +4012,7 @@ display(wrapper)
 
 # %%
 widget = al.CloseButton(label='Close')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Pass a callback
@@ -3835,10 +4022,10 @@ widget = al.CloseButton(label='Close')
 status = al.TextWidget('CloseButton: waiting')
 
 def on_click(clicked_widget):
-    status.text = f'CloseButton: clicked; disabled={clicked_widget.disabled!r}'
+    status.value = f'CloseButton: clicked; disabled={clicked_widget.disabled!r}'
 
 widget.on_click(on_click)
-display(al.VBox({'button': widget, 'status': status}, height=140, spacing=8))
+al.VBox({'button': widget, 'status': status}, height=140, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3846,7 +4033,7 @@ display(al.VBox({'button': widget, 'status': status}, height=140, spacing=8))
 # %%
 widget = al.CloseButton(label='Close')
 container = al.HBox({'button': widget, 'status': al.TextWidget('Ready')}, height=100, spacing=8)
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3855,7 +4042,7 @@ display(container)
 widget = al.CloseButton(label='Close')
 widget.disabled = False
 wrapper = al.VBox({'button': widget}, width='260px', height=100, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## InfieldButton
@@ -3867,7 +4054,7 @@ display(wrapper)
 
 # %%
 widget = al.InfieldButton(label='Search', icon='Search')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Pass a callback
@@ -3877,10 +4064,10 @@ widget = al.InfieldButton(label='Search', icon='Search')
 status = al.TextWidget('InfieldButton: waiting')
 
 def on_click(clicked_widget):
-    status.text = f'InfieldButton: clicked; disabled={clicked_widget.disabled!r}'
+    status.value = f'InfieldButton: clicked; disabled={clicked_widget.disabled!r}'
 
 widget.on_click(on_click)
-display(al.VBox({'button': widget, 'status': status}, height=140, spacing=8))
+al.VBox({'button': widget, 'status': status}, height=140, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3888,7 +4075,7 @@ display(al.VBox({'button': widget, 'status': status}, height=140, spacing=8))
 # %%
 widget = al.InfieldButton(label='Search', icon='Search')
 container = al.HBox({'button': widget, 'status': al.TextWidget('Ready')}, height=100, spacing=8)
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3897,7 +4084,7 @@ display(container)
 widget = al.InfieldButton(label='Search', icon='Search')
 widget.disabled = False
 wrapper = al.VBox({'button': widget}, width='260px', height=100, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## PickerButton
@@ -3909,7 +4096,7 @@ display(wrapper)
 
 # %%
 widget = al.PickerButton(label='Pick', icon='ChevronDown')
-display(widget)
+widget
 
 # %% [markdown]
 # ### Pass a callback
@@ -3919,10 +4106,10 @@ widget = al.PickerButton(label='Pick', icon='ChevronDown')
 status = al.TextWidget('PickerButton: waiting')
 
 def on_click(clicked_widget):
-    status.text = f'PickerButton: clicked; disabled={clicked_widget.disabled!r}'
+    status.value = f'PickerButton: clicked; disabled={clicked_widget.disabled!r}'
 
 widget.on_click(on_click)
-display(al.VBox({'button': widget, 'status': status}, height=140, spacing=8))
+al.VBox({'button': widget, 'status': status}, height=140, spacing=8)
 
 # %% [markdown]
 # ### Use as a keyed child in a layout
@@ -3930,7 +4117,7 @@ display(al.VBox({'button': widget, 'status': status}, height=140, spacing=8))
 # %%
 widget = al.PickerButton(label='Pick', icon='ChevronDown')
 container = al.HBox({'button': widget, 'status': al.TextWidget('Ready')}, height=100, spacing=8)
-display(container)
+container
 
 # %% [markdown]
 # ### Customize appearance
@@ -3939,7 +4126,7 @@ display(container)
 widget = al.PickerButton(label='Pick', icon='ChevronDown')
 widget.disabled = False
 wrapper = al.VBox({'button': widget}, width='260px', height=100, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # # Composable Spectrum surfaces
@@ -3954,20 +4141,24 @@ display(wrapper)
 
 # %%
 component = al.FieldGroup({'name': al.TextInput(value='Iris', description='Name'), 'enabled': al.Switch(value=True, description='Enabled')}, label='Field group', orientation='horizontal')
-display(component)
+component
 
 # %% [markdown]
 # ### Access subcomponents by key
 
 # %%
 component = al.FieldGroup({'name': al.TextInput(value='Iris', description='Name'), 'enabled': al.Switch(value=True, description='Enabled')}, label='Field group', orientation='horizontal')
-key = component.child_keys[0] if component.child_keys else None
-first_owner = component[key] if key else None
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through component[key]'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through component[key]'
-display(al.VBox({'surface': component, 'label': al.TextWidget('Tray surface; the child was edited through component[key]')}, height=150, spacing=8))
+status = al.TextWidget('Click Edit name to update the keyed child.')
+edit = al.Button(description='Edit name', icon='Edit')
+
+def edit_name(_button, component=component, status=status):
+    name_widget = component['name']
+    name_widget.value = 'Edited through component[key]'
+    status.value = f"name value: {name_widget.value!r}"
+
+edit.on_click(edit_name)
+name_widget = component['name']
+al.VBox({'surface': component, 'edit': edit, 'status': status}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Control open state or callbacks
@@ -3977,12 +4168,12 @@ component = al.FieldGroup({'name': al.TextInput(value='Iris', description='Name'
 status = al.TextWidget(f'open={component.is_open!r}')
 button = al.Button(description='Toggle')
 
-def toggle(_button):
+def toggle(_button, component=component, status=status):
     component.toggle()
-    status.text = f'open={component.is_open!r}'
+    status.value = f'open={component.is_open!r}'
 
 button.on_click(toggle)
-display(al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8))
+al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -3992,7 +4183,7 @@ component = al.FieldGroup({'name': al.TextInput(value='Iris', description='Name'
 component.width = '360px'
 component.height = 'auto'
 wrapper = al.VBox({'surface': component, 'label': al.TextWidget('Surface wrapper')}, width='420px', height=260, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Popover
@@ -4004,20 +4195,24 @@ display(wrapper)
 
 # %%
 component = al.Popover({'content': al.TextWidget('Popover child content')}, open=True, placement='bottom')
-display(component)
+component
 
 # %% [markdown]
 # ### Access subcomponents by key
 
 # %%
-component = al.Popover({'content': al.TextWidget('Popover child content')}, open=True, placement='bottom')
-key = component.child_keys[0] if component.child_keys else None
-first_owner = component[key] if key else None
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through component[key]'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through component[key]'
-display(al.VBox({'surface': component, 'label': al.TextWidget('DialogBox surface; the child was edited through component[key]')}, height=150, spacing=8))
+component = al.Popover({'content': al.TextInput(value='Popover child content', description='Content')}, open=True, placement='bottom')
+status = al.TextWidget('Click Edit content to update the keyed child.')
+edit = al.Button(description='Edit content', icon='Edit')
+
+def edit_content(_button, component=component, status=status):
+    content_widget = component['content']
+    content_widget.value = 'Edited through component[key]'
+    status.value = f"content value: {content_widget.value!r}"
+
+edit.on_click(edit_content)
+content_widget = component['content']
+al.VBox({'surface': component, 'edit': edit, 'status': status}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Control open state or callbacks
@@ -4027,12 +4222,12 @@ component = al.Popover({'content': al.TextWidget('Popover child content')}, open
 status = al.TextWidget(f'open={component.is_open!r}')
 button = al.Button(description='Toggle')
 
-def toggle(_button):
+def toggle(_button, component=component, status=status):
     component.toggle()
-    status.text = f'open={component.is_open!r}'
+    status.value = f'open={component.is_open!r}'
 
 button.on_click(toggle)
-display(al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8))
+al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -4042,7 +4237,7 @@ component = al.Popover({'content': al.TextWidget('Popover child content')}, open
 component.width = '360px'
 component.height = 'auto'
 wrapper = al.VBox({'surface': component, 'label': al.TextWidget('Surface wrapper')}, width='420px', height=260, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Tooltip
@@ -4054,20 +4249,24 @@ display(wrapper)
 
 # %%
 component = al.Tooltip('Tooltip content', {'trigger': al.Button(description='Tooltip trigger')}, open=True, placement='top')
-display(component)
+component
 
 # %% [markdown]
 # ### Access subcomponents by key
 
 # %%
-component = al.Tooltip('Tooltip content', {'trigger': al.Button(description='Tooltip trigger')}, open=True, placement='top')
-key = component.child_keys[0] if component.child_keys else None
-first_owner = component[key] if key else None
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through component[key]'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through component[key]'
-display(al.VBox({'surface': component, 'label': al.TextWidget('Modal surface; the child was edited through component[key]')}, height=150, spacing=8))
+component = al.Tooltip('Tooltip content', {'trigger': al.TextInput(value='Tooltip trigger', description='Trigger')}, open=True, placement='top')
+status = al.TextWidget('Click Edit trigger to update the keyed child.')
+edit = al.Button(description='Edit trigger', icon='Edit')
+
+def edit_trigger(_button, component=component, status=status):
+    trigger_widget = component['trigger']
+    trigger_widget.value = 'Edited through component[key]'
+    status.value = f"trigger value: {trigger_widget.value!r}"
+
+edit.on_click(edit_trigger)
+trigger_widget = component['trigger']
+al.VBox({'surface': component, 'edit': edit, 'status': status}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Control open state or callbacks
@@ -4077,12 +4276,12 @@ component = al.Tooltip('Tooltip content', {'trigger': al.Button(description='Too
 status = al.TextWidget(f'open={component.is_open!r}')
 button = al.Button(description='Toggle')
 
-def toggle(_button):
+def toggle(_button, component=component, status=status):
     component.toggle()
-    status.text = f'open={component.is_open!r}'
+    status.value = f'open={component.is_open!r}'
 
 button.on_click(toggle)
-display(al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8))
+al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -4092,7 +4291,7 @@ component = al.Tooltip('Tooltip content', {'trigger': al.Button(description='Too
 component.width = '360px'
 component.height = 'auto'
 wrapper = al.VBox({'surface': component, 'label': al.TextWidget('Surface wrapper')}, width='420px', height=260, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Tray
@@ -4104,20 +4303,24 @@ display(wrapper)
 
 # %%
 component = al.Tray({'content': al.TextWidget('Tray content')}, open=False)
-display(al.VBox({'surface': component, 'label': al.TextWidget('Tray surface; click Toggle in the callback example to open it')}, height=150, spacing=8))
+al.VBox({'surface': component, 'label': al.TextWidget('Tray surface; click Toggle in the callback example to open it')}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Access subcomponents by key
 
 # %%
-component = al.Tray({'content': al.TextWidget('Tray content')}, open=False)
-key = component.child_keys[0] if component.child_keys else None
-first_owner = component[key] if key else None
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through component[key]'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through component[key]'
-display(al.VBox({'surface': component, 'label': al.TextWidget('Tray surface; the child was edited through component[key]')}, height=150, spacing=8))
+component = al.Tray({'content': al.TextInput(value='Tray content', description='Content')}, open=True)
+status = al.TextWidget('Click Edit content to update the keyed child.')
+edit = al.Button(description='Edit content', icon='Edit')
+
+def edit_content(_button, component=component, status=status):
+    content_widget = component['content']
+    content_widget.value = 'Edited through component[key]'
+    status.value = f"content value: {content_widget.value!r}"
+
+edit.on_click(edit_content)
+content_widget = component['content']
+al.VBox({'surface': component, 'edit': edit, 'status': status}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Control open state or callbacks
@@ -4127,12 +4330,12 @@ component = al.Tray({'content': al.TextWidget('Tray content')}, open=False)
 status = al.TextWidget(f'open={component.is_open!r}')
 button = al.Button(description='Toggle')
 
-def toggle(_button):
+def toggle(_button, component=component, status=status):
     component.toggle()
-    status.text = f'open={component.is_open!r}'
+    status.value = f'open={component.is_open!r}'
 
 button.on_click(toggle)
-display(al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8))
+al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -4142,7 +4345,7 @@ component = al.Tray({'content': al.TextWidget('Tray content')}, open=False)
 component.width = '360px'
 component.height = 'auto'
 wrapper = al.VBox({'surface': component, 'label': al.TextWidget('Surface wrapper')}, width='420px', height=260, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Overlay
@@ -4154,20 +4357,24 @@ display(wrapper)
 
 # %%
 component = al.Overlay({'content': al.TextWidget('Overlay content')}, open=True, placement='bottom')
-display(component)
+component
 
 # %% [markdown]
 # ### Access subcomponents by key
 
 # %%
-component = al.Overlay({'content': al.TextWidget('Overlay content')}, open=True, placement='bottom')
-key = component.child_keys[0] if component.child_keys else None
-first_owner = component[key] if key else None
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through component[key]'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through component[key]'
-display(component)
+component = al.Overlay({'content': al.TextInput(value='Overlay content', description='Content')}, open=True, placement='bottom')
+status = al.TextWidget('Click Edit content to update the keyed child.')
+edit = al.Button(description='Edit content', icon='Edit')
+
+def edit_content(_button, component=component, status=status):
+    content_widget = component['content']
+    content_widget.value = 'Edited through component[key]'
+    status.value = f"content value: {content_widget.value!r}"
+
+edit.on_click(edit_content)
+content_widget = component['content']
+al.VBox({'surface': component, 'edit': edit, 'status': status}, height=180, spacing=8)
 
 # %% [markdown]
 # ### Control open state or callbacks
@@ -4177,12 +4384,12 @@ component = al.Overlay({'content': al.TextWidget('Overlay content')}, open=True,
 status = al.TextWidget(f'open={component.is_open!r}')
 button = al.Button(description='Toggle')
 
-def toggle(_button):
+def toggle(_button, component=component, status=status):
     component.toggle()
-    status.text = f'open={component.is_open!r}'
+    status.value = f'open={component.is_open!r}'
 
 button.on_click(toggle)
-display(al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8))
+al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -4192,7 +4399,7 @@ component = al.Overlay({'content': al.TextWidget('Overlay content')}, open=True,
 component.width = '360px'
 component.height = 'auto'
 wrapper = al.VBox({'surface': component, 'label': al.TextWidget('Surface wrapper')}, width='420px', height=260, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## DialogBox
@@ -4204,20 +4411,25 @@ display(wrapper)
 
 # %%
 component = al.DialogBox({'body': al.VBox({'field': al.TextInput(value='Dialog value', description='Field'), 'message': al.TextWidget('Dialog body')}, height=140)}, title='DialogBox', open=False, width=420)
-display(al.VBox({'surface': component, 'label': al.TextWidget('DialogBox surface; click Toggle in the callback example to open it')}, height=150, spacing=8))
+al.VBox({'surface': component, 'label': al.TextWidget('DialogBox surface; click Toggle in the callback example to open it')}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Access subcomponents by key
 
 # %%
-component = al.DialogBox({'body': al.VBox({'field': al.TextInput(value='Dialog value', description='Field'), 'message': al.TextWidget('Dialog body')}, height=140)}, title='DialogBox', open=False, width=420)
-key = component.child_keys[0] if component.child_keys else None
-first_owner = component[key] if key else None
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through component[key]'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through component[key]'
-display(al.VBox({'surface': component, 'label': al.TextWidget('DialogBox surface; the child was edited through component[key]')}, height=150, spacing=8))
+component = al.DialogBox({'body': al.VBox({'field': al.TextInput(value='Dialog value', description='Field'), 'message': al.TextWidget('Dialog body')}, height=140)}, title='DialogBox', open=True, width=420)
+status = al.TextWidget('Click Edit field to update the nested keyed child.')
+edit = al.Button(description='Edit field', icon='Edit')
+body = component['body']
+
+def edit_field(_button, body=body, status=status):
+    field_widget = body.get_owner('field')
+    field_widget.value = 'Edited through component[key]'
+    status.value = f"field value: {field_widget.value!r}"
+
+edit.on_click(edit_field)
+field_widget = body.get_owner('field')
+al.VBox({'surface': component, 'edit': edit, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Control open state or callbacks
@@ -4227,12 +4439,12 @@ component = al.DialogBox({'body': al.VBox({'field': al.TextInput(value='Dialog v
 status = al.TextWidget(f'open={component.is_open!r}')
 button = al.Button(description='Toggle')
 
-def toggle(_button):
+def toggle(_button, component=component, status=status):
     component.toggle()
-    status.text = f'open={component.is_open!r}'
+    status.value = f'open={component.is_open!r}'
 
 button.on_click(toggle)
-display(al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8))
+al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -4242,7 +4454,7 @@ component = al.DialogBox({'body': al.VBox({'field': al.TextInput(value='Dialog v
 component.width = '360px'
 component.height = 'auto'
 wrapper = al.VBox({'surface': component, 'label': al.TextWidget('Surface wrapper')}, width='420px', height=260, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # ## Modal
@@ -4254,20 +4466,24 @@ display(wrapper)
 
 # %%
 component = al.Modal({'body': al.TextWidget('Modal body child')}, title='Modal', open=False, width=360)
-display(al.VBox({'surface': component, 'label': al.TextWidget('Modal surface; click Toggle in the callback example to open it')}, height=150, spacing=8))
+al.VBox({'surface': component, 'label': al.TextWidget('Modal surface; click Toggle in the callback example to open it')}, height=150, spacing=8)
 
 # %% [markdown]
 # ### Access subcomponents by key
 
 # %%
-component = al.Modal({'body': al.TextWidget('Modal body child')}, title='Modal', open=False, width=360)
-key = component.child_keys[0] if component.child_keys else None
-first_owner = component[key] if key else None
-if hasattr(first_owner, 'value'):
-    first_owner.value = 'Edited through component[key]'
-elif hasattr(first_owner, 'text'):
-    first_owner.text = 'Edited through component[key]'
-display(al.VBox({'surface': component, 'label': al.TextWidget('Modal surface; the child was edited through component[key]')}, height=150, spacing=8))
+component = al.Modal({'body': al.TextInput(value='Modal body child', description='Body')}, title='Modal', open=True, width=360)
+status = al.TextWidget('Click Edit body to update the keyed child.')
+edit = al.Button(description='Edit body', icon='Edit')
+
+def edit_body(_button, component=component, status=status):
+    body_widget = component['body']
+    body_widget.value = 'Edited through component[key]'
+    status.value = f"body value: {body_widget.value!r}"
+
+edit.on_click(edit_body)
+body_widget = component['body']
+al.VBox({'surface': component, 'edit': edit, 'status': status}, height=220, spacing=8)
 
 # %% [markdown]
 # ### Control open state or callbacks
@@ -4277,12 +4493,12 @@ component = al.Modal({'body': al.TextWidget('Modal body child')}, title='Modal',
 status = al.TextWidget(f'open={component.is_open!r}')
 button = al.Button(description='Toggle')
 
-def toggle(_button):
+def toggle(_button, component=component, status=status):
     component.toggle()
-    status.text = f'open={component.is_open!r}'
+    status.value = f'open={component.is_open!r}'
 
 button.on_click(toggle)
-display(al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8))
+al.VBox({'button': button, 'component': component, 'status': status}, height=260, spacing=8)
 
 # %% [markdown]
 # ### Customize appearance
@@ -4292,13 +4508,13 @@ component = al.Modal({'body': al.TextWidget('Modal body child')}, title='Modal',
 component.width = '360px'
 component.height = 'auto'
 wrapper = al.VBox({'surface': component, 'label': al.TextWidget('Surface wrapper')}, width='420px', height=260, spacing=8, resizable=False)
-display(wrapper)
+wrapper
 
 # %% [markdown]
 # # Notebook notes
 #
-# - Read value-bearing widgets with `widget.value`; `TextWidget` uses `widget.text`.
-# - React to value changes with `widget.observe(callback, names="value")` or `names="text"`.
+# - Read value-bearing widgets with `widget.value`; `TextWidget` uses `widget.value`.
+# - React to value changes with `widget.observe(callback, names="value")`.
 # - Button-like widgets use `widget.on_click(callback)`.
 # - Layout widgets expose keyed children with `child_keys`, `get_widget()`, `get_owner()`, and `widget[key]`.
 # - Component surfaces such as dialogs, trays, overlays, and popovers expose keyed children plus `show()`, `hide()`, and `toggle()` when open state is meaningful.

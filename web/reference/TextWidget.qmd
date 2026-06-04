@@ -1,19 +1,19 @@
 # TextWidget { #anylumino.TextWidget }
 
 ```python
-TextWidget(text='')
+TextWidget(value='')
 ```
 
-Small synced text display widget used in examples and tests.
+Small synced value display widget used in examples and tests.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name   | Type   | Description                           | Default   |
-|--------|--------|---------------------------------------|-----------|
-| text   | str    | Initial text displayed by the widget. | `""`      |
+| Name   | Type   | Description                            | Default   |
+|--------|--------|----------------------------------------|-----------|
+| value  | str    | Initial value displayed by the widget. | `""`      |
 
 ## Attributes
 
 | Name | Description |
 | --- | --- |
-| [text](#anylumino.TextWidget.text) | A trait for unicode strings. |
+| [value](#anylumino.TextWidget.value) | A trait for unicode strings. |

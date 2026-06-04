@@ -70,7 +70,7 @@ def set_state(message: str, variant: str = "positive") -> None:
     badge.value = message
     badge.variant = "positive" if variant == "positive" else "negative"
     meter.value = min(100, meter.value + 15)
-    log.text = f"{message}: {dataset.value}, {view_mode.value}, query={search.value!r}"
+    log.value = f"{message}: {dataset.value}, {view_mode.value}, query={search.value!r}"
 
 
 def apply_filters(_button: Button) -> None:

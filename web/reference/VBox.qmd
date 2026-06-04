@@ -16,6 +16,7 @@ VBox(
     scroll_y=None,
     child_min_width=None,
     child_min_height=None,
+    fit_content=False,
 )
 ```
 

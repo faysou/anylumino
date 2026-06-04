@@ -117,8 +117,8 @@ def active_figure() -> go.FigureWidget:
 
 
 def log(message: str) -> None:
-    status.text = message
-    metric_action.text = f"Last action: {message}"
+    status.value = message
+    metric_action.value = f"Last action: {message}"
     state_badge.value = "Updated"
 
 
@@ -190,7 +190,7 @@ def add_figure_tab(_action_id: str = "new_figure") -> None:
     figures[key] = figure
     figure_tabs.add_tab(figure, title, key=key, select=True)
     active_figure_key = key
-    metric_rows.text = f"Samples: {rows}"
+    metric_rows.value = f"Samples: {rows}"
     log(f"Created {title}")
 
 
@@ -206,8 +206,8 @@ def apply_inputs(_button: Button | None = None) -> None:
     refresh_figure(figure, rows, metric)
     if auto_focus_input.value:
         focus_figure()
-    metric_dataset.text = f"Dataset: {dataset_input.value}"
-    metric_rows.text = f"Samples: {rows}"
+    metric_dataset.value = f"Dataset: {dataset_input.value}"
+    metric_rows.value = f"Samples: {rows}"
     log(f"Applied inputs to {figure_tabs.selected_key}")
 
 

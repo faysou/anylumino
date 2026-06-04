@@ -211,10 +211,10 @@ status = TextWidget("Ready")
 dataset = TextInput(value="Greenhouse A", description="Dataset")
 
 def on_dataset_change(change):
-    status.text = f"Dataset: {change['new']}"
+    status.value = f"Dataset: {change['new']}"
 
 dataset.observe(on_dataset_change, names="value")
 
 button = Button(description="Apply", icon="CheckmarkCircle", variant="accent")
-button.on_click(lambda _button: setattr(status, "text", "Applied"))
+button.on_click(lambda _button: setattr(status, "value", "Applied"))
 ```

@@ -151,9 +151,9 @@ controls = {
 
 def update_status(name: str, value: Any) -> None:
     if name == "password":
-        status.text = "password changed: redacted"
+        status.value = "password changed: redacted"
     else:
-        status.text = f"{name}: {describe_value(value)}"
+        status.value = f"{name}: {describe_value(value)}"
 
 
 for key, control in controls.items():
