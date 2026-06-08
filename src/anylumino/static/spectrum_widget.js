@@ -14,6 +14,7 @@ import "@spectrum-web-components/overlay/sp-overlay.js";
 import "@spectrum-web-components/picker-button/sp-picker-button.js";
 import "@spectrum-web-components/popover/sp-popover.js";
 import "@spectrum-web-components/progress-circle/sp-progress-circle.js";
+import "@spectrum-web-components/table/elements.js";
 import "@spectrum-web-components/tooltip/sp-tooltip.js";
 import "@spectrum-web-components/tray/sp-tray.js";
 import "@spectrum-web-components/underlay/sp-underlay.js";
@@ -237,9 +238,108 @@ function createDialog(model) {
   return { element: wrap, root: body };
 }
 
+function normalizedTableText(value) {
+  if (value === undefined || value === null) {
+    return "";
+  }
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
+  return String(value);
+}
+
+function compareTableValues(direction, left, right) {
+  const leftNumber = Number(left);
+  const rightNumber = Number(right);
+  const order = direction === "desc" ? -1 : 1;
+  if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) {
+    return (leftNumber - rightNumber) * order;
+  }
+  return normalizedTableText(left).localeCompare(normalizedTableText(right), undefined, {
+    numeric: true,
+    sensitivity: "base",
+  }) * order;
+}
+
+function sortedTableRows(model) {
+  const rows = [...(model.get("rows") ?? [])];
+  const sortKey = String(model.get("sort_key") ?? "");
+  const sortDirection = String(model.get("sort_direction") ?? "");
+  if (!sortKey || !["asc", "desc"].includes(sortDirection)) {
+    return rows;
+  }
+  return rows.sort((left, right) =>
+    compareTableValues(sortDirection, left?.cells?.[sortKey], right?.cells?.[sortKey]),
+  );
+}
+
+function createTable(model) {
+  const table = document.createElement("sp-table");
+  table.className = "anylumino-SpectrumTable";
+  table.size = String(model.get("spectrum_size") ?? "m");
+  table.selected = [...(model.get("selected") ?? [])].map(String);
+  table.selectAllLabel = String(model.get("select_all_label") ?? "Select all rows");
+  setIfDefined(table, "selects", model.get("selects"));
+  setIfDefined(table, "density", model.get("density"));
+  setBoolAttribute(table, "quiet", model.get("quiet"));
+  setBoolAttribute(table, "emphasized", model.get("emphasized"));
+
+  const head = document.createElement("sp-table-head");
+  for (const column of model.get("columns") ?? []) {
+    const cell = document.createElement("sp-table-head-cell");
+    cell.textContent = String(column.label ?? column.key ?? "");
+    cell.sortKey = String(column.key ?? "");
+    cell.sortable = Boolean(model.get("sortable") || column.sortable);
+    if (cell.sortKey && cell.sortKey === model.get("sort_key")) {
+      setIfDefined(cell, "sort-direction", model.get("sort_direction"));
+    }
+    if (column.align) {
+      cell.style.textAlign = String(column.align);
+    }
+    head.append(cell);
+  }
+
+  const body = document.createElement("sp-table-body");
+  const columns = model.get("columns") ?? [];
+  for (const rowData of sortedTableRows(model)) {
+    const row = document.createElement("sp-table-row");
+    row.value = String(rowData.value ?? "");
+    for (const column of columns) {
+      const cell = document.createElement("sp-table-cell");
+      cell.textContent = normalizedTableText(rowData.cells?.[column.key]);
+      if (column.align) {
+        cell.style.textAlign = String(column.align);
+      }
+      row.append(cell);
+    }
+    body.append(row);
+  }
+
+  table.addEventListener("change", () => {
+    const selected = [...(table.selected ?? [])].map(String);
+    model.set("selected", selected);
+    model.save_changes();
+    model.send({ type: "selection", selected });
+  });
+  table.addEventListener("sorted", (event) => {
+    const sortKey = String(event.detail?.sortKey ?? "");
+    const sortDirection = String(event.detail?.sortDirection ?? "");
+    model.set("sort_key", sortKey);
+    model.set("sort_direction", sortDirection);
+    model.save_changes();
+    model.send({ type: "sort", sort_key: sortKey, sort_direction: sortDirection });
+  });
+
+  table.append(head, body);
+  return { element: table };
+}
+
 function createComponent(model) {
   const kind = String(model.get("component_kind") ?? "element");
 
+  if (kind === "table") {
+    return createTable(model);
+  }
   if (kind === "element") {
     return slottedContainer(model, model.get("tag") || "div");
   }
@@ -385,6 +485,17 @@ export default {
       "spectrum_scale",
       "spectrum_size",
       "attributes",
+      "columns",
+      "rows",
+      "selected",
+      "selects",
+      "sort_key",
+      "sort_direction",
+      "sortable",
+      "quiet",
+      "emphasized",
+      "density",
+      "select_all_label",
     ];
     watched.forEach((name) => model.on(`change:${name}`, rerender));
     signal.addEventListener(

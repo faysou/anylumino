@@ -1,3 +1,5 @@
+import { readFile, writeFile } from "node:fs/promises";
+
 import { build } from "esbuild";
 
 const shared = {
@@ -35,4 +37,15 @@ for (const [entryPoint, outfile] of entries) {
     entryPoints: [entryPoint],
     outfile,
   });
+  if (outfile.endsWith("spectrum_widget.bundle.js")) {
+    await normalizeGeneratedWhitespace(outfile);
+  }
+}
+
+async function normalizeGeneratedWhitespace(outfile) {
+  let text = await readFile(outfile, "utf8");
+  text = text
+    .replaceAll("Gs=`[ \t\n\\f\\r]`", 'Gs="[\\\\s]"')
+    .replaceAll("[^ \t\n\\f\\r", "[^\\\\s");
+  await writeFile(outfile, text);
 }

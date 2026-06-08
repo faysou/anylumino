@@ -27,6 +27,75 @@ def _range_value(value: Any, min_value: int | float, max_value: int | float) -> 
     return list(_json_value(value))
 
 
+def _table_json_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _table_json_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_table_json_value(item) for item in value]
+    return _json_value(value)
+
+
+def _table_column_key(index: int) -> str:
+    return f"column_{index + 1}"
+
+
+def _normalize_table_columns(columns: Iterable[Any] | None, rows: list[Any]) -> list[dict[str, Any]]:
+    if columns is None:
+        first_row = rows[0] if rows else {}
+        if isinstance(first_row, Mapping):
+            columns = list(first_row.keys())
+        elif isinstance(first_row, (list, tuple)):
+            columns = [_table_column_key(index) for index in range(len(first_row))]
+        else:
+            columns = ["value"]
+    elif isinstance(columns, Mapping):
+        columns = [{"key": key, "label": label} for key, label in columns.items()]
+
+    normalized = []
+    for index, column in enumerate(columns):
+        if isinstance(column, Mapping):
+            key = str(column.get("key", column.get("value", _table_column_key(index))))
+            label = str(column.get("label", key))
+            normalized.append(
+                {
+                    "key": key,
+                    "label": label,
+                    "sortable": bool(column.get("sortable", False)),
+                    "align": str(column.get("align", "")),
+                },
+            )
+        elif isinstance(column, (list, tuple)) and len(column) == 2:
+            label, key = column
+            normalized.append({"key": str(key), "label": str(label), "sortable": False, "align": ""})
+        else:
+            key = str(column)
+            normalized.append({"key": key, "label": key, "sortable": False, "align": ""})
+    return normalized
+
+
+def _normalize_table_rows(
+    rows: Iterable[Any],
+    columns: list[dict[str, Any]],
+    row_key: str | None,
+) -> list[dict[str, Any]]:
+    normalized = []
+    for index, row in enumerate(rows):
+        if isinstance(row, Mapping):
+            cells = {column["key"]: _table_json_value(row.get(column["key"], "")) for column in columns}
+            row_value = row.get(row_key, index) if row_key else index
+        elif isinstance(row, (list, tuple)):
+            cells = {
+                column["key"]: _table_json_value(row[column_index]) if column_index < len(row) else ""
+                for column_index, column in enumerate(columns)
+            }
+            row_value = index
+        else:
+            cells = {columns[0]["key"]: _table_json_value(row)} if columns else {"value": _table_json_value(row)}
+            row_value = index
+        normalized.append({"value": str(row_value), "cells": cells})
+    return normalized
+
+
 class ControlWidget(anywidget.AnyWidget):
     """Base class for Spectrum-backed anylumino controls.
 
@@ -1554,6 +1623,190 @@ class SpectrumWidget(ComponentWidget):
     spectrum_size = t.Unicode("m").tag(sync=True)
 
 
+class Table(SpectrumWidget):
+    """Spectrum table widget for structured row data."""
+
+    columns = t.List(t.Dict(), default_value=[]).tag(sync=True)
+    rows = t.List(t.Dict(), default_value=[]).tag(sync=True)
+    selected = t.List(t.Unicode(), default_value=[]).tag(sync=True)
+    selects = t.Unicode("").tag(sync=True)
+    sort_key = t.Unicode("").tag(sync=True)
+    sort_direction = t.Unicode("").tag(sync=True)
+    sortable = t.Bool(False).tag(sync=True)
+    quiet = t.Bool(False).tag(sync=True)
+    emphasized = t.Bool(False).tag(sync=True)
+    density = t.Unicode("").tag(sync=True)
+    select_all_label = t.Unicode("Select all rows").tag(sync=True)
+
+    def __init__(
+        self,
+        rows: Iterable[Any] = (),
+        columns: Iterable[Any] | None = None,
+        *,
+        row_key: str | None = None,
+        selected: Iterable[Any] = (),
+        selects: str = "",
+        sortable: bool = False,
+        sort_key: str = "",
+        sort_direction: str = "",
+        quiet: bool = False,
+        emphasized: bool = False,
+        density: str = "",
+        select_all_label: str = "Select all rows",
+        **kwargs: Any,
+    ) -> None:
+        row_list = list(rows)
+        column_list = _normalize_table_columns(columns, row_list)
+        self._row_key = row_key
+        super().__init__(
+            component_kind="table",
+            rows=_normalize_table_rows(row_list, column_list, row_key),
+            columns=column_list,
+            selected=[str(item) for item in selected],
+            selects=selects,
+            sortable=sortable,
+            sort_key=sort_key,
+            sort_direction=sort_direction,
+            quiet=quiet,
+            emphasized=emphasized,
+            density=density,
+            select_all_label=select_all_label,
+            **kwargs,
+        )
+        self._selection_callbacks: list[Callable[[Table], None]] = []
+        self._sort_callbacks: list[Callable[[Table], None]] = []
+
+    def set_rows(
+        self,
+        rows: Iterable[Any],
+        *,
+        columns: Iterable[Any] | None = None,
+        row_key: str | None = None,
+    ) -> None:
+        """Replace table rows from raw row mappings, sequences, or scalar values."""
+        row_list = list(rows)
+        if row_key is not None:
+            self._row_key = row_key
+        if columns is not None or not self.columns:
+            self.columns = _normalize_table_columns(columns, row_list)
+        self.rows = _normalize_table_rows(row_list, self.columns, self._row_key)
+        self._drop_missing_selection()
+
+    def append_row(self, row: Any, *, row_key: str | None = None) -> str:
+        """Append one raw row and return the normalized row value."""
+        normalized = self._normalize_new_row(row, row_key)
+        self.rows = [*self.rows, normalized]
+        return normalized["value"]
+
+    def prepend_row(self, row: Any, *, row_key: str | None = None) -> str:
+        """Prepend one raw row and return the normalized row value."""
+        normalized = self._normalize_new_row(row, row_key)
+        self.rows = [normalized, *self.rows]
+        return normalized["value"]
+
+    def _normalize_new_row(self, row: Any, row_key: str | None = None) -> dict[str, Any]:
+        if row_key is not None:
+            self._row_key = row_key
+        if not self.columns:
+            self.columns = _normalize_table_columns(None, [row])
+        normalized = _normalize_table_rows([row], self.columns, self._row_key)[0]
+        if self._row_key is None:
+            existing_values = {existing["value"] for existing in self.rows}
+            next_index = len(self.rows)
+            while str(next_index) in existing_values:
+                next_index += 1
+            normalized["value"] = str(next_index)
+        if any(existing["value"] == normalized["value"] for existing in self.rows):
+            msg = f"table row already exists: {normalized['value']}"
+            raise ValueError(msg)
+        return normalized
+
+    def update_row(self, row_value: Any, values: Any) -> None:
+        """Update cells for an existing row by row value."""
+        target = str(row_value)
+        next_rows = []
+        found = False
+        for row in self.rows:
+            if row["value"] != target:
+                next_rows.append(row)
+                continue
+            found = True
+            next_rows.append({"value": target, "cells": self._updated_row_cells(row.get("cells", {}), values)})
+        if not found:
+            msg = f"table row not found: {target}"
+            raise KeyError(msg)
+        self.rows = next_rows
+
+    def remove_row(self, row_value: Any) -> None:
+        """Remove an existing row by row value."""
+        target = str(row_value)
+        next_rows = [row for row in self.rows if row["value"] != target]
+        if len(next_rows) == len(self.rows):
+            msg = f"table row not found: {target}"
+            raise KeyError(msg)
+        self.rows = next_rows
+        if target in self.selected:
+            self.selected = [item for item in self.selected if item != target]
+
+    def on_select(
+        self,
+        callback: Callable[[Table], None],
+        remove: bool = False,
+    ) -> None:
+        """Register or unregister a callback for table selection changes."""
+        if remove:
+            self._selection_callbacks = [item for item in self._selection_callbacks if item is not callback]
+            return
+        self._selection_callbacks.append(callback)
+
+    def on_sort(
+        self,
+        callback: Callable[[Table], None],
+        remove: bool = False,
+    ) -> None:
+        """Register or unregister a callback for table sort changes."""
+        if remove:
+            self._sort_callbacks = [item for item in self._sort_callbacks if item is not callback]
+            return
+        self._sort_callbacks.append(callback)
+
+    def _updated_row_cells(self, current_cells: Mapping[str, Any], values: Any) -> dict[str, Any]:
+        cells = dict(current_cells)
+        if isinstance(values, Mapping):
+            source = values.get("cells") if isinstance(values.get("cells"), Mapping) else values
+            for column in self.columns:
+                key = column["key"]
+                if key in source:
+                    cells[key] = _table_json_value(source[key])
+            return cells
+
+        if isinstance(values, (list, tuple)):
+            for index, column in enumerate(self.columns):
+                if index < len(values):
+                    cells[column["key"]] = _table_json_value(values[index])
+            return cells
+
+        if self.columns:
+            cells[self.columns[0]["key"]] = _table_json_value(values)
+        return cells
+
+    def _drop_missing_selection(self) -> None:
+        row_values = {row["value"] for row in self.rows}
+        self.selected = [item for item in self.selected if item in row_values]
+
+    def _handle_frontend_message(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
+        msg_type = content.get("type")
+        if msg_type == "selection":
+            for callback in list(self._selection_callbacks):
+                callback(self)
+            return
+        if msg_type == "sort":
+            for callback in list(self._sort_callbacks):
+                callback(self)
+            return
+        super()._handle_frontend_message(_widget, content, _buffers)
+
+
 class SpectrumElement(SpectrumWidget):
     """Generic Spectrum element wrapper for custom or future Spectrum tags."""
 
@@ -1893,8 +2146,11 @@ _COMPONENT_PARAM_DOCS = {
     "attributes": "HTML attributes forwarded to the rendered Spectrum element.",
     "callbacks": "Optional callbacks invoked when the widget sends an activation event.",
     "children": "Child anywidgets or keyed child mapping rendered inside the component.",
+    "columns": "Table columns as strings, ``(label, key)`` pairs, or dictionaries with ``key``, ``label``, ``sortable``, and ``align``.",
     "component_kind": "Internal component kind used by specialized button subclasses.",
+    "density": "Table density, either ``'compact'``, ``'spacious'``, or empty for the Spectrum default.",
     "disabled": "Whether user interaction is disabled.",
+    "emphasized": "Whether selected table rows use Spectrum emphasized styling.",
     "height": "CSS height for display-oriented components.",
     "icon": "Spectrum workflow icon name.",
     "icon_size": "Spectrum icon size such as ``'s'``, ``'m'``, ``'l'``, ``'xl'``, or ``'xxl'``.",
@@ -1904,7 +2160,16 @@ _COMPONENT_PARAM_DOCS = {
     "open": "Whether an overlay-like component starts open.",
     "orientation": "Component orientation such as ``'horizontal'`` or ``'vertical'``.",
     "placement": "Preferred overlay placement such as ``'top'``, ``'bottom'``, ``'left'``, or ``'right'``.",
+    "quiet": "Whether to use Spectrum's quiet visual treatment.",
+    "row_key": "Optional row mapping key used as the stable Spectrum row value.",
+    "rows": "Table rows as mappings, sequences, or scalar values.",
+    "select_all_label": "Accessible label for the table select-all checkbox.",
+    "selected": "Selected table row values.",
+    "selects": "Selection mode: ``'single'``, ``'multiple'``, or empty for no selection.",
     "spectrum_size": "Spectrum component size such as ``'s'``, ``'m'``, ``'l'``, or ``'xl'``.",
+    "sort_direction": "Current table sort direction, either ``'asc'``, ``'desc'``, or empty.",
+    "sort_key": "Current table sort column key.",
+    "sortable": "Whether all table columns are sortable unless a column overrides it.",
     "tag": "Spectrum custom element tag name to render.",
     "text": "Visible text content.",
     "title": "Dialog title text.",
@@ -1930,6 +2195,24 @@ def _document_component(cls: type, summary: str, parameters: list[tuple[str, obj
 
 
 for _cls, _summary, _params in [
+    (
+        Table,
+        "Display structured data in a Spectrum table.",
+        [
+            ("rows", ()),
+            ("columns", None),
+            ("row_key", None),
+            ("selected", ()),
+            ("selects", ""),
+            ("sortable", False),
+            ("sort_key", ""),
+            ("sort_direction", ""),
+            ("quiet", False),
+            ("emphasized", False),
+            ("density", ""),
+            ("select_all_label", "Select all rows"),
+        ],
+    ),
     (
         SpectrumElement,
         "Generic wrapper for rendering a Spectrum custom element.",
@@ -2045,6 +2328,7 @@ __all__ = [
     "ToggleButtons",
     "StatusLight",
     "Switch",
+    "Table",
     "Valid",
     "Video",
     "ClearButton",

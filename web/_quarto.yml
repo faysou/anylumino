@@ -152,6 +152,7 @@ quartodoc:
         - ColorHandle
         - ColorLoupe
         - OpacityCheckerboard
+        - Table
         - FileUpload
         - Image
         - Audio

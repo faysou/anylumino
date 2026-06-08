@@ -28,6 +28,16 @@
   width: 100%;
 }
 
+.anylumino-tableHost {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.anylumino-SpectrumTable {
+  min-width: max-content;
+}
+
 .anylumino-SpectrumWidgetButton:not([disabled]) {
   transition:
     transform 80ms ease,

@@ -92,6 +92,7 @@ website:
       - reference/ColorHandle.qmd
       - reference/ColorLoupe.qmd
       - reference/OpacityCheckerboard.qmd
+      - reference/Table.qmd
       - reference/FileUpload.qmd
       - reference/Image.qmd
       - reference/Audio.qmd

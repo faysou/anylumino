@@ -48,6 +48,7 @@ from anylumino import (
     Toolbar,
     StatusLight,
     Switch,
+    Table,
     VBox,
 )
 from anylumino._common import static_asset
@@ -516,6 +517,164 @@ def test_spectrum_component_wrappers_sync_kind_and_metadata() -> None:
     assert controls["divider"].spectrum_size == "l"
 
 
+def test_spectrum_table_normalizes_mapping_rows_and_columns() -> None:
+    table = Table(
+        rows=[
+            {"symbol": "AAPL", "price": 195.12, "status": "Open"},
+            {"symbol": "MSFT", "price": 423.85, "status": "Closed"},
+        ],
+        columns=[
+            {"key": "symbol", "label": "Symbol", "sortable": True},
+            {"key": "price", "label": "Price", "align": "end"},
+            "status",
+        ],
+        row_key="symbol",
+        selected=["AAPL"],
+        selects="multiple",
+        sortable=True,
+        sort_key="price",
+        sort_direction="desc",
+        density="compact",
+        quiet=True,
+    )
+
+    assert table.component_kind == "table"
+    assert table.columns == [
+        {"key": "symbol", "label": "Symbol", "sortable": True, "align": ""},
+        {"key": "price", "label": "Price", "sortable": False, "align": "end"},
+        {"key": "status", "label": "status", "sortable": False, "align": ""},
+    ]
+    assert table.rows == [
+        {"value": "AAPL", "cells": {"symbol": "AAPL", "price": 195.12, "status": "Open"}},
+        {"value": "MSFT", "cells": {"symbol": "MSFT", "price": 423.85, "status": "Closed"}},
+    ]
+    assert table.selected == ["AAPL"]
+    assert table.selects == "multiple"
+    assert table.sort_key == "price"
+    assert table.sort_direction == "desc"
+    assert table.density == "compact"
+    assert table.quiet is True
+
+
+def test_spectrum_table_normalizes_sequence_rows_without_columns() -> None:
+    table = Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")])
+
+    assert table.columns == [
+        {"key": "column_1", "label": "column_1", "sortable": False, "align": ""},
+        {"key": "column_2", "label": "column_2", "sortable": False, "align": ""},
+    ]
+    assert table.rows == [
+        {"value": "0", "cells": {"column_1": "Budget", "column_2": "PDF"}},
+        {"value": "1", "cells": {"column_1": "Onboarding", "column_2": "XLS"}},
+    ]
+
+
+def test_spectrum_table_helpers_replace_append_update_and_remove_rows() -> None:
+    table = Table(
+        rows=[{"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"}],
+        columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+        row_key="order_id",
+        selected=["O-1"],
+        selects="multiple",
+    )
+
+    table.append_row({"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "NEW"})
+    table.update_row("O-2", {"qty": 7, "status": "FILLED"})
+    table.remove_row("O-1")
+
+    assert table.columns == [
+        {"key": "order_id", "label": "Order", "sortable": False, "align": ""},
+        {"key": "symbol", "label": "Symbol", "sortable": False, "align": ""},
+        {"key": "qty", "label": "Qty", "sortable": False, "align": ""},
+        {"key": "status", "label": "Status", "sortable": False, "align": ""},
+    ]
+    assert table.rows == [
+        {
+            "value": "O-2",
+            "cells": {"order_id": "O-2", "symbol": "MSFT", "qty": 7, "status": "FILLED"},
+        },
+    ]
+    assert table.selected == []
+
+
+def test_spectrum_table_prepend_row_inserts_before_existing_rows() -> None:
+    table = Table(
+        rows=[{"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "NEW"}],
+        columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+        row_key="order_id",
+    )
+
+    assert table.prepend_row({"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"}) == "O-1"
+    assert table.rows == [
+        {
+            "value": "O-1",
+            "cells": {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
+        },
+        {
+            "value": "O-2",
+            "cells": {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "NEW"},
+        },
+    ]
+
+
+def test_spectrum_table_set_rows_accepts_live_raw_rows() -> None:
+    table = Table(columns=["order_id", "status"], row_key="order_id", selected=["O-1", "O-3"])
+
+    table.set_rows(
+        [
+            {"order_id": "O-1", "status": "NEW"},
+            {"order_id": "O-2", "status": "PARTIAL"},
+        ],
+    )
+
+    assert table.rows == [
+        {"value": "O-1", "cells": {"order_id": "O-1", "status": "NEW"}},
+        {"value": "O-2", "cells": {"order_id": "O-2", "status": "PARTIAL"}},
+    ]
+    assert table.selected == ["O-1"]
+
+
+def test_spectrum_table_append_row_skips_existing_auto_values_after_removal() -> None:
+    table = Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS"), ("Quarterly", "DOC")])
+
+    table.remove_row("1")
+
+    assert table.append_row(("Roadmap", "MD")) == "3"
+    assert table.rows == [
+        {"value": "0", "cells": {"column_1": "Budget", "column_2": "PDF"}},
+        {"value": "2", "cells": {"column_1": "Quarterly", "column_2": "DOC"}},
+        {"value": "3", "cells": {"column_1": "Roadmap", "column_2": "MD"}},
+    ]
+
+
+def test_spectrum_table_prepend_row_skips_existing_auto_values() -> None:
+    table = Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")])
+
+    assert table.prepend_row(("Roadmap", "MD")) == "2"
+    assert table.rows == [
+        {"value": "2", "cells": {"column_1": "Roadmap", "column_2": "MD"}},
+        {"value": "0", "cells": {"column_1": "Budget", "column_2": "PDF"}},
+        {"value": "1", "cells": {"column_1": "Onboarding", "column_2": "XLS"}},
+    ]
+
+
+def test_spectrum_table_row_helpers_reject_duplicate_and_missing_rows() -> None:
+    table = Table(
+        rows=[{"order_id": "O-1", "status": "NEW"}],
+        columns=["order_id", "status"],
+        row_key="order_id",
+    )
+
+    with pytest.raises(ValueError, match="table row already exists: O-1"):
+        table.append_row({"order_id": "O-1", "status": "FILLED"})
+    with pytest.raises(ValueError, match="table row already exists: O-1"):
+        table.prepend_row({"order_id": "O-1", "status": "FILLED"})
+    with pytest.raises(KeyError, match="table row not found: O-2"):
+        table.update_row("O-2", {"status": "FILLED"})
+    with pytest.raises(KeyError, match="table row not found: O-2"):
+        table.remove_row("O-2")
+
+
 def test_selection_range_slider_resolves_index_to_values() -> None:
     slider = SelectionRangeSlider(
         options=["Mon", "Tue", "Wed", "Thu", "Fri"],
@@ -542,6 +701,7 @@ def test_spectrum_widgets_share_generic_component_base() -> None:
         FieldGroup({"field": TextInput(value="x")}),
         Tooltip("More detail", {"trigger": Button(description="Info")}),
         OpacityCheckerboard(),
+        Table(rows=[{"name": "Budget", "type": "PDF"}]),
         DialogBox({"body": TextWidget("Settings")}, title="Settings"),
         Modal({"body": TextWidget("Confirm")}, title="Confirm"),
     ]

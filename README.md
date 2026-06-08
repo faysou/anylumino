@@ -53,7 +53,7 @@ The current prototype provides:
 - Surfaces and display helpers: `FieldGroup`, `HelpText`, `ProgressCircle`,
   `Popover`, `Tooltip`, `Tray`, `DialogBox`, `Modal`, `ClearButton`,
   `CloseButton`, `InfieldButton`, `PickerButton`, `ColorHandle`, `ColorLoupe`,
-  `OpacityCheckerboard`, `Icon`, `UIIcon`, and `SpectrumElement`.
+  `OpacityCheckerboard`, `Table`, `Icon`, `UIIcon`, and `SpectrumElement`.
 - `TextWidget`, a small helper used by tests and smoke notebooks.
 
 All layout containers inherit from `LayoutWidget`, which provides keyed child
@@ -143,6 +143,35 @@ an event, not a persistent value.
 Child-capable surface widgets accept keyed child anywidgets, support `show()`,
 `hide()`, and `toggle()` for overlay-style state, and remain composable inside
 Lumino layouts.
+
+`Table` renders Spectrum table markup for structured row data. Pass mappings,
+sequences, or scalar rows; use `row_key` when mappings contain a stable row id
+such as an order id or symbol.
+
+```python
+from anylumino import Table
+
+orders = Table(
+    rows=[
+        {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
+        {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
+    ],
+    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+    row_key="order_id",
+    selects="multiple",
+    density="compact",
+)
+
+orders.prepend_row({"order_id": "O-0", "symbol": "AMD", "qty": 2, "status": "NEW"})
+orders.append_row({"order_id": "O-3", "symbol": "NVDA", "qty": 1, "status": "NEW"})
+orders.update_row("O-2", {"qty": 7, "status": "FILLED"})
+orders.remove_row("O-1")
+orders.set_rows(next_order_snapshot)
+```
+
+Each row helper assigns a new `rows` list, so displayed notebooks receive the
+update through traitlets. `prepend_row` inserts before existing rows and
+`append_row` inserts after existing rows.
 
 Frontend assets are bundled into the Python package. Runtime notebooks do not
 need CDN access for Lumino, Spectrum components, or the bundled workflow icons.

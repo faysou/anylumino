@@ -125,6 +125,7 @@ Specialized input and display widgets.
 | [ColorHandle](ColorHandle.qmd#anylumino.ColorHandle) | Display a draggable-looking color handle. |
 | [ColorLoupe](ColorLoupe.qmd#anylumino.ColorLoupe) | Display a color loupe preview. |
 | [OpacityCheckerboard](OpacityCheckerboard.qmd#anylumino.OpacityCheckerboard) | Display an opacity checkerboard swatch. |
+| [Table](Table.qmd#anylumino.Table) | Display structured data in a Spectrum table. |
 | [FileUpload](FileUpload.qmd#anylumino.FileUpload) | File upload control. |
 | [Image](Image.qmd#anylumino.Image) | Image display widget. |
 | [Audio](Audio.qmd#anylumino.Audio) | Audio display widget. |

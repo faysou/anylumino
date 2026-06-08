@@ -42,6 +42,7 @@
     "@spectrum-web-components/slider": "1.12.1",
     "@spectrum-web-components/status-light": "1.12.1",
     "@spectrum-web-components/switch": "1.12.1",
+    "@spectrum-web-components/table": "1.12.1",
     "@spectrum-web-components/tags": "1.12.1",
     "@spectrum-web-components/textfield": "1.12.1",
     "@spectrum-web-components/theme": "1.12.1",
