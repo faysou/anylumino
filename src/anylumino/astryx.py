@@ -7,10 +7,10 @@ from typing import Any
 
 import traitlets as t
 
-from ._common import json_value as _json_value
-from ._common import static_asset
-from ._components import ComponentWidget
-from ._layout import ChildInput
+from .common import json_value as _json_value
+from .common import static_asset
+from .components import ComponentWidget
+from .layout import ChildInput
 
 
 def _clean_value(value: Any) -> Any:
@@ -113,8 +113,8 @@ class AstryxWidget(ComponentWidget):
     instead of this base class.
     """
 
-    _esm = static_asset("astryx_widget.bundle.js")
-    _css = static_asset("astryx_widget.bundle.css")
+    _esm = static_asset("astryx/astryx_widget.bundle.js")
+    _css = static_asset("astryx/astryx_widget.bundle.css")
 
     component_family = t.Unicode("astryx").tag(sync=True)
     component_name = t.Unicode("Stack").tag(sync=True)
@@ -644,6 +644,524 @@ class AstryxButtonGroup(AstryxWidget):
         super().__init__("ButtonGroup", label=label, callbacks=callbacks, props={"items": _option_records(items), "label": label, **props})
 
 
+class AstryxAvatarGroup(AstryxWidget):
+    """Render a compact group of Astryx avatars.
+
+    Parameters
+    ----------
+    items : iterable
+        Avatar records. Strings are treated as names; mappings may include
+        ``label``, ``name``, ``src``, ``alt``, and status metadata.
+    overflow_count : int, default 0
+        Number displayed in the generated overflow avatar. Leave at zero when
+        every avatar is shown.
+    **props : Any
+        Additional Astryx ``AvatarGroup`` props such as ``size``.
+
+    Notes
+    -----
+    This wrapper is useful for notebook summaries that need to show owners,
+    reviewers, or participants without spending a full table column.
+    """
+
+    def __init__(self, items: Iterable[Any], *, overflow_count: int = 0, **props: Any) -> None:
+        super().__init__("AvatarGroup", props={"items": _option_records(items), "overflowCount": overflow_count, **props})
+
+
+class AstryxCode(AstryxWidget):
+    """Render inline code with Astryx styling.
+
+    Parameters
+    ----------
+    code : str
+        Inline code text to render.
+    **props : Any
+        Additional Astryx ``Code`` props.
+
+    See Also
+    --------
+    AstryxCodeBlock : Render multi-line syntax-highlighted code blocks.
+    AstryxMarkdown : Render Markdown snippets that may contain inline code.
+    """
+
+    def __init__(self, code: str, **props: Any) -> None:
+        super().__init__("Code", text=code, props=props)
+
+
+class AstryxCitation(AstryxWidget):
+    """Render a compact inline citation reference.
+
+    Parameters
+    ----------
+    source : mapping
+        Citation source metadata. Common fields are ``title``, ``url``, and
+        ``icon``.
+    number : int, default 1
+        Citation number shown by the component.
+    variant : {"number", "label"}, default "number"
+        Astryx citation presentation variant.
+    **props : Any
+        Additional Astryx ``Citation`` props.
+
+    Notes
+    -----
+    In notebooks, citations are best for compact references near model output,
+    metrics, or generated summaries. Use a full link or metadata list for
+    longer source details.
+    """
+
+    def __init__(self, source: Mapping[str, Any], *, number: int = 1, variant: str = "number", **props: Any) -> None:
+        super().__init__("Citation", value=number, variant=variant, props={"source": _clean_value(source), "number": number, "variant": variant, **props})
+
+
+class AstryxField(AstryxWidget):
+    """Wrap a custom control with an Astryx field label and status area.
+
+    Parameters
+    ----------
+    children : child input, optional
+        Input widget or composed content to render inside the field.
+    label : str
+        Field label. Astryx requires a label for accessibility, even when the
+        label is visually hidden.
+    input_id : str, optional
+        ID associated with the child input. A stable notebook-local ID is
+        generated when omitted.
+    description : str, default ""
+        Supporting text rendered below the label.
+    status : mapping, optional
+        Status record such as ``{"type": "warning", "message": "Check"}``.
+    disabled : bool, default False
+        Whether the field should be styled as disabled.
+    **props : Any
+        Additional Astryx ``Field`` props.
+    """
+
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        label: str,
+        input_id: str = "",
+        description: str = "",
+        status: Mapping[str, Any] | None = None,
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Field",
+            children,
+            label=label,
+            disabled=disabled,
+            props={
+                "label": label,
+                "inputID": input_id,
+                "description": description or None,
+                "status": _clean_value(status) if status else None,
+                **props,
+            },
+        )
+
+
+class AstryxFieldStatus(AstryxWidget):
+    """Render an Astryx field status message.
+
+    Parameters
+    ----------
+    message : str
+        Status text shown to the user.
+    type : {"success", "warning", "error"}, default "success"
+        Status severity.
+    variant : {"attached", "detached"}, default "detached"
+        Visual attachment style relative to a nearby field.
+    **props : Any
+        Additional Astryx ``FieldStatus`` props.
+    """
+
+    def __init__(self, message: str, *, type: str = "success", variant: str = "detached", **props: Any) -> None:
+        super().__init__("FieldStatus", label=message, variant=type, props={"type": type, "message": message, "variant": variant, **props})
+
+
+class AstryxFormLayout(AstryxWidget):
+    """Arrange Astryx form controls with consistent field spacing.
+
+    Parameters
+    ----------
+    children : child input, optional
+        Form fields or controls to arrange.
+    direction : {"vertical", "horizontal", "horizontal-labels"}, default "vertical"
+        Astryx form layout direction.
+    **props : Any
+        Additional Astryx ``FormLayout`` props.
+
+    Notes
+    -----
+    Use this instead of a generic grid when the content is semantically a form.
+    It keeps notebook controls closer to the spacing and label alignment used
+    by JupyterLab-style settings panels.
+    """
+
+    def __init__(self, children: ChildInput = None, *, direction: str = "vertical", **props: Any) -> None:
+        super().__init__("FormLayout", children, props={"direction": direction, **props})
+
+
+class AstryxInputGroup(AstryxWidget):
+    """Group an input with prefix and suffix adornments.
+
+    Parameters
+    ----------
+    children : child input, optional
+        Usually an :class:`AstryxTextInput` or :class:`AstryxNumberInput`.
+    label : str
+        Accessible label for the grouped input.
+    prefix : str, optional
+        Text rendered before the child input, for example a currency symbol.
+    suffix : str, optional
+        Text rendered after the child input, for example a unit.
+    disabled : bool, default False
+        Whether the group should be styled as disabled.
+    **props : Any
+        Additional Astryx ``InputGroup`` props such as ``size``.
+    """
+
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        label: str,
+        prefix: str = "",
+        suffix: str = "",
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "InputGroup",
+            children,
+            label=label,
+            disabled=disabled,
+            props={"label": label, "prefix": prefix or None, "suffix": suffix or None, **props},
+        )
+
+
+class AstryxCollapsible(AstryxWidget):
+    """Render expandable notebook content.
+
+    Parameters
+    ----------
+    children : child input, optional
+        Content shown when the disclosure is open.
+    trigger : str
+        Text shown in the always-visible trigger area.
+    default_open : bool, default True
+        Initial open state for the uncontrolled Astryx component.
+    value : str, optional
+        Identifier used by Astryx collapsible groups.
+    **props : Any
+        Additional Astryx ``Collapsible`` props.
+
+    Notes
+    -----
+    This is useful for hiding verbose diagnostics, raw JSON, parameter blocks,
+    or explanatory detail while keeping the main notebook output scannable.
+    """
+
+    def __init__(self, children: ChildInput = None, *, trigger: str, default_open: bool = True, value: str = "", **props: Any) -> None:
+        super().__init__(
+            "Collapsible",
+            children,
+            label=trigger,
+            props={"trigger": trigger, "defaultIsOpen": default_open, "value": value or None, **props},
+        )
+
+
+class AstryxOutline(AstryxWidget):
+    """Render a table-of-contents outline.
+
+    Parameters
+    ----------
+    items : iterable of mapping
+        Outline records with ``id``, ``label``, and ``level`` fields.
+    active_id : str, optional
+        Currently active heading ID. When set, the value is synchronized back
+        to Python on frontend changes.
+    label : str, default "Table of contents"
+        Accessible label for the outline navigation.
+    density : {"default", "compact"}, default "compact"
+        Item spacing density.
+    **props : Any
+        Additional Astryx ``Outline`` props.
+    """
+
+    def __init__(self, items: Iterable[Mapping[str, Any]], *, active_id: str = "", label: str = "Table of contents", density: str = "compact", **props: Any) -> None:
+        super().__init__(
+            "Outline",
+            label=label,
+            value=active_id,
+            props={"items": _clean_value(list(items)), "label": label, "density": density, **props},
+        )
+
+
+class AstryxTreeList(AstryxWidget):
+    """Render hierarchical notebook data as an expandable tree.
+
+    Parameters
+    ----------
+    items : iterable of mapping
+        Recursive tree records. Each record should contain ``id`` and
+        ``label`` and may include ``children``, ``description``, ``href``,
+        ``isSelected``, and ``isExpanded``.
+    header : str, optional
+        Optional header rendered above the tree.
+    density : {"compact", "balanced", "spacious"}, default "balanced"
+        Astryx row density.
+    **props : Any
+        Additional Astryx ``TreeList`` props.
+
+    Notes
+    -----
+    Tree lists are helpful for datasets, model artifacts, report sections, and
+    file-like hierarchies that would be too noisy as a flat table.
+    """
+
+    def __init__(self, items: Iterable[Mapping[str, Any]], *, header: str = "", density: str = "balanced", **props: Any) -> None:
+        super().__init__("TreeList", props={"items": _clean_value(list(items)), "header": header or None, "density": density, **props})
+
+
+class AstryxToolbar(AstryxWidget):
+    """Render an Astryx toolbar with optional start, center, and end slots.
+
+    Parameters
+    ----------
+    children : child input, optional
+        Toolbar content. When a mapping is provided, keys named ``"start"``,
+        ``"center"``, and ``"end"`` are used as Astryx toolbar slots.
+    label : str
+        Accessible toolbar label.
+    size : {"sm", "md", "lg"}, default "sm"
+        Size inherited by compatible toolbar controls.
+    gap : int or float, default 1
+        Astryx spacing step between toolbar items.
+    **props : Any
+        Additional Astryx ``Toolbar`` props such as ``variant`` or
+        ``dividers``.
+    """
+
+    def __init__(self, children: ChildInput = None, *, label: str, size: str = "sm", gap: int | float = 1, **props: Any) -> None:
+        super().__init__("Toolbar", children, label=label, props={"label": label, "size": size, "gap": gap, **props})
+
+
+class AstryxTooltip(AstryxWidget):
+    """Attach a tooltip to notebook content.
+
+    Parameters
+    ----------
+    content : str or child input
+        Tooltip content. Keep this concise because tooltips are intended for
+        short hover or focus hints.
+    trigger : child input, optional
+        Trigger widget or text. When a mapping is used, key ``"trigger"`` is
+        treated as the trigger and key ``"content"`` can override ``content``.
+    label : str, optional
+        Fallback text content when ``content`` is empty.
+    **props : Any
+        Additional Astryx ``Tooltip`` props such as ``placement`` or
+        ``hasHoverIndication``.
+    """
+
+    def __init__(self, content: str | ChildInput, trigger: ChildInput = None, *, label: str = "", **props: Any) -> None:
+        children = {"trigger": trigger} if trigger is not None else None
+        if not isinstance(content, str):
+            children = {"trigger": trigger, "content": content} if trigger is not None else {"content": content}
+            content_prop = None
+        else:
+            content_prop = content
+        super().__init__("Tooltip", children, label=label or content_prop or "", props={"content": content_prop, **props})
+
+
+class AstryxHoverCard(AstryxWidget):
+    """Attach a hover card with richer preview content.
+
+    Parameters
+    ----------
+    content : str or child input
+        Preview content shown in the hover layer.
+    trigger : child input
+        Trigger widget or text that opens the hover card.
+    label : str, optional
+        Accessible fallback label.
+    **props : Any
+        Additional Astryx ``HoverCard`` props such as ``placement`` and
+        ``delay``.
+    """
+
+    def __init__(self, content: str | ChildInput, trigger: ChildInput, *, label: str = "", **props: Any) -> None:
+        children = {"trigger": trigger}
+        content_prop: str | None = content if isinstance(content, str) else None
+        if not isinstance(content, str):
+            children["content"] = content
+        super().__init__("HoverCard", children, label=label or content_prop or "", props={"content": content_prop, **props})
+
+
+class AstryxPopover(AstryxWidget):
+    """Render click-triggered popover content.
+
+    Parameters
+    ----------
+    content : str or child input
+        Popover body content. Child widgets can be used for interactive
+        controls.
+    trigger : child input
+        Trigger widget, typically an :class:`AstryxButton` or
+        :class:`AstryxIconButton`.
+    label : str
+        Accessible label for the popover dialog.
+    **props : Any
+        Additional Astryx ``Popover`` props such as ``placement`` or ``width``.
+    """
+
+    def __init__(self, content: str | ChildInput, trigger: ChildInput, *, label: str, **props: Any) -> None:
+        children = {"trigger": trigger}
+        content_prop: str | None = content if isinstance(content, str) else None
+        if not isinstance(content, str):
+            children["content"] = content
+        super().__init__("Popover", children, label=label, props={"content": content_prop, "label": label, **props})
+
+
+class AstryxDropdownMenu(AstryxWidget):
+    """Render a button-backed Astryx dropdown menu.
+
+    Parameters
+    ----------
+    items : iterable
+        Menu records. Strings become actions; mappings may include ``label``,
+        ``value``, ``icon``, ``disabled``, or Astryx section/divider records.
+    label : str
+        Button label and accessible menu trigger label.
+    variant : str, default "secondary"
+        Astryx button variant used by the trigger.
+    disabled : bool, default False
+        Whether the menu trigger is disabled.
+    callbacks : iterable of callable, optional
+        Python callbacks invoked when a menu item is clicked.
+    **props : Any
+        Additional Astryx ``DropdownMenu`` props.
+    """
+
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        label: str,
+        variant: str = "secondary",
+        disabled: bool = False,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "DropdownMenu",
+            label=label,
+            variant=variant,
+            disabled=disabled,
+            callbacks=callbacks,
+            props={"items": _option_records(items), "button": {"label": label, "variant": variant}, **props},
+        )
+
+
+class AstryxMoreMenu(AstryxWidget):
+    """Render a compact overflow action menu.
+
+    Parameters
+    ----------
+    items : iterable
+        Menu records using the same shape as :class:`AstryxDropdownMenu`.
+    label : str, default "More options"
+        Accessible label for the icon-only trigger.
+    variant : str, default "ghost"
+        Astryx trigger button variant.
+    disabled : bool, default False
+        Whether the menu trigger is disabled.
+    callbacks : iterable of callable, optional
+        Python callbacks invoked when a menu item is clicked.
+    **props : Any
+        Additional Astryx ``MoreMenu`` props such as ``size``.
+    """
+
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        label: str = "More options",
+        variant: str = "ghost",
+        disabled: bool = False,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "MoreMenu",
+            label=label,
+            variant=variant,
+            disabled=disabled,
+            callbacks=callbacks,
+            props={"items": _option_records(items), "label": label, "variant": variant, **props},
+        )
+
+
+class AstryxCalendar(AstryxWidget):
+    """Render an Astryx calendar date picker.
+
+    Parameters
+    ----------
+    value : str or mapping, optional
+        Selected date for single mode or a date-range mapping for range mode.
+    mode : {"single", "range"}, default "single"
+        Calendar selection mode.
+    **props : Any
+        Additional Astryx ``Calendar`` props such as ``min``, ``max``,
+        ``numberOfMonths``, or ``hasWeekNumbers``.
+    """
+
+    def __init__(self, value: str | Mapping[str, str] | None = None, *, mode: str = "single", **props: Any) -> None:
+        super().__init__("Calendar", value=value, props={"mode": mode, **props})
+
+
+class AstryxFileInput(AstryxWidget):
+    """Render an Astryx file input.
+
+    Parameters
+    ----------
+    label : str
+        Accessible file input label.
+    value : object, optional
+        Initial synchronized value. Frontend selections synchronize file
+        metadata records, not file bytes.
+    multiple : bool, default False
+        Whether users may select more than one file.
+    disabled : bool, default False
+        Whether the file input is disabled.
+    **props : Any
+        Additional Astryx ``FileInput`` props such as ``accept``, ``mode``, or
+        ``maxSize``.
+
+    Notes
+    -----
+    Notebook kernels receive file metadata only. Uploading file contents should
+    be implemented as a separate explicit workflow.
+    """
+
+    def __init__(self, *, label: str, value: Any = None, multiple: bool = False, disabled: bool = False, **props: Any) -> None:
+        super().__init__("FileInput", label=label, value=value, disabled=disabled, props={"label": label, "isMultiple": multiple, **props})
+
+
+# TODO(astryx): Candidate follow-ups after the notebook-safe wrappers above:
+# - study a reusable brand/theme identity API so notebooks can define shared
+#   colors, typography, and component variants without per-widget styling props;
+# - consider data-entry wrappers with richer state synchronization
+#   (Tokenizer, Typeahead, CommandPalette) once frontend search-source semantics
+#   and Python callback contracts are confirmed;
+# - evaluate modal/dialog-style components (Dialog, AlertDialog) in JupyterLab
+#   output areas before exposing stable wrappers.
+
+
 class AstryxTable(AstryxWidget):
     """Render a data-driven Astryx table for notebook use.
 
@@ -1034,36 +1552,51 @@ class AstryxTimestamp(AstryxWidget):
 __all__ = [
     "AstryxAspectRatio",
     "AstryxAvatar",
+    "AstryxAvatarGroup",
     "AstryxBadge",
     "AstryxBanner",
     "AstryxBlockquote",
     "AstryxBreadcrumbs",
     "AstryxButton",
     "AstryxButtonGroup",
+    "AstryxCalendar",
     "AstryxCard",
     "AstryxCenter",
     "AstryxCheckbox",
     "AstryxCheckboxList",
     "AstryxClickableCard",
+    "AstryxCitation",
+    "AstryxCode",
     "AstryxCodeBlock",
     "AstryxComponent",
+    "AstryxCollapsible",
+    "AstryxDropdownMenu",
     "AstryxDateInput",
     "AstryxDateRangeInput",
     "AstryxDateTimeInput",
     "AstryxDivider",
     "AstryxEmptyState",
+    "AstryxField",
+    "AstryxFieldStatus",
+    "AstryxFileInput",
+    "AstryxFormLayout",
     "AstryxGrid",
+    "AstryxHoverCard",
     "AstryxHeading",
     "AstryxIcon",
     "AstryxIconButton",
+    "AstryxInputGroup",
     "AstryxKbd",
     "AstryxLink",
     "AstryxList",
     "AstryxMarkdown",
     "AstryxMetadataList",
+    "AstryxMoreMenu",
     "AstryxMultiSelector",
     "AstryxNumberInput",
+    "AstryxOutline",
     "AstryxProgressBar",
+    "AstryxPopover",
     "AstryxRadioList",
     "AstryxSection",
     "AstryxSegmentedControl",
@@ -1085,5 +1618,8 @@ __all__ = [
     "AstryxTimestamp",
     "AstryxToggleButton",
     "AstryxToken",
+    "AstryxToolbar",
+    "AstryxTooltip",
+    "AstryxTreeList",
     "AstryxWidget",
 ]

@@ -7,17 +7,29 @@ import traitlets as t
 from anylumino import (
     AccordionPanel,
     AstryxBadge,
+    AstryxAvatarGroup,
     AstryxBanner,
     AstryxButton,
     AstryxCard,
+    AstryxCalendar,
     AstryxCheckboxList,
+    AstryxCode,
     AstryxCodeBlock,
     AstryxComponent,
+    AstryxDropdownMenu,
     AstryxEmptyState,
+    AstryxField,
+    AstryxFileInput,
+    AstryxFormLayout,
     AstryxHeading,
+    AstryxHoverCard,
+    AstryxInputGroup,
+    AstryxMoreMenu,
     AstryxMultiSelector,
     AstryxNumberInput,
+    AstryxOutline,
     AstryxProgressBar,
+    AstryxPopover,
     AstryxRadioList,
     AstryxSegmentedControl,
     AstryxSelector,
@@ -29,7 +41,9 @@ from anylumino import (
     AstryxText,
     AstryxTextArea,
     AstryxTextInput,
+    AstryxTooltip,
     AstryxToggleButton,
+    AstryxTreeList,
     AstryxWidget,
     Badge,
     BoxPanel,
@@ -76,7 +90,7 @@ from anylumino import (
     Table,
     VBox,
 )
-from anylumino._common import static_asset
+from anylumino.common import static_asset
 
 
 def _asset_path(asset: object) -> Path:
@@ -485,13 +499,19 @@ def test_date_controls_are_native_family_not_spectrum_controls() -> None:
 
 
 def test_widget_frontend_assets_are_lazy_paths() -> None:
+    assert _asset_path(TabPanel._esm).parent.name == "layout"
+    assert _asset_path(TextWidget._esm).parent.name == "layout"
     assert _asset_path(ControlWidget._esm).name == "control_widget.bundle.js"
+    assert _asset_path(ControlWidget._esm).parent.name == "spectrum"
     assert _asset_path(ControlWidget._css).name == "control_widget.css"
     assert _asset_path(DatePicker._esm).name == "native_control_widget.bundle.js"
+    assert _asset_path(DatePicker._esm).parent.name == "spectrum"
     assert _asset_path(DatePicker._css).name == "native_control_widget.css"
     assert _asset_path(SpectrumWidget._esm).name == "spectrum_widget.bundle.js"
+    assert _asset_path(SpectrumWidget._esm).parent.name == "spectrum"
     assert _asset_path(SpectrumWidget._css).name == "spectrum_widget.css"
     assert _asset_path(AstryxWidget._esm).name == "astryx_widget.bundle.js"
+    assert _asset_path(AstryxWidget._esm).parent.name == "astryx"
     assert _asset_path(AstryxWidget._css).name == "astryx_widget.bundle.css"
 
 
@@ -810,11 +830,25 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
         AstryxCheckboxList(["Quotes", "Trades"], value=["Quotes"], label="Streams"),
         AstryxTable(rows, {"symbol": "Symbol", "status": "Status"}),
         AstryxCard({"body": AstryxText("Card body")}),
+        AstryxAvatarGroup(["Ada", "Grace"], overflow_count=1),
+        AstryxFormLayout({"symbol": AstryxTextInput(value="AAPL", label="Symbol")}),
+        AstryxField(AstryxTextInput(value="MSFT", label="Symbol", isLabelHidden=True), label="Field symbol"),
+        AstryxInputGroup(AstryxNumberInput(value=10, label="Qty", isLabelHidden=True), label="Quantity", suffix="sh"),
+        AstryxCalendar("2026-07-09"),
+        AstryxFileInput(label="Upload", accept=".csv"),
         AstryxStatusDot("Connected", variant="success"),
         AstryxProgressBar(55, label="Progress", variant="success"),
         AstryxEmptyState("No orders", description="The selected account has no open orders."),
         AstryxBanner("Market data connected", status="success"),
+        AstryxCode("symbol"),
         AstryxCodeBlock("print('ready')", language="python"),
+        AstryxOutline([{"id": "summary", "label": "Summary", "level": 1}]),
+        AstryxTreeList([{"id": "src", "label": "src", "isExpanded": True, "children": [{"id": "app", "label": "app.py"}]}]),
+        AstryxDropdownMenu(["Refresh", {"label": "Export", "value": "export"}], label="Actions"),
+        AstryxMoreMenu(["Edit", "Delete"]),
+        AstryxTooltip("Run cell", AstryxButton("Run")),
+        AstryxHoverCard(AstryxText("Preview"), AstryxButton("Preview")),
+        AstryxPopover(AstryxText("Settings"), AstryxButton("Open"), label="Settings"),
     ]
 
     assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
@@ -833,6 +867,15 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
         {"key": "status", "header": "Status", "width": {"kind": "proportional", "value": 1}},
     ]
     assert widgets[14].child_keys == ["body"]
+    assert widgets[15].component_name == "AvatarGroup"
+    assert widgets[16].component_name == "FormLayout"
+    assert widgets[17].props["label"] == "Field symbol"
+    assert widgets[18].props["suffix"] == "sh"
+    assert widgets[19].component_name == "Calendar"
+    assert widgets[20].component_name == "FileInput"
+    assert widgets[29].props["items"][1]["value"] == "export"
+    assert widgets[32].child_keys == ["trigger", "content"]
+    assert widgets[33].child_keys == ["trigger", "content"]
 
 
 def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> None:

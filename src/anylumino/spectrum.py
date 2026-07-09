@@ -8,17 +8,17 @@ from typing import Any
 import anywidget
 import traitlets as t
 
-from ._common import REQUIRED as _REQUIRED
-from ._common import doc as _doc
-from ._common import document_control as _document_control
-from ._common import json_value as _json_value
-from ._common import option_value as _option_value
-from ._common import options_tuple as _options_tuple
-from ._common import signature as _signature
-from ._common import static_asset
-from ._components import ComponentWidget
-from ._layout import ChildInput
-from ._layout import TitleInput
+from .common import REQUIRED as _REQUIRED
+from .common import doc as _doc
+from .common import document_control as _document_control
+from .common import json_value as _json_value
+from .common import option_value as _option_value
+from .common import options_tuple as _options_tuple
+from .common import signature as _signature
+from .common import static_asset
+from .components import ComponentWidget
+from .layout import ChildInput
+from .layout import TitleInput
 
 
 def _range_value(value: Any, min_value: int | float, max_value: int | float) -> list[Any]:
@@ -104,8 +104,8 @@ class ControlWidget(anywidget.AnyWidget):
     controls frontend.
     """
 
-    _esm = static_asset("control_widget.bundle.js")
-    _css = static_asset("control_widget.css")
+    _esm = static_asset("spectrum/control_widget.bundle.js")
+    _css = static_asset("spectrum/control_widget.css")
 
     control_kind = t.Unicode("text").tag(sync=True)
     value = t.Any(None, allow_none=True).tag(sync=True)
@@ -1614,8 +1614,8 @@ class SpectrumWidget(ComponentWidget):
     such as dialogs, popovers, trays, and field groups composable.
     """
 
-    _esm = static_asset("spectrum_widget.bundle.js")
-    _css = static_asset("spectrum_widget.css")
+    _esm = static_asset("spectrum/spectrum_widget.bundle.js")
+    _css = static_asset("spectrum/spectrum_widget.css")
 
     component_family = t.Unicode("spectrum").tag(sync=True)
     spectrum_color = t.Unicode("light").tag(sync=True)

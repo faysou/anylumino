@@ -23,13 +23,13 @@ const shared = {
 };
 
 const entries = [
-  ["src/anylumino/static/tab_panel.js", "src/anylumino/static/tab_panel.bundle.js"],
-  ["src/anylumino/static/layout_panel.js", "src/anylumino/static/layout_panel.bundle.js"],
-  ["src/anylumino/static/action_panel.js", "src/anylumino/static/action_panel.bundle.js"],
-  ["src/anylumino/static/control_widget.js", "src/anylumino/static/control_widget.bundle.js"],
-  ["src/anylumino/static/native_control_widget.js", "src/anylumino/static/native_control_widget.bundle.js"],
-  ["src/anylumino/static/spectrum_widget.js", "src/anylumino/static/spectrum_widget.bundle.js"],
-  ["src/anylumino/static/astryx_widget.js", "src/anylumino/static/astryx_widget.bundle.js"],
+  ["src/anylumino/static/layout/tab_panel.js", "src/anylumino/static/layout/tab_panel.bundle.js"],
+  ["src/anylumino/static/layout/layout_panel.js", "src/anylumino/static/layout/layout_panel.bundle.js"],
+  ["src/anylumino/static/layout/action_panel.js", "src/anylumino/static/layout/action_panel.bundle.js"],
+  ["src/anylumino/static/spectrum/control_widget.js", "src/anylumino/static/spectrum/control_widget.bundle.js"],
+  ["src/anylumino/static/spectrum/native_control_widget.js", "src/anylumino/static/spectrum/native_control_widget.bundle.js"],
+  ["src/anylumino/static/spectrum/spectrum_widget.js", "src/anylumino/static/spectrum/spectrum_widget.bundle.js"],
+  ["src/anylumino/static/astryx/astryx_widget.js", "src/anylumino/static/astryx/astryx_widget.bundle.js"],
 ];
 
 for (const [entryPoint, outfile] of entries) {

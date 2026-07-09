@@ -116,7 +116,7 @@ such as `AddContent`, `RotateRight`, `Comment`, `GraphTrend`, `StepForward`,
 Most input controls are Spectrum-backed anywidgets and live in the Spectrum
 family internally, so future component-library families can be added without
 mixing renderer code. Date and time controls are browser-native controls in
-`_controls.py`. All controls can be placed inside Lumino layouts like any other
+`controls.py`. All controls can be placed inside Lumino layouts like any other
 child widget and expose synced `value` traits plus normal traitlets observers.
 Controls with an `icon` argument use the same Spectrum workflow icon fields as
 action widgets. Use the `variant`, `quiet`, `spectrum_size`,

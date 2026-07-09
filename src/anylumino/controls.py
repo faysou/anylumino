@@ -8,16 +8,16 @@ from typing import Any
 import anywidget
 import traitlets as t
 
-from ._common import document_control as _document_control
-from ._common import json_value as _json_value
-from ._common import static_asset
+from .common import document_control as _document_control
+from .common import json_value as _json_value
+from .common import static_asset
 
 
 class _NativeControlWidget(anywidget.AnyWidget):
     """Base class for browser-native anylumino controls."""
 
-    _esm = static_asset("native_control_widget.bundle.js")
-    _css = static_asset("native_control_widget.css")
+    _esm = static_asset("spectrum/native_control_widget.bundle.js")
+    _css = static_asset("spectrum/native_control_widget.css")
 
     control_family = t.Unicode("native").tag(sync=True)
     control_kind = t.Unicode("date").tag(sync=True)

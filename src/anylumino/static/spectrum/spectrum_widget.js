@@ -27,7 +27,7 @@ import {
   cssSize,
   removeModelListener,
   renderWidgetRef,
-} from "./composition.js";
+} from "../layout/composition.js";
 
 function setBoolAttribute(element, name, value) {
   if (Boolean(value)) {

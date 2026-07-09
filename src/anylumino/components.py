@@ -7,12 +7,12 @@ from typing import Any
 import anywidget
 import traitlets as t
 
-from ._layout import ChildInput
-from ._layout import TitleInput
-from ._layout import _normalize_children
-from ._layout import _size_to_css
-from ._layout import _widget_list_from_json
-from ._layout import _widget_list_to_json
+from .layout import ChildInput
+from .layout import TitleInput
+from .layout import _normalize_children
+from .layout import _size_to_css
+from .layout import _widget_list_from_json
+from .layout import _widget_list_to_json
 
 
 class ComponentWidget(anywidget.AnyWidget):

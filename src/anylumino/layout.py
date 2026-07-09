@@ -6,7 +6,7 @@ from typing import Any, Iterable
 import anywidget
 import traitlets as t
 
-from ._common import static_asset
+from .common import static_asset
 
 
 TAB_PLACEMENTS = ("top", "bottom", "left", "right")
@@ -365,8 +365,8 @@ class TabPanel(LayoutWidget):
         Whether the panel receives a notebook-friendly resize handle.
     """
 
-    _esm = static_asset("tab_panel.bundle.js")
-    _css = static_asset("tab_panel.css")
+    _esm = static_asset("layout/tab_panel.bundle.js")
+    _css = static_asset("layout/tab_panel.css")
     _title_prefix = "Tab"
 
     selected_index = t.Int(0).tag(sync=True)
@@ -452,8 +452,8 @@ class BoxPanel(LayoutWidget):
         Minimum child sizes used when scrolling is enabled.
     """
 
-    _esm = static_asset("layout_panel.bundle.js")
-    _css = static_asset("layout_panel.css")
+    _esm = static_asset("layout/layout_panel.bundle.js")
+    _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("box").tag(sync=True)
     direction = t.Enum(BOX_DIRECTIONS, default_value="left-to-right").tag(sync=True)
@@ -727,8 +727,8 @@ class SplitPanel(LayoutWidget):
         dividers remain draggable independently.
     """
 
-    _esm = static_asset("layout_panel.bundle.js")
-    _css = static_asset("layout_panel.css")
+    _esm = static_asset("layout/layout_panel.bundle.js")
+    _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("split").tag(sync=True)
     orientation = t.Enum(ORIENTATIONS, default_value="horizontal").tag(sync=True)
@@ -785,8 +785,8 @@ class DockPanel(LayoutWidget):
         Whether the dock panel gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout_panel.bundle.js")
-    _css = static_asset("layout_panel.css")
+    _esm = static_asset("layout/layout_panel.bundle.js")
+    _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("dock").tag(sync=True)
     mode = t.Enum(DOCK_MODES, default_value="split-right").tag(sync=True)
@@ -826,8 +826,8 @@ class AccordionPanel(LayoutWidget):
         Whether the accordion gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout_panel.bundle.js")
-    _css = static_asset("layout_panel.css")
+    _esm = static_asset("layout/layout_panel.bundle.js")
+    _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("accordion").tag(sync=True)
 
@@ -866,8 +866,8 @@ class StackedPanel(LayoutWidget):
         Whether the panel gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout_panel.bundle.js")
-    _css = static_asset("layout_panel.css")
+    _esm = static_asset("layout/layout_panel.bundle.js")
+    _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("stacked").tag(sync=True)
     selected_index = t.Int(0).tag(sync=True)
@@ -928,8 +928,8 @@ class GridPanel(LayoutWidget):
         Whether the grid gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout_panel.bundle.js")
-    _css = static_asset("layout_panel.css")
+    _esm = static_asset("layout/layout_panel.bundle.js")
+    _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("grid").tag(sync=True)
     columns = t.Unicode("1fr 1fr").tag(sync=True)
@@ -994,8 +994,8 @@ class ResponsivePanel(LayoutWidget):
         Whether the panel gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout_panel.bundle.js")
-    _css = static_asset("layout_panel.css")
+    _esm = static_asset("layout/layout_panel.bundle.js")
+    _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("responsive").tag(sync=True)
     breakpoint = t.Int(760).tag(sync=True)
@@ -1034,8 +1034,8 @@ class ResponsivePanel(LayoutWidget):
 
 
 class _ActionWidget(anywidget.AnyWidget):
-    _esm = static_asset("action_panel.bundle.js")
-    _css = static_asset("action_panel.css")
+    _esm = static_asset("layout/action_panel.bundle.js")
+    _css = static_asset("layout/action_panel.css")
 
     action_kind = t.Enum(ACTION_KINDS).tag(sync=True)
     actions = t.List(t.Dict(), default_value=[]).tag(sync=True)
@@ -1177,8 +1177,8 @@ class TextWidget(anywidget.AnyWidget):
         Initial value displayed by the widget.
     """
 
-    _esm = static_asset("text_widget.js")
-    _css = static_asset("text_widget.css")
+    _esm = static_asset("layout/text_widget.js")
+    _css = static_asset("layout/text_widget.css")
 
     value = t.Unicode("").tag(sync=True)
 

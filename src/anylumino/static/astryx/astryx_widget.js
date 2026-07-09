@@ -6,35 +6,50 @@ import "@astryxdesign/core/astryx.css";
 import "@astryxdesign/theme-neutral/theme.css";
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Avatar } from "@astryxdesign/core/Avatar";
+import { AvatarGroup, AvatarGroupOverflow } from "@astryxdesign/core/AvatarGroup";
 import { Badge } from "@astryxdesign/core/Badge";
 import { Banner } from "@astryxdesign/core/Banner";
 import { Blockquote } from "@astryxdesign/core/Blockquote";
 import { Breadcrumbs, BreadcrumbItem } from "@astryxdesign/core/Breadcrumbs";
 import { Button } from "@astryxdesign/core/Button";
 import { ButtonGroup } from "@astryxdesign/core/ButtonGroup";
+import { Calendar } from "@astryxdesign/core/Calendar";
 import { Card } from "@astryxdesign/core/Card";
 import { Center } from "@astryxdesign/core/Center";
 import { CheckboxInput } from "@astryxdesign/core/CheckboxInput";
 import { CheckboxList, CheckboxListItem } from "@astryxdesign/core/CheckboxList";
 import { ClickableCard } from "@astryxdesign/core/ClickableCard";
+import { Citation } from "@astryxdesign/core/Citation";
+import { Code } from "@astryxdesign/core/Code";
 import { CodeBlock } from "@astryxdesign/core/CodeBlock";
+import { Collapsible } from "@astryxdesign/core/Collapsible";
 import { DateInput } from "@astryxdesign/core/DateInput";
 import { DateRangeInput } from "@astryxdesign/core/DateRangeInput";
 import { DateTimeInput } from "@astryxdesign/core/DateTimeInput";
 import { Divider } from "@astryxdesign/core/Divider";
+import { DropdownMenu } from "@astryxdesign/core/DropdownMenu";
 import { EmptyState } from "@astryxdesign/core/EmptyState";
+import { Field } from "@astryxdesign/core/Field";
+import { FieldStatus } from "@astryxdesign/core/FieldStatus";
+import { FileInput } from "@astryxdesign/core/FileInput";
+import { FormLayout } from "@astryxdesign/core/FormLayout";
 import { Grid } from "@astryxdesign/core/Grid";
+import { HoverCard } from "@astryxdesign/core/HoverCard";
 import { Icon } from "@astryxdesign/core/Icon";
 import { IconButton } from "@astryxdesign/core/IconButton";
+import { InputGroup, InputGroupText } from "@astryxdesign/core/InputGroup";
 import { Item } from "@astryxdesign/core/Item";
 import { Kbd } from "@astryxdesign/core/Kbd";
 import { Link } from "@astryxdesign/core/Link";
 import { List, ListItem } from "@astryxdesign/core/List";
 import { Markdown } from "@astryxdesign/core/Markdown";
 import { MetadataList, MetadataListItem } from "@astryxdesign/core/MetadataList";
+import { MoreMenu } from "@astryxdesign/core/MoreMenu";
 import { MultiSelector } from "@astryxdesign/core/MultiSelector";
 import { NumberInput } from "@astryxdesign/core/NumberInput";
+import { Outline } from "@astryxdesign/core/Outline";
 import { Pagination } from "@astryxdesign/core/Pagination";
+import { Popover } from "@astryxdesign/core/Popover";
 import { ProgressBar } from "@astryxdesign/core/ProgressBar";
 import { RadioList, RadioListItem } from "@astryxdesign/core/RadioList";
 import { Section } from "@astryxdesign/core/Section";
@@ -63,6 +78,9 @@ import { TimeInput } from "@astryxdesign/core/TimeInput";
 import { Timestamp } from "@astryxdesign/core/Timestamp";
 import { ToggleButton } from "@astryxdesign/core/ToggleButton";
 import { Token } from "@astryxdesign/core/Token";
+import { Toolbar } from "@astryxdesign/core/Toolbar";
+import { Tooltip } from "@astryxdesign/core/Tooltip";
+import { TreeList } from "@astryxdesign/core/TreeList";
 import { Theme } from "@astryxdesign/core/theme";
 import { neutralTheme } from "@astryxdesign/theme-neutral/built";
 import {
@@ -70,42 +88,57 @@ import {
   cssSize,
   removeModelListener,
   renderWidgetRef,
-} from "./composition.js";
+} from "../layout/composition.js";
 import "./astryx_widget.css";
 
 const COMPONENTS = {
   AspectRatio,
   Avatar,
+  AvatarGroup,
   Badge,
   Banner,
   Blockquote,
   Breadcrumbs,
   Button,
   ButtonGroup,
+  Calendar,
   Card,
   Center,
   CheckboxInput,
   CheckboxList,
+  Citation,
   ClickableCard,
+  Code,
   CodeBlock,
+  Collapsible,
   DateInput,
   DateRangeInput,
   DateTimeInput,
   Divider,
+  DropdownMenu,
   EmptyState,
+  Field,
+  FieldStatus,
+  FileInput,
+  FormLayout,
   Grid,
+  HoverCard,
   Heading,
   Icon,
   IconButton,
+  InputGroup,
   Item,
   Kbd,
   Link,
   List,
   Markdown,
   MetadataList,
+  MoreMenu,
   MultiSelector,
   NumberInput,
+  Outline,
   Pagination,
+  Popover,
   ProgressBar,
   RadioList,
   Section,
@@ -128,24 +161,34 @@ const COMPONENTS = {
   Timestamp,
   ToggleButton,
   Token,
+  Toolbar,
+  Tooltip,
+  TreeList,
 };
 
 const PROP_DRIVEN_COMPONENTS = new Set([
   "Avatar",
   "Badge",
   "Button",
+  "Calendar",
   "CheckboxInput",
+  "Citation",
   "CodeBlock",
   "DateInput",
   "DateRangeInput",
   "DateTimeInput",
   "Divider",
+  "DropdownMenu",
   "EmptyState",
+  "FieldStatus",
+  "FileInput",
   "Icon",
   "IconButton",
   "Kbd",
   "MultiSelector",
+  "MoreMenu",
   "NumberInput",
+  "Outline",
   "Pagination",
   "ProgressBar",
   "SelectableCard",
@@ -163,10 +206,12 @@ const PROP_DRIVEN_COMPONENTS = new Set([
   "Timestamp",
   "ToggleButton",
   "Token",
+  "TreeList",
 ]);
 
 const GENERATED_CHILD_COMPONENTS = new Set([
   "Breadcrumbs",
+  "AvatarGroup",
   "ButtonGroup",
   "CheckboxList",
   "List",
@@ -217,6 +262,20 @@ function setNumberValue(model, value) {
 
 function setArrayValue(model, value) {
   setModelValue(model, Array.isArray(value) ? value : []);
+}
+
+function fileInputValue(files, isMultiple) {
+  if (!files) {
+    return isMultiple ? [] : null;
+  }
+  const fileList = Array.isArray(files) ? files : [files];
+  const records = fileList.map((file) => ({
+    name: file.name,
+    size: file.size,
+    type: file.type,
+    lastModified: file.lastModified,
+  }));
+  return isMultiple ? records : (records[0] ?? null);
 }
 
 function asArray(value) {
@@ -352,6 +411,34 @@ function slotChildren(model) {
       key: `${keys[index] ?? "widget"}-${index}`,
     }),
   );
+}
+
+function slotChild(model, key, index) {
+  return React.createElement("div", {
+    className: "anylumino-AstryxChild",
+    "data-anylumino-key": key ?? "",
+    "data-anylumino-index": String(index),
+    key: `${key ?? "widget"}-${index}`,
+  });
+}
+
+function keyedSlotChildren(model) {
+  const refs = model.get("widgets") ?? [];
+  if (refs.length === 0) {
+    return [];
+  }
+  const keys = model.get("child_keys") ?? [];
+  return refs.map((_ref, index) => slotChild(model, keys[index] ?? "", index));
+}
+
+function slotByKey(model, key) {
+  const refs = model.get("widgets") ?? [];
+  const keys = model.get("child_keys") ?? [];
+  const index = keys.indexOf(key);
+  if (index < 0 || index >= refs.length) {
+    return undefined;
+  }
+  return slotChild(model, key, index);
 }
 
 function componentProps(model) {
@@ -494,6 +581,14 @@ function componentProps(model) {
     };
   }
 
+  if (name === "Calendar") {
+    return {
+      ...props,
+      value: value == null || value === "" ? undefined : value,
+      onChange: (nextValue) => setModelValue(model, nextValue),
+    };
+  }
+
   if (name === "Timestamp") {
     return {
       ...props,
@@ -528,6 +623,18 @@ function componentProps(model) {
       value: asArray(value),
       isDisabled: disabled,
       onChange: (nextValue) => setArrayValue(model, nextValue),
+    };
+  }
+
+  if (name === "FileInput") {
+    const isMultiple = Boolean(props.isMultiple || props.multiple);
+    return {
+      ...props,
+      label: label || props.label || "File",
+      value: null,
+      isDisabled: disabled,
+      isMultiple,
+      onChange: (files) => setModelValue(model, fileInputValue(files, isMultiple)),
     };
   }
 
@@ -616,6 +723,128 @@ function componentProps(model) {
     };
   }
 
+  if (name === "Citation") {
+    return {
+      ...props,
+      source: props.source ?? { title: label || textFor(model) },
+      number: Number(value ?? props.number ?? 1),
+      variant: variant || props.variant || "number",
+    };
+  }
+
+  if (name === "Field") {
+    return {
+      ...props,
+      label: label || props.label || "Field",
+      inputID: props.inputID || props.inputId || `anylumino-field-${model.model_id}`,
+      isDisabled: disabled || props.isDisabled,
+    };
+  }
+
+  if (name === "FieldStatus") {
+    return {
+      ...props,
+      type: variant || props.type || "success",
+      message: label || props.message || textFor(model),
+    };
+  }
+
+  if (name === "FormLayout") {
+    return {
+      direction: "vertical",
+      ...props,
+    };
+  }
+
+  if (name === "InputGroup") {
+    return {
+      ...props,
+      label: label || props.label || "Input group",
+      isDisabled: disabled || props.isDisabled,
+    };
+  }
+
+  if (name === "Collapsible") {
+    return {
+      ...props,
+      trigger: props.trigger || label || textFor(model) || "Details",
+    };
+  }
+
+  if (name === "Toolbar") {
+    return {
+      ...props,
+      label: label || props.label || "Toolbar",
+      startContent: props.startContent ?? slotByKey(model, "start"),
+      centerContent: props.centerContent ?? slotByKey(model, "center"),
+      endContent: props.endContent ?? slotByKey(model, "end"),
+    };
+  }
+
+  if (name === "Tooltip") {
+    return {
+      ...props,
+      content: props.content ?? slotByKey(model, "content") ?? label ?? textFor(model),
+    };
+  }
+
+  if (name === "HoverCard") {
+    return {
+      ...props,
+      content: props.content ?? slotByKey(model, "content") ?? label ?? textFor(model),
+    };
+  }
+
+  if (name === "Popover") {
+    return {
+      ...props,
+      label: label || props.label || "Popover",
+      content: props.content ?? slotByKey(model, "content") ?? label ?? textFor(model),
+    };
+  }
+
+  if (name === "DropdownMenu") {
+    return {
+      ...props,
+      items: menuItems(model, rawProps(model).items),
+      button: {
+        label: label || props.button?.label || "Menu",
+        variant: variant || props.button?.variant || "secondary",
+        isDisabled: disabled,
+        ...(props.button ?? {}),
+      },
+      onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
+    };
+  }
+
+  if (name === "MoreMenu") {
+    return {
+      ...props,
+      label: label || props.label || "More options",
+      isDisabled: disabled,
+      items: menuItems(model, rawProps(model).items),
+      onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
+    };
+  }
+
+  if (name === "Outline") {
+    const originalProps = rawProps(model);
+    return {
+      ...props,
+      items: asArray(originalProps.items),
+      activeId: value || props.activeId,
+      onActiveIdChange: (nextValue) => setStringValue(model, nextValue),
+    };
+  }
+
+  if (name === "TreeList") {
+    const originalProps = rawProps(model);
+    return {
+      ...props,
+      items: asArray(originalProps.items),
+    };
+  }
+
   if (name === "Table") {
     const originalProps = rawProps(model);
     return {
@@ -670,6 +899,27 @@ function itemValue(item, fallback) {
   return String(item ?? fallback);
 }
 
+function menuItems(model, items) {
+  return asArray(items).map((item, index) => {
+    if (item?.type === "divider") {
+      return { type: "divider" };
+    }
+    if (item?.type === "section") {
+      return {
+        ...item,
+        items: menuItems(model, item.items),
+      };
+    }
+    const value = itemValue(item, index);
+    return {
+      ...item,
+      label: itemLabel(item, `Action ${index + 1}`),
+      isDisabled: Boolean(item?.disabled ?? item?.isDisabled),
+      onClick: () => model.send({ type: "click", value }),
+    };
+  });
+}
+
 function generatedChildren(model, name) {
   const props = rawProps(model);
   if (!GENERATED_CHILD_COMPONENTS.has(name)) {
@@ -686,6 +936,24 @@ function generatedChildren(model, name) {
         isDisabled: Boolean(item?.disabled),
       }),
     );
+  }
+
+  if (name === "AvatarGroup") {
+    const items = asArray(props.items);
+    const overflowCount = Number(props.overflowCount ?? props.overflow_count ?? 0);
+    const children = items.map((item, index) =>
+      React.createElement(Avatar, {
+        key: itemValue(item, index),
+        name: itemLabel(item, `User ${index + 1}`),
+        src: item?.src,
+        alt: item?.alt,
+        status: item?.status,
+      }),
+    );
+    if (overflowCount > 0) {
+      children.push(React.createElement(AvatarGroupOverflow, { key: "__overflow", count: overflowCount }));
+    }
+    return children;
   }
 
   if (name === "MetadataList") {
@@ -779,6 +1047,22 @@ function generatedChildren(model, name) {
 function componentChildren(model) {
   const name = String(model.get("component_name") || model.get("component_kind") || "Stack");
   const slots = slotChildren(model);
+  if (["Tooltip", "HoverCard", "Popover"].includes(name)) {
+    return (slotByKey(model, "trigger") ?? slots ?? textFor(model)) || undefined;
+  }
+  if (name === "InputGroup") {
+    const props = rawProps(model);
+    const keyedSlots = keyedSlotChildren(model);
+    const children = [
+      props.prefix == null ? null : React.createElement(InputGroupText, { key: "__prefix" }, String(props.prefix)),
+      ...keyedSlots,
+      props.suffix == null ? null : React.createElement(InputGroupText, { key: "__suffix" }, String(props.suffix)),
+    ].filter(Boolean);
+    return children.length ? children : undefined;
+  }
+  if (name === "Toolbar") {
+    return undefined;
+  }
   if (slots) {
     return slots;
   }

@@ -138,6 +138,25 @@ controls = al.AstryxGrid(
     width="100%",
 )
 
+wrapped_symbol = al.AstryxField(
+    al.AstryxTextInput(value="NVDA", label="Symbol", isLabelHidden=True, width="180px"),
+    label="Wrapped symbol",
+    description="Field wrapper around a custom input",
+    width="220px",
+)
+grouped_qty = al.AstryxInputGroup(
+    al.AstryxNumberInput(value=100, label="Quantity", isLabelHidden=True),
+    label="Quantity",
+    suffix="sh",
+    width="220px",
+)
+calendar = al.AstryxCalendar("2026-07-09", hasWeekNumbers=True)
+file_input = al.AstryxFileInput(label="Upload CSV", accept=".csv", mode="input", width="240px")
+form_layout = al.AstryxFormLayout(
+    {"field": wrapped_symbol, "quantity": grouped_qty, "file": file_input},
+    direction="vertical",
+)
+
 
 rows = [
     {"id": "AAPL", "symbol": "AAPL", "side": "BUY", "status": "Live"},
@@ -185,6 +204,15 @@ button_group = al.AstryxButtonGroup(
 )
 apply_button = al.AstryxButton("Apply", variant="primary", callbacks=[record_click])
 more_button = al.AstryxIconButton("More actions", icon="moreHorizontal", variant="ghost", callbacks=[record_click])
+dropdown = al.AstryxDropdownMenu(
+    [
+        {"label": "Refresh", "value": "refresh"},
+        {"label": "Export", "value": "export"},
+    ],
+    label="Actions",
+    callbacks=[record_click],
+)
+more_menu = al.AstryxMoreMenu(["Edit", "Duplicate", "Archive"], callbacks=[record_click])
 
 
 data_section = al.AstryxGrid(
@@ -196,7 +224,7 @@ data_section = al.AstryxGrid(
             {
                 "tabs": tabs,
                 "actions": al.AstryxStack(
-                    {"group": button_group, "apply": apply_button, "more": more_button},
+                    {"group": button_group, "apply": apply_button, "menu": dropdown, "more_menu": more_menu, "more": more_button},
                     direction="horizontal",
                     gap=2,
                     align="center",
@@ -213,6 +241,7 @@ data_section = al.AstryxGrid(
 
 
 avatar = al.AstryxAvatar("Ada Lovelace", size="medium")
+avatar_group = al.AstryxAvatarGroup(["Ada Lovelace", "Grace Hopper", "Katherine Johnson"], overflow_count=2, size="small")
 icon = al.AstryxIcon("check", size="md", color="success")
 token = al.AstryxToken("sim", color="blue")
 kbd = al.AstryxKbd("mod+enter")
@@ -220,10 +249,40 @@ skeleton = al.AstryxSkeleton(width=160, height=16)
 spinner = al.AstryxSpinner(size="sm", label="Loading")
 empty = al.AstryxEmptyState("No rejected orders", description="Rejected order events will appear here.", isCompact=True)
 code = al.AstryxCodeBlock("order = {'symbol': 'AAPL', 'side': 'BUY'}", language="python", hasLineNumbers=False)
+inline_code = al.AstryxCode("order_id")
 markdown = al.AstryxMarkdown("**Markdown** with `inline code` and a compact list:\n\n- quotes\n- trades", density="compact")
 quote = al.AstryxBlockquote("Design system widgets can compose cleanly inside Jupyter outputs.")
 timestamp = al.AstryxTimestamp("2026-07-09T14:30:00Z", format="system_date_time", isTimezoneShown=True)
 thumbnail = al.AstryxThumbnail(label="preview.png", isLoading=True)
+citation = al.AstryxCitation({"title": "Run report", "url": "#"}, number=1)
+outline = al.AstryxOutline(
+    [
+        {"id": "summary", "label": "Summary", "level": 1},
+        {"id": "orders", "label": "Orders", "level": 2},
+        {"id": "risk", "label": "Risk", "level": 2},
+    ],
+    active_id="summary",
+)
+tree = al.AstryxTreeList(
+    [
+        {
+            "id": "catalog",
+            "label": "catalog",
+            "description": "Market data",
+            "isExpanded": True,
+            "children": [
+                {"id": "quotes", "label": "quotes.parquet"},
+                {"id": "trades", "label": "trades.parquet"},
+            ],
+        },
+    ],
+    header="Artifacts",
+    density="compact",
+)
+tooltip = al.AstryxTooltip("Runs validation", al.AstryxButton("Validate", variant="secondary"))
+hover = al.AstryxHoverCard(al.AstryxText("Last run: success"), al.AstryxButton("Run state"))
+popover = al.AstryxPopover(al.AstryxText("Compact popover content"), al.AstryxButton("Open"), label="Details")
+details = al.AstryxCollapsible(al.AstryxMarkdown("Verbose diagnostics can live here."), trigger="Diagnostics", default_open=False)
 
 
 visuals = al.AstryxGrid(
@@ -231,7 +290,7 @@ visuals = al.AstryxGrid(
         "identity": al.AstryxCard(
             {
                 "row": al.AstryxStack(
-                    {"avatar": avatar, "icon": icon, "token": token, "kbd": kbd, "time": timestamp},
+                    {"avatar": avatar, "group": avatar_group, "icon": icon, "token": token, "kbd": kbd, "time": timestamp},
                     direction="horizontal",
                     gap=3,
                     align="center",
@@ -251,10 +310,32 @@ visuals = al.AstryxGrid(
         "empty": al.AstryxCard({"empty": empty}, padding=3),
         "content": al.AstryxCard(
             {
+                "inline": al.AstryxStack(
+                    {"code": inline_code, "citation": citation},
+                    direction="horizontal",
+                    gap=2,
+                    align="center",
+                ),
                 "markdown": markdown,
                 "divider": al.AstryxDivider(),
                 "quote": quote,
                 "code": code,
+            },
+            padding=3,
+        ),
+        "structure": al.AstryxCard(
+            {
+                "form": form_layout,
+                "calendar": calendar,
+                "outline": outline,
+                "tree": tree,
+                "overlays": al.AstryxStack(
+                    {"tooltip": tooltip, "hover": hover, "popover": popover},
+                    direction="horizontal",
+                    gap=2,
+                    wrap="wrap",
+                ),
+                "details": details,
             },
             padding=3,
         ),
@@ -308,3 +389,13 @@ assert controls.child_keys == [
 assert orders.component_name == "Table"
 assert tabs.props["items"] == ["Summary", "Orders", "Risk"]
 assert button_group.props["items"][0]["label"] == "Apply"
+assert form_layout.component_name == "FormLayout"
+assert wrapped_symbol.component_name == "Field"
+assert grouped_qty.component_name == "InputGroup"
+assert calendar.component_name == "Calendar"
+assert dropdown.component_name == "DropdownMenu"
+assert more_menu.component_name == "MoreMenu"
+assert outline.component_name == "Outline"
+assert tree.component_name == "TreeList"
+assert tooltip.child_keys == ["trigger"]
+assert popover.child_keys == ["trigger", "content"]

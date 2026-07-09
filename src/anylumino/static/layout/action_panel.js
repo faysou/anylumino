@@ -11,7 +11,7 @@ import "@spectrum-web-components/theme/theme-light.js";
 import "@spectrum-web-components/theme/scale-medium.js";
 import "@spectrum-web-components/action-button/sp-action-button.js";
 import "@spectrum-web-components/icon/sp-icon.js";
-import "./spectrum_icons.js";
+import "../spectrum/spectrum_icons.js";
 
 function cssSize(value, fallback) {
   if (typeof value === "string" && value.trim()) {
