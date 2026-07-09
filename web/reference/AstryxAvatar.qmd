@@ -1,0 +1,14 @@
+# AstryxAvatar { #anylumino.AstryxAvatar }
+
+```python
+AstryxAvatar(name, **props)
+```
+
+Render an Astryx avatar.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type   | Description                                                                                                                                                                                                                               | Default    |
+|---------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| name    | str    | Astryx component option.                                                                                                                                                                                                                  | _required_ |
+| **props | Any    | JSON-safe Avatar props. Useful keys: src, fallbackSrc, alt, size, status, className, and style. The Python name argument provides the accessible fallback name. See Astryx component docs: <https://astryx.atmeta.com/components/Avatar>. | `{}`       |

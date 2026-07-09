@@ -1,0 +1,16 @@
+# AstryxGrid { #anylumino.AstryxGrid }
+
+```python
+AstryxGrid(children=None, *, columns=2, gap=3, **props)
+```
+
+Arrange child widgets in an Astryx grid.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                       | Description                                                                                                                                                                                                                                                                                          | Default   |
+|----------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| children | ChildInput                 | Child widget, sequence of widgets, or mapping of slot names to widgets.                                                                                                                                                                                                                              | `None`    |
+| columns  | int \| Mapping\[str, Any\] | Grid or table column definition.                                                                                                                                                                                                                                                                     | `2`       |
+| gap      | int \| float               | Astryx spacing step between children.                                                                                                                                                                                                                                                                | `3`       |
+| **props  | Any                        | JSON-safe Grid props. Useful keys: minChildWidth, width, height, rowGap, columnGap, align, justify, className, and style. The columns and gap props are set from the Python arguments unless explicitly overridden in props. See Astryx component docs: <https://astryx.atmeta.com/components/Grid>. | `{}`      |

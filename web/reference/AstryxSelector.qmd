@@ -1,0 +1,16 @@
+# AstryxSelector { #anylumino.AstryxSelector }
+
+```python
+AstryxSelector(options, value=None, *, label='', **props)
+```
+
+Render a single-value Astryx selector.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                                   | Description                                                                                                                                                                                                                                                                                                                                           | Default    |
+|---------|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| options | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.                                                                                                                                                                                                                                                                            | _required_ |
+| value   | str \| None                            | Synchronized component value.                                                                                                                                                                                                                                                                                                                         | `None`     |
+| label   | str                                    | Visible or accessible label for the component.                                                                                                                                                                                                                                                                                                        | `''`       |
+| **props | Any                                    | JSON-safe Selector props. Useful keys: hasClear, hasSearch, searchPlaceholder, placeholder, size, isDisabled, isLabelHidden, description, isOptional, isRequired, status, className, and style. anylumino generates options and manages value and change synchronization. See Astryx component docs: <https://astryx.atmeta.com/components/Selector>. | `{}`       |

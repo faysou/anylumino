@@ -1,0 +1,15 @@
+# AstryxEmptyState { #anylumino.AstryxEmptyState }
+
+```python
+AstryxEmptyState(title, *, description='', **props)
+```
+
+Render an Astryx empty-state message.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type   | Description                                                                                                                                                                                                                                                                                                                                 | Default    |
+|-------------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| title       | str    | Dialog or empty-state title.                                                                                                                                                                                                                                                                                                                | _required_ |
+| description | str    | Supporting description text.                                                                                                                                                                                                                                                                                                                | `''`       |
+| **props     | Any    | JSON-safe EmptyState props. Useful keys: headingLevel, isCompact, className, and style. Upstream icon and actions props expect React nodes and are not adapted by the Python bridge. The Python title and description arguments cover the primary text props. See Astryx component docs: <https://astryx.atmeta.com/components/EmptyState>. | `{}`       |

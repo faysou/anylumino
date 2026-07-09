@@ -30,6 +30,7 @@ website:
       contents:
         - guide-overview.qmd
         - guide.qmd
+        - astryx.qmd
         - controls.qmd
         - examples.qmd
 
@@ -69,104 +70,110 @@ quartodoc:
         - StackedPanel
         - GridPanel
         - ResponsivePanel
-        - FieldGroup
-        - Popover
-        - Tray
-        - Overlay
-        - DialogBox
-        - Modal
-    - title: "Action widgets"
-      desc: "Toolbar, menu, and command-palette widgets with Python callbacks."
-      contents:
-        - Toolbar
-        - MenuBar
-        - CommandPalette
-        - ClearButton
-        - CloseButton
-        - InfieldButton
-        - PickerButton
-    - title: "Text input controls"
-      desc: "Text, password, tag, and structured-list controls."
-      contents:
-        - TextInput
-        - Text
-        - TextArea
-        - Textarea
-        - PasswordInput
-        - Password
-        - Combobox
-        - SearchInput
-        - TagsInput
-        - ColorsInput
-        - FloatsInput
-        - IntsInput
-    - title: "Selection controls"
-      desc: "Choice and multi-choice controls."
-      contents:
-        - Dropdown
-        - RadioButtons
-        - ToggleButtons
-        - ListBox
-        - Select
-        - MultiSelect
-        - SelectMultiple
-        - SelectionSlider
-        - SelectionRangeSlider
-    - title: "Boolean and action controls"
-      desc: "Buttons, toggles, checkboxes, and validation indicators."
-      contents:
-        - Button
-        - Checkbox
-        - ToggleButton
-        - Switch
-        - Valid
-        - StatusLight
-        - Tooltip
-    - title: "Numeric controls"
-      desc: "Numeric sliders, range sliders, text inputs, and progress indicators."
-      contents:
-        - IntSlider
-        - IntegerSlider
-        - IntRangeSlider
-        - IntegerRangeSlider
-        - IntText
-        - IntegerInput
-        - BoundedIntText
-        - FloatSlider
-        - FloatRangeSlider
-        - FloatLogSlider
-        - FloatText
-        - BoundedFloatText
-        - IntProgress
-        - FloatProgress
-        - Meter
-        - ProgressCircle
-        - Play
-    - title: "Date, color, file, and media controls"
-      desc: "Specialized input and display widgets."
-      contents:
-        - DatePicker
-        - TimePicker
-        - DatetimePicker
-        - ColorPicker
-        - ColorHandle
-        - ColorLoupe
-        - OpacityCheckerboard
-        - Table
-        - FileUpload
-        - Image
-        - Audio
-        - Video
-        - Output
-        - HTML
-        - HTMLMath
-        - Label
         - TextWidget
-        - Badge
-        - Link
-        - Divider
-        - SpectrumElement
-        - Icon
-        - UIIcon
-        - HelpText
-        - Underlay
+    - title: "Astryx base and theme"
+      desc: "Shared Astryx wrapper primitives and reusable theme identity."
+      contents:
+        - AstryxWidget
+        - AstryxComponent
+        - AstryxBrand
+        - AstryxBuiltTheme
+        - AstryxTheme
+    - title: "Astryx typography and content"
+      desc: "Text, headings, code, markdown, and semantic inline content."
+      contents:
+        - AstryxText
+        - AstryxHeading
+        - AstryxMarkdown
+        - AstryxCode
+        - AstryxCodeBlock
+        - AstryxBlockquote
+        - AstryxKbd
+        - AstryxLink
+        - AstryxCitation
+        - AstryxTimestamp
+        - AstryxThumbnail
+        - AstryxAvatar
+        - AstryxAvatarGroup
+        - AstryxIcon
+    - title: "Astryx layout containers"
+      desc: "Containers for arranging Astryx content inside notebook outputs."
+      contents:
+        - AstryxStack
+        - AstryxGrid
+        - AstryxCenter
+        - AstryxSection
+        - AstryxCard
+        - AstryxClickableCard
+        - AstryxAspectRatio
+        - AstryxDivider
+        - AstryxCollapsible
+    - title: "Astryx forms and inputs"
+      desc: "Form composition and direct value-entry controls."
+      contents:
+        - AstryxFormLayout
+        - AstryxField
+        - AstryxFieldStatus
+        - AstryxInputGroup
+        - AstryxTextInput
+        - AstryxTextArea
+        - AstryxNumberInput
+        - AstryxSlider
+        - AstryxCheckbox
+        - AstryxSwitch
+        - AstryxToggleButton
+        - AstryxDateInput
+        - AstryxDateRangeInput
+        - AstryxDateTimeInput
+        - AstryxTimeInput
+        - AstryxCalendar
+        - AstryxFileInput
+    - title: "Astryx selection and search"
+      desc: "Choice controls, searchable fields, and tokenized filters."
+      contents:
+        - AstryxSelector
+        - AstryxMultiSelector
+        - AstryxSegmentedControl
+        - AstryxRadioList
+        - AstryxCheckboxList
+        - AstryxTypeahead
+        - AstryxTokenizer
+    - title: "Astryx actions and menus"
+      desc: "Buttons, toolbars, menus, and command launchers."
+      contents:
+        - AstryxButton
+        - AstryxIconButton
+        - AstryxButtonGroup
+        - AstryxToolbar
+        - AstryxDropdownMenu
+        - AstryxMoreMenu
+        - AstryxCommandPalette
+    - title: "Astryx feedback and status"
+      desc: "Status indicators, progress, loading states, and empty states."
+      contents:
+        - AstryxBadge
+        - AstryxStatusDot
+        - AstryxProgressBar
+        - AstryxSpinner
+        - AstryxSkeleton
+        - AstryxToken
+        - AstryxBanner
+        - AstryxEmptyState
+    - title: "Astryx overlays and previews"
+      desc: "Notebook-safe tooltip, popover, hover-card, and dialog surfaces."
+      contents:
+        - AstryxTooltip
+        - AstryxHoverCard
+        - AstryxPopover
+        - AstryxDialog
+        - AstryxAlertDialog
+    - title: "Astryx navigation and data"
+      desc: "Tabs, lists, outlines, tree views, metadata, and tables."
+      contents:
+        - AstryxBreadcrumbs
+        - AstryxTabList
+        - AstryxList
+        - AstryxMetadataList
+        - AstryxOutline
+        - AstryxTreeList
+        - AstryxTable

@@ -1,0 +1,14 @@
+# AstryxCode { #anylumino.AstryxCode }
+
+```python
+AstryxCode(code, **props)
+```
+
+Render inline code with Astryx styling.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type   | Description                                                                                                                                                                        | Default    |
+|---------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| code    | str    | Astryx component option.                                                                                                                                                           | _required_ |
+| **props | Any    | JSON-safe Code props. Useful keys: className and style. The code text is passed as component text content. See Astryx component docs: <https://astryx.atmeta.com/components/Code>. | `{}`       |

@@ -4,7 +4,7 @@ import inspect
 import re
 from pathlib import Path
 
-from anylumino import _controls
+from anylumino import controls
 
 
 REFERENCE_DIR = Path("web/reference")
@@ -52,8 +52,8 @@ def main() -> None:
 
 def _control_signatures() -> dict[str, inspect.Signature]:
     signatures = {}
-    for name in _controls.__all__:
-        obj = getattr(_controls, name)
+    for name in controls.__all__:
+        obj = getattr(controls, name)
         signature = getattr(obj, "__signature__", None)
         if signature is not None:
             signatures[name] = signature

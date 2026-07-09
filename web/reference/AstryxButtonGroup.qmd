@@ -1,0 +1,16 @@
+# AstryxButtonGroup { #anylumino.AstryxButtonGroup }
+
+```python
+AstryxButtonGroup(items, *, label, callbacks=None, **props)
+```
+
+Render an Astryx button group from item records.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                      | Description                                                                                                                                                                                                                                                    | Default    |
+|-----------|-----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| items     | Iterable\[Any\]                                           | Item records used by generated child components or static search sources.                                                                                                                                                                                      | _required_ |
+| label     | str                                                       | Visible or accessible label for the component.                                                                                                                                                                                                                 | _required_ |
+| callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                                                                                                                                                                                             | `None`     |
+| **props   | Any                                                       | JSON-safe ButtonGroup props. Useful keys: orientation, size, isDisabled, data-testid, className, and style. anylumino generates child buttons from items and handles callbacks. See Astryx component docs: <https://astryx.atmeta.com/components/ButtonGroup>. | `{}`       |

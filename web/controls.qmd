@@ -1,220 +1,160 @@
 ---
-title: "Input controls"
+title: "Astryx controls"
 ---
 
-`anylumino` provides portable anywidget input controls. Most controls are
-Spectrum-backed anywidgets; date and time controls use browser-native inputs.
-All of them can be nested inside any Lumino layout widget.
+Astryx controls are the interactive building blocks for notebook forms,
+filters, command panels, and data views. They synchronize Python state through
+normal traitlets and can be composed inside Lumino layouts or other Astryx
+containers.
 
-## Common controls
+## Form controls
 
 ```python
-from anylumino import (
-    Button,
-    Checkbox,
-    Dropdown,
-    IntSlider,
-    ListBox,
-    MultiSelect,
-    ScrollBox,
-    TextInput,
-)
+import anylumino as al
 
-controls = ScrollBox(
+order_form = al.AstryxFormLayout(
     {
-        "dataset": TextInput(value="Greenhouse A", description="Dataset"),
-        "samples": IntSlider(value=120, min=25, max=250, description="Samples"),
-        "metric": Dropdown(options=["Temperature", "Humidity", "CO2"], value="Temperature"),
-        "enabled": Checkbox(value=True, description="Enabled"),
-        "actions": Button(description="Apply"),
-    },
-    height=320,
+        "symbol": al.AstryxTextInput(value="AAPL", label="Symbol"),
+        "quantity": al.AstryxNumberInput(value=100, label="Quantity", min=1),
+        "side": al.AstryxSegmentedControl(
+            ["Buy", "Sell"],
+            value="Buy",
+            label="Side",
+        ),
+        "routing": al.AstryxSelector(
+            ["Smart", "Primary", "Dark"],
+            value="Smart",
+            label="Routing",
+        ),
+        "urgent": al.AstryxCheckbox(value=False, label="Urgent"),
+    }
 )
 ```
 
-## Control families
-
-These controls are anylumino anywidgets and can be composed inside anylumino
-layouts:
-
-| Family | Controls |
-|---|---|
-| Text input | `TextInput`, `Text`, `TextArea`, `Textarea`, `PasswordInput`, `Password`, `Combobox`, `SearchInput` |
-| Structured input | `TagsInput`, `ColorsInput`, `FloatsInput`, `IntsInput` |
-| Selection | `Dropdown`, `RadioButtons`, `ToggleButtons`, `ListBox`, `Select`, `MultiSelect`, `SelectMultiple`, `SelectionSlider`, `SelectionRangeSlider` |
-| Boolean and actions | `Button`, `Checkbox`, `ToggleButton`, `Switch`, `Valid`, `StatusLight`, `ClearButton`, `CloseButton`, `InfieldButton`, `PickerButton` |
-| Integers | `IntSlider`, `IntegerSlider`, `IntRangeSlider`, `IntegerRangeSlider`, `IntText`, `IntegerInput`, `BoundedIntText`, `IntProgress` |
-| Floats and progress | `FloatSlider`, `FloatRangeSlider`, `FloatLogSlider`, `FloatText`, `BoundedFloatText`, `FloatProgress`, `Meter`, `ProgressCircle` |
-| Native date and time | `DatePicker`, `TimePicker`, `DatetimePicker` |
-| Color | `ColorPicker`, `ColorHandle`, `ColorLoupe`, `OpacityCheckerboard` |
-| File and media | `FileUpload`, `Image`, `Audio`, `Video` |
-| Display and output | `Output`, `HTML`, `HTMLMath`, `Label`, `TextWidget`, `Badge`, `Link`, `Divider`, `Icon`, `UIIcon`, `HelpText`, `Tooltip`, `Underlay`, `SpectrumElement` |
-| Layout surfaces | `FieldGroup`, `Popover`, `Tray`, `Overlay`, `DialogBox`, `Modal` |
-| Playback | `Play` |
-
-The generated [API reference](reference/index.qmd) includes one page per
-control, with constructor signatures and argument details from anylumino's
-control classes.
-
-## Common arguments
-
-Most controls accept a small application-oriented set of keyword arguments.
-These are the ones used most often in anylumino layouts:
-
-| Argument | Applies to | Purpose |
-|---|---|---|
-| `value` | Most controls | Initial value and synced Python value. |
-| `description` | Most form controls | Label shown above the control. |
-| `disabled` | Most interactive controls | Prevent user edits while keeping the widget visible. |
-| `continuous_update` | Text inputs and sliders | Whether Python receives updates while the user is typing or dragging. |
-| `placeholder` | `TextInput`, `TextArea`, `PasswordInput`, `Combobox` | Empty-state text inside the input. |
-| `options` | Selection controls | Choices for dropdowns, list boxes, radio buttons, and selection sliders. |
-| `index`, `label` | Selection controls | Alternative ways to select or inspect the current option. |
-| `min`, `max`, `step` | Numeric controls | Numeric bounds and increment size. |
-| `readout`, `readout_format` | Sliders | Whether and how to show the current numeric value. |
-| `orientation` | Sliders, progress bars, selection sliders | Horizontal or vertical display. |
-| `rows` | `TextArea`, `ListBox`, `MultiSelect` | Visible row count. |
-| `variant`, `quiet`, `icon`, `icon_src`, `icon_size`, `tooltip` | Buttons and toggle buttons | Spectrum appearance, Spectrum workflow icon metadata, custom icon source, and hover text. |
-| `accept`, `multiple` | `FileUpload` | Accepted file types and whether multiple files are allowed. |
-
-Icons on anylumino controls render through Spectrum workflow icons. Use
-Spectrum names such as `CheckmarkCircle`, `AddContent`, `RotateRight`,
-`Upload`, `InfoCircle`, or `HelpCircle`. Pass `icon_src` to render a custom
-SVG/image through `sp-icon`, and `icon_size` for Spectrum icon sizing.
-Anylumino action widgets accept the same icon fields, so toolbar examples can
-share icon declarations with `Button` and `ToggleButton`.
-
-The Spectrum components and bundled workflow icons are packaged with
-anylumino's generated frontend bundles. Runtime notebooks do not need CDN
-access. Use `icon_src` for custom local icon files or data URI icons.
-
-## Design-system customization
-
-Spectrum-backed controls are wrapped in `sp-theme` using
-`spectrum_color="light"` and `spectrum_scale="medium"` by default. Pass
-`spectrum_size` on individual controls where Spectrum supports component sizes.
-Use `variant` for semantic or button variants and `quiet=True` for Spectrum's
-quiet treatment.
-
-For application-wide styling, define CSS custom properties on a notebook page,
-JupyterLab theme, or parent widget. Spectrum components consume Spectrum CSS
-tokens such as color, spacing, and typography variables, while anylumino adds a
-small set of wrapper variables such as `--anylumino-control-gap`.
-
-## Surfaces and display helpers
-
-Input controls are not the only widgets you can compose. Anylumino also exposes
-concrete surfaces and display helpers such as `DialogBox`, `Popover`,
-`Tooltip`, `FieldGroup`, `HelpText`, `ProgressCircle`, `Icon`, and `UIIcon`.
-Child-capable surfaces accept keyed child anywidgets and overlay-style widgets
-provide `show()`, `hide()`, and `toggle()` methods.
-
-Examples:
+Use `.value` to read synchronized state:
 
 ```python
-from anylumino import Button, DialogBox, FieldGroup, TextInput, VBox
+order_form["symbol"].value
+order_form["quantity"].value
+```
 
-dialog = DialogBox(
+Use `observe(..., names="value")` when another widget should react to edits:
+
+```python
+status = al.TextWidget("Ready")
+symbol = al.AstryxTextInput(value="AAPL", label="Symbol")
+
+def on_symbol_change(change):
+    status.value = f"Symbol: {change['new']}"
+
+symbol.observe(on_symbol_change, names="value")
+```
+
+## Selection controls
+
+Astryx selection widgets cover small option sets, searchable option sets, and
+multi-value tokenized filters.
+
+```python
+filters = al.AstryxStack(
     {
-        "body": VBox(
-            {
-                "name": TextInput(value="Notebook", description="Name"),
-                "close": Button(description="Close"),
-            }
-        )
+        "symbol": al.AstryxTypeahead(
+            ["AAPL", "MSFT", "NVDA"],
+            value="AAPL",
+            label="Symbol",
+        ),
+        "fields": al.AstryxTokenizer(
+            ["Bid", "Ask", "Last", "Size"],
+            value=["Bid", "Ask"],
+            label="Fields",
+        ),
+        "density": al.AstryxSegmentedControl(
+            ["Compact", "Standard", "Expanded"],
+            value="Standard",
+            label="Density",
+        ),
+        "metric": al.AstryxSelector(
+            ["Latency", "Volume", "Fills"],
+            value="Latency",
+            label="Metric",
+        ),
     },
-    title="Settings",
+    gap=3,
+)
+```
+
+`AstryxTypeahead`, `AstryxTokenizer`, and `AstryxCommandPalette` currently use
+static search sources. Query text and open-state changes are sent as widget
+messages; selected item ids are synchronized through `.value`.
+
+## Buttons and actions
+
+Button-like widgets use callbacks because a click is an event, not a persistent
+value.
+
+```python
+status = al.TextWidget("Ready")
+
+submit = al.AstryxButton(
+    "Submit",
+    variant="primary",
+    callbacks=[lambda _button: setattr(status, "value", "Submitted")],
 )
 
-Button(description="Open", callbacks=[lambda _button: dialog.show()])
+actions = al.AstryxCommandPalette(
+    [
+        {"id": "refresh", "label": "Refresh", "auxiliaryData": {"group": "Data"}},
+        {"id": "export", "label": "Export CSV", "auxiliaryData": {"group": "Files"}},
+    ],
+    value="refresh",
+    width=420,
+)
 ```
 
-Use `SpectrumElement(tag, children=..., attributes=...)` for a Spectrum element
-that is not covered by a concrete Python class yet.
+## Tables
 
-## Date and time controls
-
-`DatePicker`, `TimePicker`, and `DatetimePicker` are browser-native controls in
-the non-Spectrum control module. They accept Python date/time objects as well as
-compatible strings. Python values are serialized with `isoformat()` before they
-are synced to the browser.
-
-`TimePicker` renders a compact time input plus an anylumino popup with separate
-hour and minute columns. The minute column contains all 60 minute values, so it
-is suitable for notebook workflows that need exact time selection.
-
-`DatetimePicker` renders a date input followed by the same time picker used by
-`TimePicker`, keeping date and time edits visible in one control.
-
-Examples:
+`AstryxTable` is the data-grid control for notebook data views:
 
 ```python
-TextInput(value="Greenhouse A", description="Dataset", placeholder="Name")
-IntSlider(value=120, min=25, max=250, step=5, description="Samples")
-Dropdown(options=["Temperature", "Humidity", "CO2"], value="Temperature")
-Button(description="Apply", icon="CheckmarkCircle", variant="accent")
-TimePicker(value=time(9, 37), description="Start time")
-DatetimePicker(value=datetime(2026, 5, 31, 9, 37), description="Scheduled")
+orders = al.AstryxTable(
+    rows=[
+        {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
+        {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
+    ],
+    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+    row_key="order_id",
+    selects="multiple",
+    sortable=True,
+)
 ```
 
-## Aliases
-
-These aliases are provided for application-style naming:
-
-| anylumino alias | Canonical class |
-|---|---|
-| `TextInput` | `Text` |
-| `TextArea` | `Textarea` |
-| `PasswordInput` | `Password` |
-| `ListBox` | `Select` |
-| `MultiSelect` | `SelectMultiple` |
-| `IntegerInput` | `IntText` |
-| `IntegerSlider` | `IntSlider` |
-| `IntegerRangeSlider` | `IntRangeSlider` |
-
-## Full control smoke test
-
-Open `notebooks/input_controls_hbox.py` in JupyterLab. Despite the filename, it
-now uses `ScrollBox` to show a vertical list of controls in one scrollable
-Lumino panel.
-
-## Accessing values
-
-Input widgets expose their current Python-side value through the synced
-`.value` trait. Read it directly after the widget has been created, and use
-`observe(..., names="value")` when another widget should react to edits:
+Leave `selects=""` for no checkbox column, use `selects="single"` for one
+selected row, or use `selects="multiple"` for checkbox multi-selection.
 
 ```python
-dataset = TextInput(value="Greenhouse A", description="Dataset")
-samples = IntSlider(value=120, min=25, max=250, description="Samples")
-
-dataset.value
-samples.value
-
-def on_samples_change(change):
-    print("new sample count", change["new"])
-
-samples.observe(on_samples_change, names="value")
+orders.append_row({"order_id": "O-3", "symbol": "NVDA", "qty": 1, "status": "NEW"})
+orders.update_row("O-2", {"qty": 7, "status": "FILLED"})
+orders.remove_row("O-1")
+orders.set_rows(next_order_snapshot)
 ```
 
-Selection widgets also expose `.value`; some additionally expose `.index` for
-the selected option position. Button-like widgets use callbacks because a click
-is an event, not a persistent value.
+## Themed controls
 
-## Callback pattern
-
-Controls are normal anywidget objects with traitlets, so use `observe()` for
-state changes and `on_click()` for button-like activations:
+Wrap related controls in `AstryxTheme` to apply a shared brand identity:
 
 ```python
-status = TextWidget("Ready")
-dataset = TextInput(value="Greenhouse A", description="Dataset")
+brand = al.AstryxBrand(
+    "desk",
+    **{
+        "color-accent": ("#0057b8", "#79b8ff"),
+        "color-background-card": ("#ffffff", "#111827"),
+        "radius-container": "8px",
+    },
+)
 
-def on_dataset_change(change):
-    status.value = f"Dataset: {change['new']}"
-
-dataset.observe(on_dataset_change, names="value")
-
-button = Button(description="Apply", icon="CheckmarkCircle", variant="accent")
-button.on_click(lambda _button: setattr(status, "value", "Applied"))
+panel = al.AstryxTheme(
+    {"filters": filters, "submit": submit, "orders": orders},
+    brand=brand,
+    gap=3,
+)
 ```

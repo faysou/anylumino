@@ -1,0 +1,339 @@
+---
+title: "Astryx widgets"
+---
+
+Astryx widgets are the component family for notebook UIs in `anylumino`. They
+provide JupyterLab-friendly controls, tables, surfaces, and theme support while
+keeping Python state synchronized through anywidget traits.
+
+## Notebook dashboard
+
+```python
+import anylumino as al
+
+brand = al.AstryxBrand(
+    "desk",
+    **{
+        "color-accent": ("#0057b8", "#79b8ff"),
+        "color-background-card": ("#ffffff", "#111827"),
+        "color-text-primary": ("#111827", "#f9fafb"),
+        "radius-container": "8px",
+    },
+)
+
+status = al.TextWidget("Ready")
+
+orders = al.AstryxTable(
+    rows=[
+        {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
+        {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
+    ],
+    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+    row_key="order_id",
+    selects="multiple",
+    sortable=True,
+    width="100%",
+)
+
+workspace = al.AstryxTheme(
+    {
+        "header": al.AstryxStack(
+            {
+                "title": al.AstryxHeading("Orders", level=3),
+                "badge": al.AstryxBadge("Live", variant="success"),
+            },
+            direction="horizontal",
+            align="center",
+            gap=2,
+        ),
+        "symbol": al.AstryxTypeahead(
+            ["AAPL", "MSFT", "NVDA"],
+            value="AAPL",
+            label="Symbol",
+        ),
+        "fields": al.AstryxTokenizer(
+            ["Bid", "Ask", "Last", "Size"],
+            value=["Bid", "Ask"],
+            label="Fields",
+        ),
+        "density": al.AstryxSegmentedControl(
+            ["Compact", "Standard"],
+            value="Standard",
+            label="Density",
+        ),
+        "refresh": al.AstryxButton(
+            "Refresh",
+            variant="primary",
+            callbacks=[lambda _button: setattr(status, "value", "Refreshed")],
+        ),
+        "orders": orders,
+    },
+    brand=brand,
+    gap=3,
+)
+
+al.SplitPanel(
+    {"workspace": workspace, "status": status},
+    orientation="vertical",
+    sizes=[0.85, 0.15],
+    height=560,
+)
+```
+
+## Component groups
+
+### Foundation and theme
+
+Use these when creating reusable wrappers, applying shared styling, or reaching
+for a component that does not yet have a dedicated Python class.
+
+- `AstryxWidget`
+- `AstryxComponent`
+- `AstryxBrand`
+- `AstryxTheme`
+
+### Typography and content
+
+Use these for headings, body copy, rendered Markdown, code, links, avatars, and
+small semantic content.
+
+- `AstryxText`
+- `AstryxHeading`
+- `AstryxMarkdown`
+- `AstryxCode`
+- `AstryxCodeBlock`
+- `AstryxBlockquote`
+- `AstryxKbd`
+- `AstryxLink`
+- `AstryxCitation`
+- `AstryxTimestamp`
+- `AstryxThumbnail`
+- `AstryxAvatar`
+- `AstryxAvatarGroup`
+- `AstryxIcon`
+
+### Layout containers
+
+Use these to arrange Astryx content inside a notebook output before placing the
+result in a Lumino layout.
+
+- `AstryxStack`
+- `AstryxGrid`
+- `AstryxCenter`
+- `AstryxSection`
+- `AstryxCard`
+- `AstryxClickableCard`
+- `AstryxAspectRatio`
+- `AstryxDivider`
+- `AstryxCollapsible`
+
+### Forms and direct inputs
+
+Use these for direct value entry and form composition.
+
+- `AstryxFormLayout`
+- `AstryxField`
+- `AstryxFieldStatus`
+- `AstryxInputGroup`
+- `AstryxTextInput`
+- `AstryxTextArea`
+- `AstryxNumberInput`
+- `AstryxSlider`
+- `AstryxCheckbox`
+- `AstryxSwitch`
+- `AstryxToggleButton`
+- `AstryxDateInput`
+- `AstryxDateRangeInput`
+- `AstryxDateTimeInput`
+- `AstryxTimeInput`
+- `AstryxCalendar`
+- `AstryxFileInput`
+
+### Selection and search
+
+Use these when users choose from predefined options or searchable static
+sources.
+
+- `AstryxSelector`
+- `AstryxMultiSelector`
+- `AstryxSegmentedControl`
+- `AstryxRadioList`
+- `AstryxCheckboxList`
+- `AstryxTypeahead`
+- `AstryxTokenizer`
+
+### Actions and menus
+
+Use these for command surfaces and button-like interactions.
+
+- `AstryxButton`
+- `AstryxIconButton`
+- `AstryxButtonGroup`
+- `AstryxToolbar`
+- `AstryxDropdownMenu`
+- `AstryxMoreMenu`
+- `AstryxCommandPalette`
+
+### Feedback and status
+
+Use these to show state, progress, loading placeholders, or empty results.
+
+- `AstryxBadge`
+- `AstryxStatusDot`
+- `AstryxProgressBar`
+- `AstryxSpinner`
+- `AstryxSkeleton`
+- `AstryxToken`
+- `AstryxBanner`
+- `AstryxEmptyState`
+
+### Overlays and previews
+
+Use these for notebook-safe contextual surfaces. Dialog wrappers default to
+inline rendering so they stay inside the output area.
+
+- `AstryxTooltip`
+- `AstryxHoverCard`
+- `AstryxPopover`
+- `AstryxDialog`
+- `AstryxAlertDialog`
+
+### Navigation and data
+
+Use these for structured navigation and data-heavy notebook views.
+
+- `AstryxBreadcrumbs`
+- `AstryxTabList`
+- `AstryxList`
+- `AstryxMetadataList`
+- `AstryxOutline`
+- `AstryxTreeList`
+- `AstryxTable`
+
+## Forms and values
+
+Input widgets expose a synced `.value` trait:
+
+```python
+symbol = al.AstryxTextInput(value="AAPL", label="Symbol")
+quantity = al.AstryxNumberInput(value=100, label="Quantity", min=1)
+side = al.AstryxSegmentedControl(["Buy", "Sell"], value="Buy", label="Side")
+
+symbol.value
+quantity.value
+side.value
+
+symbol.observe(lambda change: print(change["new"]), names="value")
+```
+
+Button-style widgets use callbacks because a click is an event:
+
+```python
+status = al.TextWidget("Ready")
+submit = al.AstryxButton(
+    "Submit",
+    variant="primary",
+    callbacks=[lambda _button: setattr(status, "value", "Submitted")],
+)
+```
+
+## Tables
+
+`AstryxTable` renders structured row data with optional checkbox selection and
+sorting:
+
+```python
+orders = al.AstryxTable(
+    rows=[
+        {"order_id": "O-1", "symbol": "AAPL", "qty": 10},
+        {"order_id": "O-2", "symbol": "MSFT", "qty": 5},
+    ],
+    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty"},
+    row_key="order_id",
+    selects="multiple",
+    sortable=True,
+)
+
+orders.append_row({"order_id": "O-3", "symbol": "NVDA", "qty": 1})
+orders.update_row("O-2", {"qty": 7})
+orders.remove_row("O-1")
+orders.set_rows(next_order_snapshot)
+```
+
+Use `selects=""` for no checkbox column, `selects="single"` for one selected
+row, or `selects="multiple"` for checkbox multi-selection.
+
+## Theme identity
+
+Use `AstryxBrand` and `AstryxTheme` to apply small shared design-token
+overrides:
+
+```python
+brand = al.AstryxBrand(
+    "desk",
+    **{
+        "color-accent": ("#0057b8", "#79b8ff"),
+        "color-background-card": ("#ffffff", "#111827"),
+        "radius-container": "8px",
+    },
+)
+
+panel = al.AstryxTheme(
+    {"button": al.AstryxButton("Run"), "status": al.AstryxBadge("Ready")},
+    brand=brand,
+    mode="system",
+    gap=2,
+)
+```
+
+`AstryxTheme` propagates the brand to nested Astryx children because each
+anywidget child is mounted in its own frontend root.
+
+Use `AstryxBuiltTheme` when the theme has been built with
+`npm run astryx -- theme build`. Pass the generated CSS path or CSS text to
+`AstryxBuiltTheme`, then use the descriptor as the `brand` for `AstryxTheme`.
+The theme name must match the name in the Astryx TypeScript theme source.
+
+Each Astryx widget is rendered by anywidget as its own frontend root in
+JupyterLab. `AstryxTheme` therefore propagates the selected brand and mode to
+nested Astryx children instead of relying only on a React context provider
+around the parent output. Runtime brands are converted with Astryx
+`defineTheme()` in the browser. Built themes inject their generated CSS into
+`document.head` once per unique theme/CSS pair and share that style element
+between notebook outputs with a reference count.
+
+When testing theme changes, rebuild the frontend bundle before starting
+JupyterLab:
+
+```sh
+npm run build
+uv run --no-sync jupyter lab . --port=8888 --no-browser --ServerApp.token='' --ServerApp.password=''
+```
+
+Then run `notebooks/astryx_themes.py`. A correct browser run shows one
+`style[data-anylumino-astryx-built-theme-id]` element for repeated uses of the
+same built theme. Restart JupyterLab or use a fresh browser task space after a
+frontend rebuild; otherwise JupyterLab can reuse an older anywidget ES module
+instance while developing locally.
+
+## Notebook-safe overlays
+
+Dialog-style components default to inline rendering so they stay inside the
+Jupyter output area:
+
+```python
+preview = al.AstryxDialog(
+    al.AstryxText("Inline dialog content stays inside the notebook output."),
+    open=True,
+    width=360,
+)
+
+confirm = al.AstryxAlertDialog(
+    "Confirm action",
+    "This inline preview uses the alert dialog surface.",
+    action_label="Confirm",
+)
+```
+
+Use non-inline dialogs only after validating the surrounding notebook
+environment.

@@ -52,6 +52,7 @@ from anylumino import (
     AstryxTypeahead,
     AstryxWidget,
     AstryxBrand,
+    AstryxBuiltTheme,
     Badge,
     BoxPanel,
     Button,
@@ -901,18 +902,128 @@ def test_astryx_theme_applies_reusable_brand_to_child_widgets() -> None:
         "desk",
         **{
             "color-accent": ("#0057b8", "#79b8ff"),
+            "--color-text-primary": ("#111827", "#f9fafb"),
             "color-background-card": ("#ffffff", "#111111"),
             "radius-container": "8px",
         },
     )
     button = AstryxButton("Run")
-    panel = AstryxTheme({"button": button}, brand=brand, color_mode="dark", gap=3)
+    panel = AstryxTheme({"button": button}, brand=brand, mode="system", gap=3)
 
+    assert brand == {
+        "name": "desk",
+        "tokens": {
+            "--color-accent": ["#0057b8", "#79b8ff"],
+            "--color-text-primary": ["#111827", "#f9fafb"],
+            "--color-background-card": ["#ffffff", "#111111"],
+            "--radius-container": "8px",
+        },
+    }
     assert panel.brand == brand
-    assert panel.color_mode == "dark"
+    assert panel.color_mode == "system"
     assert panel.props["gap"] == 3
     assert button.brand == brand
+    assert button.color_mode == "system"
+
+
+def test_astryx_built_theme_applies_precompiled_theme_descriptor_to_child_widgets(tmp_path: Path) -> None:
+    css_path = tmp_path / "desk-theme.css"
+    css_path.write_text(
+        '[data-astryx-theme="desk-built"] { --color-accent: #0057b8; }',
+        encoding="utf-8",
+    )
+    theme = AstryxBuiltTheme(
+        "desk-built",
+        css=css_path,
+        tokens={"color-accent": "#0057b8", "--radius-container": "6px"},
+    )
+    button = AstryxButton("Run")
+    panel = AstryxTheme({"button": button}, brand=theme, mode="dark")
+
+    assert theme == {
+        "name": "desk-built",
+        "built": True,
+        "tokens": {"--color-accent": "#0057b8", "--radius-container": "6px"},
+        "css": '[data-astryx-theme="desk-built"] { --color-accent: #0057b8; }',
+        "components": {},
+    }
+    assert panel.brand == theme
+    assert panel.color_mode == "dark"
+    assert button.brand == theme
     assert button.color_mode == "dark"
+
+
+@pytest.mark.parametrize("mode", ["light", "dark", "system"])
+def test_astryx_theme_accepts_supported_modes_for_runtime_and_built_themes(mode: str) -> None:
+    runtime = AstryxTheme(brand=AstryxBrand("runtime", **{"color-accent": ("#111111", "#eeeeee")}), mode=mode)
+    built = AstryxTheme(brand=AstryxBuiltTheme("neutral"), mode=mode)
+
+    assert runtime.color_mode == mode
+    assert built.color_mode == mode
+    assert built.brand == {"name": "neutral", "built": True, "tokens": {}, "css": "", "components": {}}
+
+
+def test_astryx_theme_rejects_invalid_theme_modes() -> None:
+    with pytest.raises(ValueError, match="theme mode must be one of"):
+        AstryxTheme(color_mode="sepia")
+
+
+def test_astryx_typeahead_can_use_python_backed_search(monkeypatch: pytest.MonkeyPatch) -> None:
+    widget = AstryxTypeahead(
+        ["AAPL", "MSFT"],
+        label="Symbol",
+        search=lambda query: [{"id": f"{query}-1", "label": query.upper()}],
+    )
+    sent: list[dict[str, object]] = []
+    monkeypatch.setattr(widget, "send", lambda content, buffers=None: sent.append(content))
+
+    widget._handle_frontend_message(
+        widget,
+        {"type": "search", "request_id": "req-1", "query": "nvda"},
+        None,
+    )
+
+    assert widget.search_mode == "python"
+    assert sent == [
+        {
+            "type": "search-results",
+            "request_id": "req-1",
+            "query": "nvda",
+            "items": [{"id": "nvda-1", "label": "NVDA"}],
+        },
+    ]
+
+
+def test_astryx_tokenizer_static_search_remains_default() -> None:
+    widget = AstryxTokenizer(["Bid", "Ask"], value=["Bid"], label="Fields")
+
+    assert widget.search_mode == "static"
+    assert widget.props["items"] == [{"id": "Bid", "label": "Bid"}, {"id": "Ask", "label": "Ask"}]
+
+
+def test_astryx_command_palette_can_use_python_backed_search(monkeypatch: pytest.MonkeyPatch) -> None:
+    widget = AstryxCommandPalette(
+        [{"id": "refresh", "label": "Refresh"}],
+        search=lambda query: [{"id": f"{query}-cmd", "label": f"Run {query}"}],
+    )
+    sent: list[dict[str, object]] = []
+    monkeypatch.setattr(widget, "send", lambda content, buffers=None: sent.append(content))
+
+    widget._handle_frontend_message(
+        widget,
+        {"type": "search", "request_id": "cmd-1", "query": "rebalance"},
+        None,
+    )
+
+    assert widget.search_mode == "python"
+    assert sent == [
+        {
+            "type": "search-results",
+            "request_id": "cmd-1",
+            "query": "rebalance",
+            "items": [{"id": "rebalance-cmd", "label": "Run rebalance"}],
+        },
+    ]
 
 
 def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> None:

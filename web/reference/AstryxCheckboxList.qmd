@@ -1,0 +1,16 @@
+# AstryxCheckboxList { #anylumino.AstryxCheckboxList }
+
+```python
+AstryxCheckboxList(items, value=(), *, label, **props)
+```
+
+Render a multi-choice Astryx checkbox list.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type            | Description                                                                                                                                                                                                                                                                                                      | Default    |
+|---------|-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| items   | Iterable\[Any\] | Item records used by generated child components or static search sources.                                                                                                                                                                                                                                        | _required_ |
+| value   | Iterable\[str\] | Synchronized component value.                                                                                                                                                                                                                                                                                    | `()`       |
+| label   | str             | Visible or accessible label for the component.                                                                                                                                                                                                                                                                   | _required_ |
+| **props | Any             | JSON-safe CheckboxList props. Useful keys: isLabelHidden, description, density, hasDividers, isDisabled, status, className, and style. anylumino generates checkbox items from items and manages value/onChange synchronization. See Astryx component docs: <https://astryx.atmeta.com/components/CheckboxList>. | `{}`       |

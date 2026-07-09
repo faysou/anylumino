@@ -1,0 +1,15 @@
+# AstryxFormLayout { #anylumino.AstryxFormLayout }
+
+```python
+AstryxFormLayout(children=None, *, direction='vertical', **props)
+```
+
+Arrange Astryx form controls with consistent spacing.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type       | Description                                                                                                                                                                                                          | Default      |
+|-----------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| children  | ChildInput | Child widget, sequence of widgets, or mapping of slot names to widgets.                                                                                                                                              | `None`       |
+| direction | str        | Layout direction.                                                                                                                                                                                                    | `'vertical'` |
+| **props   | Any        | JSON-safe FormLayout props. Useful keys: className and style. The direction prop supports vertical, horizontal, and horizontal-labels. See Astryx component docs: <https://astryx.atmeta.com/components/FormLayout>. | `{}`         |

@@ -1,0 +1,24 @@
+# AstryxIconButton { #anylumino.AstryxIconButton }
+
+```python
+AstryxIconButton(
+    label,
+    *,
+    icon='close',
+    variant='secondary',
+    callbacks=None,
+    **props,
+)
+```
+
+Render an icon-only Astryx button.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                      | Description                                                                                                                                                                                                                         | Default       |
+|-----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| label     | str                                                       | Visible or accessible label for the component.                                                                                                                                                                                      | _required_    |
+| icon      | str                                                       | Astryx icon name.                                                                                                                                                                                                                   | `'close'`     |
+| variant   | str                                                       | Astryx visual variant.                                                                                                                                                                                                              | `'secondary'` |
+| callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                                                                                                                                                                  | `None`        |
+| **props   | Any                                                       | JSON-safe IconButton props. Useful keys: size, isLoading, tooltip, className, and style. anylumino manages label, icon, variant, and click callbacks. See Astryx component docs: <https://astryx.atmeta.com/components/IconButton>. | `{}`          |

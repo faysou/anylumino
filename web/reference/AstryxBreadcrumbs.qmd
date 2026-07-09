@@ -1,0 +1,14 @@
+# AstryxBreadcrumbs { #anylumino.AstryxBreadcrumbs }
+
+```python
+AstryxBreadcrumbs(items, **props)
+```
+
+Render Astryx breadcrumbs from item records.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type            | Description                                                                                                                                                                                                                   | Default    |
+|---------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| items   | Iterable\[Any\] | Item records used by generated child components or static search sources.                                                                                                                                                     | _required_ |
+| **props | Any             | JSON-safe Breadcrumbs props. Useful keys: separator, variant, label, className, and style. anylumino generates breadcrumb children from items. See Astryx component docs: <https://astryx.atmeta.com/components/Breadcrumbs>. | `{}`       |

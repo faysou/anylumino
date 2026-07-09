@@ -1,0 +1,15 @@
+# AstryxCalendar { #anylumino.AstryxCalendar }
+
+```python
+AstryxCalendar(value=None, *, mode='single', **props)
+```
+
+Render an Astryx calendar date picker.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                               | Description                                                                                                                                                                                                                                                                                                                                | Default    |
+|---------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| value   | str \| Mapping\[str, str\] \| None | Synchronized component value.                                                                                                                                                                                                                                                                                                              | `None`     |
+| mode    | str                                | Component mode.                                                                                                                                                                                                                                                                                                                            | `'single'` |
+| **props | Any                                | JSON-safe Calendar props. Useful keys: defaultValue, numberOfMonths, min, max, dateConstraints, focusDate, hasOutsideDays, hasWeekNumbers, hasVariableRowCount, weekStartsOn, className, and style. anylumino manages mode, value, and change synchronization. See Astryx component docs: <https://astryx.atmeta.com/components/Calendar>. | `{}`       |

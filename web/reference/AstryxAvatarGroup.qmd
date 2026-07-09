@@ -1,0 +1,15 @@
+# AstryxAvatarGroup { #anylumino.AstryxAvatarGroup }
+
+```python
+AstryxAvatarGroup(items, *, overflow_count=0, **props)
+```
+
+Render a compact group of Astryx avatars.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type            | Description                                                                                                                                                                                                                                                 | Default    |
+|----------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| items          | Iterable\[Any\] | Item records used by generated child components or static search sources.                                                                                                                                                                                   | _required_ |
+| overflow_count | int             | Number shown in the avatar-group overflow indicator.                                                                                                                                                                                                        | `0`        |
+| **props        | Any             | JSON-safe AvatarGroup props. Useful keys: size, data-testid, className, and style. anylumino generates avatars from items and supports overflow_count through overflowCount. See Astryx component docs: <https://astryx.atmeta.com/components/AvatarGroup>. | `{}`       |

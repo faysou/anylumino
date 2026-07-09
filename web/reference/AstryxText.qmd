@@ -1,0 +1,14 @@
+# AstryxText { #anylumino.AstryxText }
+
+```python
+AstryxText(text, *, props=None, **kwargs)
+```
+
+Render themed Astryx body text.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                        | Description                                                                                                                                                                                                                                                                               | Default    |
+|--------|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| text   | str                         | Text content synchronized to the frontend component.                                                                                                                                                                                                                                      | _required_ |
+| props  | Mapping\[str, Any\] \| None | JSON-safe Text props. Useful keys: type, size, color, weight, display, as, maxLines, hasTruncateTooltip, wordBreak, textWrap, justify, hasCapsize, hasStrikethrough, hasTabularNumbers, id, className, and style. See Astryx component docs: <https://astryx.atmeta.com/components/Text>. | `None`     |

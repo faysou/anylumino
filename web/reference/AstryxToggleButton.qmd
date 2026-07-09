@@ -1,0 +1,16 @@
+# AstryxToggleButton { #anylumino.AstryxToggleButton }
+
+```python
+AstryxToggleButton(value=False, *, label, disabled=False, **props)
+```
+
+Render a two-state Astryx toggle button.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type   | Description                                                                                                                                                                                                                                                                                                                                                                                                       | Default    |
+|----------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| value    | bool   | Synchronized component value.                                                                                                                                                                                                                                                                                                                                                                                     | `False`    |
+| label    | str    | Visible or accessible label for the component.                                                                                                                                                                                                                                                                                                                                                                    | _required_ |
+| disabled | bool   | Whether the component should render disabled.                                                                                                                                                                                                                                                                                                                                                                     | `False`    |
+| **props  | Any    | JSON-safe ToggleButton props. Useful keys: size, isLoading, tooltip, value, data-testid, className, and style. Upstream icon, pressedIcon, and children props expect React nodes and are not adapted by the Python bridge. anylumino manages pressed state through the Python value argument and disabled state through disabled. See Astryx component docs: <https://astryx.atmeta.com/components/ToggleButton>. | `{}`       |

@@ -309,8 +309,73 @@ function rawProps(model) {
   return { ...(model.get("props") ?? {}) };
 }
 
+function hashString(value) {
+  let hash = 5381;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 33) ^ value.charCodeAt(index);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function useBuiltThemeCSS(themeRecord) {
+  const themeName = String(themeRecord?.name ?? "neutral");
+  const css = typeof themeRecord?.css === "string" ? themeRecord.css.trim() : "";
+  React.useInsertionEffect(() => {
+    if (!css || typeof document === "undefined") {
+      return undefined;
+    }
+    const styleKey = `${themeName}-${hashString(css)}`;
+    const selector = `style[data-anylumino-astryx-built-theme-id="${styleKey}"]`;
+    const matches = [...document.querySelectorAll(selector)];
+    const existing = matches[0];
+    if (existing) {
+      for (const duplicate of matches.slice(1)) {
+        duplicate.remove();
+      }
+      existing.setAttribute(
+        "data-anylumino-astryx-built-theme-count",
+        String(Number(existing.getAttribute("data-anylumino-astryx-built-theme-count") || "0") + 1),
+      );
+      return () => {
+        const count = Number(existing.getAttribute("data-anylumino-astryx-built-theme-count") || "1") - 1;
+        if (count <= 0) {
+          existing.remove();
+        } else {
+          existing.setAttribute("data-anylumino-astryx-built-theme-count", String(count));
+        }
+      };
+    }
+
+    const element = document.createElement("style");
+    element.setAttribute("data-anylumino-astryx-built-theme", themeName);
+    element.setAttribute("data-anylumino-astryx-built-theme-id", styleKey);
+    element.setAttribute("data-anylumino-astryx-built-theme-count", "1");
+    element.textContent = css;
+    document.head.appendChild(element);
+    return () => {
+      if (!element.isConnected) {
+        return;
+      }
+      const count = Number(element.getAttribute("data-anylumino-astryx-built-theme-count") || "1") - 1;
+      if (count <= 0) {
+        element.remove();
+      } else {
+        element.setAttribute("data-anylumino-astryx-built-theme-count", String(count));
+      }
+    };
+  }, [themeName, css]);
+}
+
 function brandTheme(model) {
   const brand = model.get("brand") ?? {};
+  if (brand.built || brand.__built) {
+    return {
+      name: String(brand.name ?? "neutral"),
+      __built: true,
+      tokens: brand.tokens ?? {},
+      components: brand.components ?? undefined,
+    };
+  }
   const tokens = brand.tokens ?? brand;
   if (!tokens || Object.keys(tokens).length === 0) {
     return neutralTheme;
@@ -341,6 +406,43 @@ function searchableItems(items) {
       label: String(item ?? `Item ${index + 1}`),
     };
   });
+}
+
+let searchRequestCounter = 0;
+
+function requestPythonSearch(model, query) {
+  const requestId = `${model.model_id ?? "model"}-${Date.now()}-${++searchRequestCounter}`;
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (items) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      clearTimeout(timeout);
+      removeModelListener(model, "msg:custom", onMessage);
+      resolve(searchableItems(items));
+    };
+    const onMessage = (content) => {
+      if (content?.type !== "search-results" || String(content.request_id ?? "") !== requestId) {
+        return;
+      }
+      finish(content.items ?? []);
+    };
+    const timeout = setTimeout(() => finish([]), 10000);
+    model.on("msg:custom", onMessage);
+    model.send({ type: "search", request_id: requestId, query: String(query ?? "") });
+  });
+}
+
+function searchSourceFor(model, items) {
+  if (String(model.get("search_mode") || "static") !== "python") {
+    return createStaticSource(items);
+  }
+  return {
+    search: (query) => requestPythonSearch(model, query),
+    bootstrap: () => requestPythonSearch(model, ""),
+  };
 }
 
 function selectedSearchItem(items, value) {
@@ -714,7 +816,7 @@ function componentProps(model) {
       ...props,
       label: label || props.label || "Typeahead",
       value: selectedSearchItem(items, value),
-      searchSource: createStaticSource(items),
+      searchSource: searchSourceFor(model, items),
       isDisabled: disabled,
       onChange: (item) => setItemValue(model, item),
       onChangeQuery: (query) => model.send({ type: "query", query }),
@@ -728,7 +830,7 @@ function componentProps(model) {
       ...props,
       label: label || props.label || "Tokenizer",
       value: selectedSearchItems(items, value),
-      searchSource: createStaticSource(items),
+      searchSource: searchSourceFor(model, items),
       isDisabled: disabled,
       onChange: (nextItems) => setItemArrayValue(model, nextItems),
       onChangeQuery: (query) => model.send({ type: "query", query }),
@@ -743,7 +845,7 @@ function componentProps(model) {
       isInline: props.isInline ?? true,
       isOpen: props.isOpen ?? true,
       value: value == null ? undefined : String(value),
-      searchSource: createStaticSource(items),
+      searchSource: searchSourceFor(model, items),
       onValueChange: (nextValue) => setStringValue(model, nextValue),
       onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
     };
@@ -1288,6 +1390,7 @@ function AstryxTableView({ model }) {
 function AstryxModelView({ model }) {
   const name = String(model.get("component_name") || model.get("component_kind") || "Stack");
   const mode = String(model.get("color_mode") || "light");
+  useBuiltThemeCSS(model.get("brand") ?? {});
   const theme = React.useMemo(() => brandTheme(model), [JSON.stringify(model.get("brand") ?? {})]);
   const props = componentProps(model);
   const Component = componentFor(name, props);
@@ -1374,6 +1477,7 @@ export default {
       "color_mode",
       "theme",
       "brand",
+      "search_mode",
     ];
 
     watched.forEach((name) => model.on(`change:${name}`, renderCurrent));

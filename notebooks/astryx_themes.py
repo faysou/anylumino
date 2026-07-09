@@ -1,0 +1,123 @@
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.3
+#   kernelspec:
+#     display_name: Python 3 (ipykernel)
+#     language: python
+#     name: python3
+# ---
+
+# %% [markdown]
+# # Astryx theme smoke test
+#
+# This notebook exercises runtime Astryx themes and a precompiled-style
+# `AstryxBuiltTheme` descriptor inside JupyterLab output areas.
+
+# %%
+from __future__ import annotations
+
+import anylumino as al
+
+
+runtime_blue = al.AstryxBrand(
+    "runtime-blue",
+    **{
+        "color-accent": ("#0057b8", "#79b8ff"),
+        "color-background-card": ("#ffffff", "#111827"),
+        "color-text-primary": ("#111827", "#f9fafb"),
+        "radius-container": "8px",
+    },
+)
+
+runtime_green = al.AstryxBrand(
+    "runtime-green",
+    **{
+        "color-accent": ("#0f7b43", "#7be0a3"),
+        "color-background-card": ("#f8fff9", "#07190f"),
+        "color-text-primary": ("#102116", "#f1fff5"),
+        "radius-container": "10px",
+    },
+)
+
+built_css = """
+@layer astryx-theme {
+  @scope([data-astryx-theme="built-plum"]) to ([data-astryx-theme]) {
+    :scope {
+      --color-accent: light-dark(#7c2d92, #e7a8ff);
+      --color-background-card: light-dark(#fff7ff, #1c0d22);
+      --color-background-surface: light-dark(#ffffff, #24102c);
+      --color-text-primary: light-dark(#24102c, #fff7ff);
+      --color-text-secondary: light-dark(#724a7b, #d7b7df);
+      --radius-container: 12px;
+    }
+  }
+}
+"""
+
+built_plum = al.AstryxBuiltTheme(
+    "built-plum",
+    css=built_css,
+    tokens={
+        "color-accent": ("#7c2d92", "#e7a8ff"),
+        "color-background-card": ("#fff7ff", "#1c0d22"),
+        "color-text-primary": ("#24102c", "#fff7ff"),
+    },
+)
+
+
+def theme_panel(title: str, theme: dict[str, object], mode: str) -> al.AstryxTheme:
+    return al.AstryxTheme(
+        al.AstryxCard(
+            al.AstryxStack(
+                {
+                    "title": al.AstryxHeading(title, level=3),
+                    "body": al.AstryxText(f"mode={mode}", type="supporting", color="secondary"),
+                    "actions": al.AstryxStack(
+                        {
+                            "button": al.AstryxButton("Primary", variant="primary"),
+                            "badge": al.AstryxBadge("Ready", variant="success"),
+                            "status": al.AstryxStatusDot("Connected", variant="success"),
+                        },
+                        direction="horizontal",
+                        gap=2,
+                        align="center",
+                        wrap="wrap",
+                    ),
+                    "progress": al.AstryxProgressBar(72, label="Coverage", hasValueLabel=True),
+                },
+                gap=2,
+            ),
+            width="100%",
+            padding=4,
+        ),
+        brand=theme,
+        mode=mode,
+        width="100%",
+    )
+
+
+themes = al.AstryxGrid(
+    {
+        "runtime_light": theme_panel("Runtime blue light", runtime_blue, "light"),
+        "runtime_dark": theme_panel("Runtime blue dark", runtime_blue, "dark"),
+        "runtime_system": theme_panel("Runtime green system", runtime_green, "system"),
+        "built_plum": theme_panel("Built plum system", built_plum, "system"),
+    },
+    columns="repeat(auto-fit, minmax(260px, 1fr))",
+    gap=3,
+    width="100%",
+)
+
+themes
+
+# %%
+assert runtime_blue["name"] == "runtime-blue"
+assert built_plum["built"] is True
+assert built_plum["name"] == "built-plum"
+assert "data-astryx-theme=\"built-plum\"" in built_plum["css"]

@@ -1,0 +1,16 @@
+# AstryxPopover { #anylumino.AstryxPopover }
+
+```python
+AstryxPopover(content, trigger, *, label, **props)
+```
+
+Render click-triggered popover content.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type              | Description                                                                                                                                                                                                                                                                                                    | Default    |
+|---------|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| content | str \| ChildInput | Overlay or tooltip content.                                                                                                                                                                                                                                                                                    | _required_ |
+| trigger | ChildInput        | Trigger content used by disclosure or overlay components.                                                                                                                                                                                                                                                      | _required_ |
+| label   | str               | Visible or accessible label for the component.                                                                                                                                                                                                                                                                 | _required_ |
+| **props | Any               | JSON-safe Popover props. Useful keys: placement, alignment, isOpen, isEnabled, width, hasCloseButton, closeButtonLabel, hasAutoFocus, data-testid, className, and style. anylumino manages content, label, and trigger child slots. See Astryx component docs: <https://astryx.atmeta.com/components/Popover>. | `{}`       |

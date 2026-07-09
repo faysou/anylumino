@@ -1,38 +1,40 @@
-UV ?= uv
-UV_CACHE_DIR ?= .uv-cache
-LAB_PORT ?= 8888
 DOCS_PORT ?= 4200
+DOCS_HOST ?= 127.0.0.1
 OPEN ?= open
-DOCS_URL = http://127.0.0.1:$(DOCS_PORT)/
+DOCS_URL = http://$(DOCS_HOST):$(DOCS_PORT)/
 
 .PHONY: install-dev
 install-dev:
-	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) sync --group dev
+	uv sync --group dev
 	npm ci
 	npm run build
-	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run --no-sync jupytext-config set-default-viewer
+	uv run --no-sync jupytext-config set-default-viewer
 
 .PHONY: frontend
 frontend:
 	npm run build
 
-.PHONY: lab
-lab:
-	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run --group dev jupyter lab . --port=$(LAB_PORT)
-
 .PHONY: test
 test:
-	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run pytest
+	uv run pytest
 
 .PHONY: docs-reference
 docs-reference:
-	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run --no-sync quartodoc build --config web/_quarto.yml
-	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run --no-sync python scripts/patch_reference_signatures.py
+	uv run --no-sync quartodoc build --config web/_quarto.yml
+	uv run --no-sync python scripts/patch_reference_signatures.py
 
 .PHONY: docs-clean-output
 docs-clean-output:
 	rm -rf web/_site
 	find web -name '*.html' -not -path 'web/_site/*' -delete
+
+.PHONY: docs-check-port
+docs-check-port:
+	@if lsof -nP -iTCP:$(DOCS_PORT) -sTCP:LISTEN >/dev/null 2>&1; then \
+		echo "Port $(DOCS_PORT) is already in use. Stop the process below or run with DOCS_PORT=<free-port>:"; \
+		lsof -nP -iTCP:$(DOCS_PORT) -sTCP:LISTEN; \
+		exit 1; \
+	fi
 
 .PHONY: docs
 docs: docs-reference docs-clean-output
@@ -44,6 +46,6 @@ docs-preview: docs-reference docs-clean-output
 	quarto preview web --no-browser --port $(DOCS_PORT)
 
 .PHONY: docs-serve
-docs-serve: docs
+docs-serve: docs-check-port docs
 	(sleep 1; $(OPEN) $(DOCS_URL)) &
-	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run --no-sync python -m http.server $(DOCS_PORT) --directory web/_site
+	uv run --no-sync python -m http.server $(DOCS_PORT) --bind $(DOCS_HOST) --directory web/_site

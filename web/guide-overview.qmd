@@ -3,28 +3,45 @@ title: "Overview"
 ---
 
 `anylumino` is a small Python package for building notebook interfaces where
-Lumino layout widgets arrange child anywidgets and anylumino controls.
+Lumino layout widgets arrange child anywidgets and Astryx components provide
+the application UI.
 
 The package gives notebooks an app-like layout vocabulary: tabs, split panes,
-dock panels, scrollable control stacks, menus, command palettes, and keyed child
-access from Python.
+dock panels, scrollable control stacks, forms, tables, command palettes, and
+keyed child access from Python.
 
 The core idea is direct composition:
 
 ```python
-from anylumino import SplitPanel, TabPanel, TextInput, IntSlider, VBox
+import anylumino as al
 
-controls = VBox(
-    {
-        "dataset": TextInput(value="Greenhouse A", description="Dataset"),
-        "samples": IntSlider(value=120, min=25, max=250, description="Samples"),
-    },
-    scroll=True,
-    height=180,
+orders = al.AstryxTable(
+    rows=order_rows,
+    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+    row_key="order_id",
+    selects="multiple",
+    sortable=True,
 )
 
-tabs = TabPanel({"trend": trend_figure, "summary": samples_table})
-SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
+controls = al.AstryxTheme(
+    {
+        "symbol": al.AstryxTypeahead(
+            ["AAPL", "MSFT", "NVDA"],
+            value="AAPL",
+            label="Symbol",
+        ),
+        "fields": al.AstryxTokenizer(
+            ["Bid", "Ask", "Last"],
+            value=["Bid", "Ask"],
+            label="Fields",
+        ),
+        "refresh": al.AstryxButton("Refresh", variant="primary"),
+    },
+    gap=3,
+)
+
+tabs = al.TabPanel({"orders": orders, "chart": trend_figure})
+al.SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 ```
 
 The benefit is not only visual layout. An anywidget layout library gives a
@@ -53,15 +70,16 @@ UI component instead of spreading them across notebook-global variables.
 
 - `Toolbar` for compact command rows.
 - `MenuBar` for grouped commands.
-- `CommandPalette` for searchable actions.
+- `AstryxCommandPalette` for inline notebook-safe searchable commands.
+- `CommandPalette` for Lumino-style searchable actions.
 
 Each action can dispatch to a Python callback.
 
 ## Controls
 
-`anylumino` includes Spectrum-backed controls such as `TextInput`, `IntSlider`,
-`Dropdown`, `Checkbox`, `Button`, `ListBox`, and `MultiSelect`, plus
-browser-native date and time controls.
+`anylumino` includes Astryx wrappers for buttons, text inputs, selectors,
+tokenizers, segmented controls, tables, status surfaces, popovers, inline
+dialogs, and reusable brand themes.
 
 :::
 
@@ -85,5 +103,6 @@ variables.
 
 - Read the [composition guide](guide.qmd) for child mapping, mutation, resizing,
   and callbacks.
-- Review [controls](controls.qmd) for the control widgets.
+- Review [Astryx widgets](astryx.qmd) for notebook UI components.
+- Review [controls](controls.qmd) for Astryx form and control patterns.
 - Explore the [examples](examples.qmd) for notebook dashboard patterns.

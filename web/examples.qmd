@@ -25,10 +25,69 @@ tabs
 tabs.add("recent", figure_b, title="Recent", select=True)
 ```
 
-## Figure dashboard skeleton
+## Astryx order dashboard skeleton
 
 ```python
-from anylumino import CommandPalette, MenuBar, SplitPanel, TabPanel, Toolbar, VBox
+import anylumino as al
+
+status = al.TextWidget("Ready")
+
+orders = al.AstryxTable(
+    rows=order_rows,
+    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+    row_key="order_id",
+    selects="multiple",
+    sortable=True,
+)
+
+filters = al.AstryxTheme(
+    {
+        "symbol": al.AstryxTypeahead(
+            ["AAPL", "MSFT", "NVDA"],
+            value="AAPL",
+            label="Symbol",
+        ),
+        "fields": al.AstryxTokenizer(
+            ["Bid", "Ask", "Last"],
+            value=["Bid", "Ask"],
+            label="Fields",
+        ),
+        "commands": al.AstryxCommandPalette(
+            [
+                {
+                    "id": "refresh",
+                    "label": "Refresh",
+                    "auxiliaryData": {"group": "Data"},
+                },
+                {
+                    "id": "export",
+                    "label": "Export CSV",
+                    "auxiliaryData": {"group": "Files"},
+                },
+            ],
+            value="refresh",
+            width=420,
+        ),
+        "refresh": al.AstryxButton(
+            "Refresh",
+            variant="primary",
+            callbacks=[lambda _button: setattr(status, "value", "Refreshed")],
+        ),
+    },
+    gap=3,
+)
+
+tabs = al.TabPanel({"orders": orders, "chart": trend_figure})
+al.SplitPanel(
+    {"filters": filters, "workspace": tabs, "status": status},
+    sizes=[0.25, 0.65, 0.10],
+)
+```
+
+## Lumino action skeleton
+
+```python
+import anylumino as al
 
 actions = [
     {"id": "new-figure", "label": "New figure", "icon": "AddContent"},
@@ -36,26 +95,30 @@ actions = [
 ]
 
 callbacks = {
-    "new-figure": lambda _id: tabs.add("figure-2", new_figure, title="Figure 2", select=True),
+    "new-figure": lambda _id: tabs.add(
+        "figure-2",
+        new_figure,
+        title="Figure 2",
+        select=True,
+    ),
     "refresh": lambda _id: tabs.call_owner(tabs.selected_key, "refresh"),
 }
 
-toolbar = Toolbar(actions, callbacks=callbacks)
-menu = MenuBar([{"label": "Figure", "items": actions}], callbacks=callbacks)
-palette = CommandPalette(actions, callbacks=callbacks)
+toolbar = al.Toolbar(actions, callbacks=callbacks)
+menu = al.MenuBar([{"label": "Figure", "items": actions}], callbacks=callbacks)
 
-tabs = TabPanel({"figure-1": figure_panel})
-controls = VBox({"menu": menu, "toolbar": toolbar, "palette": palette})
-
-SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
+tabs = al.TabPanel({"figure-1": figure_panel})
+al.SplitPanel(
+    {"controls": al.VBox({"menu": menu, "toolbar": toolbar}), "workspace": tabs},
+)
 ```
 
-Icons render through Spectrum workflow icons, the same convention used by
-Spectrum-backed anylumino controls. Use `icon_src` for custom SVG/image icons and
-`icon_size` for Spectrum icon sizing.
+Lumino action widgets still use bundled workflow icon names such as
+`AddContent` and `RotateRight`. Astryx widgets use their own component props and
+brand tokens.
 
 The frontend bundles are shipped with anylumino, so these examples do not
-require CDN access for Lumino, Spectrum components, or bundled workflow icons.
+require CDN access for Lumino, Astryx, or bundled workflow icons.
 
 ## Local notebooks
 
@@ -65,13 +128,10 @@ The repository includes Jupytext notebooks for smoke testing:
   figures.
 - `notebooks/plotly_dashboard.py` exercises all layout and action widgets with
   Plotly figure updates.
-- `notebooks/input_controls_hbox.py` shows Spectrum-backed controls and native
-  date/time controls inside `ScrollBox`.
-- `notebooks/spectrum_components.py` focuses on Spectrum-backed controls,
-  workflow icons, variants, and per-widget theme knobs.
-- `notebooks/spectrum_remaining_components.py` demonstrates surface widgets,
-  display helpers, dialogs, popovers, trays, tooltips, field groups, progress
-  circles, color handles, and button variants.
+- `notebooks/astryx_components_smoke.py` covers the Astryx component family,
+  theme propagation, static search wrappers, and inline dialog wrappers.
+- `notebooks/astryx_table.py` focuses on Astryx table selection, sorting, and
+  row helper behavior.
 - `notebooks/itables_tabs.py` places an `itables.widget.ITable` inside a tab,
   appends rows to a pandas DataFrame, and refreshes the displayed table with
   `ITable.update(...)`.

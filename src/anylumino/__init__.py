@@ -78,6 +78,7 @@ from .astryx import (
     AstryxTypeahead,
     AstryxWidget,
     AstryxBrand,
+    AstryxBuiltTheme,
 )
 from .components import ComponentWidget
 from .controls import DatePicker, DatetimePicker, TimePicker
@@ -261,6 +262,7 @@ __all__ = [
     "AstryxTypeahead",
     "AstryxWidget",
     "AstryxBrand",
+    "AstryxBuiltTheme",
     "Audio",
     "Badge",
     "BoundedFloatText",

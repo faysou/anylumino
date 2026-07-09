@@ -1,0 +1,14 @@
+# AstryxSpinner { #anylumino.AstryxSpinner }
+
+```python
+AstryxSpinner(label='Loading', **props)
+```
+
+Render an Astryx loading spinner.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type   | Description                                                                                                                                                                                                                                                | Default     |
+|---------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| label   | str    | Visible or accessible label for the component.                                                                                                                                                                                                             | `'Loading'` |
+| **props | Any    | JSON-safe Spinner props. Useful keys: size, shade, label, aria-label, className, and style. size supports sm, md, and lg; shade supports default, onMedia, subtle, and inherit. See Astryx component docs: <https://astryx.atmeta.com/components/Spinner>. | `{}`        |

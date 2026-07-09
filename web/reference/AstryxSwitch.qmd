@@ -1,0 +1,16 @@
+# AstryxSwitch { #anylumino.AstryxSwitch }
+
+```python
+AstryxSwitch(value=False, *, label='', disabled=False, **props)
+```
+
+Render an Astryx switch for binary settings.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type   | Description                                                                                                                                                                                                                                                                                                                                   | Default   |
+|----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| value    | bool   | Synchronized component value.                                                                                                                                                                                                                                                                                                                 | `False`   |
+| label    | str    | Visible or accessible label for the component.                                                                                                                                                                                                                                                                                                | `''`      |
+| disabled | bool   | Whether the component should render disabled.                                                                                                                                                                                                                                                                                                 | `False`   |
+| **props  | Any    | JSON-safe Switch props. Useful keys: isLoading, isLabelHidden, description, isOptional, isRequired, status, labelIcon, labelTooltip, labelPosition, labelSpacing, className, and style. anylumino manages label, value, disabled state, and change synchronization. See Astryx component docs: <https://astryx.atmeta.com/components/Switch>. | `{}`      |

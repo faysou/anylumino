@@ -1,0 +1,16 @@
+# AstryxBanner { #anylumino.AstryxBanner }
+
+```python
+AstryxBanner(title, *, status='info', description='', **props)
+```
+
+Render an Astryx banner for prominent status messages.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type   | Description                                                                                                                                                                                                                                                                                                                                                        | Default    |
+|-------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| title       | str    | Dialog or empty-state title.                                                                                                                                                                                                                                                                                                                                       | _required_ |
+| status      | str    | Validation or status record displayed by Astryx.                                                                                                                                                                                                                                                                                                                   | `'info'`   |
+| description | str    | Supporting description text.                                                                                                                                                                                                                                                                                                                                       | `''`       |
+| **props     | Any    | JSON-safe Banner props. Useful keys: status, isDismissable, container, defaultIsExpanded, className, and style. Upstream icon and endContent props expect React nodes and are not adapted by the Python bridge. anylumino maps title to the label field and description to text content. See Astryx component docs: <https://astryx.atmeta.com/components/Banner>. | `{}`       |

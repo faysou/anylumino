@@ -1,0 +1,16 @@
+# AstryxNumberInput { #anylumino.AstryxNumberInput }
+
+```python
+AstryxNumberInput(value=None, *, label='', disabled=False, **props)
+```
+
+Render an Astryx numeric input.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                         | Default   |
+|----------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| value    | int \| float \| None | Synchronized component value.                                                                                                                                                                                                                                                                                                                                                                                                       | `None`    |
+| label    | str                  | Visible or accessible label for the component.                                                                                                                                                                                                                                                                                                                                                                                      | `''`      |
+| disabled | bool                 | Whether the component should render disabled.                                                                                                                                                                                                                                                                                                                                                                                       | `False`   |
+| **props  | Any                  | JSON-safe NumberInput props. Useful keys: size, isLabelHidden, description, isOptional, isRequired, placeholder, labelTooltip, startIcon, labelIcon, status, min, max, step, units, isIntegerOnly, hasClear, htmlName, autoComplete, hasAutoFocus, className, and style. anylumino manages label, value, disabled state, and change synchronization. See Astryx component docs: <https://astryx.atmeta.com/components/NumberInput>. | `{}`      |

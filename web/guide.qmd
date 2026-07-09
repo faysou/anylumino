@@ -10,7 +10,7 @@ composition API: keyed children, child lookup, dynamic mutation, and method
 forwarding.
 
 The goal is to make bigger widgets from existing widgets. A composed widget can
-combine anywidgets, anylumino controls, charts, tables, and outputs into one
+combine anywidgets, Astryx components, charts, tables, and outputs into one
 reusable object. Because that object is still an anywidget, it can be nested
 again inside tabs, split panes, dock panels, or another domain-specific
 component.
@@ -62,15 +62,24 @@ layout widgets. The subclass is still an anywidget, so it can be nested inside
 another layout.
 
 ```python
-from anylumino import Toolbar, VBox
+import anylumino as al
 
 
-class FigurePanel(VBox):
+class FigurePanel(al.VBox):
     def __init__(self, figure):
         self.figure = figure
-        toolbar = Toolbar(
-            [{"id": "refresh", "label": "Refresh", "icon": "rotate"}],
-            callbacks={"refresh": lambda _id: self.refresh()},
+        toolbar = al.AstryxStack(
+            {
+                "title": al.AstryxHeading("Figure", level=3),
+                "refresh": al.AstryxButton(
+                    "Refresh",
+                    variant="primary",
+                    callbacks=[lambda _button: self.refresh()],
+                ),
+            },
+            direction="horizontal",
+            align="center",
+            gap=2,
         )
         super().__init__({"toolbar": toolbar, "figure": figure}, height=520)
 
@@ -81,7 +90,7 @@ class FigurePanel(VBox):
         self.figure.data = data
 
 
-tabs = TabPanel({"trend": FigurePanel(figure)})
+tabs = al.TabPanel({"trend": FigurePanel(figure)})
 tabs["trend"].refresh()
 ```
 
@@ -172,28 +181,30 @@ Actions are plain dictionaries keyed by an `id`. The matching callback receives
 the action id.
 
 ```python
-from anylumino import Toolbar
+import anylumino as al
 
-toolbar = Toolbar(
-    [
-        {"id": "refresh", "label": "Refresh", "icon": "RotateRight"},
-        {"id": "note", "label": "Note", "icon": "Comment"},
-    ],
-    callbacks={
-        "refresh": lambda _id: figure_panel.refresh(),
-        "note": lambda _id: figure_panel.add_note(text="Event"),
+toolbar = al.AstryxStack(
+    {
+        "refresh": al.AstryxButton(
+            "Refresh",
+            variant="primary",
+            callbacks=[lambda _button: figure_panel.refresh()],
+        ),
+        "note": al.AstryxButton(
+            "Note",
+            callbacks=[lambda _button: figure_panel.add_note(text="Event")],
+        ),
     },
+    direction="horizontal",
+    gap=2,
 )
 ```
 
-Action widget icons render through Spectrum workflow icons, matching
-Spectrum-backed anylumino controls such as `Button(icon="CheckmarkCircle")`.
-Use Spectrum icon
-names such as `AddContent`, `RotateRight`, `Comment`, `GraphTrend`,
-`StepForward`, `FullScreen`, and `HelpCircle`. Pass `icon_src` for a custom
-image or SVG icon and `icon_size` to control Spectrum icon sizing.
+For compact application chrome, the Lumino-style `Toolbar`, `MenuBar`, and
+`CommandPalette` remain available and dispatch action ids to Python callbacks.
+For notebook content, prefer Astryx controls such as `AstryxButton`,
+`AstryxCommandPalette`, and `AstryxSegmentedControl` because they share the
+same visual system as forms, tables, and status surfaces.
 
-Lumino, Spectrum components, and the bundled workflow icon set are compiled
-into anylumino's frontend bundles, so notebooks do not need CDN access at
-runtime. Use `icon_src` for local or data URI icons outside the bundled workflow
-icon set.
+Lumino, Astryx, and the bundled workflow icon set are compiled into
+anylumino's frontend bundles, so notebooks do not need CDN access at runtime.

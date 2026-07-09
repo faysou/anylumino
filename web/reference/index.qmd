@@ -18,128 +18,146 @@ Lumino-backed containers for composing anywidget children.
 | [StackedPanel](StackedPanel.qmd#anylumino.StackedPanel) | Lumino stacked panel that shows one selected child at a time. |
 | [GridPanel](GridPanel.qmd#anylumino.GridPanel) | CSS grid-backed Lumino panel for placing children in grid cells. |
 | [ResponsivePanel](ResponsivePanel.qmd#anylumino.ResponsivePanel) | Box layout that switches direction when its width crosses a breakpoint. |
-| [FieldGroup](FieldGroup.qmd#anylumino.FieldGroup) | Group child controls into a horizontal or vertical field layout. |
-| [Popover](Popover.qmd#anylumino.Popover) | Display child content in a popover surface. |
-| [Tray](Tray.qmd#anylumino.Tray) | Display child content in a tray surface. |
-| [Overlay](Overlay.qmd#anylumino.Overlay) | Position child content as an overlay. |
-| [DialogBox](DialogBox.qmd#anylumino.DialogBox) | Display a composable modal dialog. |
-| [Modal](Modal.qmd#anylumino.Modal) | Alias for a composable modal dialog. |
-
-## Action widgets
-
-Toolbar, menu, and command-palette widgets with Python callbacks.
-
-| | |
-| --- | --- |
-| [Toolbar](Toolbar.qmd#anylumino.Toolbar) | Toolbar of clickable actions that can invoke Python callbacks. |
-| [MenuBar](MenuBar.qmd#anylumino.MenuBar) | Lumino-style menu bar with nested menu items and Python callbacks. |
-| [CommandPalette](CommandPalette.qmd#anylumino.CommandPalette) | Command palette for searchable actions grouped by category. |
-| [ClearButton](ClearButton.qmd#anylumino.ClearButton) | Compact clear-style action button. |
-| [CloseButton](CloseButton.qmd#anylumino.CloseButton) | Compact close-style action button. |
-| [InfieldButton](InfieldButton.qmd#anylumino.InfieldButton) | Button designed for placement inside an input field. |
-| [PickerButton](PickerButton.qmd#anylumino.PickerButton) | Button styled for opening picker-style popups. |
-
-## Text input controls
-
-Text, password, tag, and structured-list controls.
-
-| | |
-| --- | --- |
-| [TextInput](TextInput.qmd#anylumino.TextInput) | Single-line text input control. |
-| [Text](Text.qmd#anylumino.Text) | Single-line text input control. |
-| [TextArea](TextArea.qmd#anylumino.TextArea) | Multiline text input control. |
-| [Textarea](Textarea.qmd#anylumino.Textarea) | Multiline text input control. |
-| [PasswordInput](PasswordInput.qmd#anylumino.PasswordInput) | Password text input control. |
-| [Password](Password.qmd#anylumino.Password) | Password text input control. |
-| [Combobox](Combobox.qmd#anylumino.Combobox) | Text input with dropdown suggestions. |
-| [SearchInput](SearchInput.qmd#anylumino.SearchInput) | Spectrum search input control. |
-| [TagsInput](TagsInput.qmd#anylumino.TagsInput) | List input for string tags. |
-| [ColorsInput](ColorsInput.qmd#anylumino.ColorsInput) | List input for color tags. |
-| [FloatsInput](FloatsInput.qmd#anylumino.FloatsInput) | List input for float values. |
-| [IntsInput](IntsInput.qmd#anylumino.IntsInput) | List input for integer values. |
-
-## Selection controls
-
-Choice and multi-choice controls.
-
-| | |
-| --- | --- |
-| [Dropdown](Dropdown.qmd#anylumino.Dropdown) | Dropdown selection control. |
-| [RadioButtons](RadioButtons.qmd#anylumino.RadioButtons) | Radio-button selection control. |
-| [ToggleButtons](ToggleButtons.qmd#anylumino.ToggleButtons) | Segmented toggle-button selection control. |
-| [ListBox](ListBox.qmd#anylumino.ListBox) | List-box single-selection control. |
-| [Select](Select.qmd#anylumino.Select) | List-box single-selection control. |
-| [MultiSelect](MultiSelect.qmd#anylumino.MultiSelect) | List-box multi-selection control. |
-| [SelectMultiple](SelectMultiple.qmd#anylumino.SelectMultiple) | List-box multi-selection control. |
-| [SelectionSlider](SelectionSlider.qmd#anylumino.SelectionSlider) | Slider selection control. |
-| [SelectionRangeSlider](SelectionRangeSlider.qmd#anylumino.SelectionRangeSlider) | Range slider selection control. |
-
-## Boolean and action controls
-
-Buttons, toggles, checkboxes, and validation indicators.
-
-| | |
-| --- | --- |
-| [Button](Button.qmd#anylumino.Button) | Clickable button control. |
-| [Checkbox](Checkbox.qmd#anylumino.Checkbox) | Boolean checkbox control. |
-| [ToggleButton](ToggleButton.qmd#anylumino.ToggleButton) | Boolean toggle-button control. |
-| [Switch](Switch.qmd#anylumino.Switch) | Spectrum switch control. |
-| [Valid](Valid.qmd#anylumino.Valid) | Boolean validity indicator control. |
-| [StatusLight](StatusLight.qmd#anylumino.StatusLight) | Spectrum status-light display control. |
-| [Tooltip](Tooltip.qmd#anylumino.Tooltip) | Display tooltip text with an optional trigger child. |
-
-## Numeric controls
-
-Numeric sliders, range sliders, text inputs, and progress indicators.
-
-| | |
-| --- | --- |
-| [IntSlider](IntSlider.qmd#anylumino.IntSlider) | Integer slider control. |
-| [IntegerSlider](IntegerSlider.qmd#anylumino.IntegerSlider) | Integer slider control. |
-| [IntRangeSlider](IntRangeSlider.qmd#anylumino.IntRangeSlider) | Integer range slider control. |
-| [IntegerRangeSlider](IntegerRangeSlider.qmd#anylumino.IntegerRangeSlider) | Integer range slider control. |
-| [IntText](IntText.qmd#anylumino.IntText) | Integer text input control. |
-| [IntegerInput](IntegerInput.qmd#anylumino.IntegerInput) | Integer text input control. |
-| [BoundedIntText](BoundedIntText.qmd#anylumino.BoundedIntText) | Bounded integer text input control. |
-| [FloatSlider](FloatSlider.qmd#anylumino.FloatSlider) | Float slider control. |
-| [FloatRangeSlider](FloatRangeSlider.qmd#anylumino.FloatRangeSlider) | Float range slider control. |
-| [FloatLogSlider](FloatLogSlider.qmd#anylumino.FloatLogSlider) | Logarithmic float slider control. |
-| [FloatText](FloatText.qmd#anylumino.FloatText) | Float text input control. |
-| [BoundedFloatText](BoundedFloatText.qmd#anylumino.BoundedFloatText) | Bounded float text input control. |
-| [IntProgress](IntProgress.qmd#anylumino.IntProgress) | Integer progress bar control. |
-| [FloatProgress](FloatProgress.qmd#anylumino.FloatProgress) | Float progress bar control. |
-| [Meter](Meter.qmd#anylumino.Meter) | Spectrum meter display control. |
-| [ProgressCircle](ProgressCircle.qmd#anylumino.ProgressCircle) | Display circular progress or indeterminate activity. |
-| [Play](Play.qmd#anylumino.Play) | Playback stepper control. |
-
-## Date, color, file, and media controls
-
-Specialized input and display widgets.
-
-| | |
-| --- | --- |
-| [DatePicker](DatePicker.qmd#anylumino.DatePicker) | Browser-native date picker control. |
-| [TimePicker](TimePicker.qmd#anylumino.TimePicker) | Browser-native time picker control. |
-| [DatetimePicker](DatetimePicker.qmd#anylumino.DatetimePicker) | Browser-native datetime picker control. |
-| [ColorPicker](ColorPicker.qmd#anylumino.ColorPicker) | Color picker control. |
-| [ColorHandle](ColorHandle.qmd#anylumino.ColorHandle) | Display a draggable-looking color handle. |
-| [ColorLoupe](ColorLoupe.qmd#anylumino.ColorLoupe) | Display a color loupe preview. |
-| [OpacityCheckerboard](OpacityCheckerboard.qmd#anylumino.OpacityCheckerboard) | Display an opacity checkerboard swatch. |
-| [Table](Table.qmd#anylumino.Table) | Display structured data in a Spectrum table. |
-| [FileUpload](FileUpload.qmd#anylumino.FileUpload) | File upload control. |
-| [Image](Image.qmd#anylumino.Image) | Image display widget. |
-| [Audio](Audio.qmd#anylumino.Audio) | Audio display widget. |
-| [Video](Video.qmd#anylumino.Video) | Video display widget. |
-| [Output](Output.qmd#anylumino.Output) | Simple output display widget. |
-| [HTML](HTML.qmd#anylumino.HTML) | HTML display widget. |
-| [HTMLMath](HTMLMath.qmd#anylumino.HTMLMath) | HTML display alias matching the ipywidgets HTMLMath API. |
-| [Label](Label.qmd#anylumino.Label) | Plain text label widget. |
 | [TextWidget](TextWidget.qmd#anylumino.TextWidget) | Small synced value display widget used in examples and tests. |
-| [Badge](Badge.qmd#anylumino.Badge) | Spectrum badge display control. |
-| [Link](Link.qmd#anylumino.Link) | Spectrum link display control. |
-| [Divider](Divider.qmd#anylumino.Divider) | Spectrum divider display control. |
-| [SpectrumElement](SpectrumElement.qmd#anylumino.SpectrumElement) | Generic wrapper for rendering a Spectrum custom element. |
-| [Icon](Icon.qmd#anylumino.Icon) | Display a Spectrum workflow icon. |
-| [UIIcon](UIIcon.qmd#anylumino.UIIcon) | Display a Spectrum UI icon. |
-| [HelpText](HelpText.qmd#anylumino.HelpText) | Display contextual help or validation text. |
-| [Underlay](Underlay.qmd#anylumino.Underlay) | Display a page underlay backdrop. |
+
+## Astryx base and theme
+
+Shared Astryx wrapper primitives and reusable theme identity.
+
+| | |
+| --- | --- |
+| [AstryxWidget](AstryxWidget.qmd#anylumino.AstryxWidget) | Base anywidget for Astryx-backed components. |
+| [AstryxComponent](AstryxComponent.qmd#anylumino.AstryxComponent) | Render a registered Astryx component by name. |
+| [AstryxBrand](AstryxBrand.qmd#anylumino.AstryxBrand) | Create a reusable Astryx runtime theme token mapping. |
+| [AstryxBuiltTheme](AstryxBuiltTheme.qmd#anylumino.AstryxBuiltTheme) | Create a JSON-safe descriptor for a precompiled Astryx theme. |
+| [AstryxTheme](AstryxTheme.qmd#anylumino.AstryxTheme) | Apply a reusable Astryx theme to child widgets. |
+
+## Astryx typography and content
+
+Text, headings, code, markdown, and semantic inline content.
+
+| | |
+| --- | --- |
+| [AstryxText](AstryxText.qmd#anylumino.AstryxText) | Render themed Astryx body text. |
+| [AstryxHeading](AstryxHeading.qmd#anylumino.AstryxHeading) | Render a semantic Astryx heading. |
+| [AstryxMarkdown](AstryxMarkdown.qmd#anylumino.AstryxMarkdown) | Render Markdown content through Astryx. |
+| [AstryxCode](AstryxCode.qmd#anylumino.AstryxCode) | Render inline code with Astryx styling. |
+| [AstryxCodeBlock](AstryxCodeBlock.qmd#anylumino.AstryxCodeBlock) | Render syntax-highlighted code with Astryx styling. |
+| [AstryxBlockquote](AstryxBlockquote.qmd#anylumino.AstryxBlockquote) | Render quoted text with Astryx blockquote styling. |
+| [AstryxKbd](AstryxKbd.qmd#anylumino.AstryxKbd) | Render keyboard shortcut text with Astryx styling. |
+| [AstryxLink](AstryxLink.qmd#anylumino.AstryxLink) | Render an Astryx text link. |
+| [AstryxCitation](AstryxCitation.qmd#anylumino.AstryxCitation) | Render a compact inline citation reference. |
+| [AstryxTimestamp](AstryxTimestamp.qmd#anylumino.AstryxTimestamp) | Render a timestamp value with Astryx formatting. |
+| [AstryxThumbnail](AstryxThumbnail.qmd#anylumino.AstryxThumbnail) | Render an Astryx thumbnail image or placeholder. |
+| [AstryxAvatar](AstryxAvatar.qmd#anylumino.AstryxAvatar) | Render an Astryx avatar. |
+| [AstryxAvatarGroup](AstryxAvatarGroup.qmd#anylumino.AstryxAvatarGroup) | Render a compact group of Astryx avatars. |
+| [AstryxIcon](AstryxIcon.qmd#anylumino.AstryxIcon) | Render an Astryx icon by name. |
+
+## Astryx layout containers
+
+Containers for arranging Astryx content inside notebook outputs.
+
+| | |
+| --- | --- |
+| [AstryxStack](AstryxStack.qmd#anylumino.AstryxStack) | Arrange child widgets in an Astryx stack. |
+| [AstryxGrid](AstryxGrid.qmd#anylumino.AstryxGrid) | Arrange child widgets in an Astryx grid. |
+| [AstryxCenter](AstryxCenter.qmd#anylumino.AstryxCenter) | Center child content in an Astryx container. |
+| [AstryxSection](AstryxSection.qmd#anylumino.AstryxSection) | Render an Astryx section container. |
+| [AstryxCard](AstryxCard.qmd#anylumino.AstryxCard) | Render an Astryx card container. |
+| [AstryxClickableCard](AstryxClickableCard.qmd#anylumino.AstryxClickableCard) | Render an Astryx card that behaves like an action target. |
+| [AstryxAspectRatio](AstryxAspectRatio.qmd#anylumino.AstryxAspectRatio) | Constrain child content to a fixed aspect ratio. |
+| [AstryxDivider](AstryxDivider.qmd#anylumino.AstryxDivider) | Render an Astryx divider. |
+| [AstryxCollapsible](AstryxCollapsible.qmd#anylumino.AstryxCollapsible) | Render expandable notebook content. |
+
+## Astryx forms and inputs
+
+Form composition and direct value-entry controls.
+
+| | |
+| --- | --- |
+| [AstryxFormLayout](AstryxFormLayout.qmd#anylumino.AstryxFormLayout) | Arrange Astryx form controls with consistent spacing. |
+| [AstryxField](AstryxField.qmd#anylumino.AstryxField) | Wrap a custom control with an Astryx field label. |
+| [AstryxFieldStatus](AstryxFieldStatus.qmd#anylumino.AstryxFieldStatus) | Render an Astryx field status message. |
+| [AstryxInputGroup](AstryxInputGroup.qmd#anylumino.AstryxInputGroup) | Group an input with prefix and suffix adornments. |
+| [AstryxTextInput](AstryxTextInput.qmd#anylumino.AstryxTextInput) | Render a single-line Astryx text input. |
+| [AstryxTextArea](AstryxTextArea.qmd#anylumino.AstryxTextArea) | Render a multiline Astryx text area. |
+| [AstryxNumberInput](AstryxNumberInput.qmd#anylumino.AstryxNumberInput) | Render an Astryx numeric input. |
+| [AstryxSlider](AstryxSlider.qmd#anylumino.AstryxSlider) | Render an Astryx slider control. |
+| [AstryxCheckbox](AstryxCheckbox.qmd#anylumino.AstryxCheckbox) | Render an Astryx checkbox input. |
+| [AstryxSwitch](AstryxSwitch.qmd#anylumino.AstryxSwitch) | Render an Astryx switch for binary settings. |
+| [AstryxToggleButton](AstryxToggleButton.qmd#anylumino.AstryxToggleButton) | Render a two-state Astryx toggle button. |
+| [AstryxDateInput](AstryxDateInput.qmd#anylumino.AstryxDateInput) | Render an Astryx date input. |
+| [AstryxDateRangeInput](AstryxDateRangeInput.qmd#anylumino.AstryxDateRangeInput) | Render an Astryx date-range input. |
+| [AstryxDateTimeInput](AstryxDateTimeInput.qmd#anylumino.AstryxDateTimeInput) | Render an Astryx date-time input. |
+| [AstryxTimeInput](AstryxTimeInput.qmd#anylumino.AstryxTimeInput) | Render an Astryx time input. |
+| [AstryxCalendar](AstryxCalendar.qmd#anylumino.AstryxCalendar) | Render an Astryx calendar date picker. |
+| [AstryxFileInput](AstryxFileInput.qmd#anylumino.AstryxFileInput) | Render an Astryx file input. |
+
+## Astryx selection and search
+
+Choice controls, searchable fields, and tokenized filters.
+
+| | |
+| --- | --- |
+| [AstryxSelector](AstryxSelector.qmd#anylumino.AstryxSelector) | Render a single-value Astryx selector. |
+| [AstryxMultiSelector](AstryxMultiSelector.qmd#anylumino.AstryxMultiSelector) | Render an Astryx selector that accepts multiple values. |
+| [AstryxSegmentedControl](AstryxSegmentedControl.qmd#anylumino.AstryxSegmentedControl) | Render a compact Astryx segmented control. |
+| [AstryxRadioList](AstryxRadioList.qmd#anylumino.AstryxRadioList) | Render a single-choice Astryx radio list. |
+| [AstryxCheckboxList](AstryxCheckboxList.qmd#anylumino.AstryxCheckboxList) | Render a multi-choice Astryx checkbox list. |
+| [AstryxTypeahead](AstryxTypeahead.qmd#anylumino.AstryxTypeahead) | Render a notebook-safe Astryx typeahead. |
+| [AstryxTokenizer](AstryxTokenizer.qmd#anylumino.AstryxTokenizer) | Render a notebook-safe Astryx tokenizer. |
+
+## Astryx actions and menus
+
+Buttons, toolbars, menus, and command launchers.
+
+| | |
+| --- | --- |
+| [AstryxButton](AstryxButton.qmd#anylumino.AstryxButton) | Render an Astryx push button. |
+| [AstryxIconButton](AstryxIconButton.qmd#anylumino.AstryxIconButton) | Render an icon-only Astryx button. |
+| [AstryxButtonGroup](AstryxButtonGroup.qmd#anylumino.AstryxButtonGroup) | Render an Astryx button group from item records. |
+| [AstryxToolbar](AstryxToolbar.qmd#anylumino.AstryxToolbar) | Render an Astryx toolbar with optional slots. |
+| [AstryxDropdownMenu](AstryxDropdownMenu.qmd#anylumino.AstryxDropdownMenu) | Render a button-backed Astryx dropdown menu. |
+| [AstryxMoreMenu](AstryxMoreMenu.qmd#anylumino.AstryxMoreMenu) | Render a compact overflow action menu. |
+| [AstryxCommandPalette](AstryxCommandPalette.qmd#anylumino.AstryxCommandPalette) | Render an inline Astryx command palette for notebook output areas. |
+
+## Astryx feedback and status
+
+Status indicators, progress, loading states, and empty states.
+
+| | |
+| --- | --- |
+| [AstryxBadge](AstryxBadge.qmd#anylumino.AstryxBadge) | Render a compact status or category badge. |
+| [AstryxStatusDot](AstryxStatusDot.qmd#anylumino.AstryxStatusDot) | Render an inline Astryx status indicator. |
+| [AstryxProgressBar](AstryxProgressBar.qmd#anylumino.AstryxProgressBar) | Render an Astryx progress bar. |
+| [AstryxSpinner](AstryxSpinner.qmd#anylumino.AstryxSpinner) | Render an Astryx loading spinner. |
+| [AstryxSkeleton](AstryxSkeleton.qmd#anylumino.AstryxSkeleton) | Render an Astryx skeleton placeholder. |
+| [AstryxToken](AstryxToken.qmd#anylumino.AstryxToken) | Render an Astryx token or chip. |
+| [AstryxBanner](AstryxBanner.qmd#anylumino.AstryxBanner) | Render an Astryx banner for prominent status messages. |
+| [AstryxEmptyState](AstryxEmptyState.qmd#anylumino.AstryxEmptyState) | Render an Astryx empty-state message. |
+
+## Astryx overlays and previews
+
+Notebook-safe tooltip, popover, hover-card, and dialog surfaces.
+
+| | |
+| --- | --- |
+| [AstryxTooltip](AstryxTooltip.qmd#anylumino.AstryxTooltip) | Attach a tooltip to notebook content. |
+| [AstryxHoverCard](AstryxHoverCard.qmd#anylumino.AstryxHoverCard) | Attach a hover card with richer preview content. |
+| [AstryxPopover](AstryxPopover.qmd#anylumino.AstryxPopover) | Render click-triggered popover content. |
+| [AstryxDialog](AstryxDialog.qmd#anylumino.AstryxDialog) | Render Astryx dialog content inline in notebook output. |
+| [AstryxAlertDialog](AstryxAlertDialog.qmd#anylumino.AstryxAlertDialog) | Render an inline Astryx alert dialog for confirmations. |
+
+## Astryx navigation and data
+
+Tabs, lists, outlines, tree views, metadata, and tables.
+
+| | |
+| --- | --- |
+| [AstryxBreadcrumbs](AstryxBreadcrumbs.qmd#anylumino.AstryxBreadcrumbs) | Render Astryx breadcrumbs from item records. |
+| [AstryxTabList](AstryxTabList.qmd#anylumino.AstryxTabList) | Render an Astryx tab list. |
+| [AstryxList](AstryxList.qmd#anylumino.AstryxList) | Render an Astryx list from item records. |
+| [AstryxMetadataList](AstryxMetadataList.qmd#anylumino.AstryxMetadataList) | Render label-value metadata rows. |
+| [AstryxOutline](AstryxOutline.qmd#anylumino.AstryxOutline) | Render a table-of-contents outline. |
+| [AstryxTreeList](AstryxTreeList.qmd#anylumino.AstryxTreeList) | Render hierarchical notebook data as an expandable tree. |
+| [AstryxTable](AstryxTable.qmd#anylumino.AstryxTable) | Render a data-driven Astryx table for notebook use. |

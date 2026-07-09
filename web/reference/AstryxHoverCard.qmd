@@ -1,0 +1,16 @@
+# AstryxHoverCard { #anylumino.AstryxHoverCard }
+
+```python
+AstryxHoverCard(content, trigger, *, label='', **props)
+```
+
+Attach a hover card with richer preview content.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type              | Description                                                                                                                                                                                                                                                                                               | Default    |
+|---------|-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| content | str \| ChildInput | Overlay or tooltip content.                                                                                                                                                                                                                                                                               | _required_ |
+| trigger | ChildInput        | Trigger content used by disclosure or overlay components.                                                                                                                                                                                                                                                 | _required_ |
+| label   | str               | Visible or accessible label for the component.                                                                                                                                                                                                                                                            | `''`       |
+| **props | Any               | JSON-safe HoverCard props. Useful keys: placement, alignment, delay, hideDelay, focusTrigger, isEnabled, hasHoverIndication, isOpen, isDefaultOpen, className, and style. anylumino manages content and trigger child slots. See Astryx component docs: <https://astryx.atmeta.com/components/HoverCard>. | `{}`       |

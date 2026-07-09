@@ -1,0 +1,26 @@
+# AstryxMoreMenu { #anylumino.AstryxMoreMenu }
+
+```python
+AstryxMoreMenu(
+    items,
+    *,
+    label='More options',
+    variant='ghost',
+    disabled=False,
+    callbacks=None,
+    **props,
+)
+```
+
+Render a compact overflow action menu.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                      | Description                                                                                                                                                                                                                                                                                        | Default          |
+|-----------|-----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| items     | Iterable\[Any\]                                           | Item records used by generated child components or static search sources.                                                                                                                                                                                                                          | _required_       |
+| label     | str                                                       | Visible or accessible label for the component.                                                                                                                                                                                                                                                     | `'More options'` |
+| variant   | str                                                       | Astryx visual variant.                                                                                                                                                                                                                                                                             | `'ghost'`        |
+| disabled  | bool                                                      | Whether the component should render disabled.                                                                                                                                                                                                                                                      | `False`          |
+| callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                                                                                                                                                                                                                                 | `None`           |
+| **props   | Any                                                       | JSON-safe MoreMenu props. Useful keys: size, className, and style. Upstream icon expects a React node and is not adapted by the Python bridge. anylumino manages items, label, variant, disabled state, and callbacks. See Astryx component docs: <https://astryx.atmeta.com/components/MoreMenu>. | `{}`             |

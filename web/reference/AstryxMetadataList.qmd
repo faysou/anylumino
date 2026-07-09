@@ -1,0 +1,14 @@
+# AstryxMetadataList { #anylumino.AstryxMetadataList }
+
+```python
+AstryxMetadataList(items, **props)
+```
+
+Render label-value metadata rows.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                            | Description                                                                                                                                                                                                                                           | Default    |
+|---------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| items   | Iterable\[Mapping\[str, Any\]\] | Item records used by generated child components or static search sources.                                                                                                                                                                             | _required_ |
+| **props | Any                             | JSON-safe MetadataList props. Useful keys: columns, label, maxNumOfItems, orientation, title, className, and style. anylumino generates metadata children from items. See Astryx component docs: <https://astryx.atmeta.com/components/MetadataList>. | `{}`       |

@@ -1,0 +1,15 @@
+# AstryxDateTimeInput { #anylumino.AstryxDateTimeInput }
+
+```python
+AstryxDateTimeInput(value=None, *, label='', **props)
+```
+
+Render an Astryx date-time input.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type        | Description                                                                                                                                                                                                                                                                                                                                                                                                                               | Default   |
+|---------|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| value   | str \| None | Synchronized component value.                                                                                                                                                                                                                                                                                                                                                                                                             | `None`    |
+| label   | str         | Visible or accessible label for the component.                                                                                                                                                                                                                                                                                                                                                                                            | `''`      |
+| **props | Any         | JSON-safe DateTimeInput props. Useful keys: isLabelHidden, description, isOptional, isRequired, isDisabled, isLoading, min, max, hasSeconds, hourFormat, timeIncrement, hasClear, placeholder, timePlaceholder, timeLabel, size, status, labelTooltip, numberOfMonths, className, and style. anylumino manages label, value, and change synchronization. See Astryx component docs: <https://astryx.atmeta.com/components/DateTimeInput>. | `{}`      |

@@ -1,0 +1,14 @@
+# AstryxKbd { #anylumino.AstryxKbd }
+
+```python
+AstryxKbd(keys, **props)
+```
+
+Render keyboard shortcut text with Astryx styling.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type   | Description                                                                                                                                                                                    | Default    |
+|---------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| keys    | str    | Keyboard shortcut text.                                                                                                                                                                        | _required_ |
+| **props | Any    | JSON-safe Kbd props. Useful keys: className and style. The keys argument provides the displayed keyboard shortcut text. See Astryx component docs: <https://astryx.atmeta.com/components/Kbd>. | `{}`       |

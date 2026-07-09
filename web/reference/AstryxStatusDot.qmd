@@ -1,0 +1,15 @@
+# AstryxStatusDot { #anylumino.AstryxStatusDot }
+
+```python
+AstryxStatusDot(label, *, variant='neutral', **props)
+```
+
+Render an inline Astryx status indicator.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type   | Description                                                                                                                                                                                                                            | Default     |
+|---------|--------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| label   | str    | Visible or accessible label for the component.                                                                                                                                                                                         | _required_  |
+| variant | str    | Astryx visual variant.                                                                                                                                                                                                                 | `'neutral'` |
+| **props | Any    | JSON-safe StatusDot props. Useful keys: isPulsing, tooltip, className, and style. The variant prop supports success, warning, error, accent, and neutral. See Astryx component docs: <https://astryx.atmeta.com/components/StatusDot>. | `{}`        |

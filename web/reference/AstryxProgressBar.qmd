@@ -1,0 +1,16 @@
+# AstryxProgressBar { #anylumino.AstryxProgressBar }
+
+```python
+AstryxProgressBar(value=0, *, label, variant='accent', **props)
+```
+
+Render an Astryx progress bar.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type         | Description                                                                                                                                                                                                                                                                                                               | Default    |
+|---------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| value   | int \| float | Synchronized component value.                                                                                                                                                                                                                                                                                             | `0`        |
+| label   | str          | Visible or accessible label for the component.                                                                                                                                                                                                                                                                            | _required_ |
+| variant | str          | Astryx visual variant.                                                                                                                                                                                                                                                                                                    | `'accent'` |
+| **props | Any          | JSON-safe ProgressBar props. Useful keys: max, isLabelHidden, hasValueLabel, variant, isIndeterminate, isDisabled, className, and style. anylumino manages label and value; variant supports accent, success, warning, error, and neutral. See Astryx component docs: <https://astryx.atmeta.com/components/ProgressBar>. | `{}`       |
