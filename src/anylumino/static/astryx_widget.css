@@ -1,0 +1,36 @@
+.anylumino-AstryxWidgetHost,
+.anylumino-AstryxWidgetHost *,
+.anylumino-AstryxWidgetHost *::before,
+.anylumino-AstryxWidgetHost *::after {
+  box-sizing: border-box;
+}
+
+.anylumino-AstryxWidgetHost {
+  display: block;
+  min-width: 0;
+  color: var(--color-text-primary, #111111);
+  font: 13px / 1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.anylumino-AstryxChild {
+  min-width: 0;
+}
+
+.anylumino-DividerHost {
+  width: 100%;
+  min-height: 1px;
+  padding-block: 4px;
+}
+
+.anylumino-TableHost {
+  max-width: 100%;
+  overflow: visible;
+}
+
+.anylumino-TableHost > .astryx-table-scroll-wrapper {
+  max-width: 100%;
+}
+
+.anylumino-TableHost table {
+  margin: 0;
+}

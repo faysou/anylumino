@@ -2,9 +2,12 @@
   "name": "anylumino-frontend",
   "private": true,
   "scripts": {
+    "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs",
     "build": "node scripts/build-frontend.mjs"
   },
   "dependencies": {
+    "@astryxdesign/core": "^0.1.2",
+    "@astryxdesign/theme-neutral": "^0.1.2",
     "@lumino/commands": "2.3.3",
     "@lumino/widgets": "2.8.0",
     "@spectrum-web-components/action-button": "1.12.1",
@@ -48,9 +51,12 @@
     "@spectrum-web-components/theme": "1.12.1",
     "@spectrum-web-components/tooltip": "1.12.1",
     "@spectrum-web-components/tray": "1.12.1",
-    "@spectrum-web-components/underlay": "1.12.1"
+    "@spectrum-web-components/underlay": "1.12.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@astryxdesign/cli": "^0.1.2",
     "esbuild": "0.28.0"
   }
 }

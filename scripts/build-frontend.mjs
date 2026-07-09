@@ -29,6 +29,7 @@ const entries = [
   ["src/anylumino/static/control_widget.js", "src/anylumino/static/control_widget.bundle.js"],
   ["src/anylumino/static/native_control_widget.js", "src/anylumino/static/native_control_widget.bundle.js"],
   ["src/anylumino/static/spectrum_widget.js", "src/anylumino/static/spectrum_widget.bundle.js"],
+  ["src/anylumino/static/astryx_widget.js", "src/anylumino/static/astryx_widget.bundle.js"],
 ];
 
 for (const [entryPoint, outfile] of entries) {

@@ -6,6 +6,31 @@ import traitlets as t
 
 from anylumino import (
     AccordionPanel,
+    AstryxBadge,
+    AstryxBanner,
+    AstryxButton,
+    AstryxCard,
+    AstryxCheckboxList,
+    AstryxCodeBlock,
+    AstryxComponent,
+    AstryxEmptyState,
+    AstryxHeading,
+    AstryxMultiSelector,
+    AstryxNumberInput,
+    AstryxProgressBar,
+    AstryxRadioList,
+    AstryxSegmentedControl,
+    AstryxSelector,
+    AstryxSlider,
+    AstryxStack,
+    AstryxStatusDot,
+    AstryxTabList,
+    AstryxTable,
+    AstryxText,
+    AstryxTextArea,
+    AstryxTextInput,
+    AstryxToggleButton,
+    AstryxWidget,
     Badge,
     BoxPanel,
     Button,
@@ -466,6 +491,8 @@ def test_widget_frontend_assets_are_lazy_paths() -> None:
     assert _asset_path(DatePicker._css).name == "native_control_widget.css"
     assert _asset_path(SpectrumWidget._esm).name == "spectrum_widget.bundle.js"
     assert _asset_path(SpectrumWidget._css).name == "spectrum_widget.css"
+    assert _asset_path(AstryxWidget._esm).name == "astryx_widget.bundle.js"
+    assert _asset_path(AstryxWidget._css).name == "astryx_widget.bundle.css"
 
 
 def test_missing_static_asset_is_import_safe_until_loaded() -> None:
@@ -740,3 +767,188 @@ def test_spectrum_overlay_state_uses_is_open_without_shadowing_widget_open() -> 
 
     dialog.toggle()
     assert dialog.is_open is True
+
+
+def test_astryx_widgets_share_generic_component_base() -> None:
+    widgets = [
+        AstryxButton("Run", variant="primary"),
+        AstryxTextInput(value="AAPL", label="Symbol", placeholder="Ticker"),
+        AstryxComponent("Badge", label="Live", props={"variant": "success"}),
+        AstryxStack({"button": AstryxButton("Run")}, direction="horizontal", gap=1),
+    ]
+
+    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, AstryxWidget) for widget in widgets] == [True] * len(widgets)
+    assert widgets[0].component_family == "astryx"
+    assert widgets[0].component_name == "Button"
+    assert widgets[0].label == "Run"
+    assert widgets[0].variant == "primary"
+    assert widgets[1].component_name == "TextInput"
+    assert widgets[1].value == "AAPL"
+    assert widgets[1].props == {"placeholder": "Ticker"}
+    assert widgets[2].props == {"variant": "success"}
+
+
+def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
+    rows = [
+        {"id": "a", "symbol": "AAPL", "status": "Live"},
+        {"id": "m", "symbol": "MSFT", "status": "Paused"},
+    ]
+    widgets = [
+        AstryxText("Overview"),
+        AstryxHeading("Orders", level=3),
+        AstryxBadge("Live", variant="success"),
+        AstryxTextArea(value="Notes", label="Notes", rows=4),
+        AstryxNumberInput(value=25, label="Limit", min=0, max=100),
+        AstryxSlider(value=42, label="Risk", min=0, max=100),
+        AstryxToggleButton(value=True, label="Pinned"),
+        AstryxSelector([("Latency", "latency"), ("Volume", "volume")], value="latency", label="Metric"),
+        AstryxMultiSelector(["Bid", "Ask", "Last"], value=["Bid", "Last"], label="Fields"),
+        AstryxTabList(["Summary", "Orders", "Fills"], value="Summary"),
+        AstryxSegmentedControl(["Compact", "Detailed"], value="Compact", label="Density"),
+        AstryxRadioList(["Auto", "Manual"], value="Auto", label="Mode"),
+        AstryxCheckboxList(["Quotes", "Trades"], value=["Quotes"], label="Streams"),
+        AstryxTable(rows, {"symbol": "Symbol", "status": "Status"}),
+        AstryxCard({"body": AstryxText("Card body")}),
+        AstryxStatusDot("Connected", variant="success"),
+        AstryxProgressBar(55, label="Progress", variant="success"),
+        AstryxEmptyState("No orders", description="The selected account has no open orders."),
+        AstryxBanner("Market data connected", status="success"),
+        AstryxCodeBlock("print('ready')", language="python"),
+    ]
+
+    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, AstryxWidget) for widget in widgets] == [True] * len(widgets)
+    assert widgets[1].component_name == "Heading"
+    assert widgets[1].props == {"level": 3}
+    assert widgets[3].component_name == "TextArea"
+    assert widgets[7].props["options"] == [
+        {"label": "Latency", "value": "latency"},
+        {"label": "Volume", "value": "volume"},
+    ]
+    assert widgets[9].props["items"] == ["Summary", "Orders", "Fills"]
+    assert widgets[13].props["rows"] == rows
+    assert widgets[13].props["columns"] == [
+        {"key": "symbol", "header": "Symbol", "width": {"kind": "proportional", "value": 1}},
+        {"key": "status", "header": "Status", "width": {"kind": "proportional", "value": 1}},
+    ]
+    assert widgets[14].child_keys == ["body"]
+
+
+def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> None:
+    table = AstryxTable(
+        rows=[
+            {"symbol": "AAPL", "price": 195.12, "venue": "XNAS", "status": "Open"},
+            {"symbol": "MSFT", "price": 423.85, "venue": "XNAS", "status": "Open"},
+        ],
+        columns=[
+            {"key": "symbol", "header": "Symbol", "sortable": True, "width": 1},
+            {"key": "price", "header": "Price", "align": "end", "width": {"kind": "pixel", "value": 96}},
+            ("Venue", "venue"),
+            "status",
+        ],
+        row_key="symbol",
+        selected=["AAPL"],
+        selects="multiple",
+        sortable=True,
+        sort_key="price",
+        sort_direction="desc",
+        density="compact",
+        dividers="grid",
+        hasHover=True,
+        width="720px",
+    )
+
+    assert table.width == "720px"
+    assert table.row_key == "symbol"
+    assert table.props["density"] == "compact"
+    assert table.selected == ["AAPL"]
+    assert table.selects == "multiple"
+    assert table.sortable is True
+    assert table.sort_key == "price"
+    assert table.sort_direction == "desc"
+    assert table.columns == [
+        {"key": "symbol", "header": "Symbol", "sortable": True, "width": {"kind": "proportional", "value": 1}},
+        {"key": "price", "header": "Price", "align": "end", "width": {"kind": "pixel", "value": 96}},
+        {"key": "venue", "header": "Venue", "width": {"kind": "proportional", "value": 1}},
+        {"key": "status", "header": "status", "width": {"kind": "proportional", "value": 1}},
+    ]
+    assert table.rows == [
+        {"symbol": "AAPL", "price": 195.12, "venue": "XNAS", "status": "Open"},
+        {"symbol": "MSFT", "price": 423.85, "venue": "XNAS", "status": "Open"},
+    ]
+
+    assert table.append_row({"symbol": "TSLA", "price": 187.42, "venue": "XNAS", "status": "Open"}) == "TSLA"
+    assert table.prepend_row({"symbol": "AMD", "price": 159.55, "venue": "XNAS", "status": "Open"}) == "AMD"
+    table.update_row("MSFT", {"price": 426.11, "status": "Filled"})
+    table.remove_row("AAPL")
+
+    assert [row["symbol"] for row in table.rows] == ["AMD", "MSFT", "TSLA"]
+    assert table.selected == []
+    assert table.rows[1]["price"] == 426.11
+    assert table.rows[1]["status"] == "Filled"
+    with pytest.raises(ValueError, match="table row already exists: MSFT"):
+        table.append_row({"symbol": "MSFT", "price": 1, "venue": "XNAS", "status": "Duplicate"})
+    with pytest.raises(KeyError, match="table row not found: AAPL"):
+        table.remove_row("AAPL")
+
+
+def test_astryx_table_selection_and_sort_callbacks_match_spectrum_table_api() -> None:
+    table = AstryxTable(
+        rows=[
+            {"symbol": "AAPL", "price": 195.12},
+            {"symbol": "MSFT", "price": 423.85},
+        ],
+        columns=[
+            {"key": "symbol", "header": "Symbol", "sortable": True},
+            {"key": "price", "header": "Price", "sortable": True},
+        ],
+        row_key="symbol",
+        selected=["AAPL"],
+        selects="multiple",
+        sortable=True,
+    )
+    selected_calls = []
+    sort_calls = []
+
+    table.on_select(lambda widget: selected_calls.append(widget.selected))
+    table.on_sort(lambda widget: sort_calls.append((widget.sort_key, widget.sort_direction)))
+    table.selected = ["AAPL", "MSFT"]
+    table._handle_frontend_message(table, {"type": "selection", "selected": table.selected}, None)
+    table.sort_key = "price"
+    table.sort_direction = "asc"
+    table._handle_frontend_message(table, {"type": "sort", "sort_key": "price", "sort_direction": "asc"}, None)
+
+    assert selected_calls == [["AAPL", "MSFT"]]
+    assert sort_calls == [("price", "asc")]
+
+
+def test_astryx_table_accepts_sequence_rows_without_columns() -> None:
+    table = AstryxTable(rows=[("Budget", "PDF"), ("Onboarding", "XLS")], row_key=None)
+
+    assert table.row_key == "__row_id"
+    assert table.columns == [
+        {"key": "column_1", "header": "column_1", "width": {"kind": "proportional", "value": 1}},
+        {"key": "column_2", "header": "column_2", "width": {"kind": "proportional", "value": 1}},
+    ]
+    assert table.rows == [
+        {"column_1": "Budget", "column_2": "PDF", "__row_id": "0"},
+        {"column_1": "Onboarding", "column_2": "XLS", "__row_id": "1"},
+    ]
+    assert table.append_row(("Quarterly", "DOC")) == "2"
+
+
+def test_astryx_widget_children_are_keyed_and_composable() -> None:
+    button = AstryxButton("Run")
+    symbol = AstryxTextInput(value="AAPL", label="Symbol")
+    stack = AstryxStack({"button": button, "symbol": symbol}, direction="horizontal", gap=2)
+
+    assert stack.component_name == "Stack"
+    assert stack.child_keys == ["button", "symbol"]
+    assert stack["button"] is button
+    assert stack.get_owner("symbol") is symbol
+    assert stack.props == {"direction": "horizontal", "gap": 2}
+    assert stack.get_state(key=["widgets"])["widgets"] == [
+        f"anywidget:{button.model_id}",
+        f"anywidget:{symbol.model_id}",
+    ]

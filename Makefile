@@ -1,5 +1,6 @@
 UV ?= uv
 UV_CACHE_DIR ?= .uv-cache
+LAB_PORT ?= 8888
 DOCS_PORT ?= 4200
 OPEN ?= open
 DOCS_URL = http://127.0.0.1:$(DOCS_PORT)/
@@ -17,7 +18,7 @@ frontend:
 
 .PHONY: lab
 lab:
-	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run --no-sync jupyter lab
+	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run --group dev jupyter lab . --port=$(LAB_PORT)
 
 .PHONY: test
 test:
