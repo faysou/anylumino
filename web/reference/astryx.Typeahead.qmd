@@ -1,0 +1,75 @@
+# astryx.Typeahead { #anylumino.astryx.Typeahead }
+
+```python
+astryx.Typeahead(
+    items,
+    value=None,
+    *,
+    label,
+    disabled=False,
+    search=None,
+    **props,
+)
+```
+
+Render a notebook-safe Astryx typeahead.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                         | Description                                                                                                                                                                                                                                                                                          | Default    |
+|----------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| items    | Iterable\[Any\] \| Mapping\[str, Any\]       | Searchable items. Mappings, pairs, strings, and dictionaries are normalized into ``{"id": ..., "label": ...}`` records.                                                                                                                                                                              | _required_ |
+| value    | str \| None                                  | Selected item id synchronized back to Python. Use ``None`` for no initial selection.                                                                                                                                                                                                                 | `None`     |
+| label    | str                                          | Accessible field label.                                                                                                                                                                                                                                                                              | _required_ |
+| disabled | bool                                         | Whether the input should render disabled.                                                                                                                                                                                                                                                            | `False`    |
+| search   | Callable\[\[str\], Iterable\[Any\]\] \| None | Optional Python-backed search source. The callback receives the current query string and returns item records, pairs, mappings, or strings that can be normalized into ``{"id": ..., "label": ...}`` records. When omitted, the frontend uses a static in-browser search source backed by ``items``. | `None`     |
+| **props  | Any                                          | JSON-safe Typeahead props forwarded to Astryx. See the ``Astryx Props`` section below.                                                                                                                                                                                                               | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Typeahead props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``label`` (string; required): Accessible label for the input.
+- ``searchSource`` (SearchSource<T>; required): Data source providing search and bootstrap
+  methods for populating the dropdown.
+- ``value`` (T or null; required): Currently selected item, or null if nothing is selected.
+- ``onChange`` ((item: T or null) => void; required): Called when the selection changes.
+- ``placeholder`` (string): Input placeholder text.
+- ``hasEntriesOnFocus`` (boolean): Show bootstrap results on focus before typing.
+- ``hasClear`` (boolean): Show clear button to deselect the current value.
+- ``isDisabled`` (boolean): Disables the input.
+- ``maxMenuItems`` (number): Maximum number of dropdown items to display.
+- ``status`` (InputStatus): Validation status object with type and message for
+  error/warning/success states.
+- ``renderItem`` ((item: T) => ReactNode): Custom render function for dropdown items. Default
+  renders TypeaheadItem.
+- ``isLabelHidden`` (boolean): Visually hides the label while keeping it accessible.
+- ``description`` (string): Helper text displayed below the label.
+- ``isRequired`` (boolean): Marks the field as required.
+- ``isOptional`` (boolean): Shows an optional indicator on the label.
+- ``labelTooltip`` (string): Tooltip text shown on the label.
+- ``emptySearchResultsText`` (string): Text shown when search returns no results.
+- ``hasAutoFocus`` (boolean): Auto-focus the input on mount.
+- ``size`` ('sm' or 'md' or 'lg'): Input and token size.
+- ``debounceMs`` (number): Debounce delay in ms before triggering search. Set to 0 for
+  synchronous sources.
+- ``onChangeQuery`` ((query: string) => void): Callback fired when the search query text
+  changes.
+- ``onOpenChange`` ((isOpen: boolean) => void): Callback when the dropdown opens or closes.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value: not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Typeahead>.
+
+## Notes {.doc-section .doc-section-notes}
+
+With ``search=None``, the frontend receives an Astryx ``createStaticSource``
+backed by ``items``. With a Python search callback, the frontend uses
+Astryx's async ``SearchSource`` interface and resolves each query through
+the anywidget comm channel. The selected item id is stored in ``value``.

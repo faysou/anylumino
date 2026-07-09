@@ -14,8 +14,9 @@ The core idea is direct composition:
 
 ```python
 import anylumino as al
+import anylumino.astryx as ax
 
-orders = al.AstryxTable(
+orders = ax.Table(
     rows=order_rows,
     columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
     row_key="order_id",
@@ -23,19 +24,19 @@ orders = al.AstryxTable(
     sortable=True,
 )
 
-controls = al.AstryxTheme(
+controls = ax.Theme(
     {
-        "symbol": al.AstryxTypeahead(
+        "symbol": ax.Typeahead(
             ["AAPL", "MSFT", "NVDA"],
             value="AAPL",
             label="Symbol",
         ),
-        "fields": al.AstryxTokenizer(
+        "fields": ax.Tokenizer(
             ["Bid", "Ask", "Last"],
             value=["Bid", "Ask"],
             label="Fields",
         ),
-        "refresh": al.AstryxButton("Refresh", variant="primary"),
+        "refresh": ax.Button("Refresh", variant="primary"),
     },
     gap=3,
 )
@@ -70,7 +71,7 @@ UI component instead of spreading them across notebook-global variables.
 
 - `Toolbar` for compact command rows.
 - `MenuBar` for grouped commands.
-- `AstryxCommandPalette` for inline notebook-safe searchable commands.
+- `CommandPalette` for inline notebook-safe searchable commands.
 - `CommandPalette` for Lumino-style searchable actions.
 
 Each action can dispatch to a Python callback.

@@ -1,0 +1,51 @@
+# astryx.InputGroup { #anylumino.astryx.InputGroup }
+
+```python
+astryx.InputGroup(
+    children=None,
+    *,
+    label,
+    prefix='',
+    suffix='',
+    disabled=False,
+    **props,
+)
+```
+
+Group an input with prefix and suffix adornments.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type       | Description                                                                             | Default    |
+|----------|------------|-----------------------------------------------------------------------------------------|------------|
+| children | ChildInput | Child widget, sequence of widgets, or mapping of slot names to widgets.                 | `None`     |
+| label    | str        | Visible or accessible label for the component.                                          | _required_ |
+| prefix   | str        | Text rendered before grouped input children.                                            | `''`       |
+| suffix   | str        | Text rendered after grouped input children.                                             | `''`       |
+| disabled | bool       | Whether the component should render disabled.                                           | `False`    |
+| **props  | Any        | JSON-safe InputGroup props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe InputGroup props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``children`` (ReactNode; required): Input and InputGroupText children.
+- ``label`` (string; required): Accessible label for the group.
+- ``isLabelHidden`` (boolean): Visually hide the label.
+- ``description`` (string): Helper text between label and input group.
+- ``isDisabled`` (boolean): Disable the entire group.
+- ``isOptional`` (boolean): Show "(optional)" indicator.
+- ``isRequired`` (boolean): Mark the field as required.
+- ``size`` ('sm' or 'md' or 'lg'): Default size for inputs in the group.
+- ``status`` (InputStatus): Status indicator applied to the group border.
+- ``labelTooltip`` (string): Tooltip text at the end of the label.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization.
+- ``data-testid`` (string): Test selector.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/InputGroup>.

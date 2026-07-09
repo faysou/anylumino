@@ -1,0 +1,44 @@
+# astryx.Collapsible { #anylumino.astryx.Collapsible }
+
+```python
+astryx.Collapsible(
+    children=None,
+    *,
+    trigger,
+    default_open=True,
+    value='',
+    **props,
+)
+```
+
+Render expandable notebook content.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type       | Description                                                                              | Default    |
+|--------------|------------|------------------------------------------------------------------------------------------|------------|
+| children     | ChildInput | Child widget, sequence of widgets, or mapping of slot names to widgets.                  | `None`     |
+| trigger      | str        | Trigger content used by disclosure or overlay components.                                | _required_ |
+| default_open | bool       | Initial uncontrolled open state.                                                         | `True`     |
+| value        | str        | Synchronized component value.                                                            | `''`       |
+| **props      | Any        | JSON-safe Collapsible props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Collapsible props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``trigger`` (ReactNode; required): Content shown in the trigger area (always visible).
+- ``children`` (ReactNode): Content that collapses and expands.
+- ``defaultIsOpen`` (boolean): Default open state (uncontrolled).
+- ``isOpen`` (boolean): Controlled open state.
+- ``onOpenChange`` ((isOpen: boolean) => void): Callback invoked when the open state changes.
+- ``value`` (string): Identifier used for group coordination. Required when placed inside an
+  CollapsibleGroup.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Collapsible>.

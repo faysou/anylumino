@@ -17,15 +17,16 @@
 # # Astryx theme smoke test
 #
 # This notebook exercises runtime Astryx themes and a precompiled-style
-# `AstryxBuiltTheme` descriptor inside JupyterLab output areas.
+# `BuiltTheme` descriptor inside JupyterLab output areas.
 
 # %%
 from __future__ import annotations
 
 import anylumino as al
+import anylumino.astryx as ax
 
 
-runtime_blue = al.AstryxBrand(
+runtime_blue = ax.Brand(
     "runtime-blue",
     **{
         "color-accent": ("#0057b8", "#79b8ff"),
@@ -35,7 +36,7 @@ runtime_blue = al.AstryxBrand(
     },
 )
 
-runtime_green = al.AstryxBrand(
+runtime_green = ax.Brand(
     "runtime-green",
     **{
         "color-accent": ("#0f7b43", "#7be0a3"),
@@ -60,7 +61,7 @@ built_css = """
 }
 """
 
-built_plum = al.AstryxBuiltTheme(
+built_plum = ax.BuiltTheme(
     "built-plum",
     css=built_css,
     tokens={
@@ -71,25 +72,25 @@ built_plum = al.AstryxBuiltTheme(
 )
 
 
-def theme_panel(title: str, theme: dict[str, object], mode: str) -> al.AstryxTheme:
-    return al.AstryxTheme(
-        al.AstryxCard(
-            al.AstryxStack(
+def theme_panel(title: str, theme: dict[str, object], mode: str) -> ax.Theme:
+    return ax.Theme(
+        ax.Card(
+            ax.Stack(
                 {
-                    "title": al.AstryxHeading(title, level=3),
-                    "body": al.AstryxText(f"mode={mode}", type="supporting", color="secondary"),
-                    "actions": al.AstryxStack(
+                    "title": ax.Heading(title, level=3),
+                    "body": ax.Text(f"mode={mode}", type="supporting", color="secondary"),
+                    "actions": ax.Stack(
                         {
-                            "button": al.AstryxButton("Primary", variant="primary"),
-                            "badge": al.AstryxBadge("Ready", variant="success"),
-                            "status": al.AstryxStatusDot("Connected", variant="success"),
+                            "button": ax.Button("Primary", variant="primary"),
+                            "badge": ax.Badge("Ready", variant="success"),
+                            "status": ax.StatusDot("Connected", variant="success"),
                         },
                         direction="horizontal",
                         gap=2,
                         align="center",
                         wrap="wrap",
                     ),
-                    "progress": al.AstryxProgressBar(72, label="Coverage", hasValueLabel=True),
+                    "progress": ax.ProgressBar(72, label="Coverage", hasValueLabel=True),
                 },
                 gap=2,
             ),
@@ -102,7 +103,7 @@ def theme_panel(title: str, theme: dict[str, object], mode: str) -> al.AstryxThe
     )
 
 
-themes = al.AstryxGrid(
+themes = ax.Grid(
     {
         "runtime_light": theme_panel("Runtime blue light", runtime_blue, "light"),
         "runtime_dark": theme_panel("Runtime blue dark", runtime_blue, "dark"),

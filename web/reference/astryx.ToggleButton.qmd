@@ -1,0 +1,50 @@
+# astryx.ToggleButton { #anylumino.astryx.ToggleButton }
+
+```python
+astryx.ToggleButton(value=False, *, label, disabled=False, **props)
+```
+
+Render a two-state Astryx toggle button.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type   | Description                                                                               | Default    |
+|----------|--------|-------------------------------------------------------------------------------------------|------------|
+| value    | bool   | Synchronized component value.                                                             | `False`    |
+| label    | str    | Visible or accessible label for the component.                                            | _required_ |
+| disabled | bool   | Whether the component should render disabled.                                             | `False`    |
+| **props  | Any    | JSON-safe ToggleButton props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe ToggleButton props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``label`` (string; required): Accessible label for the button. Used as visible text, or as
+  aria-label for icon-only buttons.
+- ``isPressed`` (boolean): Whether the button is currently pressed. Ignored when inside a group.
+- ``onPressedChange`` ((isPressed: boolean, event: MouseEvent) => void): Called when pressed
+  state should change. Receives the next state and the click event; call
+  event.preventDefault() to skip pressedChangeAction. Ignored when inside a group.
+- ``pressedChangeAction`` ((isPressed: boolean) => void or Promise<void>): Action handler for
+  API- or navigation-backed toggles, run in a transition. Shows an optimistic pressed state
+  immediately and a spinner while pending; the button stays interruptible by re-clicks.
+- ``size`` ('sm' or 'md' or 'lg'): Button size. Defaults to group size when inside a group.
+- ``isDisabled`` (boolean): Whether the button is disabled.
+- ``isLoading`` (boolean): Whether the button shows a loading spinner.
+- ``icon`` (ReactNode): Icon element. When provided without children, button becomes icon-only
+  with tooltip from label.
+- ``isIconOnly`` (boolean): When true, renders as a square icon-only button with 'label' as the
+  aria-label and an automatic tooltip from the label.
+- ``pressedIcon`` (ReactNode): Icon shown when pressed. Falls back to icon if not provided.
+- ``children`` (ReactNode): Visible content. If omitted with icon, button becomes icon-only.
+- ``tooltip`` (string): Tooltip text shown on hover.
+- ``value`` (string): Value identifier when used inside ToggleButtonGroup. Required in groups.
+- ``data-testid`` (string): Test selector for automated testing frameworks.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/ToggleButton>.

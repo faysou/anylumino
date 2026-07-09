@@ -1,0 +1,58 @@
+# astryx.CodeBlock { #anylumino.astryx.CodeBlock }
+
+```python
+astryx.CodeBlock(code, *, language='python', **props)
+```
+
+Render syntax-highlighted code with Astryx styling.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type   | Description                                                                            | Default    |
+|----------|--------|----------------------------------------------------------------------------------------|------------|
+| code     | str    | Astryx component option.                                                               | _required_ |
+| language | str    | Code language used for syntax highlighting.                                            | `'python'` |
+| **props  | Any    | JSON-safe CodeBlock props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe CodeBlock props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``code`` (string; required): The code string to display.
+- ``language`` (string): Language for syntax highlighting. Use "plaintext" to disable.
+- ``title`` (string): Filename or label shown in the header bar.
+- ``hasLanguageLabel`` (boolean): Show the language name in the header bar. Hidden when language
+  is "plaintext".
+- ``hasLineNumbers`` (boolean): Show a line number gutter.
+- ``highlightLines`` (number[]): 1-indexed line numbers to highlight.
+- ``hasCopyButton`` (boolean): Show a copy-to-clipboard button.
+- ``onCopy`` (() => void): Callback after the code is copied.
+- ``isWrapped`` (boolean): Wrap long lines instead of enabling horizontal scroll.
+- ``maxHeight`` (number or string): Max height before the block scrolls vertically.
+- ``size`` ('sm' or 'md'): Text size variant.
+- ``width`` (string): Width of the code block. Any CSS width value. 'fit-content' (default)
+  shrinks to longest line. '100%' fills parent width.
+- ``container`` ('card' or 'section'): Container presentation style. 'card' (default): border
+  and radius with the muted syntax background for a standalone card look. 'section': no
+  border or radius and a transparent background so the block blends into the card or panel
+  it's embedded in.
+- ``tokenizer`` ((code: string, language: string) => Array<{type: string; start: number; end:
+  number}>): Custom tokenizer override for unsupported languages.
+- ``isCollapsible`` (boolean): Allow collapsing the code body into just the header bar. Starts
+  expanded; the header becomes clickable to toggle. Only shows the toggle when the code
+  exceeds collapsibleThreshold lines.
+- ``collapsibleThreshold`` (number): Minimum number of lines before the collapse toggle appears.
+  Below this threshold the code block renders normally even when isCollapsible is true.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization. Must be a stylex.create()
+  value.
+- ``className`` (string): CSS class name for the root element. Prefer xstyle for styling.
+- ``style`` (CSSProperties): Inline styles. Prefer xstyle for StyleX-optimized styling.
+- ``data-testid`` (string): Test selector for automated testing frameworks.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/CodeBlock>.

@@ -27,12 +27,13 @@ mapping is preferred for application-style notebooks because it gives each child
 a stable key:
 
 ```python
-from anylumino import TabPanel, TextWidget
+from anylumino import TabPanel
+from anylumino import astryx as ax
 
 tabs = TabPanel(
     {
-        "status": TextWidget("Ready"),
-        "logs": TextWidget("No events yet"),
+        "status": ax.Text("Ready"),
+        "logs": ax.Text("No events yet"),
     },
     titles={"status": "Status", "logs": "Logs"},
 )
@@ -63,15 +64,16 @@ another layout.
 
 ```python
 import anylumino as al
+import anylumino.astryx as ax
 
 
 class FigurePanel(al.VBox):
     def __init__(self, figure):
         self.figure = figure
-        toolbar = al.AstryxStack(
+        toolbar = ax.Stack(
             {
-                "title": al.AstryxHeading("Figure", level=3),
-                "refresh": al.AstryxButton(
+                "title": ax.Heading("Figure", level=3),
+                "refresh": ax.Button(
                     "Refresh",
                     variant="primary",
                     callbacks=[lambda _button: self.refresh()],
@@ -183,14 +185,14 @@ the action id.
 ```python
 import anylumino as al
 
-toolbar = al.AstryxStack(
+toolbar = ax.Stack(
     {
-        "refresh": al.AstryxButton(
+        "refresh": ax.Button(
             "Refresh",
             variant="primary",
             callbacks=[lambda _button: figure_panel.refresh()],
         ),
-        "note": al.AstryxButton(
+        "note": ax.Button(
             "Note",
             callbacks=[lambda _button: figure_panel.add_note(text="Event")],
         ),
@@ -202,8 +204,8 @@ toolbar = al.AstryxStack(
 
 For compact application chrome, the Lumino-style `Toolbar`, `MenuBar`, and
 `CommandPalette` remain available and dispatch action ids to Python callbacks.
-For notebook content, prefer Astryx controls such as `AstryxButton`,
-`AstryxCommandPalette`, and `AstryxSegmentedControl` because they share the
+For notebook content, prefer Astryx controls such as `Button`,
+`CommandPalette`, and `SegmentedControl` because they share the
 same visual system as forms, tables, and status surfaces.
 
 Lumino, Astryx, and the bundled workflow icon set are compiled into

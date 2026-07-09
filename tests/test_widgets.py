@@ -2,100 +2,30 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
+
+from anylumino import astryx as ax
+from anylumino import spectrum as sx
 import traitlets as t
 
 from anylumino import (
     AccordionPanel,
-    AstryxAlertDialog,
-    AstryxBadge,
-    AstryxAvatarGroup,
-    AstryxBanner,
-    AstryxButton,
-    AstryxCard,
-    AstryxCalendar,
-    AstryxCheckboxList,
-    AstryxCode,
-    AstryxCodeBlock,
-    AstryxCommandPalette,
-    AstryxComponent,
-    AstryxDialog,
-    AstryxDropdownMenu,
-    AstryxEmptyState,
-    AstryxField,
-    AstryxFileInput,
-    AstryxFormLayout,
-    AstryxHeading,
-    AstryxHoverCard,
-    AstryxInputGroup,
-    AstryxMoreMenu,
-    AstryxMultiSelector,
-    AstryxNumberInput,
-    AstryxOutline,
-    AstryxProgressBar,
-    AstryxPopover,
-    AstryxRadioList,
-    AstryxSegmentedControl,
-    AstryxSelector,
-    AstryxSlider,
-    AstryxStack,
-    AstryxStatusDot,
-    AstryxTabList,
-    AstryxTable,
-    AstryxText,
-    AstryxTextArea,
-    AstryxTextInput,
-    AstryxTheme,
-    AstryxTooltip,
-    AstryxToggleButton,
-    AstryxTokenizer,
-    AstryxTreeList,
-    AstryxTypeahead,
-    AstryxWidget,
-    AstryxBrand,
-    AstryxBuiltTheme,
-    Badge,
     BoxPanel,
-    Button,
-    Checkbox,
-    ClearButton,
-    CloseButton,
     CommandPalette,
     ComponentWidget,
-    ControlWidget,
     DatePicker,
     DatetimePicker,
-    DialogBox,
-    Divider,
-    Dropdown,
-    FieldGroup,
     GridPanel,
     HBox,
-    HTMLMath,
-    IntSlider,
-    Link,
-    ListBox,
-    Meter,
-    Modal,
-    OpacityCheckerboard,
     DockPanel,
     LayoutWidget,
     MenuBar,
     ResponsivePanel,
     ScrollBox,
-    SearchInput,
-    SelectionRangeSlider,
-    SpectrumElement,
-    SpectrumWidget,
     SplitPanel,
     StackedPanel,
     TabPanel,
-    TextInput,
     TextWidget,
-    Tooltip,
     Toolbar,
-    StatusLight,
-    Switch,
-    Table,
     VBox,
 )
 from anylumino.common import static_asset
@@ -438,7 +368,7 @@ def test_action_widget_invokes_registered_callback() -> None:
 
 
 def test_control_icon_metadata_is_synced() -> None:
-    button = Button(
+    button = sx.Button(
         description="Help",
         icon="HelpCircle",
         icon_size="m",
@@ -475,11 +405,11 @@ def test_menubar_and_command_palette_store_actions() -> None:
 
 
 def test_anylumino_controls_are_composable_children() -> None:
-    button = Button(description="Run")
-    symbol = TextInput(value="Greenhouse A", description="Dataset")
-    interval = Dropdown(options=["Daily", "Weekly"], value="Daily", description="Interval")
-    live = Checkbox(value=True, description="Enabled")
-    rows = IntSlider(value=100, min=10, max=250, description="Rows")
+    button = sx.Button(description="Run")
+    symbol = sx.TextInput(value="Greenhouse A", description="Dataset")
+    interval = sx.Dropdown(options=["Daily", "Weekly"], value="Daily", description="Interval")
+    live = sx.Checkbox(value=True, description="Enabled")
+    rows = sx.IntSlider(value=100, min=10, max=250, description="Rows")
 
     panel = GridPanel(
         {
@@ -492,7 +422,7 @@ def test_anylumino_controls_are_composable_children() -> None:
         columns="1fr",
     )
 
-    assert isinstance(button, ControlWidget)
+    assert isinstance(button, sx.ControlWidget)
     assert panel.get_widget("button") is button
     assert panel["symbol"] is symbol
     assert panel.child_keys == ["button", "symbol", "interval", "live", "rows"]
@@ -503,24 +433,24 @@ def test_date_controls_are_native_family_not_spectrum_controls() -> None:
     picker = DatePicker()
 
     assert picker.control_family == "native"
-    assert isinstance(picker, ControlWidget) is False
+    assert isinstance(picker, sx.ControlWidget) is False
 
 
 def test_widget_frontend_assets_are_lazy_paths() -> None:
     assert _asset_path(TabPanel._esm).parent.name == "layout"
     assert _asset_path(TextWidget._esm).parent.name == "layout"
-    assert _asset_path(ControlWidget._esm).name == "control_widget.bundle.js"
-    assert _asset_path(ControlWidget._esm).parent.name == "spectrum"
-    assert _asset_path(ControlWidget._css).name == "control_widget.css"
+    assert _asset_path(sx.ControlWidget._esm).name == "control_widget.bundle.js"
+    assert _asset_path(sx.ControlWidget._esm).parent.name == "spectrum"
+    assert _asset_path(sx.ControlWidget._css).name == "control_widget.css"
     assert _asset_path(DatePicker._esm).name == "native_control_widget.bundle.js"
     assert _asset_path(DatePicker._esm).parent.name == "spectrum"
     assert _asset_path(DatePicker._css).name == "native_control_widget.css"
-    assert _asset_path(SpectrumWidget._esm).name == "spectrum_widget.bundle.js"
-    assert _asset_path(SpectrumWidget._esm).parent.name == "spectrum"
-    assert _asset_path(SpectrumWidget._css).name == "spectrum_widget.css"
-    assert _asset_path(AstryxWidget._esm).name == "astryx_widget.bundle.js"
-    assert _asset_path(AstryxWidget._esm).parent.name == "astryx"
-    assert _asset_path(AstryxWidget._css).name == "astryx_widget.bundle.css"
+    assert _asset_path(sx.SpectrumWidget._esm).name == "spectrum_widget.bundle.js"
+    assert _asset_path(sx.SpectrumWidget._esm).parent.name == "spectrum"
+    assert _asset_path(sx.SpectrumWidget._css).name == "spectrum_widget.css"
+    assert _asset_path(ax.Widget._esm).name == "astryx_widget.bundle.js"
+    assert _asset_path(ax.Widget._esm).parent.name == "astryx"
+    assert _asset_path(ax.Widget._css).name == "astryx_widget.bundle.css"
 
 
 def test_missing_static_asset_is_import_safe_until_loaded() -> None:
@@ -538,14 +468,14 @@ def test_datetime_picker_preserves_iso_precision() -> None:
 
 
 def test_dropdown_option_pairs_are_normalized_once() -> None:
-    control = Dropdown(options=[("One", 1), ("Two", 2)], index=1)
+    control = sx.Dropdown(options=[("One", 1), ("Two", 2)], index=1)
 
     assert control.options == (("One", 1), ("Two", 2))
     assert control.value == 2
 
 
 def test_html_math_is_html_alias() -> None:
-    widget = HTMLMath(value="<strong>x</strong>", description="Value")
+    widget = sx.HTMLMath(value="<strong>x</strong>", description="Value")
 
     assert widget.control_kind == "html"
     assert widget.html is True
@@ -554,13 +484,13 @@ def test_html_math_is_html_alias() -> None:
 
 def test_spectrum_component_wrappers_sync_kind_and_metadata() -> None:
     controls = {
-        "search": SearchInput(value="iris", description="Search"),
-        "switch": Switch(value=True, description="Enabled"),
-        "status": StatusLight(value=True, description="Ready", variant="positive"),
-        "badge": Badge(value="Ready", variant="informative", icon="InfoCircle"),
-        "meter": Meter(value=64, description="Coverage", variant="positive", readout=True),
-        "link": Link("https://example.com", description="Docs"),
-        "divider": Divider(spectrum_size="l"),
+        "search": sx.SearchInput(value="iris", description="Search"),
+        "switch": sx.Switch(value=True, description="Enabled"),
+        "status": sx.StatusLight(value=True, description="Ready", variant="positive"),
+        "badge": sx.Badge(value="Ready", variant="informative", icon="InfoCircle"),
+        "meter": sx.Meter(value=64, description="Coverage", variant="positive", readout=True),
+        "link": sx.Link("https://example.com", description="Docs"),
+        "divider": sx.Divider(spectrum_size="l"),
     }
 
     assert controls["search"].control_kind == "search"
@@ -573,7 +503,7 @@ def test_spectrum_component_wrappers_sync_kind_and_metadata() -> None:
 
 
 def test_spectrum_table_normalizes_mapping_rows_and_columns() -> None:
-    table = Table(
+    table = sx.Table(
         rows=[
             {"symbol": "AAPL", "price": 195.12, "status": "Open"},
             {"symbol": "MSFT", "price": 423.85, "status": "Closed"},
@@ -612,7 +542,7 @@ def test_spectrum_table_normalizes_mapping_rows_and_columns() -> None:
 
 
 def test_spectrum_table_normalizes_sequence_rows_without_columns() -> None:
-    table = Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")])
+    table = sx.Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")])
 
     assert table.columns == [
         {"key": "column_1", "label": "column_1", "sortable": False, "align": ""},
@@ -625,7 +555,7 @@ def test_spectrum_table_normalizes_sequence_rows_without_columns() -> None:
 
 
 def test_spectrum_table_helpers_replace_append_update_and_remove_rows() -> None:
-    table = Table(
+    table = sx.Table(
         rows=[{"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"}],
         columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
         row_key="order_id",
@@ -653,7 +583,7 @@ def test_spectrum_table_helpers_replace_append_update_and_remove_rows() -> None:
 
 
 def test_spectrum_table_prepend_row_inserts_before_existing_rows() -> None:
-    table = Table(
+    table = sx.Table(
         rows=[{"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "NEW"}],
         columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
         row_key="order_id",
@@ -673,7 +603,7 @@ def test_spectrum_table_prepend_row_inserts_before_existing_rows() -> None:
 
 
 def test_spectrum_table_set_rows_accepts_live_raw_rows() -> None:
-    table = Table(columns=["order_id", "status"], row_key="order_id", selected=["O-1", "O-3"])
+    table = sx.Table(columns=["order_id", "status"], row_key="order_id", selected=["O-1", "O-3"])
 
     table.set_rows(
         [
@@ -690,7 +620,7 @@ def test_spectrum_table_set_rows_accepts_live_raw_rows() -> None:
 
 
 def test_spectrum_table_append_row_skips_existing_auto_values_after_removal() -> None:
-    table = Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS"), ("Quarterly", "DOC")])
+    table = sx.Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS"), ("Quarterly", "DOC")])
 
     table.remove_row("1")
 
@@ -703,7 +633,7 @@ def test_spectrum_table_append_row_skips_existing_auto_values_after_removal() ->
 
 
 def test_spectrum_table_prepend_row_skips_existing_auto_values() -> None:
-    table = Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")])
+    table = sx.Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")])
 
     assert table.prepend_row(("Roadmap", "MD")) == "2"
     assert table.rows == [
@@ -714,7 +644,7 @@ def test_spectrum_table_prepend_row_skips_existing_auto_values() -> None:
 
 
 def test_spectrum_table_row_helpers_reject_duplicate_and_missing_rows() -> None:
-    table = Table(
+    table = sx.Table(
         rows=[{"order_id": "O-1", "status": "NEW"}],
         columns=["order_id", "status"],
         row_key="order_id",
@@ -731,7 +661,7 @@ def test_spectrum_table_row_helpers_reject_duplicate_and_missing_rows() -> None:
 
 
 def test_selection_range_slider_resolves_index_to_values() -> None:
-    slider = SelectionRangeSlider(
+    slider = sx.SelectionRangeSlider(
         options=["Mon", "Tue", "Wed", "Thu", "Fri"],
         index=(1, 3),
     )
@@ -741,7 +671,7 @@ def test_selection_range_slider_resolves_index_to_values() -> None:
 
 
 def test_list_box_alias_uses_anylumino_select_control() -> None:
-    control = ListBox(options=["Greenhouse A", "Greenhouse B"], value="Greenhouse A")
+    control = sx.ListBox(options=["Greenhouse A", "Greenhouse B"], value="Greenhouse A")
 
     assert control.value == "Greenhouse A"
     assert control.options == ("Greenhouse A", "Greenhouse B")
@@ -750,25 +680,25 @@ def test_list_box_alias_uses_anylumino_select_control() -> None:
 
 def test_spectrum_widgets_share_generic_component_base() -> None:
     widgets = [
-        SpectrumElement("section"),
-        ClearButton(),
-        CloseButton(),
-        FieldGroup({"field": TextInput(value="x")}),
-        Tooltip("More detail", {"trigger": Button(description="Info")}),
-        OpacityCheckerboard(),
-        Table(rows=[{"name": "Budget", "type": "PDF"}]),
-        DialogBox({"body": TextWidget("Settings")}, title="Settings"),
-        Modal({"body": TextWidget("Confirm")}, title="Confirm"),
+        sx.SpectrumElement("section"),
+        sx.ClearButton(),
+        sx.CloseButton(),
+        sx.FieldGroup({"field": sx.TextInput(value="x")}),
+        sx.Tooltip("More detail", {"trigger": sx.Button(description="Info")}),
+        sx.OpacityCheckerboard(),
+        sx.Table(rows=[{"name": "Budget", "type": "PDF"}]),
+        sx.DialogBox({"body": TextWidget("Settings")}, title="Settings"),
+        sx.Modal({"body": TextWidget("Confirm")}, title="Confirm"),
     ]
 
     assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
-    assert [isinstance(widget, SpectrumWidget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, sx.SpectrumWidget) for widget in widgets] == [True] * len(widgets)
 
 
 def test_spectrum_widget_children_are_keyed_and_composable() -> None:
-    text = TextInput(value="Dataset")
-    switch = Switch(value=True, description="Enabled")
-    group = FieldGroup({"name": text, "enabled": switch}, orientation="vertical")
+    text = sx.TextInput(value="Dataset")
+    switch = sx.Switch(value=True, description="Enabled")
+    group = sx.FieldGroup({"name": text, "enabled": switch}, orientation="vertical")
 
     assert group.component_kind == "field-group"
     assert group.child_keys == ["name", "enabled"]
@@ -782,7 +712,7 @@ def test_spectrum_widget_children_are_keyed_and_composable() -> None:
 
 
 def test_spectrum_overlay_state_uses_is_open_without_shadowing_widget_open() -> None:
-    dialog = DialogBox({"body": TextWidget("Dialog")}, title="Settings", open=False)
+    dialog = sx.DialogBox({"body": TextWidget("Dialog")}, title="Settings", open=False)
 
     assert callable(dialog.open)
     assert dialog.is_open is False
@@ -799,14 +729,14 @@ def test_spectrum_overlay_state_uses_is_open_without_shadowing_widget_open() -> 
 
 def test_astryx_widgets_share_generic_component_base() -> None:
     widgets = [
-        AstryxButton("Run", variant="primary"),
-        AstryxTextInput(value="AAPL", label="Symbol", placeholder="Ticker"),
-        AstryxComponent("Badge", label="Live", props={"variant": "success"}),
-        AstryxStack({"button": AstryxButton("Run")}, direction="horizontal", gap=1),
+        ax.Button("Run", variant="primary"),
+        ax.TextInput(value="AAPL", label="Symbol", placeholder="Ticker"),
+        ax.Component("Badge", label="Live", props={"variant": "success"}),
+        ax.Stack({"button": ax.Button("Run")}, direction="horizontal", gap=1),
     ]
 
     assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
-    assert [isinstance(widget, AstryxWidget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, ax.Widget) for widget in widgets] == [True] * len(widgets)
     assert widgets[0].component_family == "astryx"
     assert widgets[0].component_name == "Button"
     assert widgets[0].label == "Run"
@@ -823,49 +753,49 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
         {"id": "m", "symbol": "MSFT", "status": "Paused"},
     ]
     widgets = [
-        AstryxText("Overview"),
-        AstryxHeading("Orders", level=3),
-        AstryxBadge("Live", variant="success"),
-        AstryxTextArea(value="Notes", label="Notes", rows=4),
-        AstryxNumberInput(value=25, label="Limit", min=0, max=100),
-        AstryxSlider(value=42, label="Risk", min=0, max=100),
-        AstryxToggleButton(value=True, label="Pinned"),
-        AstryxSelector([("Latency", "latency"), ("Volume", "volume")], value="latency", label="Metric"),
-        AstryxMultiSelector(["Bid", "Ask", "Last"], value=["Bid", "Last"], label="Fields"),
-        AstryxTabList(["Summary", "Orders", "Fills"], value="Summary"),
-        AstryxSegmentedControl(["Compact", "Detailed"], value="Compact", label="Density"),
-        AstryxRadioList(["Auto", "Manual"], value="Auto", label="Mode"),
-        AstryxCheckboxList(["Quotes", "Trades"], value=["Quotes"], label="Streams"),
-        AstryxTable(rows, {"symbol": "Symbol", "status": "Status"}),
-        AstryxCard({"body": AstryxText("Card body")}),
-        AstryxAvatarGroup(["Ada", "Grace"], overflow_count=1),
-        AstryxFormLayout({"symbol": AstryxTextInput(value="AAPL", label="Symbol")}),
-        AstryxField(AstryxTextInput(value="MSFT", label="Symbol", isLabelHidden=True), label="Field symbol"),
-        AstryxInputGroup(AstryxNumberInput(value=10, label="Qty", isLabelHidden=True), label="Quantity", suffix="sh"),
-        AstryxCalendar("2026-07-09"),
-        AstryxFileInput(label="Upload", accept=".csv"),
-        AstryxStatusDot("Connected", variant="success"),
-        AstryxProgressBar(55, label="Progress", variant="success"),
-        AstryxEmptyState("No orders", description="The selected account has no open orders."),
-        AstryxBanner("Market data connected", status="success"),
-        AstryxCode("symbol"),
-        AstryxCodeBlock("print('ready')", language="python"),
-        AstryxOutline([{"id": "summary", "label": "Summary", "level": 1}]),
-        AstryxTreeList([{"id": "src", "label": "src", "isExpanded": True, "children": [{"id": "app", "label": "app.py"}]}]),
-        AstryxDropdownMenu(["Refresh", {"label": "Export", "value": "export"}], label="Actions"),
-        AstryxMoreMenu(["Edit", "Delete"]),
-        AstryxTooltip("Run cell", AstryxButton("Run")),
-        AstryxHoverCard(AstryxText("Preview"), AstryxButton("Preview")),
-        AstryxPopover(AstryxText("Settings"), AstryxButton("Open"), label="Settings"),
-        AstryxTypeahead(["AAPL", "MSFT"], value="AAPL", label="Symbol"),
-        AstryxTokenizer(["Bid", "Ask", "Last"], value=["Bid", "Ask"], label="Fields"),
-        AstryxCommandPalette([{"id": "refresh", "label": "Refresh"}], value="refresh"),
-        AstryxDialog(AstryxText("Inline dialog")),
-        AstryxAlertDialog("Confirm", "Continue?", action_label="Continue"),
+        ax.Text("Overview"),
+        ax.Heading("Orders", level=3),
+        ax.Badge("Live", variant="success"),
+        ax.TextArea(value="Notes", label="Notes", rows=4),
+        ax.NumberInput(value=25, label="Limit", min=0, max=100),
+        ax.Slider(value=42, label="Risk", min=0, max=100),
+        ax.ToggleButton(value=True, label="Pinned"),
+        ax.Selector([("Latency", "latency"), ("Volume", "volume")], value="latency", label="Metric"),
+        ax.MultiSelector(["Bid", "Ask", "Last"], value=["Bid", "Last"], label="Fields"),
+        ax.TabList(["Summary", "Orders", "Fills"], value="Summary"),
+        ax.SegmentedControl(["Compact", "Detailed"], value="Compact", label="Density"),
+        ax.RadioList(["Auto", "Manual"], value="Auto", label="Mode"),
+        ax.CheckboxList(["Quotes", "Trades"], value=["Quotes"], label="Streams"),
+        ax.Table(rows, {"symbol": "Symbol", "status": "Status"}),
+        ax.Card({"body": ax.Text("Card body")}),
+        ax.AvatarGroup(["Ada", "Grace"], overflow_count=1),
+        ax.FormLayout({"symbol": ax.TextInput(value="AAPL", label="Symbol")}),
+        ax.Field(ax.TextInput(value="MSFT", label="Symbol", isLabelHidden=True), label="Field symbol"),
+        ax.InputGroup(ax.NumberInput(value=10, label="Qty", isLabelHidden=True), label="Quantity", suffix="sh"),
+        ax.Calendar("2026-07-09"),
+        ax.FileInput(label="Upload", accept=".csv"),
+        ax.StatusDot("Connected", variant="success"),
+        ax.ProgressBar(55, label="Progress", variant="success"),
+        ax.EmptyState("No orders", description="The selected account has no open orders."),
+        ax.Banner("Market data connected", status="success"),
+        ax.Code("symbol"),
+        ax.CodeBlock("print('ready')", language="python"),
+        ax.Outline([{"id": "summary", "label": "Summary", "level": 1}]),
+        ax.TreeList([{"id": "src", "label": "src", "isExpanded": True, "children": [{"id": "app", "label": "app.py"}]}]),
+        ax.DropdownMenu(["Refresh", {"label": "Export", "value": "export"}], label="Actions"),
+        ax.MoreMenu(["Edit", "Delete"]),
+        ax.Tooltip("Run cell", ax.Button("Run")),
+        ax.HoverCard(ax.Text("Preview"), ax.Button("Preview")),
+        ax.Popover(ax.Text("Settings"), ax.Button("Open"), label="Settings"),
+        ax.Typeahead(["AAPL", "MSFT"], value="AAPL", label="Symbol"),
+        ax.Tokenizer(["Bid", "Ask", "Last"], value=["Bid", "Ask"], label="Fields"),
+        ax.CommandPalette([{"id": "refresh", "label": "Refresh"}], value="refresh"),
+        ax.Dialog(ax.Text("Inline dialog")),
+        ax.AlertDialog("Confirm", "Continue?", action_label="Continue"),
     ]
 
     assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
-    assert [isinstance(widget, AstryxWidget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, ax.Widget) for widget in widgets] == [True] * len(widgets)
     assert widgets[1].component_name == "Heading"
     assert widgets[1].props == {"level": 3}
     assert widgets[3].component_name == "TextArea"
@@ -898,7 +828,7 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
 
 
 def test_astryx_theme_applies_reusable_brand_to_child_widgets() -> None:
-    brand = AstryxBrand(
+    brand = ax.Brand(
         "desk",
         **{
             "color-accent": ("#0057b8", "#79b8ff"),
@@ -907,8 +837,8 @@ def test_astryx_theme_applies_reusable_brand_to_child_widgets() -> None:
             "radius-container": "8px",
         },
     )
-    button = AstryxButton("Run")
-    panel = AstryxTheme({"button": button}, brand=brand, mode="system", gap=3)
+    button = ax.Button("Run")
+    panel = ax.Theme({"button": button}, brand=brand, mode="system", gap=3)
 
     assert brand == {
         "name": "desk",
@@ -932,13 +862,13 @@ def test_astryx_built_theme_applies_precompiled_theme_descriptor_to_child_widget
         '[data-astryx-theme="desk-built"] { --color-accent: #0057b8; }',
         encoding="utf-8",
     )
-    theme = AstryxBuiltTheme(
+    theme = ax.BuiltTheme(
         "desk-built",
         css=css_path,
         tokens={"color-accent": "#0057b8", "--radius-container": "6px"},
     )
-    button = AstryxButton("Run")
-    panel = AstryxTheme({"button": button}, brand=theme, mode="dark")
+    button = ax.Button("Run")
+    panel = ax.Theme({"button": button}, brand=theme, mode="dark")
 
     assert theme == {
         "name": "desk-built",
@@ -955,8 +885,8 @@ def test_astryx_built_theme_applies_precompiled_theme_descriptor_to_child_widget
 
 @pytest.mark.parametrize("mode", ["light", "dark", "system"])
 def test_astryx_theme_accepts_supported_modes_for_runtime_and_built_themes(mode: str) -> None:
-    runtime = AstryxTheme(brand=AstryxBrand("runtime", **{"color-accent": ("#111111", "#eeeeee")}), mode=mode)
-    built = AstryxTheme(brand=AstryxBuiltTheme("neutral"), mode=mode)
+    runtime = ax.Theme(brand=ax.Brand("runtime", **{"color-accent": ("#111111", "#eeeeee")}), mode=mode)
+    built = ax.Theme(brand=ax.BuiltTheme("neutral"), mode=mode)
 
     assert runtime.color_mode == mode
     assert built.color_mode == mode
@@ -965,11 +895,11 @@ def test_astryx_theme_accepts_supported_modes_for_runtime_and_built_themes(mode:
 
 def test_astryx_theme_rejects_invalid_theme_modes() -> None:
     with pytest.raises(ValueError, match="theme mode must be one of"):
-        AstryxTheme(color_mode="sepia")
+        ax.Theme(color_mode="sepia")
 
 
 def test_astryx_typeahead_can_use_python_backed_search(monkeypatch: pytest.MonkeyPatch) -> None:
-    widget = AstryxTypeahead(
+    widget = ax.Typeahead(
         ["AAPL", "MSFT"],
         label="Symbol",
         search=lambda query: [{"id": f"{query}-1", "label": query.upper()}],
@@ -995,14 +925,14 @@ def test_astryx_typeahead_can_use_python_backed_search(monkeypatch: pytest.Monke
 
 
 def test_astryx_tokenizer_static_search_remains_default() -> None:
-    widget = AstryxTokenizer(["Bid", "Ask"], value=["Bid"], label="Fields")
+    widget = ax.Tokenizer(["Bid", "Ask"], value=["Bid"], label="Fields")
 
     assert widget.search_mode == "static"
     assert widget.props["items"] == [{"id": "Bid", "label": "Bid"}, {"id": "Ask", "label": "Ask"}]
 
 
 def test_astryx_command_palette_can_use_python_backed_search(monkeypatch: pytest.MonkeyPatch) -> None:
-    widget = AstryxCommandPalette(
+    widget = ax.CommandPalette(
         [{"id": "refresh", "label": "Refresh"}],
         search=lambda query: [{"id": f"{query}-cmd", "label": f"Run {query}"}],
     )
@@ -1027,7 +957,7 @@ def test_astryx_command_palette_can_use_python_backed_search(monkeypatch: pytest
 
 
 def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> None:
-    table = AstryxTable(
+    table = ax.Table(
         rows=[
             {"symbol": "AAPL", "price": 195.12, "venue": "XNAS", "status": "Open"},
             {"symbol": "MSFT", "price": 423.85, "venue": "XNAS", "status": "Open"},
@@ -1085,7 +1015,7 @@ def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> Non
 
 
 def test_astryx_table_selection_and_sort_callbacks_match_spectrum_table_api() -> None:
-    table = AstryxTable(
+    table = ax.Table(
         rows=[
             {"symbol": "AAPL", "price": 195.12},
             {"symbol": "MSFT", "price": 423.85},
@@ -1115,7 +1045,7 @@ def test_astryx_table_selection_and_sort_callbacks_match_spectrum_table_api() ->
 
 
 def test_astryx_table_accepts_sequence_rows_without_columns() -> None:
-    table = AstryxTable(rows=[("Budget", "PDF"), ("Onboarding", "XLS")], row_key=None)
+    table = ax.Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")], row_key=None)
 
     assert table.row_key == "__row_id"
     assert table.columns == [
@@ -1130,9 +1060,9 @@ def test_astryx_table_accepts_sequence_rows_without_columns() -> None:
 
 
 def test_astryx_widget_children_are_keyed_and_composable() -> None:
-    button = AstryxButton("Run")
-    symbol = AstryxTextInput(value="AAPL", label="Symbol")
-    stack = AstryxStack({"button": button, "symbol": symbol}, direction="horizontal", gap=2)
+    button = ax.Button("Run")
+    symbol = ax.TextInput(value="AAPL", label="Symbol")
+    stack = ax.Stack({"button": button, "symbol": symbol}, direction="horizontal", gap=2)
 
     assert stack.component_name == "Stack"
     assert stack.child_keys == ["button", "symbol"]

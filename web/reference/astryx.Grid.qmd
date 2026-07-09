@@ -1,0 +1,47 @@
+# astryx.Grid { #anylumino.astryx.Grid }
+
+```python
+astryx.Grid(children=None, *, columns=2, gap=3, **props)
+```
+
+Arrange child widgets in an Astryx grid.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                       | Description                                                                       | Default   |
+|----------|----------------------------|-----------------------------------------------------------------------------------|-----------|
+| children | ChildInput                 | Child widget, sequence of widgets, or mapping of slot names to widgets.           | `None`    |
+| columns  | int \| Mapping\[str, Any\] | Grid or table column definition.                                                  | `2`       |
+| gap      | int \| float               | Astryx spacing step between children.                                             | `3`       |
+| **props  | Any                        | JSON-safe Grid props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Grid props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``columns`` (number or {minWidth: number, max?: number, repeat?: 'fill' or 'fit'}): Column
+  configuration. Use a number for fixed columns (e.g. 'columns={3}'). Use an object for
+  responsive columns: 'minWidth' sets the minimum column width in px, 'repeat' controls
+  track behavior ('"fill"' preserves empty tracks for consistent widths, '"fit"' collapses
+  empty tracks so items stretch; defaults to '"fill"'), and 'max' caps the maximum number of
+  columns.
+- ``minChildWidth`` (number): Deprecated: use 'columns={{minWidth: 280}}' instead. Minimum item
+  width in px; enables responsive auto-fit.
+- ``width`` (number or string): Container width.
+- ``height`` (number or string): Container height.
+- ``gap`` (SpacingStep): Spacing between all items.
+- ``rowGap`` (SpacingStep): Row spacing; overrides 'gap' for the row axis.
+- ``columnGap`` (SpacingStep): Column spacing; overrides 'gap' for the column axis.
+- ``align`` (GridAlignment): Vertical alignment of items.
+- ``justify`` (GridAlignment): Horizontal alignment of items.
+- ``children`` (ReactNode): Grid content.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value: not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Grid>.

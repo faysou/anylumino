@@ -1,0 +1,48 @@
+# astryx.MoreMenu { #anylumino.astryx.MoreMenu }
+
+```python
+astryx.MoreMenu(
+    items,
+    *,
+    label='More options',
+    variant='ghost',
+    disabled=False,
+    callbacks=None,
+    **props,
+)
+```
+
+Render a compact overflow action menu.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                      | Description                                                                           | Default          |
+|-----------|-----------------------------------------------------------|---------------------------------------------------------------------------------------|------------------|
+| items     | Iterable\[Any\]                                           | Item records used by generated child components or static search sources.             | _required_       |
+| label     | str                                                       | Visible or accessible label for the component.                                        | `'More options'` |
+| variant   | str                                                       | Astryx visual variant.                                                                | `'ghost'`        |
+| disabled  | bool                                                      | Whether the component should render disabled.                                         | `False`          |
+| callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                    | `None`           |
+| **props   | Any                                                       | JSON-safe MoreMenu props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`             |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe MoreMenu props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``items`` (DropdownMenuOption[]; required): Menu items: data array of actions, dividers, and
+  sections. Same type as DropdownMenu items prop.
+- ``label`` (string): Accessible label for the trigger button (aria-label) and tooltip text.
+- ``variant`` (ButtonVariant): Visual style variant of the trigger button.
+- ``size`` (ButtonSize): Size of the trigger button.
+- ``icon`` (ReactNode): Override the default three-dot icon. Accepts any ReactNode.
+- ``isDisabled`` (boolean): Whether the menu trigger is disabled.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value, not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/MoreMenu>.

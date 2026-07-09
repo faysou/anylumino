@@ -1,0 +1,67 @@
+# astryx.Button { #anylumino.astryx.Button }
+
+```python
+astryx.Button(
+    label,
+    *,
+    variant='secondary',
+    disabled=False,
+    callbacks=None,
+    **props,
+)
+```
+
+Render an Astryx push button.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                      | Description                                                                         | Default       |
+|-----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------|---------------|
+| label     | str                                                       | Visible or accessible label for the component.                                      | _required_    |
+| variant   | str                                                       | Astryx visual variant.                                                              | `'secondary'` |
+| disabled  | bool                                                      | Whether the component should render disabled.                                       | `False`       |
+| callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                  | `None`        |
+| **props   | Any                                                       | JSON-safe Button props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`          |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Button props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``label`` (string; required): Accessible label. Rendered as visible text by default; used as
+  aria-label when isIconOnly is true.
+- ``variant`` ('primary' or 'secondary' or 'ghost' or 'destructive'): Visual style variant.
+- ``size`` ('sm' or 'md' or 'lg'): Size variant.
+- ``type`` ('button' or 'submit' or 'reset'): HTML button type attribute.
+- ``name`` (string): HTML name attribute for form submission.
+- ``value`` (string or number or readonly string[]): HTML value attribute for form submission.
+- ``form`` (string): Associates the button with a form element by ID.
+- ``isLoading`` (boolean): Shows a loading spinner and disables interaction. Announces "Loading"
+  via a live region.
+- ``isInterruptible`` (boolean): Keep the button clickable while a clickAction is pending: the
+  spinner and aria-busy still show, but the button is not disabled and the action is not
+  deduped, so a re-click lands and interrupts the in-flight action with a fresh one.
+- ``isDisabled`` (boolean): Disables the button. When a tooltip is present, uses aria-disabled
+  instead of native disabled so the button stays focusable.
+- ``icon`` (ReactNode): Icon element rendered before the label text.
+- ``isIconOnly`` (boolean): When true, renders as a square icon-only button with label as
+  aria-label. Requires icon. Tip: for a dedicated icon-only button component, use IconButton
+  from '@astryxdesign/core/IconButton' instead.
+- ``children`` (ReactNode): Optional override for visible text. When provided, displayed instead
+  of label, but label is still required (it provides the accessible name). For most cases,
+  just use label alone: <Button label="Save" />.
+- ``endContent`` (ReactElement<IconProps> or ReactElement<BadgeProps>): Trailing icon or badge
+  rendered after the label. Ignored when isIconOnly is true. Color is inherited from the
+  button variant.
+- ``tooltip`` (string): Tooltip text shown on hover.
+- ``onClick`` ((e: MouseEvent) => void): Standard click handler (passed through from
+  ButtonHTMLAttributes).
+- ``clickAction`` ((e: MouseEvent) => void or Promise<void>): Async click handler. Shows loading
+  state while the returned promise is pending.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Button>.

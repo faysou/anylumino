@@ -1,0 +1,53 @@
+# astryx.Selector { #anylumino.astryx.Selector }
+
+```python
+astryx.Selector(options, value=None, *, label='', **props)
+```
+
+Render a single-value Astryx selector.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                                   | Description                                                                           | Default    |
+|---------|----------------------------------------|---------------------------------------------------------------------------------------|------------|
+| options | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.            | _required_ |
+| value   | str \| None                            | Synchronized component value.                                                         | `None`     |
+| label   | str                                    | Visible or accessible label for the component.                                        | `''`       |
+| **props | Any                                    | JSON-safe Selector props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Selector props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``label`` (string; required): Label text for accessibility.
+- ``options`` (SelectorOption[]; required): Array of items: strings, objects with
+  value/label/icon/disabled, dividers ({type: "divider"}), or sections ({type: "section",
+  title, items}).
+- ``value`` (string): Currently selected value.
+- ``onChange`` ((value: string) => void): Callback fired when the selection changes.
+- ``hasClear`` (boolean): Shows a clear (x) button when a value is selected. When true, onChange
+  also accepts null to signal the user cleared the selection.
+- ``hasSearch`` (boolean): Whether to show a search input for filtering options.
+- ``searchPlaceholder`` (string): Placeholder text for the search input.
+- ``placeholder`` (string): Placeholder text shown when no value is selected.
+- ``size`` ('sm' or 'md' or 'lg'): Size variant for the selector.
+- ``isDisabled`` (boolean): Disables the selector.
+- ``isLabelHidden`` (boolean): Visually hides the label while keeping it accessible.
+- ``description`` (string): Helper text displayed below the label.
+- ``isOptional`` (boolean): Marks the field as optional.
+- ``isRequired`` (boolean): Marks the field as required.
+- ``status`` ({type: 'error' or 'warning' or 'success', message?: string}): Validation status
+  with an optional message.
+- ``renderOption`` ((option: SelectorOptionData) => ReactNode): Custom render function for each
+  selectable option in the dropdown. Use this instead of JSX children; dividers and sections
+  are rendered by the selector.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value: not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Selector>.

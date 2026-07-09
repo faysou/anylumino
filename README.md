@@ -18,8 +18,9 @@ another layout.
 
 ```python
 import anylumino as al
+import anylumino.astryx as ax
 
-brand = al.AstryxBrand(
+brand = ax.Brand(
     "desk",
     **{
         "color-accent": ("#0057b8", "#79b8ff"),
@@ -29,9 +30,9 @@ brand = al.AstryxBrand(
     },
 )
 
-status = al.TextWidget("Ready")
+status = ax.Text("Ready")
 
-orders = al.AstryxTable(
+orders = ax.Table(
     rows=[
         {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
         {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
@@ -44,28 +45,28 @@ orders = al.AstryxTable(
     width="100%",
 )
 
-controls = al.AstryxTheme(
+controls = ax.Theme(
     {
-        "heading": al.AstryxStack(
+        "heading": ax.Stack(
             {
-                "title": al.AstryxHeading("Orders", level=3),
-                "badge": al.AstryxBadge("Live", variant="success"),
+                "title": ax.Heading("Orders", level=3),
+                "badge": ax.Badge("Live", variant="success"),
             },
             direction="horizontal",
             gap=2,
             align="center",
         ),
-        "symbol": al.AstryxTypeahead(
+        "symbol": ax.Typeahead(
             ["AAPL", "MSFT", "NVDA"],
             value="AAPL",
             label="Symbol",
         ),
-        "fields": al.AstryxTokenizer(
+        "fields": ax.Tokenizer(
             ["Bid", "Ask", "Last", "Size"],
             value=["Bid", "Ask"],
             label="Fields",
         ),
-        "refresh": al.AstryxButton(
+        "refresh": ax.Button(
             "Refresh",
             variant="primary",
             callbacks=[lambda _button: setattr(status, "value", "Refreshed")],
@@ -98,11 +99,10 @@ al.SplitPanel(
 - Astryx table helpers: normalized rows and columns, optional checkbox
   selection, sorting, row append/prepend/update/remove helpers, and Python
   callbacks for selection and sort changes.
-- Reusable Astryx theming with `AstryxBrand` and `AstryxTheme`, so notebooks can
+- Reusable Astryx theming with `Brand` and `Theme`, so notebooks can
   define shared colors, radii, and component treatment once.
-- Action widgets: `AstryxToolbar`, `AstryxDropdownMenu`, `AstryxMoreMenu`, and
-  `AstryxCommandPalette` for notebook-safe commands.
-- `TextWidget`, a small helper used by tests and smoke notebooks.
+- Action widgets: `Toolbar`, `DropdownMenu`, `MoreMenu`, and
+  `CommandPalette` for notebook-safe commands.
 
 All layout containers inherit from `LayoutWidget`, which provides keyed child
 composition, owner access, dynamic mutation, and method forwarding.
@@ -123,7 +123,7 @@ Layout children can be declared with semantic keys. If `titles` is omitted for
 a mapping, the titles default to those keys.
 
 ```python
-tabs = al.TabPanel({"orders": orders, "logs": al.TextWidget("No events")})
+tabs = al.TabPanel({"orders": orders, "logs": ax.Text("No events")})
 tabs.select_key("orders")
 tabs.selected_key
 tabs.get_widget("logs")
@@ -145,7 +145,7 @@ is still an anywidget and can be nested inside another layout:
 ```python
 class OrderDashboard(al.VBox):
     def __init__(self, rows):
-        self.table = al.AstryxTable(
+        self.table = ax.Table(
             rows,
             row_key="order_id",
             selects="multiple",
@@ -167,21 +167,21 @@ Astryx widgets are the UI family for notebook-facing controls. They use the
 `Astryx*` prefix so notebook component code stays explicit:
 
 ```python
-form = al.AstryxFormLayout(
+form = ax.FormLayout(
     {
-        "symbol": al.AstryxTextInput(value="AAPL", label="Symbol"),
-        "quantity": al.AstryxNumberInput(value=100, label="Quantity", min=1),
-        "side": al.AstryxSegmentedControl(
+        "symbol": ax.TextInput(value="AAPL", label="Symbol"),
+        "quantity": ax.NumberInput(value=100, label="Quantity", min=1),
+        "side": ax.SegmentedControl(
             ["Buy", "Sell"],
             value="Buy",
             label="Side",
         ),
-        "routing": al.AstryxSelector(
+        "routing": ax.Selector(
             ["Smart", "Primary", "Dark"],
             value="Smart",
             label="Routing",
         ),
-        "urgent": al.AstryxCheckbox(value=False, label="Urgent"),
+        "urgent": ax.Checkbox(value=False, label="Urgent"),
     }
 )
 ```
@@ -190,8 +190,8 @@ Read an input widget's current value with `.value`. Use traitlets observers
 when another widget should react to edits:
 
 ```python
-symbol = al.AstryxTextInput(value="AAPL", label="Symbol")
-quantity = al.AstryxNumberInput(value=100, label="Quantity")
+symbol = ax.TextInput(value="AAPL", label="Symbol")
+quantity = ax.NumberInput(value=100, label="Quantity")
 
 symbol.value
 quantity.value
@@ -203,8 +203,8 @@ Button-like widgets use callbacks because a click is an event, not a persistent
 value.
 
 ```python
-status = al.TextWidget("Ready")
-button = al.AstryxButton(
+status = ax.Text("Ready")
+button = ax.Button(
     "Submit",
     variant="primary",
     callbacks=[lambda _button: setattr(status, "value", "Submitted")],
@@ -213,12 +213,12 @@ button = al.AstryxButton(
 
 ## Astryx tables
 
-`AstryxTable` renders structured row data with optional checkbox selection and
+`Table` renders structured row data with optional checkbox selection and
 sorting. Pass mappings, sequences, or scalar rows; use `row_key` when mappings
 contain a stable row id such as an order id or symbol.
 
 ```python
-orders = al.AstryxTable(
+orders = ax.Table(
     rows=[
         {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
         {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
@@ -245,11 +245,11 @@ column, use `selects="single"` for one selected row, or use
 
 ## Theming
 
-Use `AstryxBrand` and `AstryxTheme` for small reusable notebook theme
+Use `Brand` and `Theme` for small reusable notebook theme
 overrides:
 
 ```python
-brand = al.AstryxBrand(
+brand = ax.Brand(
     "desk",
     **{
         "color-accent": ("#0057b8", "#79b8ff"),
@@ -258,18 +258,18 @@ brand = al.AstryxBrand(
     },
 )
 
-panel = al.AstryxTheme(
-    {"button": al.AstryxButton("Run"), "status": al.AstryxBadge("Ready")},
+panel = ax.Theme(
+    {"button": ax.Button("Run"), "status": ax.Badge("Ready")},
     brand=brand,
     mode="system",
     gap=2,
 )
 ```
 
-`AstryxTheme` propagates the brand to nested Astryx children because every
+`Theme` propagates the brand to nested Astryx children because every
 anywidget child is mounted in its own frontend root. See
 `docs/astryx_brand_theme.md` for runtime `defineTheme()` themes,
-precompiled `AstryxBuiltTheme` CSS themes, and the workflow for defining new
+precompiled `BuiltTheme` CSS themes, and the workflow for defining new
 Astryx themes. That document also describes the frontend style injection,
 deduplication, and JupyterLab testing workflow for theme changes.
 

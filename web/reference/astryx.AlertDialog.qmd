@@ -1,0 +1,62 @@
+# astryx.AlertDialog { #anylumino.astryx.AlertDialog }
+
+```python
+astryx.AlertDialog(
+    title,
+    description,
+    *,
+    action_label,
+    cancel_label='Cancel',
+    open=True,
+    inline=True,
+    callbacks=None,
+    **props,
+)
+```
+
+Render an inline Astryx alert dialog for confirmations.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                                      | Description                                                                              | Default    |
+|--------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------|------------|
+| title        | str                                                       | Dialog title linked to the alert for accessibility.                                      | _required_ |
+| description  | str                                                       | Consequence or confirmation text linked to the alert for accessibility.                  | _required_ |
+| action_label | str                                                       | Primary action button label.                                                             | _required_ |
+| cancel_label | str                                                       | Cancel button label.                                                                     | `'Cancel'` |
+| open         | bool                                                      | Initial open state synchronized through ``value``.                                       | `True`     |
+| inline       | bool                                                      | Whether dialog content renders inline instead of using native modal behavior.            | `True`     |
+| callbacks    | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked when the primary action is activated.                           | `None`     |
+| **props      | Any                                                       | JSON-safe AlertDialog props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe AlertDialog props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``isOpen`` (boolean; required): Whether the dialog is open.
+- ``onOpenChange`` ((isOpen: boolean) => unknown; required): Visibility change callback.
+- ``title`` (string; required): Dialog title. Linked via aria-labelledby.
+- ``description`` (string; required): Consequence description. Linked via aria-describedby.
+- ``actionLabel`` (string; required): Action button label.
+- ``onAction`` (() => unknown; required): Called when action button is clicked. Does NOT
+  auto-close.
+- ``cancelLabel`` (string): Cancel button label.
+- ``actionVariant`` (ButtonVariant): Action button variant.
+- ``isActionLoading`` (boolean): Shows loading spinner on the action button.
+- ``width`` (number or string): Dialog width.
+- ``isInline`` (boolean): Renders alert dialog content inline without modal behavior. For
+  documentation previews and showcases only.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/AlertDialog>.
+
+## Notes {.doc-section .doc-section-notes}
+
+The wrapper defaults to inline rendering to avoid modal focus-management
+conflicts inside Jupyter output areas. The primary action emits a click
+message with ``action="confirm"``.

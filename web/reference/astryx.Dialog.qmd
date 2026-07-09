@@ -1,0 +1,50 @@
+# astryx.Dialog { #anylumino.astryx.Dialog }
+
+```python
+astryx.Dialog(children=None, *, open=True, inline=True, **props)
+```
+
+Render Astryx dialog content inline in notebook output.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type       | Description                                                                                       | Default   |
+|----------|------------|---------------------------------------------------------------------------------------------------|-----------|
+| children | ChildInput | Dialog body content. Pass a widget, a sequence of widgets, or a mapping of slot names to widgets. | `None`    |
+| open     | bool       | Initial open state synchronized through ``value``.                                                | `True`    |
+| inline   | bool       | Whether dialog content renders inline instead of using native modal behavior.                     | `True`    |
+| **props  | Any        | JSON-safe Dialog props forwarded to Astryx. See the ``Astryx Props`` section below.               | `{}`      |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Dialog props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``isOpen`` (boolean; required): Whether the dialog is open.
+- ``onOpenChange`` ((isOpen: boolean) => unknown; required): Callback when dialog visibility
+  changes.
+- ``children`` (ReactNode; required): Dialog content.
+- ``width`` (number or string): Width of the dialog in pixels or any CSS value.
+- ``maxHeight`` (number or string): Maximum height of the dialog.
+- ``position`` (DialogPosition): Static position for the dialog; centered by default when
+  omitted.
+- ``variant`` ('standard' or 'fullscreen'): Dialog variant: fullscreen expands to fill the
+  entire viewport.
+- ``purpose`` ('required' or 'form' or 'info'): Controls dismissal behavior: required disables
+  Escape and backdrop click; form disables backdrop click after interaction; info allows
+  both.
+- ``isInline`` (boolean): Renders dialog content inline without the <dialog> element, backdrop,
+  or modal behavior. For documentation previews and showcases only.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Dialog>.
+
+## Notes {.doc-section .doc-section-notes}
+
+The wrapper defaults to inline rendering to avoid modal focus-management
+conflicts inside Jupyter output areas. Set ``inline=False`` only when the
+surrounding notebook environment can safely host modal dialogs.

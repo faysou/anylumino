@@ -19,15 +19,15 @@
 # %%
 from __future__ import annotations
 
-from anylumino import AstryxBadge
-from anylumino import AstryxCard
-from anylumino import AstryxDivider
-from anylumino import AstryxHeading
-from anylumino import AstryxStack
-from anylumino import AstryxTable
+from anylumino.astryx import Badge
+from anylumino.astryx import Card
+from anylumino.astryx import Divider
+from anylumino.astryx import Heading
+from anylumino.astryx import Stack
+from anylumino.astryx import Table
 
 
-table = AstryxTable(
+table = Table(
     rows=[
         {"symbol": "AAPL", "price": 195.12, "venue": "XNAS", "status": "Open", "qty": 400},
         {"symbol": "MSFT", "price": 423.85, "venue": "XNAS", "status": "Open", "qty": 250},
@@ -54,14 +54,14 @@ table = AstryxTable(
     width="100%",
 )
 
-panel = AstryxCard(
+panel = Card(
     {
-        "content": AstryxStack(
+        "content": Stack(
             {
-                "title": AstryxStack(
+                "title": Stack(
                     {
-                        "heading": AstryxHeading("Orders", level=3),
-                        "badge": AstryxBadge("Live", variant="success"),
+                        "heading": Heading("Orders", level=3),
+                        "badge": Badge("Live", variant="success"),
                     },
                     direction="horizontal",
                     align="center",
@@ -69,7 +69,7 @@ panel = AstryxCard(
                     gap=3,
                     width="100%",
                 ),
-                "divider": AstryxDivider(),
+                "divider": Divider(),
                 "table": table,
             },
             direction="vertical",

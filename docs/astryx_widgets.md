@@ -12,8 +12,9 @@ shared brand identity.
 
 ```python
 import anylumino as al
+import anylumino.astryx as ax
 
-brand = al.AstryxBrand(
+brand = ax.Brand(
     "desk",
     **{
         "color-accent": ("#0057b8", "#79b8ff"),
@@ -23,9 +24,9 @@ brand = al.AstryxBrand(
     },
 )
 
-status = al.TextWidget("Ready")
+status = ax.Text("Ready")
 
-orders = al.AstryxTable(
+orders = ax.Table(
     rows=[
         {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
         {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
@@ -37,33 +38,33 @@ orders = al.AstryxTable(
     width="100%",
 )
 
-controls = al.AstryxTheme(
+controls = ax.Theme(
     {
-        "header": al.AstryxStack(
+        "header": ax.Stack(
             {
-                "title": al.AstryxHeading("Orders", level=3),
-                "badge": al.AstryxBadge("Live", variant="success"),
+                "title": ax.Heading("Orders", level=3),
+                "badge": ax.Badge("Live", variant="success"),
             },
             direction="horizontal",
             align="center",
             gap=2,
         ),
-        "symbol": al.AstryxTypeahead(
+        "symbol": ax.Typeahead(
             ["AAPL", "MSFT", "NVDA"],
             value="AAPL",
             label="Symbol",
         ),
-        "fields": al.AstryxTokenizer(
+        "fields": ax.Tokenizer(
             ["Bid", "Ask", "Last", "Size"],
             value=["Bid", "Ask"],
             label="Fields",
         ),
-        "density": al.AstryxSegmentedControl(
+        "density": ax.SegmentedControl(
             ["Compact", "Standard"],
             value="Standard",
             label="Density",
         ),
-        "refresh": al.AstryxButton(
+        "refresh": ax.Button(
             "Refresh",
             variant="primary",
             callbacks=[lambda _button: setattr(status, "value", "Refreshed")],
@@ -90,136 +91,136 @@ al.SplitPanel(
 Use these when creating reusable wrappers, applying shared styling, or reaching
 for a component that does not yet have a dedicated Python class.
 
-- `AstryxWidget`
-- `AstryxComponent`
-- `AstryxBrand`
-- `AstryxTheme`
+- `Widget`
+- `Component`
+- `Brand`
+- `Theme`
 
 ### Typography and content
 
 Use these for headings, body copy, rendered Markdown, code, links, avatars, and
 small semantic content.
 
-- `AstryxText`
-- `AstryxHeading`
-- `AstryxMarkdown`
-- `AstryxCode`
-- `AstryxCodeBlock`
-- `AstryxBlockquote`
-- `AstryxKbd`
-- `AstryxLink`
-- `AstryxCitation`
-- `AstryxTimestamp`
-- `AstryxThumbnail`
-- `AstryxAvatar`
-- `AstryxAvatarGroup`
-- `AstryxIcon`
+- `Text`
+- `Heading`
+- `Markdown`
+- `Code`
+- `CodeBlock`
+- `Blockquote`
+- `Kbd`
+- `Link`
+- `Citation`
+- `Timestamp`
+- `Thumbnail`
+- `Avatar`
+- `AvatarGroup`
+- `Icon`
 
 ### Layout containers
 
 Use these to arrange Astryx content inside a notebook output before placing the
 result in a Lumino layout.
 
-- `AstryxStack`
-- `AstryxGrid`
-- `AstryxCenter`
-- `AstryxSection`
-- `AstryxCard`
-- `AstryxClickableCard`
-- `AstryxAspectRatio`
-- `AstryxDivider`
-- `AstryxCollapsible`
+- `Stack`
+- `Grid`
+- `Center`
+- `Section`
+- `Card`
+- `ClickableCard`
+- `AspectRatio`
+- `Divider`
+- `Collapsible`
 
 ### Forms and direct inputs
 
 Use these for direct value entry and form composition.
 
-- `AstryxFormLayout`
-- `AstryxField`
-- `AstryxFieldStatus`
-- `AstryxInputGroup`
-- `AstryxTextInput`
-- `AstryxTextArea`
-- `AstryxNumberInput`
-- `AstryxSlider`
-- `AstryxCheckbox`
-- `AstryxSwitch`
-- `AstryxToggleButton`
-- `AstryxDateInput`
-- `AstryxDateRangeInput`
-- `AstryxDateTimeInput`
-- `AstryxTimeInput`
-- `AstryxCalendar`
-- `AstryxFileInput`
+- `FormLayout`
+- `Field`
+- `FieldStatus`
+- `InputGroup`
+- `TextInput`
+- `TextArea`
+- `NumberInput`
+- `Slider`
+- `Checkbox`
+- `Switch`
+- `ToggleButton`
+- `DateInput`
+- `DateRangeInput`
+- `DateTimeInput`
+- `TimeInput`
+- `Calendar`
+- `FileInput`
 
 ### Selection and search
 
 Use these when users choose from predefined options or searchable static
 sources.
 
-- `AstryxSelector`
-- `AstryxMultiSelector`
-- `AstryxSegmentedControl`
-- `AstryxRadioList`
-- `AstryxCheckboxList`
-- `AstryxTypeahead`
-- `AstryxTokenizer`
+- `Selector`
+- `MultiSelector`
+- `SegmentedControl`
+- `RadioList`
+- `CheckboxList`
+- `Typeahead`
+- `Tokenizer`
 
 ### Actions and menus
 
 Use these for command surfaces and button-like interactions.
 
-- `AstryxButton`
-- `AstryxIconButton`
-- `AstryxButtonGroup`
-- `AstryxToolbar`
-- `AstryxDropdownMenu`
-- `AstryxMoreMenu`
-- `AstryxCommandPalette`
+- `Button`
+- `IconButton`
+- `ButtonGroup`
+- `Toolbar`
+- `DropdownMenu`
+- `MoreMenu`
+- `CommandPalette`
 
 ### Feedback and status
 
 Use these to show state, progress, loading placeholders, or empty results.
 
-- `AstryxBadge`
-- `AstryxStatusDot`
-- `AstryxProgressBar`
-- `AstryxSpinner`
-- `AstryxSkeleton`
-- `AstryxToken`
-- `AstryxBanner`
-- `AstryxEmptyState`
+- `Badge`
+- `StatusDot`
+- `ProgressBar`
+- `Spinner`
+- `Skeleton`
+- `Token`
+- `Banner`
+- `EmptyState`
 
 ### Overlays and previews
 
 Use these for notebook-safe contextual surfaces. Dialog wrappers default to
 inline rendering so they stay inside the output area.
 
-- `AstryxTooltip`
-- `AstryxHoverCard`
-- `AstryxPopover`
-- `AstryxDialog`
-- `AstryxAlertDialog`
+- `Tooltip`
+- `HoverCard`
+- `Popover`
+- `Dialog`
+- `AlertDialog`
 
 ### Navigation and data
 
 Use these for structured navigation and data-heavy notebook views.
 
-- `AstryxBreadcrumbs`
-- `AstryxTabList`
-- `AstryxList`
-- `AstryxMetadataList`
-- `AstryxOutline`
-- `AstryxTreeList`
-- `AstryxTable`
+- `Breadcrumbs`
+- `TabList`
+- `List`
+- `MetadataList`
+- `Outline`
+- `TreeList`
+- `Table`
 
 ## State and callbacks
 
 Input widgets expose a synced `.value` trait:
 
 ```python
-symbol = al.AstryxTextInput(value="AAPL", label="Symbol")
-quantity = al.AstryxNumberInput(value=100, label="Quantity")
+symbol = ax.TextInput(value="AAPL", label="Symbol")
+quantity = ax.NumberInput(value=100, label="Quantity")
 
 symbol.value
 quantity.value
@@ -230,8 +231,8 @@ symbol.observe(lambda change: print(change["new"]), names="value")
 Button-style widgets use callbacks because a click is an event:
 
 ```python
-status = al.TextWidget("Ready")
-submit = al.AstryxButton(
+status = ax.Text("Ready")
+submit = ax.Button(
     "Submit",
     variant="primary",
     callbacks=[lambda _button: setattr(status, "value", "Submitted")],
@@ -240,10 +241,10 @@ submit = al.AstryxButton(
 
 ## Table selection and sorting
 
-`AstryxTable` keeps selection and sort state in synced traits:
+`Table` keeps selection and sort state in synced traits:
 
 ```python
-orders = al.AstryxTable(
+orders = ax.Table(
     rows=[
         {"order_id": "O-1", "symbol": "AAPL", "qty": 10},
         {"order_id": "O-2", "symbol": "MSFT", "qty": 5},
@@ -267,13 +268,13 @@ row, or `selects="multiple"` for checkbox multi-selection.
 Dialog-style components default to inline rendering:
 
 ```python
-preview = al.AstryxDialog(
-    al.AstryxText("Inline dialog content stays inside the notebook output."),
+preview = ax.Dialog(
+    ax.Text("Inline dialog content stays inside the notebook output."),
     open=True,
     width=360,
 )
 
-confirm = al.AstryxAlertDialog(
+confirm = ax.AlertDialog(
     "Confirm action",
     "This inline preview uses the alert dialog surface.",
     action_label="Confirm",

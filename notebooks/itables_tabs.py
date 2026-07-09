@@ -24,15 +24,12 @@
 # %%
 from __future__ import annotations
 
+import anylumino.spectrum as sx
 import pandas as pd
 from itables.widget import ITable
 
-from anylumino import Button
-from anylumino import Dropdown
-from anylumino import IntSlider
 from anylumino import SplitPanel
 from anylumino import TabPanel
-from anylumino import TextInput
 from anylumino import TextWidget
 from anylumino import Toolbar
 from anylumino import VBox
@@ -67,12 +64,12 @@ state = {
     "next_sample_id": 4,
 }
 
-site_input = TextInput(value="East bed", description="Site")
-species_input = Dropdown(options=["Iris", "Daisy", "Lupine"], value="Iris", description="Species")
-count_input = IntSlider(value=10, min=1, max=50, step=1, description="Count")
-height_input = IntSlider(value=30, min=5, max=80, step=1, description="Height cm")
-add_button = Button(description="Add row", variant="accent", icon="AddContent")
-reset_button = Button(description="Reset", icon="RotateRight")
+site_input = sx.TextInput(value="East bed", description="Site")
+species_input = sx.Dropdown(options=["Iris", "Daisy", "Lupine"], value="Iris", description="Species")
+count_input = sx.IntSlider(value=10, min=1, max=50, step=1, description="Count")
+height_input = sx.IntSlider(value=30, min=5, max=80, step=1, description="Height cm")
+add_button = sx.Button(description="Add row", variant="accent", icon="AddContent")
+reset_button = sx.Button(description="Reset", icon="RotateRight")
 status = TextWidget("Ready. Press Add row to append to the DataFrame and refresh the ITable.")
 summary = TextWidget(make_summary(state["df"]))
 

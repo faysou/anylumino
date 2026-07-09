@@ -1,0 +1,32 @@
+# astryx.AspectRatio { #anylumino.astryx.AspectRatio }
+
+```python
+astryx.AspectRatio(children=None, *, ratio=16 / 9, **props)
+```
+
+Constrain child content to a fixed aspect ratio.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type         | Description                                                                              | Default    |
+|----------|--------------|------------------------------------------------------------------------------------------|------------|
+| children | ChildInput   | Child widget, sequence of widgets, or mapping of slot names to widgets.                  | `None`     |
+| ratio    | int \| float | Aspect ratio as a numeric width divided by height value.                                 | `'16 / 9'` |
+| **props  | Any          | JSON-safe AspectRatio props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe AspectRatio props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``ratio`` (number; required): Aspect ratio as width/height (e.g. 16/9, 1).
+- ``children`` (ReactNode; required): Content positioned absolutely to fill the container.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value, not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/AspectRatio>.

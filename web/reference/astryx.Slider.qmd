@@ -1,0 +1,57 @@
+# astryx.Slider { #anylumino.astryx.Slider }
+
+```python
+astryx.Slider(value=0, *, label='', disabled=False, **props)
+```
+
+Render an Astryx slider control.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                                                        | Description                                                                         | Default   |
+|----------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------------|-----------|
+| value    | int \| float \| tuple\[int \| float, int \| float\] \| list\[int \| float\] | Synchronized component value.                                                       | `0`       |
+| label    | str                                                                         | Visible or accessible label for the component.                                      | `''`      |
+| disabled | bool                                                                        | Whether the component should render disabled.                                       | `False`   |
+| **props  | Any                                                                         | JSON-safe Slider props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Slider props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``label`` (string; required): Label text (always rendered for accessibility).
+- ``value`` (number or [number, number]; required): Current value: a 'number' for single thumb
+  mode or '[number, number]' for range mode.
+- ``onChange`` ((value: number) => void or (value: [number, number]) => void): Callback fired on
+  value change during drag.
+- ``onChangeEnd`` ((value: number) => void or (value: [number, number]) => void): Callback fired
+  when drag ends.
+- ``min`` (number): Minimum value.
+- ``max`` (number): Maximum value.
+- ``step`` (number): Step increment.
+- ``orientation`` ('horizontal' or 'vertical'): Orientation of the slider.
+- ``formatValue`` ((value: number) => string): Custom value formatting function used for display
+  and 'aria-valuetext'.
+- ``valueDisplay`` ('tooltip' or 'text' or 'none'): How the current value is displayed.
+- ``marks`` (Array<{ value: number; label?: string }>): Tick marks at specified positions with
+  optional labels.
+- ``minStepsBetweenThumbs`` (number): Minimum number of steps between thumbs in range mode;
+  prevents thumbs from overlapping.
+- ``isDisabled`` (boolean): Whether the slider is disabled.
+- ``isOptional`` (boolean): Whether the field is optional.
+- ``isRequired`` (boolean): Whether the field is required.
+- ``isLabelHidden`` (boolean): Whether to visually hide the label.
+- ``description`` (string): Description text rendered below the label.
+- ``status`` (InputStatus): Status indicator object ('{ type, message }') for validation
+  feedback.
+- ``labelTooltip`` (string): Tooltip text for an info icon displayed next to the label.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value, not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Slider>.

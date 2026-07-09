@@ -70,110 +70,109 @@ quartodoc:
         - StackedPanel
         - GridPanel
         - ResponsivePanel
-        - TextWidget
     - title: "Astryx base and theme"
       desc: "Shared Astryx wrapper primitives and reusable theme identity."
       contents:
-        - AstryxWidget
-        - AstryxComponent
-        - AstryxBrand
-        - AstryxBuiltTheme
-        - AstryxTheme
+        - astryx.Widget
+        - astryx.Component
+        - astryx.Brand
+        - astryx.BuiltTheme
+        - astryx.Theme
     - title: "Astryx typography and content"
       desc: "Text, headings, code, markdown, and semantic inline content."
       contents:
-        - AstryxText
-        - AstryxHeading
-        - AstryxMarkdown
-        - AstryxCode
-        - AstryxCodeBlock
-        - AstryxBlockquote
-        - AstryxKbd
-        - AstryxLink
-        - AstryxCitation
-        - AstryxTimestamp
-        - AstryxThumbnail
-        - AstryxAvatar
-        - AstryxAvatarGroup
-        - AstryxIcon
+        - astryx.Text
+        - astryx.Heading
+        - astryx.Markdown
+        - astryx.Code
+        - astryx.CodeBlock
+        - astryx.Blockquote
+        - astryx.Kbd
+        - astryx.Link
+        - astryx.Citation
+        - astryx.Timestamp
+        - astryx.Thumbnail
+        - astryx.Avatar
+        - astryx.AvatarGroup
+        - astryx.Icon
     - title: "Astryx layout containers"
       desc: "Containers for arranging Astryx content inside notebook outputs."
       contents:
-        - AstryxStack
-        - AstryxGrid
-        - AstryxCenter
-        - AstryxSection
-        - AstryxCard
-        - AstryxClickableCard
-        - AstryxAspectRatio
-        - AstryxDivider
-        - AstryxCollapsible
+        - astryx.Stack
+        - astryx.Grid
+        - astryx.Center
+        - astryx.Section
+        - astryx.Card
+        - astryx.ClickableCard
+        - astryx.AspectRatio
+        - astryx.Divider
+        - astryx.Collapsible
     - title: "Astryx forms and inputs"
       desc: "Form composition and direct value-entry controls."
       contents:
-        - AstryxFormLayout
-        - AstryxField
-        - AstryxFieldStatus
-        - AstryxInputGroup
-        - AstryxTextInput
-        - AstryxTextArea
-        - AstryxNumberInput
-        - AstryxSlider
-        - AstryxCheckbox
-        - AstryxSwitch
-        - AstryxToggleButton
-        - AstryxDateInput
-        - AstryxDateRangeInput
-        - AstryxDateTimeInput
-        - AstryxTimeInput
-        - AstryxCalendar
-        - AstryxFileInput
+        - astryx.FormLayout
+        - astryx.Field
+        - astryx.FieldStatus
+        - astryx.InputGroup
+        - astryx.TextInput
+        - astryx.TextArea
+        - astryx.NumberInput
+        - astryx.Slider
+        - astryx.Checkbox
+        - astryx.Switch
+        - astryx.ToggleButton
+        - astryx.DateInput
+        - astryx.DateRangeInput
+        - astryx.DateTimeInput
+        - astryx.TimeInput
+        - astryx.Calendar
+        - astryx.FileInput
     - title: "Astryx selection and search"
       desc: "Choice controls, searchable fields, and tokenized filters."
       contents:
-        - AstryxSelector
-        - AstryxMultiSelector
-        - AstryxSegmentedControl
-        - AstryxRadioList
-        - AstryxCheckboxList
-        - AstryxTypeahead
-        - AstryxTokenizer
+        - astryx.Selector
+        - astryx.MultiSelector
+        - astryx.SegmentedControl
+        - astryx.RadioList
+        - astryx.CheckboxList
+        - astryx.Typeahead
+        - astryx.Tokenizer
     - title: "Astryx actions and menus"
       desc: "Buttons, toolbars, menus, and command launchers."
       contents:
-        - AstryxButton
-        - AstryxIconButton
-        - AstryxButtonGroup
-        - AstryxToolbar
-        - AstryxDropdownMenu
-        - AstryxMoreMenu
-        - AstryxCommandPalette
+        - astryx.Button
+        - astryx.IconButton
+        - astryx.ButtonGroup
+        - astryx.Toolbar
+        - astryx.DropdownMenu
+        - astryx.MoreMenu
+        - astryx.CommandPalette
     - title: "Astryx feedback and status"
       desc: "Status indicators, progress, loading states, and empty states."
       contents:
-        - AstryxBadge
-        - AstryxStatusDot
-        - AstryxProgressBar
-        - AstryxSpinner
-        - AstryxSkeleton
-        - AstryxToken
-        - AstryxBanner
-        - AstryxEmptyState
+        - astryx.Badge
+        - astryx.StatusDot
+        - astryx.ProgressBar
+        - astryx.Spinner
+        - astryx.Skeleton
+        - astryx.Token
+        - astryx.Banner
+        - astryx.EmptyState
     - title: "Astryx overlays and previews"
       desc: "Notebook-safe tooltip, popover, hover-card, and dialog surfaces."
       contents:
-        - AstryxTooltip
-        - AstryxHoverCard
-        - AstryxPopover
-        - AstryxDialog
-        - AstryxAlertDialog
+        - astryx.Tooltip
+        - astryx.HoverCard
+        - astryx.Popover
+        - astryx.Dialog
+        - astryx.AlertDialog
     - title: "Astryx navigation and data"
       desc: "Tabs, lists, outlines, tree views, metadata, and tables."
       contents:
-        - AstryxBreadcrumbs
-        - AstryxTabList
-        - AstryxList
-        - AstryxMetadataList
-        - AstryxOutline
-        - AstryxTreeList
-        - AstryxTable
+        - astryx.Breadcrumbs
+        - astryx.TabList
+        - astryx.List
+        - astryx.MetadataList
+        - astryx.Outline
+        - astryx.TreeList
+        - astryx.Table

@@ -19,10 +19,10 @@
 # %%
 from __future__ import annotations
 
-from anylumino import Table
+import anylumino.spectrum as sx
 
 
-table = Table(
+table = sx.Table(
     rows=[
         {"symbol": "AAPL", "price": 195.12, "venue": "XNAS", "status": "Open"},
         {"symbol": "MSFT", "price": 423.85, "venue": "XNAS", "status": "Open"},

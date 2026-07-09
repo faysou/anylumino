@@ -1,21 +1,22 @@
 # Astryx theme wrappers
 
-`AstryxBrand`, `AstryxBuiltTheme`, and `AstryxTheme` provide reusable ways to
+`Brand`, `BuiltTheme`, and `Theme` provide reusable ways to
 apply Astryx theme identity to notebook widgets without passing style-related
 props to each component. The frontend bridge uses Astryx `Theme`; runtime
 themes are created with `defineTheme()`, while precompiled themes use CSS from
 `npx astryx theme build`. See the upstream theme docs at
 <https://astryx.atmeta.com/themes>.
 
-## AstryxBrand
+## Brand
 
-`AstryxBrand` creates a JSON-safe Astryx `defineTheme()` token record that can
+`Brand` creates a JSON-safe Astryx `defineTheme()` token record that can
 be synced to the frontend.
 
 ```python
 import anylumino as al
+import anylumino.astryx as ax
 
-brand = al.AstryxBrand(
+brand = ax.Brand(
     "trading-desk",
     **{
         "color-accent": ("#0057b8", "#79b8ff"),
@@ -46,13 +47,13 @@ normalizes `color-accent` to `--color-accent` before syncing the token record.
 Token values can be strings or two-item light/dark tuples. For example,
 `("white", "black")` becomes a mode-aware token value.
 
-## AstryxBuiltTheme
+## BuiltTheme
 
-`AstryxBuiltTheme` describes a precompiled Astryx theme. Use it when a theme has
+`BuiltTheme` describes a precompiled Astryx theme. Use it when a theme has
 already been built to CSS with the Astryx CLI.
 
 ```python
-built_theme = al.AstryxBuiltTheme(
+built_theme = ax.BuiltTheme(
     "trading-desk",
     css="themes/trading-desk/theme.css",
     tokens={
@@ -70,14 +71,14 @@ is already bundled by AnyLumino, such as the default neutral theme.
 The optional `tokens` mapping is retained in the synced theme object for Astryx
 hooks and debugging. The generated CSS is what actually styles the widgets.
 
-## AstryxTheme
+## Theme
 
-`AstryxTheme` applies a runtime or precompiled theme and color mode to a subtree
+`Theme` applies a runtime or precompiled theme and color mode to a subtree
 of Astryx widgets. It renders as an Astryx `Stack`, so it also accepts layout
 options such as `direction` and `gap`.
 
 ```python
-app = al.AstryxTheme(
+app = ax.Theme(
     {
         "header": header,
         "controls": controls,
@@ -94,11 +95,11 @@ available as the Python trait name, but `mode` matches the Astryx `Theme` prop
 and takes precedence when provided.
 
 The wrapper applies the brand to itself and recursively to nested
-`AstryxWidget` children:
+`Widget` children:
 
 ```python
-button = al.AstryxButton("Refresh")
-panel = al.AstryxTheme([button], brand=brand, color_mode="dark")
+button = ax.Button("Refresh")
+panel = ax.Theme([button], brand=brand, color_mode="dark")
 
 assert panel.brand == brand
 assert button.brand == brand
@@ -137,17 +138,17 @@ npm run astryx -- theme build themes/tradingDeskTheme.ts --out themes/trading-de
 Use the generated CSS from Python:
 
 ```python
-theme = al.AstryxBuiltTheme(
+theme = ax.BuiltTheme(
     "trading-desk",
     css=Path("themes/trading-desk/theme.css"),
 )
 
-panel = al.AstryxTheme([al.AstryxButton("Refresh")], brand=theme, mode="system")
+panel = ax.Theme([ax.Button("Refresh")], brand=theme, mode="system")
 ```
 
 Use this path when a theme includes generated component overrides, scale
 configuration, or enough CSS that runtime injection is no longer desirable.
-Use `AstryxBrand` for small notebook-local token overrides.
+Use `Brand` for small notebook-local token overrides.
 
 ## Frontend behavior
 
@@ -167,10 +168,10 @@ frontend side if a theme depends on them.
 
 ## How notebook rendering works
 
-The Python wrappers synchronize plain JSON over traitlets. `AstryxBrand`
-returns a runtime descriptor with a `name` and `tokens`. `AstryxBuiltTheme`
+The Python wrappers synchronize plain JSON over traitlets. `Brand`
+returns a runtime descriptor with a `name` and `tokens`. `BuiltTheme`
 returns a built descriptor with `name`, `built=True`, generated `css`, optional
-`tokens`, and optional `components`. `AstryxTheme` stores that descriptor on
+`tokens`, and optional `components`. `Theme` stores that descriptor on
 itself and applies the same descriptor and color mode to every nested Astryx
 widget before display.
 

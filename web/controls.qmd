@@ -11,22 +11,23 @@ containers.
 
 ```python
 import anylumino as al
+import anylumino.astryx as ax
 
-order_form = al.AstryxFormLayout(
+order_form = ax.FormLayout(
     {
-        "symbol": al.AstryxTextInput(value="AAPL", label="Symbol"),
-        "quantity": al.AstryxNumberInput(value=100, label="Quantity", min=1),
-        "side": al.AstryxSegmentedControl(
+        "symbol": ax.TextInput(value="AAPL", label="Symbol"),
+        "quantity": ax.NumberInput(value=100, label="Quantity", min=1),
+        "side": ax.SegmentedControl(
             ["Buy", "Sell"],
             value="Buy",
             label="Side",
         ),
-        "routing": al.AstryxSelector(
+        "routing": ax.Selector(
             ["Smart", "Primary", "Dark"],
             value="Smart",
             label="Routing",
         ),
-        "urgent": al.AstryxCheckbox(value=False, label="Urgent"),
+        "urgent": ax.Checkbox(value=False, label="Urgent"),
     }
 )
 ```
@@ -41,8 +42,8 @@ order_form["quantity"].value
 Use `observe(..., names="value")` when another widget should react to edits:
 
 ```python
-status = al.TextWidget("Ready")
-symbol = al.AstryxTextInput(value="AAPL", label="Symbol")
+status = ax.Text("Ready")
+symbol = ax.TextInput(value="AAPL", label="Symbol")
 
 def on_symbol_change(change):
     status.value = f"Symbol: {change['new']}"
@@ -56,24 +57,24 @@ Astryx selection widgets cover small option sets, searchable option sets, and
 multi-value tokenized filters.
 
 ```python
-filters = al.AstryxStack(
+filters = ax.Stack(
     {
-        "symbol": al.AstryxTypeahead(
+        "symbol": ax.Typeahead(
             ["AAPL", "MSFT", "NVDA"],
             value="AAPL",
             label="Symbol",
         ),
-        "fields": al.AstryxTokenizer(
+        "fields": ax.Tokenizer(
             ["Bid", "Ask", "Last", "Size"],
             value=["Bid", "Ask"],
             label="Fields",
         ),
-        "density": al.AstryxSegmentedControl(
+        "density": ax.SegmentedControl(
             ["Compact", "Standard", "Expanded"],
             value="Standard",
             label="Density",
         ),
-        "metric": al.AstryxSelector(
+        "metric": ax.Selector(
             ["Latency", "Volume", "Fills"],
             value="Latency",
             label="Metric",
@@ -83,7 +84,7 @@ filters = al.AstryxStack(
 )
 ```
 
-`AstryxTypeahead`, `AstryxTokenizer`, and `AstryxCommandPalette` currently use
+`Typeahead`, `Tokenizer`, and `CommandPalette` currently use
 static search sources. Query text and open-state changes are sent as widget
 messages; selected item ids are synchronized through `.value`.
 
@@ -93,15 +94,15 @@ Button-like widgets use callbacks because a click is an event, not a persistent
 value.
 
 ```python
-status = al.TextWidget("Ready")
+status = ax.Text("Ready")
 
-submit = al.AstryxButton(
+submit = ax.Button(
     "Submit",
     variant="primary",
     callbacks=[lambda _button: setattr(status, "value", "Submitted")],
 )
 
-actions = al.AstryxCommandPalette(
+actions = ax.CommandPalette(
     [
         {"id": "refresh", "label": "Refresh", "auxiliaryData": {"group": "Data"}},
         {"id": "export", "label": "Export CSV", "auxiliaryData": {"group": "Files"}},
@@ -113,10 +114,10 @@ actions = al.AstryxCommandPalette(
 
 ## Tables
 
-`AstryxTable` is the data-grid control for notebook data views:
+`Table` is the data-grid control for notebook data views:
 
 ```python
-orders = al.AstryxTable(
+orders = ax.Table(
     rows=[
         {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
         {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
@@ -140,10 +141,10 @@ orders.set_rows(next_order_snapshot)
 
 ## Themed controls
 
-Wrap related controls in `AstryxTheme` to apply a shared brand identity:
+Wrap related controls in `Theme` to apply a shared brand identity:
 
 ```python
-brand = al.AstryxBrand(
+brand = ax.Brand(
     "desk",
     **{
         "color-accent": ("#0057b8", "#79b8ff"),
@@ -152,7 +153,7 @@ brand = al.AstryxBrand(
     },
 )
 
-panel = al.AstryxTheme(
+panel = ax.Theme(
     {"filters": filters, "submit": submit, "orders": orders},
     brand=brand,
     gap=3,

@@ -1,0 +1,39 @@
+# astryx.MetadataList { #anylumino.astryx.MetadataList }
+
+```python
+astryx.MetadataList(items, **props)
+```
+
+Render label-value metadata rows.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name    | Type                            | Description                                                                               | Default    |
+|---------|---------------------------------|-------------------------------------------------------------------------------------------|------------|
+| items   | Iterable\[Mapping\[str, Any\]\] | Item records used by generated child components or static search sources.                 | _required_ |
+| **props | Any                             | JSON-safe MetadataList props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe MetadataList props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``children`` (ReactNode; required): Metadata items (MetadataListItem components).
+- ``columns`` ('multi' or 'single' or number): Column layout mode.
+- ``label`` ({ position?: 'start' or 'top', width?: number or string }): Label display
+  configuration. position controls label placement, width sets a custom label column width.
+  Defaults to { position: 'top' } for multi-column layouts.
+- ``maxNumOfItems`` (number): Maximum items to show before collapsing with a show more/less
+  toggle.
+- ``orientation`` ('vertical' or 'horizontal'): Layout orientation. Horizontal mode flows items
+  in a row with flex-wrap.
+- ``title`` (ReactNode): Optional title or heading above the list.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization. Must be a stylex.create()
+  value.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/MetadataList>.
