@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import "@astryxdesign/core/reset.css";
 import "@astryxdesign/core/astryx.css";
 import "@astryxdesign/theme-neutral/theme.css";
+import { AlertDialog } from "@astryxdesign/core/AlertDialog";
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Avatar } from "@astryxdesign/core/Avatar";
 import { AvatarGroup, AvatarGroupOverflow } from "@astryxdesign/core/AvatarGroup";
@@ -23,9 +24,11 @@ import { Citation } from "@astryxdesign/core/Citation";
 import { Code } from "@astryxdesign/core/Code";
 import { CodeBlock } from "@astryxdesign/core/CodeBlock";
 import { Collapsible } from "@astryxdesign/core/Collapsible";
+import { CommandPalette } from "@astryxdesign/core/CommandPalette";
 import { DateInput } from "@astryxdesign/core/DateInput";
 import { DateRangeInput } from "@astryxdesign/core/DateRangeInput";
 import { DateTimeInput } from "@astryxdesign/core/DateTimeInput";
+import { Dialog } from "@astryxdesign/core/Dialog";
 import { Divider } from "@astryxdesign/core/Divider";
 import { DropdownMenu } from "@astryxdesign/core/DropdownMenu";
 import { EmptyState } from "@astryxdesign/core/EmptyState";
@@ -78,10 +81,12 @@ import { TimeInput } from "@astryxdesign/core/TimeInput";
 import { Timestamp } from "@astryxdesign/core/Timestamp";
 import { ToggleButton } from "@astryxdesign/core/ToggleButton";
 import { Token } from "@astryxdesign/core/Token";
+import { Tokenizer } from "@astryxdesign/core/Tokenizer";
 import { Toolbar } from "@astryxdesign/core/Toolbar";
 import { Tooltip } from "@astryxdesign/core/Tooltip";
 import { TreeList } from "@astryxdesign/core/TreeList";
-import { Theme } from "@astryxdesign/core/theme";
+import { Typeahead, createStaticSource } from "@astryxdesign/core/Typeahead";
+import { Theme, defineTheme } from "@astryxdesign/core/theme";
 import { neutralTheme } from "@astryxdesign/theme-neutral/built";
 import {
   combineSignals,
@@ -92,6 +97,7 @@ import {
 import "./astryx_widget.css";
 
 const COMPONENTS = {
+  AlertDialog,
   AspectRatio,
   Avatar,
   AvatarGroup,
@@ -111,9 +117,11 @@ const COMPONENTS = {
   Code,
   CodeBlock,
   Collapsible,
+  CommandPalette,
   DateInput,
   DateRangeInput,
   DateTimeInput,
+  Dialog,
   Divider,
   DropdownMenu,
   EmptyState,
@@ -161,12 +169,15 @@ const COMPONENTS = {
   Timestamp,
   ToggleButton,
   Token,
+  Tokenizer,
   Toolbar,
   Tooltip,
   TreeList,
+  Typeahead,
 };
 
 const PROP_DRIVEN_COMPONENTS = new Set([
+  "AlertDialog",
   "Avatar",
   "Badge",
   "Button",
@@ -174,9 +185,11 @@ const PROP_DRIVEN_COMPONENTS = new Set([
   "CheckboxInput",
   "Citation",
   "CodeBlock",
+  "CommandPalette",
   "DateInput",
   "DateRangeInput",
   "DateTimeInput",
+  "Dialog",
   "Divider",
   "DropdownMenu",
   "EmptyState",
@@ -206,7 +219,9 @@ const PROP_DRIVEN_COMPONENTS = new Set([
   "Timestamp",
   "ToggleButton",
   "Token",
+  "Tokenizer",
   "TreeList",
+  "Typeahead",
 ]);
 
 const GENERATED_CHILD_COMPONENTS = new Set([
@@ -264,6 +279,14 @@ function setArrayValue(model, value) {
   setModelValue(model, Array.isArray(value) ? value : []);
 }
 
+function setItemValue(model, item) {
+  setModelValue(model, item == null ? null : String(item.id ?? item.value ?? item.label ?? ""));
+}
+
+function setItemArrayValue(model, items) {
+  setArrayValue(model, asArray(items).map((item) => String(item.id ?? item.value ?? item.label ?? "")));
+}
+
 function fileInputValue(files, isMultiple) {
   if (!files) {
     return isMultiple ? [] : null;
@@ -284,6 +307,53 @@ function asArray(value) {
 
 function rawProps(model) {
   return { ...(model.get("props") ?? {}) };
+}
+
+function brandTheme(model) {
+  const brand = model.get("brand") ?? {};
+  const tokens = brand.tokens ?? brand;
+  if (!tokens || Object.keys(tokens).length === 0) {
+    return neutralTheme;
+  }
+  const normalizedTokens = {};
+  for (const [name, value] of Object.entries(tokens)) {
+    const tokenName = String(name).startsWith("--") ? String(name) : `--${name}`;
+    normalizedTokens[tokenName] = value;
+  }
+  return defineTheme({
+    name: String(brand.name ?? "anylumino-brand"),
+    tokens: normalizedTokens,
+  });
+}
+
+function searchableItems(items) {
+  return asArray(items).map((item, index) => {
+    if (item && typeof item === "object") {
+      const id = String(item.id ?? item.value ?? item.label ?? index);
+      return {
+        ...item,
+        id,
+        label: itemLabel(item, `Item ${index + 1}`),
+      };
+    }
+    return {
+      id: String(item ?? index),
+      label: String(item ?? `Item ${index + 1}`),
+    };
+  });
+}
+
+function selectedSearchItem(items, value) {
+  if (value == null || value === "") {
+    return null;
+  }
+  const selectedId = String(value);
+  return items.find((item) => String(item.id) === selectedId) ?? null;
+}
+
+function selectedSearchItems(items, value) {
+  const selectedIds = new Set(asArray(value).map(String));
+  return items.filter((item) => selectedIds.has(String(item.id)));
 }
 
 function iconNode(icon, props = {}) {
@@ -638,6 +708,47 @@ function componentProps(model) {
     };
   }
 
+  if (name === "Typeahead") {
+    const items = searchableItems(rawProps(model).items);
+    return {
+      ...props,
+      label: label || props.label || "Typeahead",
+      value: selectedSearchItem(items, value),
+      searchSource: createStaticSource(items),
+      isDisabled: disabled,
+      onChange: (item) => setItemValue(model, item),
+      onChangeQuery: (query) => model.send({ type: "query", query }),
+      onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
+    };
+  }
+
+  if (name === "Tokenizer") {
+    const items = searchableItems(rawProps(model).items);
+    return {
+      ...props,
+      label: label || props.label || "Tokenizer",
+      value: selectedSearchItems(items, value),
+      searchSource: createStaticSource(items),
+      isDisabled: disabled,
+      onChange: (nextItems) => setItemArrayValue(model, nextItems),
+      onChangeQuery: (query) => model.send({ type: "query", query }),
+    };
+  }
+
+  if (name === "CommandPalette") {
+    const items = searchableItems(rawProps(model).items);
+    return {
+      ...props,
+      label: label || props.label || "Command palette",
+      isInline: props.isInline ?? true,
+      isOpen: props.isOpen ?? true,
+      value: value == null ? undefined : String(value),
+      searchSource: createStaticSource(items),
+      onValueChange: (nextValue) => setStringValue(model, nextValue),
+      onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
+    };
+  }
+
   if (name === "TabList") {
     return {
       ...props,
@@ -800,6 +911,28 @@ function componentProps(model) {
       ...props,
       label: label || props.label || "Popover",
       content: props.content ?? slotByKey(model, "content") ?? label ?? textFor(model),
+    };
+  }
+
+  if (name === "Dialog") {
+    return {
+      ...props,
+      isInline: props.isInline ?? true,
+      isOpen: value == null ? (props.isOpen ?? true) : Boolean(value),
+      onOpenChange: (isOpen) => setBooleanValue(model, isOpen),
+    };
+  }
+
+  if (name === "AlertDialog") {
+    return {
+      ...props,
+      title: props.title || label || "Alert",
+      description: props.description || textFor(model),
+      actionLabel: props.actionLabel || "Continue",
+      isInline: props.isInline ?? true,
+      isOpen: value == null ? (props.isOpen ?? true) : Boolean(value),
+      onOpenChange: (isOpen) => setBooleanValue(model, isOpen),
+      onAction: () => model.send({ type: "click", action: "confirm" }),
     };
   }
 
@@ -1155,13 +1288,14 @@ function AstryxTableView({ model }) {
 function AstryxModelView({ model }) {
   const name = String(model.get("component_name") || model.get("component_kind") || "Stack");
   const mode = String(model.get("color_mode") || "light");
+  const theme = React.useMemo(() => brandTheme(model), [JSON.stringify(model.get("brand") ?? {})]);
   const props = componentProps(model);
   const Component = componentFor(name, props);
   const children = componentChildren(model);
 
   return React.createElement(
     Theme,
-    { theme: neutralTheme, mode },
+    { theme, mode },
     React.createElement(
       "div",
       {
@@ -1239,6 +1373,7 @@ export default {
       "props",
       "color_mode",
       "theme",
+      "brand",
     ];
 
     watched.forEach((name) => model.on(`change:${name}`, renderCurrent));

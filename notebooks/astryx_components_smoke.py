@@ -25,6 +25,15 @@ from __future__ import annotations
 import anylumino as al
 
 
+brand = al.AstryxBrand(
+    "trading-desk",
+    **{
+        "color-accent": ("#0057b8", "#79b8ff"),
+        "color-background-card": ("#ffffff", "#111827"),
+        "color-text-primary": ("#111827", "#f9fafb"),
+        "radius-container": "8px",
+    },
+)
 clicks = {"count": 0}
 status = al.TextWidget("astryx status: ready")
 
@@ -97,6 +106,17 @@ fields = al.AstryxMultiSelector(
     triggerDisplay="badges",
     width="260px",
 )
+symbol_search = al.AstryxTypeahead(
+    [
+        {"id": "AAPL", "label": "AAPL"},
+        {"id": "MSFT", "label": "MSFT"},
+        {"id": "NVDA", "label": "NVDA"},
+    ],
+    value="AAPL",
+    label="Symbol search",
+    width="220px",
+)
+field_tokens = al.AstryxTokenizer(["Bid", "Ask", "Last", "Size", "Venue"], value=["Bid", "Ask"], label="Tokenized fields", width="280px")
 trade_date = al.AstryxDateInput(value="2026-07-09", label="Trade date", width="180px")
 trade_time = al.AstryxTimeInput(value="14:30", label="Time", hourFormat="24h", width="160px")
 enabled = al.AstryxCheckbox(value=True, label="Enabled")
@@ -120,6 +140,8 @@ controls = al.AstryxGrid(
         "risk": risk,
         "dataset": dataset,
         "fields": fields,
+        "symbol_search": symbol_search,
+        "field_tokens": field_tokens,
         "date": trade_date,
         "time": trade_time,
         "toggles": al.AstryxStack(
@@ -283,6 +305,16 @@ tooltip = al.AstryxTooltip("Runs validation", al.AstryxButton("Validate", varian
 hover = al.AstryxHoverCard(al.AstryxText("Last run: success"), al.AstryxButton("Run state"))
 popover = al.AstryxPopover(al.AstryxText("Compact popover content"), al.AstryxButton("Open"), label="Details")
 details = al.AstryxCollapsible(al.AstryxMarkdown("Verbose diagnostics can live here."), trigger="Diagnostics", default_open=False)
+palette = al.AstryxCommandPalette(
+    [
+        {"id": "refresh", "label": "Refresh", "auxiliaryData": {"group": "Data"}},
+        {"id": "export", "label": "Export CSV", "auxiliaryData": {"group": "Files"}},
+    ],
+    value="refresh",
+    width=420,
+)
+dialog = al.AstryxDialog(al.AstryxText("Inline dialog content stays inside the notebook output."), open=True, width=360)
+alert_dialog = al.AstryxAlertDialog("Confirm action", "This inline preview uses the alert dialog surface.", action_label="Confirm")
 
 
 visuals = al.AstryxGrid(
@@ -336,6 +368,9 @@ visuals = al.AstryxGrid(
                     wrap="wrap",
                 ),
                 "details": details,
+                "palette": palette,
+                "dialog": dialog,
+                "alert": alert_dialog,
             },
             padding=3,
         ),
@@ -348,10 +383,16 @@ visuals = al.AstryxGrid(
 
 app = al.VBox(
     {
-        "header": header,
-        "controls": controls,
-        "data": data_section,
-        "visuals": visuals,
+        "theme": al.AstryxTheme(
+            {
+                "header": header,
+                "controls": controls,
+                "data": data_section,
+                "visuals": visuals,
+            },
+            brand=brand,
+            gap=3,
+        ),
         "status": status,
     },
     width="100%",
@@ -371,6 +412,8 @@ assert pinned.value is True
 assert density.value == "Standard"
 assert dataset.value == "latency"
 assert fields.value == ["Bid", "Ask", "Last"]
+assert symbol_search.value == "AAPL"
+assert field_tokens.value == ["Bid", "Ask"]
 assert controls.component_name == "Grid"
 assert controls.child_keys == [
     "symbol",
@@ -379,6 +422,8 @@ assert controls.child_keys == [
     "risk",
     "dataset",
     "fields",
+    "symbol_search",
+    "field_tokens",
     "date",
     "time",
     "toggles",
@@ -399,3 +444,7 @@ assert outline.component_name == "Outline"
 assert tree.component_name == "TreeList"
 assert tooltip.child_keys == ["trigger"]
 assert popover.child_keys == ["trigger", "content"]
+assert palette.component_name == "CommandPalette"
+assert dialog.component_name == "Dialog"
+assert alert_dialog.component_name == "AlertDialog"
+assert header.brand == brand

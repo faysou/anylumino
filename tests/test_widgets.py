@@ -6,6 +6,7 @@ import traitlets as t
 
 from anylumino import (
     AccordionPanel,
+    AstryxAlertDialog,
     AstryxBadge,
     AstryxAvatarGroup,
     AstryxBanner,
@@ -15,7 +16,9 @@ from anylumino import (
     AstryxCheckboxList,
     AstryxCode,
     AstryxCodeBlock,
+    AstryxCommandPalette,
     AstryxComponent,
+    AstryxDialog,
     AstryxDropdownMenu,
     AstryxEmptyState,
     AstryxField,
@@ -41,10 +44,14 @@ from anylumino import (
     AstryxText,
     AstryxTextArea,
     AstryxTextInput,
+    AstryxTheme,
     AstryxTooltip,
     AstryxToggleButton,
+    AstryxTokenizer,
     AstryxTreeList,
+    AstryxTypeahead,
     AstryxWidget,
+    AstryxBrand,
     Badge,
     BoxPanel,
     Button,
@@ -849,6 +856,11 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
         AstryxTooltip("Run cell", AstryxButton("Run")),
         AstryxHoverCard(AstryxText("Preview"), AstryxButton("Preview")),
         AstryxPopover(AstryxText("Settings"), AstryxButton("Open"), label="Settings"),
+        AstryxTypeahead(["AAPL", "MSFT"], value="AAPL", label="Symbol"),
+        AstryxTokenizer(["Bid", "Ask", "Last"], value=["Bid", "Ask"], label="Fields"),
+        AstryxCommandPalette([{"id": "refresh", "label": "Refresh"}], value="refresh"),
+        AstryxDialog(AstryxText("Inline dialog")),
+        AstryxAlertDialog("Confirm", "Continue?", action_label="Continue"),
     ]
 
     assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
@@ -876,6 +888,31 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
     assert widgets[29].props["items"][1]["value"] == "export"
     assert widgets[32].child_keys == ["trigger", "content"]
     assert widgets[33].child_keys == ["trigger", "content"]
+    assert widgets[34].component_name == "Typeahead"
+    assert widgets[34].props["items"][0] == {"id": "AAPL", "label": "AAPL"}
+    assert widgets[35].value == ["Bid", "Ask"]
+    assert widgets[36].component_name == "CommandPalette"
+    assert widgets[37].props["isInline"] is True
+    assert widgets[38].props["actionLabel"] == "Continue"
+
+
+def test_astryx_theme_applies_reusable_brand_to_child_widgets() -> None:
+    brand = AstryxBrand(
+        "desk",
+        **{
+            "color-accent": ("#0057b8", "#79b8ff"),
+            "color-background-card": ("#ffffff", "#111111"),
+            "radius-container": "8px",
+        },
+    )
+    button = AstryxButton("Run")
+    panel = AstryxTheme({"button": button}, brand=brand, color_mode="dark", gap=3)
+
+    assert panel.brand == brand
+    assert panel.color_mode == "dark"
+    assert panel.props["gap"] == 3
+    assert button.brand == brand
+    assert button.color_mode == "dark"
 
 
 def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> None:
