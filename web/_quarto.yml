@@ -52,6 +52,8 @@ quartodoc:
   title: "API reference"
   dir: reference
   dynamic: true
+  options:
+    signature_name: short
   sidebar: reference/_sidebar.yml
   css: reference/_styles-quartodoc.css
   sections:
@@ -72,107 +74,117 @@ quartodoc:
         - ResponsivePanel
     - title: "Astryx base and theme"
       desc: "Shared Astryx wrapper primitives and reusable theme identity."
+      package: anylumino.astryx
       contents:
-        - astryx.Widget
-        - astryx.Component
-        - astryx.Brand
-        - astryx.BuiltTheme
-        - astryx.Theme
+        - Widget
+        - Component
+        - Brand
+        - BuiltTheme
+        - Theme
     - title: "Astryx typography and content"
       desc: "Text, headings, code, markdown, and semantic inline content."
+      package: anylumino.astryx
       contents:
-        - astryx.Text
-        - astryx.Heading
-        - astryx.Markdown
-        - astryx.Code
-        - astryx.CodeBlock
-        - astryx.Blockquote
-        - astryx.Kbd
-        - astryx.Link
-        - astryx.Citation
-        - astryx.Timestamp
-        - astryx.Thumbnail
-        - astryx.Avatar
-        - astryx.AvatarGroup
-        - astryx.Icon
+        - Text
+        - Heading
+        - Markdown
+        - Code
+        - CodeBlock
+        - Blockquote
+        - Kbd
+        - Link
+        - Citation
+        - Timestamp
+        - Thumbnail
+        - Avatar
+        - AvatarGroup
+        - Icon
     - title: "Astryx layout containers"
       desc: "Containers for arranging Astryx content inside notebook outputs."
+      package: anylumino.astryx
       contents:
-        - astryx.Stack
-        - astryx.Grid
-        - astryx.Center
-        - astryx.Section
-        - astryx.Card
-        - astryx.ClickableCard
-        - astryx.AspectRatio
-        - astryx.Divider
-        - astryx.Collapsible
+        - Stack
+        - Grid
+        - Center
+        - Section
+        - Card
+        - ClickableCard
+        - SelectableCard
+        - AspectRatio
+        - Divider
+        - Collapsible
     - title: "Astryx forms and inputs"
       desc: "Form composition and direct value-entry controls."
+      package: anylumino.astryx
       contents:
-        - astryx.FormLayout
-        - astryx.Field
-        - astryx.FieldStatus
-        - astryx.InputGroup
-        - astryx.TextInput
-        - astryx.TextArea
-        - astryx.NumberInput
-        - astryx.Slider
-        - astryx.Checkbox
-        - astryx.Switch
-        - astryx.ToggleButton
-        - astryx.DateInput
-        - astryx.DateRangeInput
-        - astryx.DateTimeInput
-        - astryx.TimeInput
-        - astryx.Calendar
-        - astryx.FileInput
+        - FormLayout
+        - Field
+        - FieldStatus
+        - InputGroup
+        - TextInput
+        - TextArea
+        - NumberInput
+        - Slider
+        - Checkbox
+        - Switch
+        - ToggleButton
+        - DateInput
+        - DateRangeInput
+        - DateTimeInput
+        - TimeInput
+        - Calendar
+        - FileInput
     - title: "Astryx selection and search"
       desc: "Choice controls, searchable fields, and tokenized filters."
+      package: anylumino.astryx
       contents:
-        - astryx.Selector
-        - astryx.MultiSelector
-        - astryx.SegmentedControl
-        - astryx.RadioList
-        - astryx.CheckboxList
-        - astryx.Typeahead
-        - astryx.Tokenizer
+        - Selector
+        - MultiSelector
+        - SegmentedControl
+        - RadioList
+        - CheckboxList
+        - Typeahead
+        - Tokenizer
     - title: "Astryx actions and menus"
       desc: "Buttons, toolbars, menus, and command launchers."
+      package: anylumino.astryx
       contents:
-        - astryx.Button
-        - astryx.IconButton
-        - astryx.ButtonGroup
-        - astryx.Toolbar
-        - astryx.DropdownMenu
-        - astryx.MoreMenu
-        - astryx.CommandPalette
+        - Button
+        - IconButton
+        - ButtonGroup
+        - Toolbar
+        - DropdownMenu
+        - MoreMenu
+        - CommandPalette
     - title: "Astryx feedback and status"
       desc: "Status indicators, progress, loading states, and empty states."
+      package: anylumino.astryx
       contents:
-        - astryx.Badge
-        - astryx.StatusDot
-        - astryx.ProgressBar
-        - astryx.Spinner
-        - astryx.Skeleton
-        - astryx.Token
-        - astryx.Banner
-        - astryx.EmptyState
+        - Badge
+        - StatusDot
+        - ProgressBar
+        - Spinner
+        - Skeleton
+        - Token
+        - Banner
+        - EmptyState
     - title: "Astryx overlays and previews"
       desc: "Notebook-safe tooltip, popover, hover-card, and dialog surfaces."
+      package: anylumino.astryx
       contents:
-        - astryx.Tooltip
-        - astryx.HoverCard
-        - astryx.Popover
-        - astryx.Dialog
-        - astryx.AlertDialog
+        - Tooltip
+        - HoverCard
+        - Popover
+        - Dialog
+        - AlertDialog
     - title: "Astryx navigation and data"
       desc: "Tabs, lists, outlines, tree views, metadata, and tables."
+      package: anylumino.astryx
       contents:
-        - astryx.Breadcrumbs
-        - astryx.TabList
-        - astryx.List
-        - astryx.MetadataList
-        - astryx.Outline
-        - astryx.TreeList
-        - astryx.Table
+        - Breadcrumbs
+        - TabList
+        - List
+        - MetadataList
+        - Outline
+        - TreeList
+        - Table

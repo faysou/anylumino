@@ -1,0 +1,65 @@
+# Calendar { #anylumino.astryx.Calendar }
+
+```python
+Calendar(
+    value=None,
+    *,
+    mode='single',
+    number_of_months=None,
+    min=None,
+    max=None,
+    outside_days=None,
+    week_numbers=None,
+    variable_rows=None,
+    week_starts_on=None,
+    **props,
+)
+```
+
+Render an Astryx calendar date picker.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                               | Description                                                                           | Default    |
+|------------------|------------------------------------|---------------------------------------------------------------------------------------|------------|
+| value            | str \| Mapping\[str, str\] \| None | Synchronized component value.                                                         | `None`     |
+| mode             | str                                | Component mode.                                                                       | `'single'` |
+| number_of_months | int \| None                        | Number of months displayed.                                                           | `None`     |
+| min              | str \| None                        | Minimum selectable ISO date.                                                          | `None`     |
+| max              | str \| None                        | Maximum selectable ISO date.                                                          | `None`     |
+| outside_days     | bool \| None                       | Whether to show dates from adjacent months.                                           | `None`     |
+| week_numbers     | bool \| None                       | Whether to show ISO week numbers.                                                     | `None`     |
+| variable_rows    | bool \| None                       | Whether the calendar uses a variable row count.                                       | `None`     |
+| week_starts_on   | int \| str \| None                 | First day of the week.                                                                | `None`     |
+| **props          | Any                                | JSON-safe Calendar props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Calendar props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``mode`` ('single' or 'range'): Selection mode.
+- ``value`` (ISODateString or DateRange): Controlled selected value.
+- ``defaultValue`` (ISODateString or DateRange): Uncontrolled default value.
+- ``onChange`` (Function): Selection callback.
+- ``numberOfMonths`` (1 or 2): Number of months to display.
+- ``min`` (ISODateString): Minimum selectable date.
+- ``max`` (ISODateString): Maximum selectable date.
+- ``dateConstraints`` (Array<(date: Date) => boolean>): Custom constraint functions.
+- ``focusDate`` (ISODateString): Controlled visible month.
+- ``onFocusDateChange`` ((focusDate: ISODateString) => void): Navigation callback.
+- ``handleRef`` (React.Ref<CalendarHandle>): Imperative handle for calendar navigation,
+  including navigateTo().
+- ``hasOutsideDays`` (boolean): Show days from adjacent months.
+- ``hasWeekNumbers`` (boolean): Show ISO week numbers.
+- ``hasVariableRowCount`` (boolean): Variable vs fixed 6-row grid.
+- ``weekStartsOn`` (0 or 1 or 2 or 3 or 4 or 5 or 6 or 'sun' or 'mon' or 'tue' or 'wed' or 'thu'
+  or 'fri' or 'sat'): First day of week. Accepts a number (0=Sunday) or a three-letter day
+  name (e.g. "mon").
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Calendar>.

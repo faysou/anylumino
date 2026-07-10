@@ -17,101 +17,102 @@ website:
       - reference/ResponsivePanel.qmd
       section: Layout widgets
     - contents:
-      - reference/astryx.Widget.qmd
-      - reference/astryx.Component.qmd
-      - reference/astryx.Brand.qmd
-      - reference/astryx.BuiltTheme.qmd
-      - reference/astryx.Theme.qmd
+      - reference/Widget.qmd
+      - reference/Component.qmd
+      - reference/Brand.qmd
+      - reference/BuiltTheme.qmd
+      - reference/Theme.qmd
       section: Astryx base and theme
     - contents:
-      - reference/astryx.Text.qmd
-      - reference/astryx.Heading.qmd
-      - reference/astryx.Markdown.qmd
-      - reference/astryx.Code.qmd
-      - reference/astryx.CodeBlock.qmd
-      - reference/astryx.Blockquote.qmd
-      - reference/astryx.Kbd.qmd
-      - reference/astryx.Link.qmd
-      - reference/astryx.Citation.qmd
-      - reference/astryx.Timestamp.qmd
-      - reference/astryx.Thumbnail.qmd
-      - reference/astryx.Avatar.qmd
-      - reference/astryx.AvatarGroup.qmd
-      - reference/astryx.Icon.qmd
+      - reference/Text.qmd
+      - reference/Heading.qmd
+      - reference/Markdown.qmd
+      - reference/Code.qmd
+      - reference/CodeBlock.qmd
+      - reference/Blockquote.qmd
+      - reference/Kbd.qmd
+      - reference/Link.qmd
+      - reference/Citation.qmd
+      - reference/Timestamp.qmd
+      - reference/Thumbnail.qmd
+      - reference/Avatar.qmd
+      - reference/AvatarGroup.qmd
+      - reference/Icon.qmd
       section: Astryx typography and content
     - contents:
-      - reference/astryx.Stack.qmd
-      - reference/astryx.Grid.qmd
-      - reference/astryx.Center.qmd
-      - reference/astryx.Section.qmd
-      - reference/astryx.Card.qmd
-      - reference/astryx.ClickableCard.qmd
-      - reference/astryx.AspectRatio.qmd
-      - reference/astryx.Divider.qmd
-      - reference/astryx.Collapsible.qmd
+      - reference/Stack.qmd
+      - reference/Grid.qmd
+      - reference/Center.qmd
+      - reference/Section.qmd
+      - reference/Card.qmd
+      - reference/ClickableCard.qmd
+      - reference/SelectableCard.qmd
+      - reference/AspectRatio.qmd
+      - reference/Divider.qmd
+      - reference/Collapsible.qmd
       section: Astryx layout containers
     - contents:
-      - reference/astryx.FormLayout.qmd
-      - reference/astryx.Field.qmd
-      - reference/astryx.FieldStatus.qmd
-      - reference/astryx.InputGroup.qmd
-      - reference/astryx.TextInput.qmd
-      - reference/astryx.TextArea.qmd
-      - reference/astryx.NumberInput.qmd
-      - reference/astryx.Slider.qmd
-      - reference/astryx.Checkbox.qmd
-      - reference/astryx.Switch.qmd
-      - reference/astryx.ToggleButton.qmd
-      - reference/astryx.DateInput.qmd
-      - reference/astryx.DateRangeInput.qmd
-      - reference/astryx.DateTimeInput.qmd
-      - reference/astryx.TimeInput.qmd
-      - reference/astryx.Calendar.qmd
-      - reference/astryx.FileInput.qmd
+      - reference/FormLayout.qmd
+      - reference/Field.qmd
+      - reference/FieldStatus.qmd
+      - reference/InputGroup.qmd
+      - reference/TextInput.qmd
+      - reference/TextArea.qmd
+      - reference/NumberInput.qmd
+      - reference/Slider.qmd
+      - reference/Checkbox.qmd
+      - reference/Switch.qmd
+      - reference/ToggleButton.qmd
+      - reference/DateInput.qmd
+      - reference/DateRangeInput.qmd
+      - reference/DateTimeInput.qmd
+      - reference/TimeInput.qmd
+      - reference/Calendar.qmd
+      - reference/FileInput.qmd
       section: Astryx forms and inputs
     - contents:
-      - reference/astryx.Selector.qmd
-      - reference/astryx.MultiSelector.qmd
-      - reference/astryx.SegmentedControl.qmd
-      - reference/astryx.RadioList.qmd
-      - reference/astryx.CheckboxList.qmd
-      - reference/astryx.Typeahead.qmd
-      - reference/astryx.Tokenizer.qmd
+      - reference/Selector.qmd
+      - reference/MultiSelector.qmd
+      - reference/SegmentedControl.qmd
+      - reference/RadioList.qmd
+      - reference/CheckboxList.qmd
+      - reference/Typeahead.qmd
+      - reference/Tokenizer.qmd
       section: Astryx selection and search
     - contents:
-      - reference/astryx.Button.qmd
-      - reference/astryx.IconButton.qmd
-      - reference/astryx.ButtonGroup.qmd
-      - reference/astryx.Toolbar.qmd
-      - reference/astryx.DropdownMenu.qmd
-      - reference/astryx.MoreMenu.qmd
-      - reference/astryx.CommandPalette.qmd
+      - reference/Button.qmd
+      - reference/IconButton.qmd
+      - reference/ButtonGroup.qmd
+      - reference/Toolbar.qmd
+      - reference/DropdownMenu.qmd
+      - reference/MoreMenu.qmd
+      - reference/CommandPalette.qmd
       section: Astryx actions and menus
     - contents:
-      - reference/astryx.Badge.qmd
-      - reference/astryx.StatusDot.qmd
-      - reference/astryx.ProgressBar.qmd
-      - reference/astryx.Spinner.qmd
-      - reference/astryx.Skeleton.qmd
-      - reference/astryx.Token.qmd
-      - reference/astryx.Banner.qmd
-      - reference/astryx.EmptyState.qmd
+      - reference/Badge.qmd
+      - reference/StatusDot.qmd
+      - reference/ProgressBar.qmd
+      - reference/Spinner.qmd
+      - reference/Skeleton.qmd
+      - reference/Token.qmd
+      - reference/Banner.qmd
+      - reference/EmptyState.qmd
       section: Astryx feedback and status
     - contents:
-      - reference/astryx.Tooltip.qmd
-      - reference/astryx.HoverCard.qmd
-      - reference/astryx.Popover.qmd
-      - reference/astryx.Dialog.qmd
-      - reference/astryx.AlertDialog.qmd
+      - reference/Tooltip.qmd
+      - reference/HoverCard.qmd
+      - reference/Popover.qmd
+      - reference/Dialog.qmd
+      - reference/AlertDialog.qmd
       section: Astryx overlays and previews
     - contents:
-      - reference/astryx.Breadcrumbs.qmd
-      - reference/astryx.TabList.qmd
-      - reference/astryx.List.qmd
-      - reference/astryx.MetadataList.qmd
-      - reference/astryx.Outline.qmd
-      - reference/astryx.TreeList.qmd
-      - reference/astryx.Table.qmd
+      - reference/Breadcrumbs.qmd
+      - reference/TabList.qmd
+      - reference/List.qmd
+      - reference/MetadataList.qmd
+      - reference/Outline.qmd
+      - reference/TreeList.qmd
+      - reference/Table.qmd
       section: Astryx navigation and data
     id: reference
   - id: dummy-sidebar

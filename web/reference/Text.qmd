@@ -1,0 +1,79 @@
+# Text { #anylumino.astryx.Text }
+
+```python
+Text(
+    text,
+    *,
+    text_type=None,
+    size=None,
+    color=None,
+    weight=None,
+    display=None,
+    max_lines=None,
+    text_wrap=None,
+    justify=None,
+    tabular_numbers=None,
+    **props,
+)
+```
+
+Render themed Astryx body text.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name            | Type         | Description                                                                                                    | Default    |
+|-----------------|--------------|----------------------------------------------------------------------------------------------------------------|------------|
+| text            | str          | Text content synchronized to the frontend component.                                                           | _required_ |
+| text_type       | str \| None  | Semantic Astryx text type, such as ``"body"``, ``"supporting"``, or ``"display-1"``.                           | `None`     |
+| size            | str \| None  | Explicit font-size override.                                                                                   | `None`     |
+| color           | str \| None  | Theme text color.                                                                                              | `None`     |
+| weight          | str \| None  | Font-weight override.                                                                                          | `None`     |
+| display         | str \| None  | Inline or block display mode.                                                                                  | `None`     |
+| max_lines       | int \| None  | Maximum rendered lines before truncation.                                                                      | `None`     |
+| text_wrap       | str \| None  | Text wrapping behavior.                                                                                        | `None`     |
+| justify         | str \| None  | Logical text alignment.                                                                                        | `None`     |
+| tabular_numbers | bool \| None | Whether numeric glyphs use tabular widths.                                                                     | `None`     |
+| **props         | Any          | Additional JSON-safe Text props forwarded to Astryx. The older ``props={...}`` mapping form remains supported. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Text props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``type`` ('body' or 'large' or 'label' or 'supporting' or 'code' or 'display-1' or 'display-2'
+  or 'display-3'): Semantic text type. Determines size, weight, and line-height from the
+  theme. Note: this prop is called 'type', not 'variant'.
+- ``children`` (ReactNode; required): Text content.
+- ``size`` ('4xs' or '3xs' or '2xs' or 'xsm' or 'sm' or 'base' or 'lg' or 'xl' or '2xl' or '3xl'
+  or '4xl'): Explicit font size override. Overrides the size from 'type' but preserves other
+  type properties. Prefer using 'type' alone.
+- ``color`` ('primary' or 'secondary' or 'disabled' or 'placeholder' or 'accent' or 'inherit'):
+  Text color. Defaults to 'secondary' for the 'supporting' type, 'primary' for all others.
+- ``weight`` ('normal' or 'medium' or 'semibold' or 'bold'): Font weight override.
+- ``display`` ('inline' or 'block'): Display type. Silently overridden to 'block' when maxLines
+  > 0 or hasCapsize is true.
+- ``as`` ('span' or 'p' or 'div' or 'label'): HTML element to render.
+- ``maxLines`` (number): Maximum lines before truncation. 0 means no truncation. When set, shows
+  a tooltip on hover if content is truncated.
+- ``hasTruncateTooltip`` (boolean or 'above' or 'below' or 'start' or 'end'): Controls tooltip
+  behavior for truncated text. true shows the tooltip at the default position, false
+  disables it, or a placement string ('above' or 'below' or 'start' or 'end') sets a
+  specific position.
+- ``wordBreak`` ('break-word' or 'break-all'): Word break behavior when truncating. Defaults to
+  'break-all' for single-line truncation, 'break-word' otherwise.
+- ``textWrap`` ('wrap' or 'nowrap' or 'balance' or 'pretty'): Text wrapping behavior.
+- ``justify`` ('start' or 'center' or 'end'): Text alignment (justification). Uses logical
+  values (start/end) for i18n/RTL compatibility.
+- ``hasCapsize`` (boolean): Enable optical alignment using text-box-trim. Forces block display.
+- ``hasStrikethrough`` (boolean): Apply strikethrough text decoration.
+- ``hasTabularNumbers`` (boolean): Use tabular (monospace) numbers for aligned numeric data.
+- ``id`` (string): HTML id attribute.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value: not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Text>.

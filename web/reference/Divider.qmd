@@ -1,0 +1,42 @@
+# Divider { #anylumino.astryx.Divider }
+
+```python
+Divider(
+    orientation='horizontal',
+    variant='subtle',
+    label=None,
+    full_bleed=None,
+    **props,
+)
+```
+
+Render an Astryx divider.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type         | Description                                                                          | Default        |
+|-------------|--------------|--------------------------------------------------------------------------------------|----------------|
+| orientation | str          | Astryx component option.                                                             | `'horizontal'` |
+| variant     | str          | Astryx visual variant.                                                               | `'subtle'`     |
+| label       | str \| None  | Optional text centered on the divider.                                               | `None`         |
+| full_bleed  | bool \| None | Whether the divider extends to the container edges.                                  | `None`         |
+| **props     | Any          | JSON-safe Divider props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`           |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Divider props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``orientation`` ('horizontal' or 'vertical'): Orientation of the divider.
+- ``label`` (ReactNode): Optional label centered on the divider.
+- ``variant`` ('subtle' or 'strong'): Visual weight of the divider line.
+- ``isFullBleed`` (boolean): Extend the divider to container edges with negative margins.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value, not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Divider>.

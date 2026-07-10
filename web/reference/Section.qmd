@@ -1,0 +1,63 @@
+# Section { #anylumino.astryx.Section }
+
+```python
+Section(
+    children=None,
+    *,
+    variant='section',
+    padding=None,
+    padding_block=None,
+    dividers=None,
+    width=None,
+    height=None,
+    max_width=None,
+    **props,
+)
+```
+
+Render an Astryx section container.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name          | Type                        | Description                                                                          | Default     |
+|---------------|-----------------------------|--------------------------------------------------------------------------------------|-------------|
+| children      | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.              | `None`      |
+| variant       | str                         | Astryx visual variant.                                                               | `'section'` |
+| padding       | int \| float \| None        | Inner padding using the Astryx spacing scale.                                        | `None`      |
+| padding_block | int \| float \| None        | Block-axis padding override.                                                         | `None`      |
+| dividers      | Iterable\[str\] \| None     | Section sides that display divider borders.                                          | `None`      |
+| width         | int \| float \| str \| None | Section width.                                                                       | `None`      |
+| height        | int \| float \| str \| None | Section height.                                                                      | `None`      |
+| max_width     | int \| float \| str \| None | Maximum section width.                                                               | `None`      |
+| **props       | Any                         | JSON-safe Section props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Section props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``variant`` ('section' or 'transparent' or 'muted'): Background variant applied to the section
+  container.
+- ``width`` (SizeValue): Width of the section; a number is interpreted as pixels, a string is
+  used as-is.
+- ``height`` (SizeValue): Height of the section; a number is interpreted as pixels, a string is
+  used as-is.
+- ``maxWidth`` (SizeValue): Maximum width of the section.
+- ``minHeight`` (SizeValue): Minimum height of the section.
+- ``children`` (ReactNode): Content rendered inside the section.
+- ``dividers`` (Array<'top' or 'bottom' or 'start' or 'end'>): Which sides of the section have
+  divider borders.
+- ``padding`` (SpacingStep): Internal padding using the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4,
+  5, 6, 8, 10). Use padding={0} for edge-to-edge content.
+- ``paddingBlock`` (SpacingStep): Block (vertical) padding override. Overrides only the
+  block-axis padding while preserving inline padding from 'padding' or the container theme
+  default. Accepts the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10).
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value, not an inline style object.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Section>.

@@ -1,0 +1,29 @@
+# BuiltTheme { #anylumino.astryx.BuiltTheme }
+
+```python
+BuiltTheme(name='neutral', *, css=None, tokens=None, components=None)
+```
+
+Create a JSON-safe descriptor for a precompiled Astryx theme.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                              | Description                                                                                                                                                                                        | Default     |
+|------------|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| name       | str                               | Astryx theme name used by the generated CSS ``data-astryx-theme`` selectors. This must match the ``name`` in the TypeScript theme passed to ``npx astryx theme build``.                            | `'neutral'` |
+| css        | str \| os.PathLike\[str\] \| None | Generated theme CSS content or a path to the generated CSS file. Pass ``None`` for built themes whose CSS is already bundled by AnyLumino, such as the default neutral theme.                      | `None`      |
+| tokens     | Mapping\[str, Any\] \| None       | Optional resolved token map from the built theme object. Token names may include or omit the leading ``"--"``. The CSS is what styles widgets; tokens are retained for Astryx hooks and debugging. | `None`      |
+| components | Mapping\[str, Any\] \| None       | Optional built component override metadata from the Astryx theme object.                                                                                                                           | `None`      |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                                                                                                  |
+|--------|--------|------------------------------------------------------------------------------------------------------------------------------|
+|        | dict   | JSON-safe precompiled theme descriptor that can be passed to :class:`Theme`, :class:`Widget`, or :meth:`Widget.apply_brand`. |
+
+## Notes {.doc-section .doc-section-notes}
+
+Built theme descriptors set ``__built`` in the frontend so Astryx ``Theme``
+does not perform runtime style injection. When ``css`` is supplied,
+AnyLumino injects that generated CSS into the notebook page and reuses it
+across widgets with the same content.

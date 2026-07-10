@@ -1,0 +1,75 @@
+# CommandPalette { #anylumino.astryx.CommandPalette }
+
+```python
+CommandPalette(
+    items,
+    value=None,
+    *,
+    label='Command palette',
+    search=None,
+    open=True,
+    inline=True,
+    width=None,
+    max_height=None,
+    empty_search_text=None,
+    empty_bootstrap_text=None,
+    **props,
+)
+```
+
+Render an inline Astryx command palette for notebook output areas.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                 | Type                                         | Description                                                                                                                                                                                                                                               | Default             |
+|----------------------|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| items                | Iterable\[Any\] \| Mapping\[str, Any\]       | Command records. Mappings, pairs, strings, and dictionaries are normalized into ``{"id": ..., "label": ...}`` records.                                                                                                                                    | _required_          |
+| value                | str \| None                                  | Selected command id synchronized back to Python.                                                                                                                                                                                                          | `None`              |
+| label                | str                                          | Accessible dialog label.                                                                                                                                                                                                                                  | `'Command palette'` |
+| search               | Callable\[\[str\], Iterable\[Any\]\] \| None | Optional Python search callback. When provided, Astryx search queries are sent to Python and callback results are normalized into ``{"id": ..., "label": ...}`` command records. When omitted, the frontend builds a static search source from ``items``. | `None`              |
+| open                 | bool                                         | Controlled palette visibility.                                                                                                                                                                                                                            | `True`              |
+| inline               | bool                                         | Whether to render inside the notebook output instead of as a modal.                                                                                                                                                                                       | `True`              |
+| width                | int \| float \| str \| None                  | Palette width.                                                                                                                                                                                                                                            | `None`              |
+| max_height           | int \| float \| str \| None                  | Maximum palette height.                                                                                                                                                                                                                                   | `None`              |
+| empty_search_text    | str \| None                                  | Message shown when a query has no results.                                                                                                                                                                                                                | `None`              |
+| empty_bootstrap_text | str \| None                                  | Message shown when the initial item source is empty.                                                                                                                                                                                                      | `None`              |
+| **props              | Any                                          | JSON-safe CommandPalette props forwarded to Astryx. See the ``Astryx Props`` section below.                                                                                                                                                               | `{}`                |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe CommandPalette props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``isOpen`` (boolean; required): Whether the command palette dialog is visible.
+- ``onOpenChange`` ((isOpen: boolean) => void; required): Called when the palette visibility
+  changes.
+- ``searchSource`` (SearchSource<T>; required): Search source providing items via search(query)
+  and bootstrap(). Use createStaticSource for static lists.
+- ``input`` (ReactNode): Input slot. Defaults to CommandPaletteInput with standard behavior.
+- ``footer`` (ReactNode): Footer slot. Defaults to CommandPaletteFooter showing keyboard hints.
+- ``renderItem`` ((item: T, isSelected: boolean) => ReactNode): Per-item render function.
+  Auto-grouping by auxiliaryData.group is preserved. When omitted, renders label text.
+- ``emptySearchText`` (ReactNode): Content shown when a search query returns no results.
+- ``emptyBootstrapText`` (ReactNode): Content shown when there is no search query and
+  bootstrap() returns nothing.
+- ``value`` (string): Controlled selected value for picker mode.
+- ``onValueChange`` ((value: string) => void): Called when the selected value changes in picker
+  mode.
+- ``label`` (string): Accessible label for the command palette dialog.
+- ``width`` (number or string): Width of the dialog.
+- ``maxHeight`` (number or string): Maximum height of the dialog.
+- ``isInline`` (boolean): Renders command palette content inline without modal behavior.
+  Automatically disables input auto-focus and initial highlighted-item auto-scroll. For
+  documentation previews and showcases only.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/CommandPalette>.
+
+## Notes {.doc-section .doc-section-notes}
+
+The palette renders inline and open by default so it remains contained in a
+Jupyter output area instead of creating a page-level modal overlay.

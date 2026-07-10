@@ -1,0 +1,35 @@
+# AvatarGroup { #anylumino.astryx.AvatarGroup }
+
+```python
+AvatarGroup(items, *, overflow_count=0, size=None, **props)
+```
+
+Render a compact group of Astryx avatars.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type            | Description                                                                              | Default    |
+|----------------|-----------------|------------------------------------------------------------------------------------------|------------|
+| items          | Iterable\[Any\] | Item records used by generated child components or static search sources.                | _required_ |
+| overflow_count | int             | Number shown in the avatar-group overflow indicator.                                     | `0`        |
+| size           | str \| None     | Avatar size used by the group.                                                           | `None`     |
+| **props        | Any             | JSON-safe AvatarGroup props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe AvatarGroup props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``children`` (ReactNode; required): Avatar children, optionally followed by one
+  AvatarGroupOverflow. Consumers handle slicing to the desired visible count.
+- ``size`` (AvatarSize): Size applied to all avatars via context.
+- ``ref`` (React.Ref<HTMLDivElement>): Ref forwarded to the root element.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization.
+- ``data-testid`` (string): Test selector for automated testing frameworks.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/AvatarGroup>.

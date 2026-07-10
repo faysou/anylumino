@@ -1,0 +1,54 @@
+# ButtonGroup { #anylumino.astryx.ButtonGroup }
+
+```python
+ButtonGroup(
+    items,
+    *,
+    label,
+    callbacks=None,
+    action_callbacks=None,
+    orientation=None,
+    size=None,
+    disabled=False,
+    **props,
+)
+```
+
+Render an Astryx button group from item records.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                                           | Description                                                                              | Default    |
+|------------------|----------------------------------------------------------------|------------------------------------------------------------------------------------------|------------|
+| items            | Iterable\[Any\]                                                | Item records used by generated child components or static search sources.                | _required_ |
+| label            | str                                                            | Visible or accessible label for the component.                                           | _required_ |
+| callbacks        | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None      | Python callbacks invoked for frontend activations.                                       | `None`     |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving the selected item value.                                      | `None`     |
+| orientation      | str \| None                                                    | Horizontal or vertical group orientation.                                                | `None`     |
+| size             | str \| None                                                    | Default child button size.                                                               | `None`     |
+| disabled         | bool                                                           | Whether all buttons are disabled.                                                        | `False`    |
+| **props          | Any                                                            | JSON-safe ButtonGroup props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe ButtonGroup props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``children`` (ReactNode; required): Button or IconButton children.
+- ``label`` (string; required): Accessible group label used as aria-label.
+- ``orientation`` ('horizontal' or 'vertical'; default 'horizontal'): Button group orientation
+  and keyboard navigation axis.
+- ``size`` ('sm' or 'md' or 'lg'; default 'md'): Default size for buttons in the group;
+  individual buttons can override it.
+- ``isDisabled`` (boolean; default false): Disables all buttons in the group.
+- ``data-testid`` (string): Test selector for automated testing.
+- ``xstyle`` (StyleXStyles): StyleX styles for the group root.
+- ``className`` (string): CSS class names for the group root.
+- ``style`` (CSSProperties): Inline styles for the group root.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/ButtonGroup>.

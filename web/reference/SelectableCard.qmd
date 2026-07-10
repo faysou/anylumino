@@ -1,0 +1,60 @@
+# SelectableCard { #anylumino.astryx.SelectableCard }
+
+```python
+SelectableCard(
+    children=None,
+    value=False,
+    *,
+    label,
+    variant='default',
+    disabled=False,
+    padding=None,
+    width=None,
+    height=None,
+    max_width=None,
+    **props,
+)
+```
+
+Render an Astryx card with a selected state.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                        | Description                                                                                 | Default     |
+|-----------|-----------------------------|---------------------------------------------------------------------------------------------|-------------|
+| children  | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.                     | `None`      |
+| value     | bool                        | Synchronized component value.                                                               | `False`     |
+| label     | str                         | Visible or accessible label for the component.                                              | _required_  |
+| variant   | str                         | Astryx visual variant.                                                                      | `'default'` |
+| disabled  | bool                        | Whether the card is disabled.                                                               | `False`     |
+| padding   | int \| float \| None        | Inner padding using the Astryx spacing scale.                                               | `None`      |
+| width     | int \| float \| str \| None | Card width.                                                                                 | `None`      |
+| height    | int \| float \| str \| None | Card height.                                                                                | `None`      |
+| max_width | int \| float \| str \| None | Maximum card width.                                                                         | `None`      |
+| **props   | Any                         | JSON-safe SelectableCard props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe SelectableCard props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``label`` (string; required): Accessibility label.
+- ``isSelected`` (boolean; required): Controlled selection state.
+- ``onChange`` ((isSelected: boolean) => void; required): Called when toggled.
+- ``isDisabled`` (boolean): Disables the card.
+- ``children`` (ReactNode): Card content.
+- ``padding`` (SpacingStep): Inner padding.
+- ``variant`` ('default' or 'transparent' or 'muted' or 'blue' or 'cyan' or 'gray' or 'green' or
+  'orange' or 'pink' or 'purple' or 'red' or 'teal' or 'yellow'): Background color variant.
+- ``width`` (SizeValue): Card width.
+- ``height`` (SizeValue): Card height.
+- ``maxWidth`` (SizeValue): Maximum card width.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value, not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/SelectableCard>.

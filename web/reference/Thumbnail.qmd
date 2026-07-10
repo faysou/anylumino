@@ -1,0 +1,59 @@
+# Thumbnail { #anylumino.astryx.Thumbnail }
+
+```python
+Thumbnail(
+    label='',
+    src='',
+    alt='',
+    loading=None,
+    disabled=False,
+    removable=False,
+    clickable=False,
+    action_callbacks=None,
+    **props,
+)
+```
+
+Render an Astryx thumbnail image or placeholder.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                                           | Description                                                                            | Default   |
+|------------------|----------------------------------------------------------------|----------------------------------------------------------------------------------------|-----------|
+| label            | str                                                            | Visible or accessible label for the component.                                         | `''`      |
+| src              | str                                                            | Image or media source URL.                                                             | `''`      |
+| alt              | str                                                            | Accessible alternative text.                                                           | `''`      |
+| loading          | bool \| None                                                   | Whether to show the loading presentation.                                              | `None`    |
+| disabled         | bool                                                           | Whether interaction is disabled.                                                       | `False`   |
+| removable        | bool                                                           | Whether to show the remove control.                                                    | `False`   |
+| clickable        | bool                                                           | Whether the thumbnail acts as a button.                                                | `False`   |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving ``"remove"`` or ``"click"``.                                | `None`    |
+| **props          | Any                                                            | JSON-safe Thumbnail props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Thumbnail props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``src`` (string): Image source URL.
+- ``alt`` (string): Alt text for the image.
+- ``label`` (string): Accessible label (e.g. file name). Shown as tooltip on hover.
+- ``onRemove`` ((e: React.MouseEvent) => void): Callback for the overlaid remove button.
+- ``onClick`` ((e: React.MouseEvent) => void): Click handler. Adds button semantics and hover
+  shadow.
+- ``isLoading`` (boolean): Shows skeleton (no src) or upload overlay (with src).
+- ``isDisabled`` (boolean): Whether the thumbnail is disabled.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value, not an inline style object like style={{}}.
+- ``className`` (string): CSS class name for the root element. Prefer xstyle for styling;
+  className is provided for integration with non-StyleX systems.
+- ``style`` (CSSProperties): Inline styles for the root element. Prefer xstyle for styling;
+  inline styles bypass StyleX optimization.
+- ``data-testid`` (string): Test selector for automated testing frameworks.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Thumbnail>.

@@ -1,0 +1,172 @@
+# Table { #anylumino.astryx.Table }
+
+```python
+Table(
+    rows=(),
+    columns=None,
+    *,
+    row_key='id',
+    selected=(),
+    selects='',
+    sortable=False,
+    sort_key='',
+    sort_direction='',
+    select_all_label='Select all rows',
+    width=None,
+    height=None,
+    density=None,
+    dividers=None,
+    striped=None,
+    hover=None,
+    vertical_align=None,
+    text_overflow=None,
+    **props,
+)
+```
+
+Render a data-driven Astryx table for notebook use.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                                           | Description                                                                        | Default             |
+|------------------|------------------------------------------------|------------------------------------------------------------------------------------|---------------------|
+| rows             | Iterable\[Any\]                                | Rows or records rendered by the component.                                         | `()`                |
+| columns          | Iterable\[Any\] \| Mapping\[str, Any\] \| None | Grid or table column definition.                                                   | `None`              |
+| row_key          | str \| None                                    | Row id field. Use ``None`` to generate notebook-local row ids.                     | `'id'`              |
+| selected         | Iterable\[Any\]                                | Initially selected row ids.                                                        | `()`                |
+| selects          | str                                            | Selection mode. Use ``""``, ``"single"``, or ``"multiple"``.                       | `''`                |
+| sortable         | bool                                           | Whether table columns should be sortable by default.                               | `False`             |
+| sort_key         | str                                            | Initially sorted table column key.                                                 | `''`                |
+| sort_direction   | str                                            | Initial sort direction, such as ``"asc"`` or ``"desc"``.                           | `''`                |
+| select_all_label | str                                            | Accessible label for the select-all checkbox.                                      | `'Select all rows'` |
+| width            | int \| float \| str \| None                    | CSS width. Numbers are normalized by anylumino where supported.                    | `None`              |
+| height           | int \| float \| str \| None                    | CSS height. Numbers are normalized by anylumino where supported.                   | `None`              |
+| density          | str \| None                                    | Compact, balanced, or spacious row density.                                        | `None`              |
+| dividers         | str \| None                                    | Row, column, grid, or no divider treatment.                                        | `None`              |
+| striped          | bool \| None                                   | Whether alternating rows receive a background wash.                                | `None`              |
+| hover            | bool \| None                                   | Whether rows highlight on pointer hover.                                           | `None`              |
+| vertical_align   | str \| None                                    | Body-cell vertical alignment.                                                      | `None`              |
+| text_overflow    | str \| None                                    | Wrap or truncate overflowing cell text.                                            | `None`              |
+| **props          | Any                                            | JSON-safe Table props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`                |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Table props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``data`` (T[]): Array of data items to render as rows. T must extend Record<string, unknown>
+  (use 'interface MyRow extends Record<string, unknown>' for custom types).
+- ``columns`` (TableColumn<T>[]): Column definitions: each column has {key, header, width?,
+  align?, renderCell?}. The 'header' field sets the column heading text. If omitted, columns
+  are auto-generated from data object keys.
+- ``idKey`` ((keyof T & string) or ((item: T) => string or number)): Row key for React
+  reconciliation. Pass a property name string or a function. Falls back to row index if
+  omitted.
+- ``density`` ('compact' or 'balanced' or 'spacious'): Row density controlling cell padding and
+  font size.
+- ``dividers`` ('rows' or 'columns' or 'grid' or 'none'): Divider style rendered between cells.
+- ``isStriped`` (boolean): Applies a background wash to even-numbered rows.
+- ``hasHover`` (boolean): Applies a hover highlight background to rows on pointer devices.
+- ``verticalAlign`` ('middle' or 'top' or 'bottom'): Vertical alignment for body row cells.
+  Controls 'vertical-align' on the '<td>' elements.
+- ``textOverflow`` ('wrap' or 'truncate'): How body cell text behaves when it exceeds the column
+  width. 'wrap' lets text wrap and the row grow taller; 'truncate' clips with an ellipsis
+  (default-rendered cells show a tooltip on hover when truncated). Header cells always
+  truncate.
+- ``children`` (ReactNode): Children mode: render TableRow/TableCell directly instead of using
+  data-driven rendering.
+- ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+  sizing). Must be a stylex.create() value: not an inline style object like style={{}}.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Table>.
+
+## Notes {.doc-section .doc-section-notes}
+
+Row checkbox selection is optional. Leave ``selects`` empty for no checkbox column, use ``"single"`` or ``"multiple"`` to enable selection.
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [columns](#anylumino.astryx.Table.columns) | Current Astryx table column definitions. |
+| [row_key](#anylumino.astryx.Table.row_key) | Current row id property used by Astryx Table. |
+| [rows](#anylumino.astryx.Table.rows) | Current normalized Astryx table rows. |
+| [select_all_label](#anylumino.astryx.Table.select_all_label) | A trait for unicode strings. |
+| [selected](#anylumino.astryx.Table.selected) | An instance of a Python list. |
+| [selects](#anylumino.astryx.Table.selects) | A trait for unicode strings. |
+| [sort_direction](#anylumino.astryx.Table.sort_direction) | A trait for unicode strings. |
+| [sort_key](#anylumino.astryx.Table.sort_key) | A trait for unicode strings. |
+| [sortable](#anylumino.astryx.Table.sortable) | A boolean (True, False) trait. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [append_row](#anylumino.astryx.Table.append_row) | Append one raw row and return its normalized row id. |
+| [on_select](#anylumino.astryx.Table.on_select) | Register or unregister a callback for table selection changes. |
+| [on_sort](#anylumino.astryx.Table.on_sort) | Register or unregister a callback for table sort changes. |
+| [prepend_row](#anylumino.astryx.Table.prepend_row) | Prepend one raw row and return its normalized row id. |
+| [remove_row](#anylumino.astryx.Table.remove_row) | Remove an existing row by row id. |
+| [set_rows](#anylumino.astryx.Table.set_rows) | Replace table rows from raw row mappings, sequences, or scalar values. |
+| [update_row](#anylumino.astryx.Table.update_row) | Update cells for an existing row by row id. |
+
+### append_row { #anylumino.astryx.Table.append_row }
+
+```python
+append_row(row, *, row_key=None)
+```
+
+Append one raw row and return its normalized row id.
+
+### on_select { #anylumino.astryx.Table.on_select }
+
+```python
+on_select(callback, remove=False)
+```
+
+Register or unregister a callback for table selection changes.
+
+### on_sort { #anylumino.astryx.Table.on_sort }
+
+```python
+on_sort(callback, remove=False)
+```
+
+Register or unregister a callback for table sort changes.
+
+### prepend_row { #anylumino.astryx.Table.prepend_row }
+
+```python
+prepend_row(row, *, row_key=None)
+```
+
+Prepend one raw row and return its normalized row id.
+
+### remove_row { #anylumino.astryx.Table.remove_row }
+
+```python
+remove_row(row_value)
+```
+
+Remove an existing row by row id.
+
+### set_rows { #anylumino.astryx.Table.set_rows }
+
+```python
+set_rows(rows, *, columns=None, row_key=None)
+```
+
+Replace table rows from raw row mappings, sequences, or scalar values.
+
+### update_row { #anylumino.astryx.Table.update_row }
+
+```python
+update_row(row_value, values)
+```
+
+Update cells for an existing row by row id.

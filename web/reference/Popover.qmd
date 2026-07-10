@@ -1,0 +1,71 @@
+# Popover { #anylumino.astryx.Popover }
+
+```python
+Popover(
+    content,
+    trigger,
+    *,
+    label,
+    placement=None,
+    alignment=None,
+    open=None,
+    enabled=None,
+    width=None,
+    close_button=None,
+    auto_focus=None,
+    **props,
+)
+```
+
+Render click-triggered popover content.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                        | Description                                                                          | Default    |
+|--------------|-----------------------------|--------------------------------------------------------------------------------------|------------|
+| content      | str \| ChildInput           | Overlay or tooltip content.                                                          | _required_ |
+| trigger      | ChildInput                  | Trigger content used by disclosure or overlay components.                            | _required_ |
+| label        | str                         | Visible or accessible label for the component.                                       | _required_ |
+| placement    | str \| None                 | Placement relative to the trigger.                                                   | `None`     |
+| alignment    | str \| None                 | Alignment along the placement axis.                                                  | `None`     |
+| open         | bool \| None                | Optional controlled open state.                                                      | `None`     |
+| enabled      | bool \| None                | Whether trigger interaction is enabled.                                              | `None`     |
+| width        | int \| float \| str \| None | Popover width.                                                                       | `None`     |
+| close_button | bool \| None                | Whether to include the accessible close button.                                      | `None`     |
+| auto_focus   | bool \| None                | Whether content receives focus when opened.                                          | `None`     |
+| **props      | Any                         | JSON-safe Popover props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+JSON-safe Popover props forwarded to Astryx.
+
+Supported Astryx props include:
+
+- ``children`` (ReactNode or render function): Trigger content. Automatic mode requires a button
+  or role=button descendant; render-function mode receives trigger props.
+- ``anchorRef`` (React.RefObject<HTMLElement>): External button or role=button anchor used for
+  sibling-mode rendering.
+- ``content`` (ReactNode; required): Popover dialog content.
+- ``placement`` (LayerPlacement; default 'below'): Placement relative to the trigger.
+- ``alignment`` (LayerAlignment; default 'start'): Alignment along the placement axis.
+- ``isOpen`` (boolean): Controlled open state.
+- ``onOpenChange`` ((isOpen: boolean) => void): Called when popover visibility changes.
+- ``isEnabled`` (boolean; default true): Disables trigger interactions when false.
+- ``width`` (number or string; default 'auto'): Popover container width. Numbers are pixels;
+  strings are CSS values.
+- ``label`` (string): Accessible label for the popover dialog.
+- ``hasCloseButton`` (boolean): Includes a hidden close button for keyboard users.
+- ``closeButtonLabel`` (string; default 'Close popover'): Accessible label for the hidden close
+  button.
+- ``hasAutoFocus`` (boolean; default true): Auto-focuses the first focusable element when
+  opened.
+- ``data-testid`` (string): Test selector for the popover container.
+- ``xstyle`` (StyleXStyles): StyleX styles for the popover content.
+- ``className`` (string): CSS class names for the popover content.
+- ``style`` (CSSProperties): Inline styles for the popover content.
+
+Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+documented for Astryx parity but cannot be serialized directly from Python unless the
+wrapper adapts them.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Popover>.
