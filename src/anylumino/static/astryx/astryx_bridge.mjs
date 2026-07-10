@@ -30,6 +30,14 @@ export function sendModelAction(model, value, action) {
 }
 
 
+export function toggleGroupValue(value, isMultiple) {
+  if (isMultiple) {
+    return Array.isArray(value) ? value.map(String) : [];
+  }
+  return value == null || value === "" ? null : String(value);
+}
+
+
 export function registeredComponent(components, name) {
   const component = components[name];
   if (component === undefined) {

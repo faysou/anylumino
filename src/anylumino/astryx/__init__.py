@@ -63,9 +63,11 @@ from .surfaces import Grid
 from .surfaces import HoverCard
 from .surfaces import InputGroup
 from .surfaces import List
+from .surfaces import Lightbox
 from .surfaces import MetadataList
 from .surfaces import MoreMenu
 from .surfaces import Outline
+from .surfaces import Overlay
 from .surfaces import Popover
 from .surfaces import RadioList
 from .surfaces import Section
@@ -75,6 +77,7 @@ from .surfaces import Stack
 from .surfaces import TabList
 from .surfaces import Tokenizer
 from .surfaces import Toolbar
+from .surfaces import ToggleButtonGroup
 from .surfaces import Tooltip
 from .surfaces import TreeList
 from .surfaces import Typeahead
@@ -125,12 +128,14 @@ __all__ = [
     "Kbd",
     "Link",
     "List",
+    "Lightbox",
     "Markdown",
     "MetadataList",
     "MoreMenu",
     "MultiSelector",
     "NumberInput",
     "Outline",
+    "Overlay",
     "Popover",
     "ProgressBar",
     "RadioList",
@@ -154,6 +159,7 @@ __all__ = [
     "TimeInput",
     "Timestamp",
     "ToggleButton",
+    "ToggleButtonGroup",
     "Token",
     "Tokenizer",
     "Toolbar",

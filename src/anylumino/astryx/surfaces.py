@@ -16,6 +16,32 @@ from .base import _option_records
 from .base import _search_records
 
 
+def _lightbox_media(
+    media: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+) -> Mapping[str, Any] | list[Mapping[str, Any]]:
+    is_single = isinstance(media, Mapping)
+    records = [media] if is_single else list(media)
+    if not records:
+        msg = "Lightbox media must contain at least one item"
+        raise ValueError(msg)
+
+    normalized = []
+    for record in records:
+        if not isinstance(record, Mapping):
+            msg = "Lightbox media items must be mappings"
+            raise TypeError(msg)
+        if not record.get("src") or "alt" not in record:
+            msg = "Lightbox media items require 'src' and 'alt'"
+            raise ValueError(msg)
+        item = _clean_value(record)
+        if item.get("type", "image") not in {"image", "video"}:
+            msg = "Lightbox media type must be 'image' or 'video'"
+            raise ValueError(msg)
+        normalized.append(item)
+
+    return normalized[0] if is_single else normalized
+
+
 class Stack(Widget):
     """Arrange child widgets in an Astryx stack.
 
@@ -306,6 +332,70 @@ class AspectRatio(Widget):
         self, children: ChildInput = None, *, ratio: int | float = 16 / 9, **props: Any
     ) -> None:
         super().__init__("AspectRatio", children, props={"ratio": ratio, **props})
+
+
+class Overlay(Widget):
+    """Render content over a base Astryx surface or media widget.
+
+    Parameters
+    ----------
+    children : ChildInput
+        Base widget displayed beneath the overlay.
+    content : str | ChildInput
+        Text or widget rendered inside the overlay scrim.
+    show_on : str, default 'always'
+        Visibility trigger: ``"always"``, ``"hover"``, ``"focus"``, or
+        ``"hover-or-focus"``.
+    open : bool | None, default None
+        Optional visibility override. When omitted, ``show_on`` controls visibility.
+    scrim : str | bool, default 'dark'
+        Dark or light scrim, or ``False`` for no scrim.
+    position : str, default 'fill'
+        Overlay placement: ``"fill"``, ``"bottom"``, or ``"top"``.
+    align : str, default 'end'
+        Content alignment: ``"start"``, ``"center"``, or ``"end"``.
+    **props : Any
+        Additional JSON-safe Overlay props forwarded to Astryx.
+
+    Astryx Props
+    ------------
+    ``children``, ``content``, ``showOn``, ``isOpen``, ``scrim``, ``position``,
+    and ``align`` are adapted by the named arguments above. ``**props`` keeps
+    the wrapper forward-compatible with additional JSON-safe Astryx props.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Overlay>.
+    """
+
+    def __init__(
+        self,
+        children: ChildInput,
+        content: str | ChildInput,
+        *,
+        show_on: str = "always",
+        open: bool | None = None,
+        scrim: str | bool = "dark",
+        position: str = "fill",
+        align: str = "end",
+        **props: Any,
+    ) -> None:
+        slots = {"base": children}
+        content_prop: str | None = content if isinstance(content, str) else None
+        if not isinstance(content, str):
+            slots["content"] = content
+        super().__init__(
+            "Overlay",
+            slots,
+            open=open,
+            props=_named_props(
+                props,
+                content=content_prop,
+                showOn=show_on,
+                isOpen=open,
+                scrim=scrim,
+                position=position,
+                align=align,
+            ),
+        )
 
 
 class Card(Widget):
@@ -1297,6 +1387,83 @@ class ButtonGroup(Widget):
                 props,
                 items=_option_records(items),
                 label=label,
+                orientation=orientation,
+                size=size,
+            ),
+        )
+
+
+class ToggleButtonGroup(Widget):
+    """Render a single- or multiple-selection group of toggle buttons.
+
+    Parameters
+    ----------
+    items : Iterable[Any]
+        Button labels, ``(label, value)`` pairs, or item mappings. Mappings can
+        also set ``disabled`` and individual button props.
+    value : str | Iterable[str] | None, default None
+        Selected value for single selection, or selected values for multiple selection.
+    label : str
+        Accessible label for the group.
+    selection_mode : str, default 'single'
+        ``"single"`` for exclusive selection or ``"multiple"`` for
+        independent selections.
+    orientation : str, default 'horizontal'
+        Horizontal or vertical button layout.
+    size : str | None, default None
+        Default size inherited by every toggle button.
+    disabled : bool, default False
+        Whether all toggle buttons are disabled.
+    **props : Any
+        Additional JSON-safe ToggleButtonGroup props forwarded to Astryx.
+
+    Astryx Props
+    ------------
+    ``children``, ``value``, ``label``, ``type``, ``orientation``, ``size``, and
+    ``isDisabled`` are adapted by the named arguments above. ``**props`` keeps
+    the wrapper forward-compatible with additional JSON-safe Astryx props.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/ToggleButtonGroup>.
+    """
+
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str | Iterable[str] | None = None,
+        *,
+        label: str,
+        selection_mode: str = "single",
+        orientation: str = "horizontal",
+        size: str | None = None,
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        if selection_mode not in {"single", "multiple"}:
+            msg = "selection_mode must be 'single' or 'multiple'"
+            raise ValueError(msg)
+        if selection_mode == "multiple":
+            selected = (
+                []
+                if value is None
+                else [value]
+                if isinstance(value, str)
+                else list(value)
+            )
+        else:
+            if value is not None and not isinstance(value, str):
+                msg = "single-selection value must be a string or None"
+                raise TypeError(msg)
+            selected = value
+
+        super().__init__(
+            "ToggleButtonGroup",
+            label=label,
+            value=selected,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                type=selection_mode,
                 orientation=orientation,
                 size=size,
             ),
@@ -3057,6 +3224,63 @@ class CommandPalette(Widget):
                 maxHeight=max_height,
                 emptySearchText=empty_search_text,
                 emptyBootstrapText=empty_bootstrap_text,
+            ),
+        )
+
+
+class Lightbox(Widget):
+    """Display one image or video, or a gallery, in an Astryx lightbox.
+
+    Parameters
+    ----------
+    media : Mapping[str, Any] | Iterable[Mapping[str, Any]]
+        One media mapping or a gallery of mappings. Every item requires
+        ``src`` and accessible ``alt`` text; ``type`` may be ``"image"`` or
+        ``"video"``, and ``caption`` is optional.
+    open : bool, default False
+        Controlled open state synchronized through ``is_open``.
+    index : int, default 0
+        Controlled gallery index synchronized through ``value``.
+    zoom : bool, default False
+        Whether images support double-click zoom and drag-to-pan.
+    auto_play : bool, default False
+        Whether video starts playing when the lightbox opens.
+    **props : Any
+        Additional JSON-safe Lightbox props forwarded to Astryx.
+
+    Astryx Props
+    ------------
+    ``media``, ``isOpen``, ``index``, ``hasZoom``, and ``hasAutoPlay`` are
+    adapted by the named arguments above. ``**props`` keeps the wrapper
+    forward-compatible with additional JSON-safe Astryx props.
+
+    Notes
+    -----
+    Video media uses Astryx's native player with browser playback controls.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Lightbox>.
+    """
+
+    def __init__(
+        self,
+        media: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+        *,
+        open: bool = False,
+        index: int = 0,
+        zoom: bool = False,
+        auto_play: bool = False,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Lightbox",
+            value=index,
+            open=open,
+            props=_named_props(
+                props,
+                media=_lightbox_media(media),
+                isOpen=open,
+                hasZoom=zoom,
+                hasAutoPlay=auto_play,
             ),
         )
 

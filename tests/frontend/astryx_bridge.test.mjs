@@ -6,6 +6,7 @@ import {
   registeredComponent,
   sendModelAction,
   setModelOpen,
+  toggleGroupValue,
 } from "../../src/anylumino/static/astryx/astryx_bridge.mjs";
 
 
@@ -65,6 +66,14 @@ test("sendModelAction preserves item values and named actions", () => {
     { type: "click", value: "export" },
     { type: "click", action: "confirm" },
   ]);
+});
+
+
+test("toggleGroupValue preserves the Astryx single and multiple value shapes", () => {
+  assert.equal(toggleGroupValue("grid", false), "grid");
+  assert.equal(toggleGroupValue(null, false), null);
+  assert.deepEqual(toggleGroupValue(["bold", 7], true), ["bold", "7"]);
+  assert.deepEqual(toggleGroupValue("bold", true), []);
 });
 
 

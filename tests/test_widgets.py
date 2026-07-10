@@ -987,6 +987,91 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
     assert widgets[38].props["actionLabel"] == "Continue"
 
 
+def test_astryx_lightbox_toggle_group_and_overlay_adapt_native_props() -> None:
+    lightbox = ax.Lightbox(
+        [
+            {"src": "first.jpg", "alt": "First chart", "caption": "Daily view"},
+            {"src": "clip.mp4", "alt": "Market replay", "type": "video"},
+        ],
+        open=True,
+        index=1,
+        zoom=True,
+        auto_play=True,
+    )
+    toggle_group = ax.ToggleButtonGroup(
+        [("Grid", "grid"), {"label": "List", "value": "list", "disabled": True}],
+        value="grid",
+        label="View mode",
+        size="sm",
+    )
+    multiple_group = ax.ToggleButtonGroup(
+        ["Bold", "Italic"],
+        value="Bold",
+        label="Formatting",
+        selection_mode="multiple",
+        orientation="vertical",
+    )
+    base = ax.Card(ax.Text("Preview"))
+    action = ax.Button("Quick view")
+    overlay = ax.Overlay(
+        base,
+        action,
+        show_on="hover-or-focus",
+        open=False,
+        scrim="light",
+        position="bottom",
+        align="center",
+    )
+
+    assert lightbox.component_name == "Lightbox"
+    assert lightbox.is_open is True
+    assert lightbox.value == 1
+    assert lightbox.props == {
+        "media": [
+            {"src": "first.jpg", "alt": "First chart", "caption": "Daily view"},
+            {"src": "clip.mp4", "alt": "Market replay", "type": "video"},
+        ],
+        "isOpen": True,
+        "hasZoom": True,
+        "hasAutoPlay": True,
+    }
+    assert toggle_group.value == "grid"
+    assert toggle_group.props == {
+        "items": [
+            {"label": "Grid", "value": "grid"},
+            {"label": "List", "value": "list", "disabled": True},
+        ],
+        "type": "single",
+        "orientation": "horizontal",
+        "size": "sm",
+    }
+    assert multiple_group.value == ["Bold"]
+    assert multiple_group.props["type"] == "multiple"
+    assert overlay.child_keys == ["base", "content"]
+    assert overlay["base"] is base
+    assert overlay["content"] is action
+    assert overlay.props == {
+        "showOn": "hover-or-focus",
+        "isOpen": False,
+        "scrim": "light",
+        "position": "bottom",
+        "align": "center",
+    }
+
+
+def test_astryx_lightbox_and_toggle_group_reject_invalid_shapes() -> None:
+    with pytest.raises(ValueError, match="at least one item"):
+        ax.Lightbox([])
+    with pytest.raises(ValueError, match="require 'src' and 'alt'"):
+        ax.Lightbox({"src": "chart.jpg"})
+    with pytest.raises(ValueError, match="must be 'image' or 'video'"):
+        ax.Lightbox({"src": "chart.jpg", "alt": "Chart", "type": "audio"})
+    with pytest.raises(ValueError, match="selection_mode"):
+        ax.ToggleButtonGroup([], label="View", selection_mode="exclusive")
+    with pytest.raises(TypeError, match="single-selection value"):
+        ax.ToggleButtonGroup([], value=["grid"], label="View")
+
+
 def test_astryx_theme_applies_reusable_brand_to_child_widgets() -> None:
     brand = ax.Brand(
         "desk",

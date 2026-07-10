@@ -152,6 +152,7 @@ quartodoc:
         - Button
         - IconButton
         - ButtonGroup
+        - ToggleButtonGroup
         - Toolbar
         - DropdownMenu
         - MoreMenu
@@ -175,6 +176,8 @@ quartodoc:
         - Tooltip
         - HoverCard
         - Popover
+        - Overlay
+        - Lightbox
         - Dialog
         - AlertDialog
     - title: "Astryx navigation and data"

@@ -83,6 +83,7 @@ website:
       - reference/Button.qmd
       - reference/IconButton.qmd
       - reference/ButtonGroup.qmd
+      - reference/ToggleButtonGroup.qmd
       - reference/Toolbar.qmd
       - reference/DropdownMenu.qmd
       - reference/MoreMenu.qmd
@@ -102,6 +103,8 @@ website:
       - reference/Tooltip.qmd
       - reference/HoverCard.qmd
       - reference/Popover.qmd
+      - reference/Overlay.qmd
+      - reference/Lightbox.qmd
       - reference/Dialog.qmd
       - reference/AlertDialog.qmd
       section: Astryx overlays and previews

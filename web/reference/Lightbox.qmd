@@ -1,0 +1,30 @@
+# Lightbox { #anylumino.astryx.Lightbox }
+
+```python
+Lightbox(media, *, open=False, index=0, zoom=False, auto_play=False, **props)
+```
+
+Display one image or video, or a gallery, in an Astryx lightbox.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                   | Description                                                                                                                                                                   | Default    |
+|-----------|--------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| media     | Mapping\[str, Any\] \| Iterable\[Mapping\[str, Any\]\] | One media mapping or a gallery of mappings. Every item requires ``src`` and accessible ``alt`` text; ``type`` may be ``"image"`` or ``"video"``, and ``caption`` is optional. | _required_ |
+| open      | bool                                                   | Controlled open state synchronized through ``is_open``.                                                                                                                       | `False`    |
+| index     | int                                                    | Controlled gallery index synchronized through ``value``.                                                                                                                      | `0`        |
+| zoom      | bool                                                   | Whether images support double-click zoom and drag-to-pan.                                                                                                                     | `False`    |
+| auto_play | bool                                                   | Whether video starts playing when the lightbox opens.                                                                                                                         | `False`    |
+| **props   | Any                                                    | Additional JSON-safe Lightbox props forwarded to Astryx.                                                                                                                      | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+``media``, ``isOpen``, ``index``, ``hasZoom``, and ``hasAutoPlay`` are
+adapted by the named arguments above. ``**props`` keeps the wrapper
+forward-compatible with additional JSON-safe Astryx props.
+
+## Notes {.doc-section .doc-section-notes}
+
+Video media uses Astryx's native player with browser playback controls.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Lightbox>.

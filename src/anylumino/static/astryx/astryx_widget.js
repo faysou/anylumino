@@ -44,6 +44,7 @@ import { InputGroup, InputGroupText } from "@astryxdesign/core/InputGroup";
 import { Item } from "@astryxdesign/core/Item";
 import { Kbd } from "@astryxdesign/core/Kbd";
 import { Link } from "@astryxdesign/core/Link";
+import { Lightbox } from "@astryxdesign/core/Lightbox";
 import { List, ListItem } from "@astryxdesign/core/List";
 import { Markdown } from "@astryxdesign/core/Markdown";
 import { MetadataList, MetadataListItem } from "@astryxdesign/core/MetadataList";
@@ -51,6 +52,7 @@ import { MoreMenu } from "@astryxdesign/core/MoreMenu";
 import { MultiSelector } from "@astryxdesign/core/MultiSelector";
 import { NumberInput } from "@astryxdesign/core/NumberInput";
 import { Outline } from "@astryxdesign/core/Outline";
+import { Overlay } from "@astryxdesign/core/Overlay";
 import { Pagination } from "@astryxdesign/core/Pagination";
 import { Popover } from "@astryxdesign/core/Popover";
 import { ProgressBar } from "@astryxdesign/core/ProgressBar";
@@ -79,7 +81,7 @@ import { TextInput } from "@astryxdesign/core/TextInput";
 import { Thumbnail } from "@astryxdesign/core/Thumbnail";
 import { TimeInput } from "@astryxdesign/core/TimeInput";
 import { Timestamp } from "@astryxdesign/core/Timestamp";
-import { ToggleButton } from "@astryxdesign/core/ToggleButton";
+import { ToggleButton, ToggleButtonGroup } from "@astryxdesign/core/ToggleButton";
 import { Token } from "@astryxdesign/core/Token";
 import { Tokenizer } from "@astryxdesign/core/Tokenizer";
 import { Toolbar } from "@astryxdesign/core/Toolbar";
@@ -99,6 +101,7 @@ import {
   registeredComponent,
   sendModelAction,
   setModelOpen,
+  toggleGroupValue,
 } from "./astryx_bridge.mjs";
 import "./astryx_widget.css";
 
@@ -144,6 +147,7 @@ const COMPONENTS = {
   Item,
   Kbd,
   Link,
+  Lightbox,
   List,
   Markdown,
   MetadataList,
@@ -151,6 +155,7 @@ const COMPONENTS = {
   MultiSelector,
   NumberInput,
   Outline,
+  Overlay,
   Pagination,
   Popover,
   ProgressBar,
@@ -174,6 +179,7 @@ const COMPONENTS = {
   TimeInput,
   Timestamp,
   ToggleButton,
+  ToggleButtonGroup,
   Token,
   Tokenizer,
   Toolbar,
@@ -203,6 +209,7 @@ const PROP_DRIVEN_COMPONENTS = new Set([
   "FileInput",
   "Icon",
   "IconButton",
+  "Lightbox",
   "Kbd",
   "MultiSelector",
   "MoreMenu",
@@ -240,6 +247,7 @@ const GENERATED_CHILD_COMPONENTS = new Set([
   "RadioList",
   "SegmentedControl",
   "TabList",
+  "ToggleButtonGroup",
 ]);
 
 function textFor(model) {
@@ -660,6 +668,18 @@ function componentProps(model) {
     };
   }
 
+  if (name === "ToggleButtonGroup") {
+    const isMultiple = props.type === "multiple";
+    return {
+      ...props,
+      label: label || "Toggle buttons",
+      type: isMultiple ? "multiple" : "single",
+      value: toggleGroupValue(value, isMultiple),
+      isDisabled: disabled,
+      onChange: (nextValue) => setModelValue(model, nextValue),
+    };
+  }
+
   if (name === "TextInput") {
     return {
       ...props,
@@ -1054,6 +1074,27 @@ function componentProps(model) {
     return result;
   }
 
+  if (name === "Overlay") {
+    const result = {
+      ...props,
+      content: props.content ?? slotByKey(model, "content"),
+    };
+    if (props.isOpen !== undefined) {
+      result.isOpen = Boolean(model.get("is_open"));
+    }
+    return result;
+  }
+
+  if (name === "Lightbox") {
+    return {
+      ...props,
+      isOpen: Boolean(model.get("is_open")),
+      index: Number(value ?? 0),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
+      onIndexChange: (nextIndex) => setNumberValue(model, nextIndex),
+    };
+  }
+
   if (name === "Dialog") {
     return {
       ...props,
@@ -1316,6 +1357,23 @@ function generatedChildren(model, name) {
     );
   }
 
+  if (name === "ToggleButtonGroup") {
+    return asArray(props.items).map((item, index) =>
+      React.createElement(ToggleButton, {
+        key: itemValue(item, index),
+        value: itemValue(item, index),
+        label: itemLabel(item, `Option ${index + 1}`),
+        variant: item?.variant,
+        size: item?.size,
+        tooltip: item?.tooltip,
+        icon: item?.icon ? iconNode(item.icon) : undefined,
+        pressedIcon: item?.pressedIcon ? iconNode(item.pressedIcon) : undefined,
+        isIconOnly: Boolean(item?.isIconOnly),
+        isDisabled: Boolean(item?.disabled ?? item?.isDisabled),
+      }),
+    );
+  }
+
   return null;
 }
 
@@ -1324,6 +1382,9 @@ function componentChildren(model) {
   const slots = slotChildren(model);
   if (["Tooltip", "HoverCard", "Popover"].includes(name)) {
     return (slotByKey(model, "trigger") ?? slots ?? textFor(model)) || undefined;
+  }
+  if (name === "Overlay") {
+    return slotByKey(model, "base");
   }
   if (name === "InputGroup") {
     const props = rawProps(model);

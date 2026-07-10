@@ -1,0 +1,38 @@
+# ToggleButtonGroup { #anylumino.astryx.ToggleButtonGroup }
+
+```python
+ToggleButtonGroup(
+    items,
+    value=None,
+    *,
+    label,
+    selection_mode='single',
+    orientation='horizontal',
+    size=None,
+    disabled=False,
+    **props,
+)
+```
+
+Render a single- or multiple-selection group of toggle buttons.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type                           | Description                                                                                                                | Default        |
+|----------------|--------------------------------|----------------------------------------------------------------------------------------------------------------------------|----------------|
+| items          | Iterable\[Any\]                | Button labels, ``(label, value)`` pairs, or item mappings. Mappings can also set ``disabled`` and individual button props. | _required_     |
+| value          | str \| Iterable\[str\] \| None | Selected value for single selection, or selected values for multiple selection.                                            | `None`         |
+| label          | str                            | Accessible label for the group.                                                                                            | _required_     |
+| selection_mode | str                            | ``"single"`` for exclusive selection or ``"multiple"`` for independent selections.                                         | `'single'`     |
+| orientation    | str                            | Horizontal or vertical button layout.                                                                                      | `'horizontal'` |
+| size           | str \| None                    | Default size inherited by every toggle button.                                                                             | `None`         |
+| disabled       | bool                           | Whether all toggle buttons are disabled.                                                                                   | `False`        |
+| **props        | Any                            | Additional JSON-safe ToggleButtonGroup props forwarded to Astryx.                                                          | `{}`           |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+``children``, ``value``, ``label``, ``type``, ``orientation``, ``size``, and
+``isDisabled`` are adapted by the named arguments above. ``**props`` keeps
+the wrapper forward-compatible with additional JSON-safe Astryx props.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/ToggleButtonGroup>.

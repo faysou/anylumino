@@ -116,6 +116,7 @@ Buttons, toolbars, menus, and command launchers.
 | [Button](Button.qmd#anylumino.astryx.Button) | Render an Astryx push button. |
 | [IconButton](IconButton.qmd#anylumino.astryx.IconButton) | Render an icon-only Astryx button. |
 | [ButtonGroup](ButtonGroup.qmd#anylumino.astryx.ButtonGroup) | Render an Astryx button group from item records. |
+| [ToggleButtonGroup](ToggleButtonGroup.qmd#anylumino.astryx.ToggleButtonGroup) | Render a single- or multiple-selection group of toggle buttons. |
 | [Toolbar](Toolbar.qmd#anylumino.astryx.Toolbar) | Render an Astryx toolbar with optional slots. |
 | [DropdownMenu](DropdownMenu.qmd#anylumino.astryx.DropdownMenu) | Render a button-backed Astryx dropdown menu. |
 | [MoreMenu](MoreMenu.qmd#anylumino.astryx.MoreMenu) | Render a compact overflow action menu. |
@@ -145,6 +146,8 @@ Notebook-safe tooltip, popover, hover-card, and dialog surfaces.
 | [Tooltip](Tooltip.qmd#anylumino.astryx.Tooltip) | Attach a tooltip to notebook content. |
 | [HoverCard](HoverCard.qmd#anylumino.astryx.HoverCard) | Attach a hover card with richer preview content. |
 | [Popover](Popover.qmd#anylumino.astryx.Popover) | Render click-triggered popover content. |
+| [Overlay](Overlay.qmd#anylumino.astryx.Overlay) | Render content over a base Astryx surface or media widget. |
+| [Lightbox](Lightbox.qmd#anylumino.astryx.Lightbox) | Display one image or video, or a gallery, in an Astryx lightbox. |
 | [Dialog](Dialog.qmd#anylumino.astryx.Dialog) | Render Astryx dialog content inline in notebook output. |
 | [AlertDialog](AlertDialog.qmd#anylumino.astryx.AlertDialog) | Render an inline Astryx alert dialog for confirmations. |
 

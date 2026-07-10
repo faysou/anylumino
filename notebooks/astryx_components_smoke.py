@@ -257,6 +257,12 @@ button_group = ax.ButtonGroup(
     label="Order actions",
     callbacks=[record_click],
 )
+view_toggle = ax.ToggleButtonGroup(
+    [("Grid", "grid"), ("List", "list")],
+    value="grid",
+    label="View mode",
+    size="sm",
+)
 apply_button = ax.Button("Apply", variant="primary", callbacks=[record_click])
 more_button = ax.IconButton(
     "More actions", icon="moreHorizontal", variant="ghost", callbacks=[record_click]
@@ -283,6 +289,7 @@ data_section = ax.Grid(
                 "actions": ax.Stack(
                     {
                         "group": button_group,
+                        "view": view_toggle,
                         "apply": apply_button,
                         "menu": dropdown,
                         "more_menu": more_menu,
@@ -387,6 +394,34 @@ alert_dialog = ax.AlertDialog(
     "This inline preview uses the alert dialog surface.",
     action_label="Confirm",
 )
+preview_image = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='640' height='360' fill='%230057b8'/%3E%3C/svg%3E"
+overlay = ax.Overlay(
+    ax.Thumbnail(label="Market preview", src=preview_image, alt="Blue market preview"),
+    ax.Button("Quick view", variant="ghost"),
+    show_on="always",
+    position="bottom",
+    align="center",
+)
+lightbox = ax.Lightbox(
+    [
+        {
+            "src": preview_image,
+            "alt": "Blue lightbox preview",
+            "caption": "Inline image preview",
+        },
+        {
+            "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+            "alt": "Flower video preview",
+            "type": "video",
+            "caption": "Native video controls",
+        },
+    ],
+    zoom=True,
+)
+open_lightbox = ax.Button(
+    "Open lightbox",
+    callbacks=[lambda _widget: lightbox.show()],
+)
 
 
 visuals = ax.Grid(
@@ -441,7 +476,14 @@ visuals = ax.Grid(
                 "outline": outline,
                 "tree": tree,
                 "overlays": ax.Stack(
-                    {"tooltip": tooltip, "hover": hover, "popover": popover},
+                    {
+                        "tooltip": tooltip,
+                        "hover": hover,
+                        "popover": popover,
+                        "overlay": overlay,
+                        "open_lightbox": open_lightbox,
+                        "lightbox": lightbox,
+                    },
                     direction="horizontal",
                     gap=2,
                     wrap="wrap",
@@ -513,6 +555,7 @@ assert controls.child_keys == [
 assert orders.component_name == "Table"
 assert tabs.props["items"] == ["Summary", "Orders", "Risk"]
 assert button_group.props["items"][0]["label"] == "Apply"
+assert view_toggle.value == "grid"
 assert form_layout.component_name == "FormLayout"
 assert wrapped_symbol.component_name == "Field"
 assert grouped_qty.component_name == "InputGroup"
@@ -523,6 +566,8 @@ assert outline.component_name == "Outline"
 assert tree.component_name == "TreeList"
 assert tooltip.child_keys == ["trigger"]
 assert popover.child_keys == ["trigger", "content"]
+assert overlay.child_keys == ["base", "content"]
+assert lightbox.props["media"][1]["type"] == "video"
 assert palette.component_name == "CommandPalette"
 assert dialog.component_name == "Dialog"
 assert alert_dialog.component_name == "AlertDialog"

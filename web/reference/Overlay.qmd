@@ -1,0 +1,38 @@
+# Overlay { #anylumino.astryx.Overlay }
+
+```python
+Overlay(
+    children,
+    content,
+    *,
+    show_on='always',
+    open=None,
+    scrim='dark',
+    position='fill',
+    align='end',
+    **props,
+)
+```
+
+Render content over a base Astryx surface or media widget.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type              | Description                                                                          | Default    |
+|----------|-------------------|--------------------------------------------------------------------------------------|------------|
+| children | ChildInput        | Base widget displayed beneath the overlay.                                           | _required_ |
+| content  | str \| ChildInput | Text or widget rendered inside the overlay scrim.                                    | _required_ |
+| show_on  | str               | Visibility trigger: ``"always"``, ``"hover"``, ``"focus"``, or ``"hover-or-focus"``. | `'always'` |
+| open     | bool \| None      | Optional visibility override. When omitted, ``show_on`` controls visibility.         | `None`     |
+| scrim    | str \| bool       | Dark or light scrim, or ``False`` for no scrim.                                      | `'dark'`   |
+| position | str               | Overlay placement: ``"fill"``, ``"bottom"``, or ``"top"``.                           | `'fill'`   |
+| align    | str               | Content alignment: ``"start"``, ``"center"``, or ``"end"``.                          | `'end'`    |
+| **props  | Any               | Additional JSON-safe Overlay props forwarded to Astryx.                              | `{}`       |
+
+## Astryx Props {.doc-section .doc-section-astryx-props}
+
+``children``, ``content``, ``showOn``, ``isOpen``, ``scrim``, ``position``,
+and ``align`` are adapted by the named arguments above. ``**props`` keeps
+the wrapper forward-compatible with additional JSON-safe Astryx props.
+
+See Astryx component docs: <https://astryx.atmeta.com/components/Overlay>.
