@@ -1,18 +1,47 @@
 # astryx.CodeBlock { #anylumino.astryx.CodeBlock }
 
 ```python
-astryx.CodeBlock(code, *, language='python', **props)
+astryx.CodeBlock(
+    code,
+    *,
+    language='python',
+    title=None,
+    language_label=None,
+    line_numbers=None,
+    highlight_lines=None,
+    copy_button=None,
+    wrapped=None,
+    max_height=None,
+    size=None,
+    width=None,
+    container=None,
+    collapsible=None,
+    collapsible_threshold=None,
+    **props,
+)
 ```
 
 Render syntax-highlighted code with Astryx styling.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type   | Description                                                                            | Default    |
-|----------|--------|----------------------------------------------------------------------------------------|------------|
-| code     | str    | Astryx component option.                                                               | _required_ |
-| language | str    | Code language used for syntax highlighting.                                            | `'python'` |
-| **props  | Any    | JSON-safe CodeBlock props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name                  | Type                        | Description                                                                            | Default    |
+|-----------------------|-----------------------------|----------------------------------------------------------------------------------------|------------|
+| code                  | str                         | Astryx component option.                                                               | _required_ |
+| language              | str                         | Code language used for syntax highlighting.                                            | `'python'` |
+| title                 | str \| None                 | Header filename or label.                                                              | `None`     |
+| language_label        | bool \| None                | Whether to show the language in the header.                                            | `None`     |
+| line_numbers          | bool \| None                | Whether to show the line-number gutter.                                                | `None`     |
+| highlight_lines       | Iterable\[int\] \| None     | One-indexed lines to highlight.                                                        | `None`     |
+| copy_button           | bool \| None                | Whether to show the copy control.                                                      | `None`     |
+| wrapped               | bool \| None                | Whether long lines wrap instead of scrolling.                                          | `None`     |
+| max_height            | int \| float \| str \| None | Maximum height before vertical scrolling.                                              | `None`     |
+| size                  | str \| None                 | Code text size.                                                                        | `None`     |
+| width                 | str \| None                 | CSS width of the code block.                                                           | `None`     |
+| container             | str \| None                 | Card or section presentation.                                                          | `None`     |
+| collapsible           | bool \| None                | Whether long code can collapse.                                                        | `None`     |
+| collapsible_threshold | int \| None                 | Minimum line count for the collapse control.                                           | `None`     |
+| **props               | Any                         | JSON-safe CodeBlock props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

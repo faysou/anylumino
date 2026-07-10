@@ -1,19 +1,37 @@
 # astryx.RadioList { #anylumino.astryx.RadioList }
 
 ```python
-astryx.RadioList(items, value, *, label, **props)
+astryx.RadioList(
+    items,
+    value,
+    *,
+    label,
+    orientation=None,
+    disabled=False,
+    size=None,
+    label_hidden=None,
+    description=None,
+    status=None,
+    **props,
+)
 ```
 
 Render a single-choice Astryx radio list.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type            | Description                                                                            | Default    |
-|---------|-----------------|----------------------------------------------------------------------------------------|------------|
-| items   | Iterable\[Any\] | Item records used by generated child components or static search sources.              | _required_ |
-| value   | str             | Synchronized component value.                                                          | _required_ |
-| label   | str             | Visible or accessible label for the component.                                         | _required_ |
-| **props | Any             | JSON-safe RadioList props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name         | Type                        | Description                                                                            | Default    |
+|--------------|-----------------------------|----------------------------------------------------------------------------------------|------------|
+| items        | Iterable\[Any\]             | Item records used by generated child components or static search sources.              | _required_ |
+| value        | str                         | Synchronized component value.                                                          | _required_ |
+| label        | str                         | Visible or accessible label for the component.                                         | _required_ |
+| orientation  | str \| None                 | Vertical or horizontal item layout.                                                    | `None`     |
+| disabled     | bool                        | Whether all radio items are disabled.                                                  | `False`    |
+| size         | str \| None                 | Radio control size.                                                                    | `None`     |
+| label_hidden | bool \| None                | Whether to visually hide the accessible label.                                         | `None`     |
+| description  | str \| None                 | Helper text displayed with the group.                                                  | `None`     |
+| status       | Mapping\[str, Any\] \| None | Validation status record.                                                              | `None`     |
+| **props      | Any                         | JSON-safe RadioList props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

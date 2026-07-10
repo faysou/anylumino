@@ -1,19 +1,33 @@
 # astryx.Banner { #anylumino.astryx.Banner }
 
 ```python
-astryx.Banner(title, *, status='info', description='', **props)
+astryx.Banner(
+    title,
+    *,
+    status='info',
+    description='',
+    dismissable=None,
+    container=None,
+    expanded=None,
+    action_callbacks=None,
+    **props,
+)
 ```
 
 Render an Astryx banner for prominent status messages.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type   | Description                                                                         | Default    |
-|-------------|--------|-------------------------------------------------------------------------------------|------------|
-| title       | str    | Dialog or empty-state title.                                                        | _required_ |
-| status      | str    | Validation or status record displayed by Astryx.                                    | `'info'`   |
-| description | str    | Supporting description text.                                                        | `''`       |
-| **props     | Any    | JSON-safe Banner props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name             | Type                                                           | Description                                                                         | Default    |
+|------------------|----------------------------------------------------------------|-------------------------------------------------------------------------------------|------------|
+| title            | str                                                            | Dialog or empty-state title.                                                        | _required_ |
+| status           | str                                                            | Validation or status record displayed by Astryx.                                    | `'info'`   |
+| description      | str                                                            | Supporting description text.                                                        | `''`       |
+| dismissable      | bool \| None                                                   | Whether the user can dismiss the banner.                                            | `None`     |
+| container        | str \| None                                                    | Card or section container presentation.                                             | `None`     |
+| expanded         | bool \| None                                                   | Whether child content starts expanded.                                              | `None`     |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving the ``"dismiss"`` action identifier.                     | `None`     |
+| **props          | Any                                                            | JSON-safe Banner props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

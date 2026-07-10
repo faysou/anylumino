@@ -1,18 +1,39 @@
 # astryx.DateRangeInput { #anylumino.astryx.DateRangeInput }
 
 ```python
-astryx.DateRangeInput(value=None, *, label='', **props)
+astryx.DateRangeInput(
+    value=None,
+    *,
+    label='',
+    disabled=False,
+    min=None,
+    max=None,
+    presets=None,
+    clear=None,
+    placeholder=None,
+    size=None,
+    number_of_months=None,
+    **props,
+)
 ```
 
 Render an Astryx date-range input.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                        | Description                                                                                 | Default   |
-|---------|-----------------------------|---------------------------------------------------------------------------------------------|-----------|
-| value   | Mapping\[str, str\] \| None | Synchronized component value.                                                               | `None`    |
-| label   | str                         | Visible or accessible label for the component.                                              | `''`      |
-| **props | Any                         | JSON-safe DateRangeInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name             | Type                                    | Description                                                                                 | Default   |
+|------------------|-----------------------------------------|---------------------------------------------------------------------------------------------|-----------|
+| value            | Mapping\[str, str\] \| None             | Synchronized component value.                                                               | `None`    |
+| label            | str                                     | Visible or accessible label for the component.                                              | `''`      |
+| disabled         | bool                                    | Whether the input is disabled.                                                              | `False`   |
+| min              | str \| None                             | Minimum ISO date.                                                                           | `None`    |
+| max              | str \| None                             | Maximum ISO date.                                                                           | `None`    |
+| presets          | Iterable\[Mapping\[str, Any\]\] \| None | Named date-range presets.                                                                   | `None`    |
+| clear            | bool \| None                            | Whether to show a clear button.                                                             | `None`    |
+| placeholder      | str \| None                             | Placeholder text.                                                                           | `None`    |
+| size             | str \| None                             | Input size.                                                                                 | `None`    |
+| number_of_months | int \| None                             | Number of calendar months to display.                                                       | `None`    |
+| **props          | Any                                     | JSON-safe DateRangeInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

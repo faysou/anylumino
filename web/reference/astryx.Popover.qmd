@@ -1,19 +1,39 @@
 # astryx.Popover { #anylumino.astryx.Popover }
 
 ```python
-astryx.Popover(content, trigger, *, label, **props)
+astryx.Popover(
+    content,
+    trigger,
+    *,
+    label,
+    placement=None,
+    alignment=None,
+    open=None,
+    enabled=None,
+    width=None,
+    close_button=None,
+    auto_focus=None,
+    **props,
+)
 ```
 
 Render click-triggered popover content.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type              | Description                                                                          | Default    |
-|---------|-------------------|--------------------------------------------------------------------------------------|------------|
-| content | str \| ChildInput | Overlay or tooltip content.                                                          | _required_ |
-| trigger | ChildInput        | Trigger content used by disclosure or overlay components.                            | _required_ |
-| label   | str               | Visible or accessible label for the component.                                       | _required_ |
-| **props | Any               | JSON-safe Popover props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name         | Type                        | Description                                                                          | Default    |
+|--------------|-----------------------------|--------------------------------------------------------------------------------------|------------|
+| content      | str \| ChildInput           | Overlay or tooltip content.                                                          | _required_ |
+| trigger      | ChildInput                  | Trigger content used by disclosure or overlay components.                            | _required_ |
+| label        | str                         | Visible or accessible label for the component.                                       | _required_ |
+| placement    | str \| None                 | Placement relative to the trigger.                                                   | `None`     |
+| alignment    | str \| None                 | Alignment along the placement axis.                                                  | `None`     |
+| open         | bool \| None                | Optional controlled open state.                                                      | `None`     |
+| enabled      | bool \| None                | Whether trigger interaction is enabled.                                              | `None`     |
+| width        | int \| float \| str \| None | Popover width.                                                                       | `None`     |
+| close_button | bool \| None                | Whether to include the accessible close button.                                      | `None`     |
+| auto_focus   | bool \| None                | Whether content receives focus when opened.                                          | `None`     |
+| **props      | Any                         | JSON-safe Popover props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

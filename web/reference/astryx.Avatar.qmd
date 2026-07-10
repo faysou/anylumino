@@ -1,17 +1,29 @@
 # astryx.Avatar { #anylumino.astryx.Avatar }
 
 ```python
-astryx.Avatar(name, **props)
+astryx.Avatar(
+    name,
+    *,
+    src=None,
+    fallback_src=None,
+    alt=None,
+    size=None,
+    **props,
+)
 ```
 
 Render an Astryx avatar.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                         | Default    |
-|---------|--------|-------------------------------------------------------------------------------------|------------|
-| name    | str    | Astryx component option.                                                            | _required_ |
-| **props | Any    | JSON-safe Avatar props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name         | Type               | Description                                                                         | Default    |
+|--------------|--------------------|-------------------------------------------------------------------------------------|------------|
+| name         | str                | Astryx component option.                                                            | _required_ |
+| src          | str \| None        | Primary image URL.                                                                  | `None`     |
+| fallback_src | str \| None        | Fallback image URL.                                                                 | `None`     |
+| alt          | str \| None        | Alternative image text.                                                             | `None`     |
+| size         | str \| int \| None | Named or pixel avatar size.                                                         | `None`     |
+| **props      | Any                | JSON-safe Avatar props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

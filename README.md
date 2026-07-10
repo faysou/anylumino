@@ -164,7 +164,11 @@ tabs["orders"].replace_orders(next_order_rows)
 ## Astryx widgets
 
 Astryx widgets are the UI family for notebook-facing controls. They use the
-`Astryx*` prefix so notebook component code stays explicit:
+`anylumino.astryx` namespace so notebook component code stays explicit. Useful
+appearance and behavior options are keyword-only constructor arguments with
+Python snake-case names. Unmodeled JSON-safe upstream options can still be
+passed through `**props`. See the [Astryx component documentation](https://astryx.atmeta.com/components)
+for the upstream component reference.
 
 ```python
 form = ax.FormLayout(
@@ -210,6 +214,9 @@ button = ax.Button(
     callbacks=[lambda _button: setattr(status, "value", "Submitted")],
 )
 ```
+
+Menus and grouped actions additionally expose `action_callbacks`, which receive
+both the widget and the selected action value.
 
 ## Astryx tables
 

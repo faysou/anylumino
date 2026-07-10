@@ -1,17 +1,19 @@
 # astryx.Icon { #anylumino.astryx.Icon }
 
 ```python
-astryx.Icon(icon, **props)
+astryx.Icon(icon, *, color=None, size=None, **props)
 ```
 
 Render an Astryx icon by name.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                       | Default    |
-|---------|--------|-----------------------------------------------------------------------------------|------------|
-| icon    | str    | Astryx icon name.                                                                 | _required_ |
-| **props | Any    | JSON-safe Icon props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name    | Type        | Description                                                                       | Default    |
+|---------|-------------|-----------------------------------------------------------------------------------|------------|
+| icon    | str         | Astryx icon name.                                                                 | _required_ |
+| color   | str \| None | Theme icon color.                                                                 | `None`     |
+| size    | str \| None | Icon size.                                                                        | `None`     |
+| **props | Any         | JSON-safe Icon props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

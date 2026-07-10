@@ -1,18 +1,39 @@
 # astryx.DateTimeInput { #anylumino.astryx.DateTimeInput }
 
 ```python
-astryx.DateTimeInput(value=None, *, label='', **props)
+astryx.DateTimeInput(
+    value=None,
+    *,
+    label='',
+    disabled=False,
+    min=None,
+    max=None,
+    seconds=None,
+    hour_format=None,
+    time_increment=None,
+    clear=None,
+    number_of_months=None,
+    **props,
+)
 ```
 
 Render an Astryx date-time input.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type        | Description                                                                                | Default   |
-|---------|-------------|--------------------------------------------------------------------------------------------|-----------|
-| value   | str \| None | Synchronized component value.                                                              | `None`    |
-| label   | str         | Visible or accessible label for the component.                                             | `''`      |
-| **props | Any         | JSON-safe DateTimeInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name             | Type         | Description                                                                                | Default   |
+|------------------|--------------|--------------------------------------------------------------------------------------------|-----------|
+| value            | str \| None  | Synchronized component value.                                                              | `None`    |
+| label            | str          | Visible or accessible label for the component.                                             | `''`      |
+| disabled         | bool         | Whether the input is disabled.                                                             | `False`   |
+| min              | str \| None  | Minimum ISO datetime.                                                                      | `None`    |
+| max              | str \| None  | Maximum ISO datetime.                                                                      | `None`    |
+| seconds          | bool \| None | Whether to include seconds.                                                                | `None`    |
+| hour_format      | str \| None  | Twelve- or twenty-four-hour display format.                                                | `None`    |
+| time_increment   | int \| None  | Arrow-key minute increment.                                                                | `None`    |
+| clear            | bool \| None | Whether to show a clear button.                                                            | `None`    |
+| number_of_months | int \| None  | Number of calendar months to display.                                                      | `None`    |
+| **props          | Any          | JSON-safe DateTimeInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

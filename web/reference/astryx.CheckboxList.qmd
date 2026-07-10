@@ -1,19 +1,37 @@
 # astryx.CheckboxList { #anylumino.astryx.CheckboxList }
 
 ```python
-astryx.CheckboxList(items, value=(), *, label, **props)
+astryx.CheckboxList(
+    items,
+    value=(),
+    *,
+    label,
+    density=None,
+    dividers=None,
+    disabled=False,
+    label_hidden=None,
+    description=None,
+    status=None,
+    **props,
+)
 ```
 
 Render a multi-choice Astryx checkbox list.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type            | Description                                                                               | Default    |
-|---------|-----------------|-------------------------------------------------------------------------------------------|------------|
-| items   | Iterable\[Any\] | Item records used by generated child components or static search sources.                 | _required_ |
-| value   | Iterable\[str\] | Synchronized component value.                                                             | `()`       |
-| label   | str             | Visible or accessible label for the component.                                            | _required_ |
-| **props | Any             | JSON-safe CheckboxList props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name         | Type                        | Description                                                                               | Default    |
+|--------------|-----------------------------|-------------------------------------------------------------------------------------------|------------|
+| items        | Iterable\[Any\]             | Item records used by generated child components or static search sources.                 | _required_ |
+| value        | Iterable\[str\]             | Synchronized component value.                                                             | `()`       |
+| label        | str                         | Visible or accessible label for the component.                                            | _required_ |
+| density      | str \| None                 | Item spacing density.                                                                     | `None`     |
+| dividers     | bool \| None                | Whether to show item dividers.                                                            | `None`     |
+| disabled     | bool                        | Whether all checkbox items are disabled.                                                  | `False`    |
+| label_hidden | bool \| None                | Whether to visually hide the accessible label.                                            | `None`     |
+| description  | str \| None                 | Helper text displayed with the group.                                                     | `None`     |
+| status       | Mapping\[str, Any\] \| None | Validation status record.                                                                 | `None`     |
+| **props      | Any                         | JSON-safe CheckboxList props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

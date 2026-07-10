@@ -22,7 +22,6 @@
 # %%
 from __future__ import annotations
 
-import anylumino as al
 import anylumino.astryx as ax
 
 
@@ -78,7 +77,9 @@ def theme_panel(title: str, theme: dict[str, object], mode: str) -> ax.Theme:
             ax.Stack(
                 {
                     "title": ax.Heading(title, level=3),
-                    "body": ax.Text(f"mode={mode}", type="supporting", color="secondary"),
+                    "body": ax.Text(
+                        f"mode={mode}", type="supporting", color="secondary"
+                    ),
                     "actions": ax.Stack(
                         {
                             "button": ax.Button("Primary", variant="primary"),
@@ -90,7 +91,7 @@ def theme_panel(title: str, theme: dict[str, object], mode: str) -> ax.Theme:
                         align="center",
                         wrap="wrap",
                     ),
-                    "progress": ax.ProgressBar(72, label="Coverage", hasValueLabel=True),
+                    "progress": ax.ProgressBar(72, label="Coverage", value_label=True),
                 },
                 gap=2,
             ),
@@ -121,4 +122,4 @@ themes
 assert runtime_blue["name"] == "runtime-blue"
 assert built_plum["built"] is True
 assert built_plum["name"] == "built-plum"
-assert "data-astryx-theme=\"built-plum\"" in built_plum["css"]
+assert 'data-astryx-theme="built-plum"' in built_plum["css"]

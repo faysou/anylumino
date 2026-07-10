@@ -1,19 +1,47 @@
 # astryx.MultiSelector { #anylumino.astryx.MultiSelector }
 
 ```python
-astryx.MultiSelector(options, value=(), *, label='', **props)
+astryx.MultiSelector(
+    options,
+    value=(),
+    *,
+    label='',
+    disabled=False,
+    placeholder=None,
+    size=None,
+    loading=None,
+    clear=None,
+    select_all=None,
+    search=None,
+    trigger_display=None,
+    max_badges=None,
+    description=None,
+    status=None,
+    **props,
+)
 ```
 
 Render an Astryx selector that accepts multiple values.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                                   | Description                                                                                | Default    |
-|---------|----------------------------------------|--------------------------------------------------------------------------------------------|------------|
-| options | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.                 | _required_ |
-| value   | Iterable\[str\]                        | Synchronized component value.                                                              | `()`       |
-| label   | str                                    | Visible or accessible label for the component.                                             | `''`       |
-| **props | Any                                    | JSON-safe MultiSelector props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name            | Type                                   | Description                                                                                | Default    |
+|-----------------|----------------------------------------|--------------------------------------------------------------------------------------------|------------|
+| options         | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.                 | _required_ |
+| value           | Iterable\[str\]                        | Synchronized component value.                                                              | `()`       |
+| label           | str                                    | Visible or accessible label for the component.                                             | `''`       |
+| disabled        | bool                                   | Whether the selector is disabled.                                                          | `False`    |
+| placeholder     | str \| None                            | Placeholder shown when no option is selected.                                              | `None`     |
+| size            | str \| None                            | Selector size.                                                                             | `None`     |
+| loading         | bool \| None                           | Whether to show the loading state.                                                         | `None`     |
+| clear           | bool \| None                           | Whether to show a clear button.                                                            | `None`     |
+| select_all      | bool \| None                           | Whether to show the select-all control.                                                    | `None`     |
+| search          | bool \| None                           | Whether to show option filtering.                                                          | `None`     |
+| trigger_display | str \| None                            | Count, labels, or badges selection summary.                                                | `None`     |
+| max_badges      | int \| None                            | Maximum badges shown in the trigger.                                                       | `None`     |
+| description     | str \| None                            | Helper text displayed with the selector.                                                   | `None`     |
+| status          | Mapping\[str, Any\] \| None            | Validation status record.                                                                  | `None`     |
+| **props         | Any                                    | JSON-safe MultiSelector props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

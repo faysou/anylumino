@@ -6,6 +6,13 @@ astryx.ClickableCard(
     *,
     label,
     variant='default',
+    disabled=False,
+    href=None,
+    target=None,
+    padding=None,
+    width=None,
+    height=None,
+    max_width=None,
     callbacks=None,
     **props,
 )
@@ -20,6 +27,13 @@ Render an Astryx card that behaves like an action target.
 | children  | ChildInput                                                | Child widget, sequence of widgets, or mapping of slot names to widgets.                    | `None`      |
 | label     | str                                                       | Visible or accessible label for the component.                                             | _required_  |
 | variant   | str                                                       | Astryx visual variant.                                                                     | `'default'` |
+| disabled  | bool                                                      | Whether the card is disabled.                                                              | `False`     |
+| href      | str \| None                                               | Optional navigation target.                                                                | `None`      |
+| target    | str \| None                                               | Link target when ``href`` is supplied.                                                     | `None`      |
+| padding   | int \| float \| None                                      | Inner padding using the Astryx spacing scale.                                              | `None`      |
+| width     | int \| float \| str \| None                               | Card width.                                                                                | `None`      |
+| height    | int \| float \| str \| None                               | Card height.                                                                               | `None`      |
+| max_width | int \| float \| str \| None                               | Maximum card width.                                                                        | `None`      |
 | callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                         | `None`      |
 | **props   | Any                                                       | JSON-safe ClickableCard props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
 

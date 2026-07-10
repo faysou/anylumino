@@ -1,7 +1,7 @@
 # astryx.AvatarGroup { #anylumino.astryx.AvatarGroup }
 
 ```python
-astryx.AvatarGroup(items, *, overflow_count=0, **props)
+astryx.AvatarGroup(items, *, overflow_count=0, size=None, **props)
 ```
 
 Render a compact group of Astryx avatars.
@@ -12,6 +12,7 @@ Render a compact group of Astryx avatars.
 |----------------|-----------------|------------------------------------------------------------------------------------------|------------|
 | items          | Iterable\[Any\] | Item records used by generated child components or static search sources.                | _required_ |
 | overflow_count | int             | Number shown in the avatar-group overflow indicator.                                     | `0`        |
+| size           | str \| None     | Avatar size used by the group.                                                           | `None`     |
 | **props        | Any             | JSON-safe AvatarGroup props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}

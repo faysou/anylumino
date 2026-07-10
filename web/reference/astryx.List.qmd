@@ -1,18 +1,31 @@
 # astryx.List { #anylumino.astryx.List }
 
 ```python
-astryx.List(items, *, header='', **props)
+astryx.List(
+    items,
+    *,
+    header='',
+    density=None,
+    dividers=None,
+    list_style=None,
+    start=None,
+    **props,
+)
 ```
 
 Render an Astryx list from item records.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type            | Description                                                                       | Default    |
-|---------|-----------------|-----------------------------------------------------------------------------------|------------|
-| items   | Iterable\[Any\] | Item records used by generated child components or static search sources.         | _required_ |
-| header  | str             | Optional header text or content.                                                  | `''`       |
-| **props | Any             | JSON-safe List props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name       | Type            | Description                                                                       | Default    |
+|------------|-----------------|-----------------------------------------------------------------------------------|------------|
+| items      | Iterable\[Any\] | Item records used by generated child components or static search sources.         | _required_ |
+| header     | str             | Optional header text or content.                                                  | `''`       |
+| density    | str \| None     | Item spacing density.                                                             | `None`     |
+| dividers   | bool \| None    | Whether to show dividers between items.                                           | `None`     |
+| list_style | str \| None     | List marker style.                                                                | `None`     |
+| start      | int \| None     | Starting number for ordered lists.                                                | `None`     |
+| **props    | Any             | JSON-safe List props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

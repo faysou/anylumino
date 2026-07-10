@@ -1,18 +1,45 @@
 # astryx.Link { #anylumino.astryx.Link }
 
 ```python
-astryx.Link(label, *, href='', **props)
+astryx.Link(
+    label,
+    *,
+    href='',
+    underline=None,
+    disabled=False,
+    external=None,
+    target=None,
+    tooltip=None,
+    standalone=None,
+    text_type=None,
+    size=None,
+    weight=None,
+    color=None,
+    max_lines=None,
+    **props,
+)
 ```
 
 Render an Astryx text link.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                       | Default    |
-|---------|--------|-----------------------------------------------------------------------------------|------------|
-| label   | str    | Visible or accessible label for the component.                                    | _required_ |
-| href    | str    | Link destination URL.                                                             | `''`       |
-| **props | Any    | JSON-safe Link props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name       | Type         | Description                                                                       | Default    |
+|------------|--------------|-----------------------------------------------------------------------------------|------------|
+| label      | str          | Visible or accessible label for the component.                                    | _required_ |
+| href       | str          | Link destination URL.                                                             | `''`       |
+| underline  | bool \| None | Whether the underline is always visible.                                          | `None`     |
+| disabled   | bool         | Whether the link is disabled.                                                     | `False`    |
+| external   | bool \| None | Whether to use external-link behavior.                                            | `None`     |
+| target     | str \| None  | Browser navigation target.                                                        | `None`     |
+| tooltip    | str \| None  | Hover tooltip text.                                                               | `None`     |
+| standalone | bool \| None | Whether to apply standalone text sizing.                                          | `None`     |
+| text_type  | str \| None  | Semantic text type.                                                               | `None`     |
+| size       | str \| None  | Explicit text-size override.                                                      | `None`     |
+| weight     | str \| None  | Font-weight override.                                                             | `None`     |
+| color      | str \| None  | Theme text color.                                                                 | `None`     |
+| max_lines  | int \| None  | Maximum rendered lines before truncation.                                         | `None`     |
+| **props    | Any          | JSON-safe Link props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

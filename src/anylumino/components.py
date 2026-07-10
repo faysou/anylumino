@@ -15,6 +15,9 @@ from .layout import _widget_list_from_json
 from .layout import _widget_list_to_json
 
 
+ActionCallback = Callable[["ComponentWidget", Any], None]
+
+
 class ComponentWidget(anywidget.AnyWidget):
     """Base class for composable component-library anywidgets.
 
@@ -49,6 +52,7 @@ class ComponentWidget(anywidget.AnyWidget):
     icon_src = t.Unicode("").tag(sync=True)
     icon_size = t.Unicode("s").tag(sync=True)
     attributes = t.Dict(default_value={}).tag(sync=True)
+    last_action = t.Any(None, allow_none=True).tag(sync=True)
 
     def __init__(
         self,
@@ -57,13 +61,17 @@ class ComponentWidget(anywidget.AnyWidget):
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        action_callbacks: Iterable[ActionCallback] | None = None,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         **kwargs: Any,
     ) -> None:
-        widget_list, owner_list, key_list, title_list = _normalize_children(children, titles, keys)
+        widget_list, owner_list, key_list, title_list = _normalize_children(
+            children, titles, keys
+        )
         self._owners_by_key = dict(zip(key_list, owner_list, strict=True))
         self._click_callbacks: list[Callable[[ComponentWidget], None]] = []
+        self._action_callbacks: list[ActionCallback] = []
         super().__init__(
             widgets=widget_list,
             child_keys=key_list,
@@ -76,6 +84,9 @@ class ComponentWidget(anywidget.AnyWidget):
         if callbacks is not None:
             for callback in callbacks:
                 self.on_click(callback)
+        if action_callbacks is not None:
+            for callback in action_callbacks:
+                self.on_action(callback)
 
     def __contains__(self, key: object) -> bool:
         return str(key) in self.child_keys
@@ -107,25 +118,47 @@ class ComponentWidget(anywidget.AnyWidget):
     ) -> None:
         """Register or unregister a callback for activations."""
         if remove:
-            self._click_callbacks = [item for item in self._click_callbacks if item is not callback]
+            self._click_callbacks = [
+                item for item in self._click_callbacks if item is not callback
+            ]
             return
         self._click_callbacks.append(callback)
+
+    def on_action(
+        self,
+        callback: ActionCallback,
+        remove: bool = False,
+    ) -> None:
+        """Register or unregister a callback for a named component action."""
+        if remove:
+            self._action_callbacks = [
+                item for item in self._action_callbacks if item is not callback
+            ]
+            return
+        self._action_callbacks.append(callback)
 
     def _resolve_index(self, key_or_index: str | int) -> int:
         if isinstance(key_or_index, int):
             return key_or_index
         return self.child_keys.index(str(key_or_index))
 
-    def _handle_frontend_message(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
+    def _handle_frontend_message(
+        self, _widget: object, content: dict[str, Any], _buffers: object
+    ) -> None:
         msg_type = content.get("type")
         if msg_type == "open":
-            self.is_open = True
+            self.is_open = bool(content.get("is_open", True))
             return
         if msg_type == "close":
             self.is_open = False
             return
         if msg_type != "click":
             return
+        has_action = "value" in content or "action" in content
+        if has_action:
+            self.last_action = content.get("value", content.get("action"))
+            for callback in list(self._action_callbacks):
+                callback(self, self.last_action)
         for callback in list(self._click_callbacks):
             callback(self)
 

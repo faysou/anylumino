@@ -1,18 +1,33 @@
 # astryx.Heading { #anylumino.astryx.Heading }
 
 ```python
-astryx.Heading(text, *, level=3, props=None, **kwargs)
+astryx.Heading(
+    text,
+    *,
+    level=3,
+    display_type=None,
+    color=None,
+    max_lines=None,
+    text_wrap=None,
+    justify=None,
+    **props,
+)
 ```
 
 Render a semantic Astryx heading.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name   | Type                        | Description                                                                          | Default    |
-|--------|-----------------------------|--------------------------------------------------------------------------------------|------------|
-| text   | str                         | Text content synchronized to the frontend component.                                 | _required_ |
-| level  | int                         | Heading level from 1 through 6.                                                      | `3`        |
-| props  | Mapping\[str, Any\] \| None | JSON-safe Heading props forwarded to Astryx. See the ``Astryx Props`` section below. | `None`     |
+| Name         | Type        | Description                                                                                                       | Default    |
+|--------------|-------------|-------------------------------------------------------------------------------------------------------------------|------------|
+| text         | str         | Text content synchronized to the frontend component.                                                              | _required_ |
+| level        | int         | Heading level from 1 through 6.                                                                                   | `3`        |
+| display_type | str \| None | Optional Astryx display-scale type.                                                                               | `None`     |
+| color        | str \| None | Theme text color.                                                                                                 | `None`     |
+| max_lines    | int \| None | Maximum rendered lines before truncation.                                                                         | `None`     |
+| text_wrap    | str \| None | Text wrapping behavior.                                                                                           | `None`     |
+| justify      | str \| None | Logical text alignment.                                                                                           | `None`     |
+| **props      | Any         | Additional JSON-safe Heading props forwarded to Astryx. The older ``props={...}`` mapping form remains supported. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

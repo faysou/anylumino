@@ -1,17 +1,19 @@
 # astryx.Spinner { #anylumino.astryx.Spinner }
 
 ```python
-astryx.Spinner(label='Loading', **props)
+astryx.Spinner(label='Loading', size=None, shade=None, **props)
 ```
 
 Render an Astryx loading spinner.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                          | Default     |
-|---------|--------|--------------------------------------------------------------------------------------|-------------|
-| label   | str    | Visible or accessible label for the component.                                       | `'Loading'` |
-| **props | Any    | JSON-safe Spinner props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
+| Name    | Type        | Description                                                                          | Default     |
+|---------|-------------|--------------------------------------------------------------------------------------|-------------|
+| label   | str         | Visible or accessible label for the component.                                       | `'Loading'` |
+| size    | str \| None | Spinner size.                                                                        | `None`      |
+| shade   | str \| None | Spinner color treatment for its background.                                          | `None`      |
+| **props | Any         | JSON-safe Spinner props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

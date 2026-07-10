@@ -16,6 +16,7 @@ frontend:
 
 .PHONY: test
 test:
+	npm test
 	uv run pytest
 
 .PHONY: docs-reference

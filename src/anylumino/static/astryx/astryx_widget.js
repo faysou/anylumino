@@ -94,6 +94,12 @@ import {
   removeModelListener,
   renderWidgetRef,
 } from "../layout/composition.js";
+import {
+  modelProps,
+  registeredComponent,
+  sendModelAction,
+  setModelOpen,
+} from "./astryx_bridge.mjs";
 import "./astryx_widget.css";
 
 const COMPONENTS = {
@@ -235,19 +241,6 @@ const GENERATED_CHILD_COMPONENTS = new Set([
   "SegmentedControl",
   "TabList",
 ]);
-
-function modelProps(model) {
-  const props = { ...(model.get("props") ?? {}) };
-  delete props.children;
-  delete props.dangerouslySetInnerHTML;
-  delete props.ref;
-  delete props.key;
-  delete props.items;
-  delete props.tabs;
-  delete props.segments;
-  delete props.metadata;
-  return props;
-}
 
 function textFor(model) {
   return String(model.get("text") || model.get("label") || model.get("value") || "");
@@ -615,7 +608,12 @@ function slotByKey(model, key) {
 
 function componentProps(model) {
   const name = String(model.get("component_name") || model.get("component_kind") || "Stack");
-  const props = modelProps(model);
+  const reserved = GENERATED_CHILD_COMPONENTS.has(name)
+    ? ["items", "tabs", "segments", "metadata"]
+    : ["Typeahead", "Tokenizer", "CommandPalette"].includes(name)
+      ? ["items"]
+      : [];
+  const props = modelProps(model, reserved);
   const label = String(model.get("label") || props.label || textFor(model));
   const variant = String(model.get("variant") || props.variant || "");
   const value = model.get("value");
@@ -820,7 +818,7 @@ function componentProps(model) {
       isDisabled: disabled,
       onChange: (item) => setItemValue(model, item),
       onChangeQuery: (query) => model.send({ type: "query", query }),
-      onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
     };
   }
 
@@ -843,11 +841,11 @@ function componentProps(model) {
       ...props,
       label: label || props.label || "Command palette",
       isInline: props.isInline ?? true,
-      isOpen: props.isOpen ?? true,
+      isOpen: Boolean(model.get("is_open")),
       value: value == null ? undefined : String(value),
       searchSource: searchSourceFor(model, items),
       onValueChange: (nextValue) => setStringValue(model, nextValue),
-      onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
     };
   }
 
@@ -892,8 +890,21 @@ function componentProps(model) {
     return {
       ...props,
       label: label || textFor(model),
-      onRemove: props.onRemove ? () => model.send({ type: "click", action: "remove" }) : undefined,
-      onClick: props.clickable ? () => model.send({ type: "click" }) : undefined,
+      onRemove: props.onRemove ? () => sendModelAction(model, undefined, "remove") : undefined,
+      onClick: props.clickable ? () => sendModelAction(model, undefined, "click") : undefined,
+    };
+  }
+
+  if (name === "Thumbnail") {
+    return {
+      ...props,
+      isDisabled: disabled,
+      onRemove: props.onRemove
+        ? () => sendModelAction(model, undefined, "remove")
+        : undefined,
+      onClick: props.clickable
+        ? () => sendModelAction(model, undefined, "click")
+        : undefined,
     };
   }
 
@@ -911,6 +922,16 @@ function componentProps(model) {
       label: label || textFor(model) || "Progress",
       value: value == null ? props.value : Number(value),
       variant: variant || props.variant || "accent",
+      isDisabled: disabled,
+    };
+  }
+
+  if (name === "Banner") {
+    return {
+      ...props,
+      onDismiss: props.isDismissable
+        ? () => sendModelAction(model, undefined, "dismiss")
+        : undefined,
     };
   }
 
@@ -981,6 +1002,8 @@ function componentProps(model) {
     return {
       ...props,
       trigger: props.trigger || label || textFor(model) || "Details",
+      isOpen: Boolean(model.get("is_open")),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
     };
   }
 
@@ -995,33 +1018,48 @@ function componentProps(model) {
   }
 
   if (name === "Tooltip") {
-    return {
+    const result = {
       ...props,
       content: props.content ?? slotByKey(model, "content") ?? label ?? textFor(model),
     };
+    if (props.isOpen !== undefined) {
+      result.isOpen = Boolean(model.get("is_open"));
+      result.onOpenChange = (isOpen) => setModelOpen(model, isOpen);
+    }
+    return result;
   }
 
   if (name === "HoverCard") {
-    return {
+    const result = {
       ...props,
       content: props.content ?? slotByKey(model, "content") ?? label ?? textFor(model),
     };
+    if (props.isOpen !== undefined) {
+      result.isOpen = Boolean(model.get("is_open"));
+      result.onOpenChange = (isOpen) => setModelOpen(model, isOpen);
+    }
+    return result;
   }
 
   if (name === "Popover") {
-    return {
+    const result = {
       ...props,
       label: label || props.label || "Popover",
       content: props.content ?? slotByKey(model, "content") ?? label ?? textFor(model),
     };
+    if (props.isOpen !== undefined) {
+      result.isOpen = Boolean(model.get("is_open"));
+      result.onOpenChange = (isOpen) => setModelOpen(model, isOpen);
+    }
+    return result;
   }
 
   if (name === "Dialog") {
     return {
       ...props,
       isInline: props.isInline ?? true,
-      isOpen: value == null ? (props.isOpen ?? true) : Boolean(value),
-      onOpenChange: (isOpen) => setBooleanValue(model, isOpen),
+      isOpen: Boolean(model.get("is_open")),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
     };
   }
 
@@ -1032,9 +1070,9 @@ function componentProps(model) {
       description: props.description || textFor(model),
       actionLabel: props.actionLabel || "Continue",
       isInline: props.isInline ?? true,
-      isOpen: value == null ? (props.isOpen ?? true) : Boolean(value),
-      onOpenChange: (isOpen) => setBooleanValue(model, isOpen),
-      onAction: () => model.send({ type: "click", action: "confirm" }),
+      isOpen: Boolean(model.get("is_open")),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
+      onAction: () => sendModelAction(model, undefined, "confirm"),
     };
   }
 
@@ -1042,13 +1080,14 @@ function componentProps(model) {
     return {
       ...props,
       items: menuItems(model, rawProps(model).items),
+      isMenuOpen: Boolean(model.get("is_open")),
       button: {
         label: label || props.button?.label || "Menu",
         variant: variant || props.button?.variant || "secondary",
         isDisabled: disabled,
         ...(props.button ?? {}),
       },
-      onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
     };
   }
 
@@ -1057,8 +1096,9 @@ function componentProps(model) {
       ...props,
       label: label || props.label || "More options",
       isDisabled: disabled,
+      isMenuOpen: Boolean(model.get("is_open")),
       items: menuItems(model, rawProps(model).items),
-      onOpenChange: (isOpen) => model.send({ type: "open", is_open: Boolean(isOpen) }),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
     };
   }
 
@@ -1117,7 +1157,7 @@ function componentFor(name, props) {
   if (name === "Stack") {
     return String(props.direction || "vertical") === "horizontal" ? HStack : VStack;
   }
-  return COMPONENTS[name] ?? Stack;
+  return registeredComponent(COMPONENTS, name);
 }
 
 function itemLabel(item, fallback) {
@@ -1150,7 +1190,7 @@ function menuItems(model, items) {
       ...item,
       label: itemLabel(item, `Action ${index + 1}`),
       isDisabled: Boolean(item?.disabled ?? item?.isDisabled),
-      onClick: () => model.send({ type: "click", value }),
+      onClick: () => sendModelAction(model, value),
     };
   });
 }
@@ -1271,7 +1311,7 @@ function generatedChildren(model, name) {
         label: itemLabel(item, `Action ${index + 1}`),
         variant: item?.variant || "secondary",
         isDisabled: Boolean(item?.disabled),
-        onClick: () => model.send({ type: "click", value: itemValue(item, index) }),
+        onClick: () => sendModelAction(model, itemValue(item, index)),
       }),
     );
   }
@@ -1463,6 +1503,7 @@ export default {
       "text",
       "label",
       "value",
+      "is_open",
       "disabled",
       "variant",
       "width",

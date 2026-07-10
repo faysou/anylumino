@@ -1,19 +1,39 @@
 # astryx.HoverCard { #anylumino.astryx.HoverCard }
 
 ```python
-astryx.HoverCard(content, trigger, *, label='', **props)
+astryx.HoverCard(
+    content,
+    trigger,
+    *,
+    label='',
+    placement=None,
+    alignment=None,
+    delay=None,
+    hide_delay=None,
+    enabled=None,
+    open=None,
+    default_open=None,
+    **props,
+)
 ```
 
 Attach a hover card with richer preview content.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type              | Description                                                                            | Default    |
-|---------|-------------------|----------------------------------------------------------------------------------------|------------|
-| content | str \| ChildInput | Overlay or tooltip content.                                                            | _required_ |
-| trigger | ChildInput        | Trigger content used by disclosure or overlay components.                              | _required_ |
-| label   | str               | Visible or accessible label for the component.                                         | `''`       |
-| **props | Any               | JSON-safe HoverCard props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name         | Type              | Description                                                                            | Default    |
+|--------------|-------------------|----------------------------------------------------------------------------------------|------------|
+| content      | str \| ChildInput | Overlay or tooltip content.                                                            | _required_ |
+| trigger      | ChildInput        | Trigger content used by disclosure or overlay components.                              | _required_ |
+| label        | str               | Visible or accessible label for the component.                                         | `''`       |
+| placement    | str \| None       | Placement relative to the trigger.                                                     | `None`     |
+| alignment    | str \| None       | Alignment along the placement axis.                                                    | `None`     |
+| delay        | int \| None       | Show delay in milliseconds.                                                            | `None`     |
+| hide_delay   | int \| None       | Hide delay in milliseconds.                                                            | `None`     |
+| enabled      | bool \| None      | Whether hover and focus triggers are enabled.                                          | `None`     |
+| open         | bool \| None      | Optional controlled open state.                                                        | `None`     |
+| default_open | bool \| None      | Initial uncontrolled open state.                                                       | `None`     |
+| **props      | Any               | JSON-safe HoverCard props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

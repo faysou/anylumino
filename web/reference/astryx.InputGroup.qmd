@@ -8,6 +8,12 @@ astryx.InputGroup(
     prefix='',
     suffix='',
     disabled=False,
+    label_hidden=None,
+    description=None,
+    optional=None,
+    required=None,
+    size=None,
+    status=None,
     **props,
 )
 ```
@@ -16,14 +22,20 @@ Group an input with prefix and suffix adornments.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type       | Description                                                                             | Default    |
-|----------|------------|-----------------------------------------------------------------------------------------|------------|
-| children | ChildInput | Child widget, sequence of widgets, or mapping of slot names to widgets.                 | `None`     |
-| label    | str        | Visible or accessible label for the component.                                          | _required_ |
-| prefix   | str        | Text rendered before grouped input children.                                            | `''`       |
-| suffix   | str        | Text rendered after grouped input children.                                             | `''`       |
-| disabled | bool       | Whether the component should render disabled.                                           | `False`    |
-| **props  | Any        | JSON-safe InputGroup props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name         | Type                        | Description                                                                             | Default    |
+|--------------|-----------------------------|-----------------------------------------------------------------------------------------|------------|
+| children     | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.                 | `None`     |
+| label        | str                         | Visible or accessible label for the component.                                          | _required_ |
+| prefix       | str                         | Text rendered before grouped input children.                                            | `''`       |
+| suffix       | str                         | Text rendered after grouped input children.                                             | `''`       |
+| disabled     | bool                        | Whether the component should render disabled.                                           | `False`    |
+| label_hidden | bool \| None                | Whether to visually hide the accessible label.                                          | `None`     |
+| description  | str \| None                 | Helper text displayed with the group.                                                   | `None`     |
+| optional     | bool \| None                | Whether to mark the group optional.                                                     | `None`     |
+| required     | bool \| None                | Whether to mark the group required.                                                     | `None`     |
+| size         | str \| None                 | Default child input size.                                                               | `None`     |
+| status       | Mapping\[str, Any\] \| None | Validation status record.                                                               | `None`     |
+| **props      | Any                         | JSON-safe InputGroup props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

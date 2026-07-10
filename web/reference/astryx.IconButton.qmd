@@ -6,6 +6,10 @@ astryx.IconButton(
     *,
     icon='close',
     variant='secondary',
+    disabled=False,
+    size=None,
+    loading=None,
+    tooltip=None,
     callbacks=None,
     **props,
 )
@@ -20,6 +24,10 @@ Render an icon-only Astryx button.
 | label     | str                                                       | Visible or accessible label for the component.                                          | _required_    |
 | icon      | str                                                       | Astryx icon name.                                                                       | `'close'`     |
 | variant   | str                                                       | Astryx visual variant.                                                                  | `'secondary'` |
+| disabled  | bool                                                      | Whether the component should render disabled.                                           | `False`       |
+| size      | str \| None                                               | Button size.                                                                            | `None`        |
+| loading   | bool \| None                                              | Whether to show the loading state.                                                      | `None`        |
+| tooltip   | str \| None                                               | Hover tooltip text.                                                                     | `None`        |
 | callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                      | `None`        |
 | **props   | Any                                                       | JSON-safe IconButton props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`          |
 

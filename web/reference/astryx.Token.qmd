@@ -1,18 +1,39 @@
 # astryx.Token { #anylumino.astryx.Token }
 
 ```python
-astryx.Token(label, *, color='default', **props)
+astryx.Token(
+    label,
+    *,
+    color='default',
+    size=None,
+    disabled=False,
+    href=None,
+    description=None,
+    label_hidden=None,
+    removable=False,
+    clickable=False,
+    action_callbacks=None,
+    **props,
+)
 ```
 
 Render an Astryx token or chip.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                        | Default     |
-|---------|--------|------------------------------------------------------------------------------------|-------------|
-| label   | str    | Visible or accessible label for the component.                                     | _required_  |
-| color   | str    | Astryx component option.                                                           | `'default'` |
-| **props | Any    | JSON-safe Token props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
+| Name             | Type                                                           | Description                                                                        | Default     |
+|------------------|----------------------------------------------------------------|------------------------------------------------------------------------------------|-------------|
+| label            | str                                                            | Visible or accessible label for the component.                                     | _required_  |
+| color            | str                                                            | Astryx component option.                                                           | `'default'` |
+| size             | str \| None                                                    | Token size.                                                                        | `None`      |
+| disabled         | bool                                                           | Whether the token is disabled.                                                     | `False`     |
+| href             | str \| None                                                    | Optional link destination.                                                         | `None`      |
+| description      | str \| None                                                    | Accessible description.                                                            | `None`      |
+| label_hidden     | bool \| None                                                   | Whether to visually hide the label.                                                | `None`      |
+| removable        | bool                                                           | Whether to show the remove control.                                                | `False`     |
+| clickable        | bool                                                           | Whether the token acts as a button.                                                | `False`     |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving ``"remove"`` or ``"click"``.                            | `None`      |
+| **props          | Any                                                            | JSON-safe Token props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

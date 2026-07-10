@@ -1,19 +1,34 @@
 # astryx.Thumbnail { #anylumino.astryx.Thumbnail }
 
 ```python
-astryx.Thumbnail(label='', src='', alt='', **props)
+astryx.Thumbnail(
+    label='',
+    src='',
+    alt='',
+    loading=None,
+    disabled=False,
+    removable=False,
+    clickable=False,
+    action_callbacks=None,
+    **props,
+)
 ```
 
 Render an Astryx thumbnail image or placeholder.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                            | Default   |
-|---------|--------|----------------------------------------------------------------------------------------|-----------|
-| label   | str    | Visible or accessible label for the component.                                         | `''`      |
-| src     | str    | Image or media source URL.                                                             | `''`      |
-| alt     | str    | Accessible alternative text.                                                           | `''`      |
-| **props | Any    | JSON-safe Thumbnail props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name             | Type                                                           | Description                                                                            | Default   |
+|------------------|----------------------------------------------------------------|----------------------------------------------------------------------------------------|-----------|
+| label            | str                                                            | Visible or accessible label for the component.                                         | `''`      |
+| src              | str                                                            | Image or media source URL.                                                             | `''`      |
+| alt              | str                                                            | Accessible alternative text.                                                           | `''`      |
+| loading          | bool \| None                                                   | Whether to show the loading presentation.                                              | `None`    |
+| disabled         | bool                                                           | Whether interaction is disabled.                                                       | `False`   |
+| removable        | bool                                                           | Whether to show the remove control.                                                    | `False`   |
+| clickable        | bool                                                           | Whether the thumbnail acts as a button.                                                | `False`   |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving ``"remove"`` or ``"click"``.                                | `None`    |
+| **props          | Any                                                            | JSON-safe Thumbnail props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

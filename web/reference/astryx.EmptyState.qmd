@@ -1,18 +1,27 @@
 # astryx.EmptyState { #anylumino.astryx.EmptyState }
 
 ```python
-astryx.EmptyState(title, *, description='', **props)
+astryx.EmptyState(
+    title,
+    *,
+    description='',
+    heading_level=None,
+    compact=None,
+    **props,
+)
 ```
 
 Render an Astryx empty-state message.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type   | Description                                                                             | Default    |
-|-------------|--------|-----------------------------------------------------------------------------------------|------------|
-| title       | str    | Dialog or empty-state title.                                                            | _required_ |
-| description | str    | Supporting description text.                                                            | `''`       |
-| **props     | Any    | JSON-safe EmptyState props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name          | Type         | Description                                                                             | Default    |
+|---------------|--------------|-----------------------------------------------------------------------------------------|------------|
+| title         | str          | Dialog or empty-state title.                                                            | _required_ |
+| description   | str          | Supporting description text.                                                            | `''`       |
+| heading_level | int \| None  | Semantic heading level.                                                                 | `None`     |
+| compact       | bool \| None | Whether to use reduced spacing.                                                         | `None`     |
+| **props       | Any          | JSON-safe EmptyState props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

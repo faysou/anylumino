@@ -1,19 +1,35 @@
 # astryx.Dialog { #anylumino.astryx.Dialog }
 
 ```python
-astryx.Dialog(children=None, *, open=True, inline=True, **props)
+astryx.Dialog(
+    children=None,
+    *,
+    open=True,
+    inline=True,
+    width=None,
+    max_height=None,
+    position=None,
+    variant=None,
+    purpose=None,
+    **props,
+)
 ```
 
 Render Astryx dialog content inline in notebook output.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type       | Description                                                                                       | Default   |
-|----------|------------|---------------------------------------------------------------------------------------------------|-----------|
-| children | ChildInput | Dialog body content. Pass a widget, a sequence of widgets, or a mapping of slot names to widgets. | `None`    |
-| open     | bool       | Initial open state synchronized through ``value``.                                                | `True`    |
-| inline   | bool       | Whether dialog content renders inline instead of using native modal behavior.                     | `True`    |
-| **props  | Any        | JSON-safe Dialog props forwarded to Astryx. See the ``Astryx Props`` section below.               | `{}`      |
+| Name       | Type                        | Description                                                                                       | Default   |
+|------------|-----------------------------|---------------------------------------------------------------------------------------------------|-----------|
+| children   | ChildInput                  | Dialog body content. Pass a widget, a sequence of widgets, or a mapping of slot names to widgets. | `None`    |
+| open       | bool                        | Controlled open state synchronized through ``is_open``.                                           | `True`    |
+| inline     | bool                        | Whether dialog content renders inline instead of using native modal behavior.                     | `True`    |
+| width      | int \| float \| str \| None | Dialog width.                                                                                     | `None`    |
+| max_height | int \| float \| str \| None | Maximum dialog height.                                                                            | `None`    |
+| position   | Mapping\[str, Any\] \| None | Static top, right, bottom, and left position values.                                              | `None`    |
+| variant    | str \| None                 | Standard or fullscreen dialog presentation.                                                       | `None`    |
+| purpose    | str \| None                 | Required, form, or informational dismissal behavior.                                              | `None`    |
+| **props    | Any                         | JSON-safe Dialog props forwarded to Astryx. See the ``Astryx Props`` section below.               | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

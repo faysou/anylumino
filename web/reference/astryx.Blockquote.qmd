@@ -1,17 +1,18 @@
 # astryx.Blockquote { #anylumino.astryx.Blockquote }
 
 ```python
-astryx.Blockquote(text, **props)
+astryx.Blockquote(text, *, cite=None, **props)
 ```
 
 Render quoted text with Astryx blockquote styling.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                             | Default    |
-|---------|--------|-----------------------------------------------------------------------------------------|------------|
-| text    | str    | Text content synchronized to the frontend component.                                    | _required_ |
-| **props | Any    | JSON-safe Blockquote props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name    | Type        | Description                                                                             | Default    |
+|---------|-------------|-----------------------------------------------------------------------------------------|------------|
+| text    | str         | Text content synchronized to the frontend component.                                    | _required_ |
+| cite    | str \| None | Optional quote attribution.                                                             | `None`     |
+| **props | Any         | JSON-safe Blockquote props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

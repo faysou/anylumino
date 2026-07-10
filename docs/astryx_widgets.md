@@ -1,12 +1,20 @@
 # Astryx notebook widgets
 
 Astryx widgets are the component family for notebook UIs in `anylumino`. They
-use the `Astryx*` prefix so the UI surface stays explicit and easy to scan in
-notebook code.
+live in the `anylumino.astryx` namespace so the UI surface stays explicit and
+easy to scan in notebook code.
 
 Use Astryx widgets when a notebook needs a polished JupyterLab-friendly
 interface with forms, selectors, tables, status surfaces, inline dialogs, or a
 shared brand identity.
+
+Useful appearance and behavior options are keyword-only constructor arguments
+with Python snake-case names, so they appear in signatures, IDE completion, and
+the API docstrings. Unmodeled JSON-safe upstream options remain available
+through `**props`; React nodes, refs, render functions, and JavaScript-only test
+props are not promoted to the Python API. See the
+[Astryx component documentation](https://astryx.atmeta.com/components) for the
+upstream component reference.
 
 ## Dashboard pattern
 
@@ -238,6 +246,9 @@ submit = ax.Button(
     callbacks=[lambda _button: setattr(status, "value", "Submitted")],
 )
 ```
+
+Menus and grouped actions also accept `action_callbacks`. Each callback
+receives `(widget, action_value)`, preserving the selected item identifier.
 
 ## Table selection and sorting
 

@@ -1,18 +1,26 @@
 # astryx.Divider { #anylumino.astryx.Divider }
 
 ```python
-astryx.Divider(orientation='horizontal', variant='subtle', **props)
+astryx.Divider(
+    orientation='horizontal',
+    variant='subtle',
+    label=None,
+    full_bleed=None,
+    **props,
+)
 ```
 
 Render an Astryx divider.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type   | Description                                                                          | Default        |
-|-------------|--------|--------------------------------------------------------------------------------------|----------------|
-| orientation | str    | Astryx component option.                                                             | `'horizontal'` |
-| variant     | str    | Astryx visual variant.                                                               | `'subtle'`     |
-| **props     | Any    | JSON-safe Divider props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`           |
+| Name        | Type         | Description                                                                          | Default        |
+|-------------|--------------|--------------------------------------------------------------------------------------|----------------|
+| orientation | str          | Astryx component option.                                                             | `'horizontal'` |
+| variant     | str          | Astryx visual variant.                                                               | `'subtle'`     |
+| label       | str \| None  | Optional text centered on the divider.                                               | `None`         |
+| full_bleed  | bool \| None | Whether the divider extends to the container edges.                                  | `None`         |
+| **props     | Any          | JSON-safe Divider props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`           |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

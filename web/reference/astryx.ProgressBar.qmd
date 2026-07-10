@@ -1,19 +1,35 @@
 # astryx.ProgressBar { #anylumino.astryx.ProgressBar }
 
 ```python
-astryx.ProgressBar(value=0, *, label, variant='accent', **props)
+astryx.ProgressBar(
+    value=0,
+    *,
+    label,
+    variant='accent',
+    max=None,
+    label_hidden=None,
+    value_label=None,
+    indeterminate=None,
+    disabled=False,
+    **props,
+)
 ```
 
 Render an Astryx progress bar.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type         | Description                                                                              | Default    |
-|---------|--------------|------------------------------------------------------------------------------------------|------------|
-| value   | int \| float | Synchronized component value.                                                            | `0`        |
-| label   | str          | Visible or accessible label for the component.                                           | _required_ |
-| variant | str          | Astryx visual variant.                                                                   | `'accent'` |
-| **props | Any          | JSON-safe ProgressBar props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name          | Type                 | Description                                                                              | Default    |
+|---------------|----------------------|------------------------------------------------------------------------------------------|------------|
+| value         | int \| float         | Synchronized component value.                                                            | `0`        |
+| label         | str                  | Visible or accessible label for the component.                                           | _required_ |
+| variant       | str                  | Astryx visual variant.                                                                   | `'accent'` |
+| max           | int \| float \| None | Maximum progress value.                                                                  | `None`     |
+| label_hidden  | bool \| None         | Whether to visually hide the accessible label.                                           | `None`     |
+| value_label   | bool \| None         | Whether to display the formatted value.                                                  | `None`     |
+| indeterminate | bool \| None         | Whether progress is unknown.                                                             | `None`     |
+| disabled      | bool                 | Whether to render the inactive visual state.                                             | `False`    |
+| **props       | Any                  | JSON-safe ProgressBar props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

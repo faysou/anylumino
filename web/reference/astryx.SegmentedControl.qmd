@@ -1,19 +1,31 @@
 # astryx.SegmentedControl { #anylumino.astryx.SegmentedControl }
 
 ```python
-astryx.SegmentedControl(items, value, *, label, **props)
+astryx.SegmentedControl(
+    items,
+    value,
+    *,
+    label,
+    size=None,
+    layout=None,
+    disabled=False,
+    **props,
+)
 ```
 
 Render a compact Astryx segmented control.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type            | Description                                                                                   | Default    |
-|---------|-----------------|-----------------------------------------------------------------------------------------------|------------|
-| items   | Iterable\[Any\] | Item records used by generated child components or static search sources.                     | _required_ |
-| value   | str             | Synchronized component value.                                                                 | _required_ |
-| label   | str             | Visible or accessible label for the component.                                                | _required_ |
-| **props | Any             | JSON-safe SegmentedControl props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name     | Type            | Description                                                                                   | Default    |
+|----------|-----------------|-----------------------------------------------------------------------------------------------|------------|
+| items    | Iterable\[Any\] | Item records used by generated child components or static search sources.                     | _required_ |
+| value    | str             | Synchronized component value.                                                                 | _required_ |
+| label    | str             | Visible or accessible label for the component.                                                | _required_ |
+| size     | str \| None     | Control size.                                                                                 | `None`     |
+| layout   | str \| None     | Hug or fill segment layout.                                                                   | `None`     |
+| disabled | bool            | Whether the entire control is disabled.                                                       | `False`    |
+| **props  | Any             | JSON-safe SegmentedControl props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

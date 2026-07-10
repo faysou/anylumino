@@ -14,6 +14,12 @@ astryx.Table(
     select_all_label='Select all rows',
     width=None,
     height=None,
+    density=None,
+    dividers=None,
+    striped=None,
+    hover=None,
+    vertical_align=None,
+    text_overflow=None,
     **props,
 )
 ```
@@ -35,6 +41,12 @@ Render a data-driven Astryx table for notebook use.
 | select_all_label | str                                            | Accessible label for the select-all checkbox.                                      | `'Select all rows'` |
 | width            | int \| float \| str \| None                    | CSS width. Numbers are normalized by anylumino where supported.                    | `None`              |
 | height           | int \| float \| str \| None                    | CSS height. Numbers are normalized by anylumino where supported.                   | `None`              |
+| density          | str \| None                                    | Compact, balanced, or spacious row density.                                        | `None`              |
+| dividers         | str \| None                                    | Row, column, grid, or no divider treatment.                                        | `None`              |
+| striped          | bool \| None                                   | Whether alternating rows receive a background wash.                                | `None`              |
+| hover            | bool \| None                                   | Whether rows highlight on pointer hover.                                           | `None`              |
+| vertical_align   | str \| None                                    | Body-cell vertical alignment.                                                      | `None`              |
+| text_overflow    | str \| None                                    | Wrap or truncate overflowing cell text.                                            | `None`              |
 | **props          | Any                                            | JSON-safe Table props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`                |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
@@ -62,8 +74,6 @@ Supported Astryx props include:
   width. 'wrap' lets text wrap and the row grow taller; 'truncate' clips with an ellipsis
   (default-rendered cells show a tooltip on hover when truncated). Header cells always
   truncate.
-- ``plugins`` (Record<string, TablePlugin<T>>): Named plugins that extend table behavior via the
-  transform pipeline. Converted to an ordered array internally.
 - ``children`` (ReactNode): Children mode: render TableRow/TableCell directly instead of using
   data-driven rendering.
 - ``xstyle`` (StyleXStyles): StyleX styles for layout customization (margins, positioning,

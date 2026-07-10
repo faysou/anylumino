@@ -1,18 +1,37 @@
 # astryx.DateInput { #anylumino.astryx.DateInput }
 
 ```python
-astryx.DateInput(value=None, *, label='', **props)
+astryx.DateInput(
+    value=None,
+    *,
+    label='',
+    disabled=False,
+    min=None,
+    max=None,
+    placeholder=None,
+    size=None,
+    clear=None,
+    number_of_months=None,
+    **props,
+)
 ```
 
 Render an Astryx date input.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type        | Description                                                                            | Default   |
-|---------|-------------|----------------------------------------------------------------------------------------|-----------|
-| value   | str \| None | Synchronized component value.                                                          | `None`    |
-| label   | str         | Visible or accessible label for the component.                                         | `''`      |
-| **props | Any         | JSON-safe DateInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name             | Type         | Description                                                                            | Default   |
+|------------------|--------------|----------------------------------------------------------------------------------------|-----------|
+| value            | str \| None  | Synchronized component value.                                                          | `None`    |
+| label            | str          | Visible or accessible label for the component.                                         | `''`      |
+| disabled         | bool         | Whether the input is disabled.                                                         | `False`   |
+| min              | str \| None  | Minimum ISO date.                                                                      | `None`    |
+| max              | str \| None  | Maximum ISO date.                                                                      | `None`    |
+| placeholder      | str \| None  | Placeholder text.                                                                      | `None`    |
+| size             | str \| None  | Input size.                                                                            | `None`    |
+| clear            | bool \| None | Whether to show a clear button.                                                        | `None`    |
+| number_of_months | int \| None  | Number of calendar months to display.                                                  | `None`    |
+| **props          | Any          | JSON-safe DateInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

@@ -8,6 +8,10 @@ astryx.MoreMenu(
     variant='ghost',
     disabled=False,
     callbacks=None,
+    action_callbacks=None,
+    size=None,
+    open=False,
+    auto_focus=None,
     **props,
 )
 ```
@@ -16,14 +20,18 @@ Render a compact overflow action menu.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                      | Description                                                                           | Default          |
-|-----------|-----------------------------------------------------------|---------------------------------------------------------------------------------------|------------------|
-| items     | Iterable\[Any\]                                           | Item records used by generated child components or static search sources.             | _required_       |
-| label     | str                                                       | Visible or accessible label for the component.                                        | `'More options'` |
-| variant   | str                                                       | Astryx visual variant.                                                                | `'ghost'`        |
-| disabled  | bool                                                      | Whether the component should render disabled.                                         | `False`          |
-| callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                    | `None`           |
-| **props   | Any                                                       | JSON-safe MoreMenu props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`             |
+| Name             | Type                                                           | Description                                                                           | Default          |
+|------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------------|------------------|
+| items            | Iterable\[Any\]                                                | Item records used by generated child components or static search sources.             | _required_       |
+| label            | str                                                            | Visible or accessible label for the component.                                        | `'More options'` |
+| variant          | str                                                            | Astryx visual variant.                                                                | `'ghost'`        |
+| disabled         | bool                                                           | Whether the component should render disabled.                                         | `False`          |
+| callbacks        | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None      | Python callbacks invoked for frontend activations.                                    | `None`           |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving the selected menu value.                                   | `None`           |
+| size             | str \| None                                                    | Trigger button size.                                                                  | `None`           |
+| open             | bool                                                           | Controlled menu visibility.                                                           | `False`          |
+| auto_focus       | bool \| None                                                   | Whether the first menu item receives focus on open.                                   | `None`           |
+| **props          | Any                                                            | JSON-safe MoreMenu props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`             |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

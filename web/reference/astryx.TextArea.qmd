@@ -8,6 +8,15 @@ astryx.TextArea(
     placeholder='',
     rows=3,
     disabled=False,
+    size=None,
+    label_hidden=None,
+    description=None,
+    optional=None,
+    required=None,
+    loading=None,
+    max_length=None,
+    spell_check=None,
+    status=None,
     **props,
 )
 ```
@@ -16,14 +25,23 @@ Render a multiline Astryx text area.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type   | Description                                                                           | Default   |
-|-------------|--------|---------------------------------------------------------------------------------------|-----------|
-| value       | str    | Synchronized component value.                                                         | `''`      |
-| label       | str    | Visible or accessible label for the component.                                        | `''`      |
-| placeholder | str    | Placeholder text shown when the control is empty.                                     | `''`      |
-| rows        | int    | Rows or records rendered by the component.                                            | `3`       |
-| disabled    | bool   | Whether the component should render disabled.                                         | `False`   |
-| **props     | Any    | JSON-safe TextArea props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name         | Type                        | Description                                                                           | Default   |
+|--------------|-----------------------------|---------------------------------------------------------------------------------------|-----------|
+| value        | str                         | Synchronized component value.                                                         | `''`      |
+| label        | str                         | Visible or accessible label for the component.                                        | `''`      |
+| placeholder  | str                         | Placeholder text shown when the control is empty.                                     | `''`      |
+| rows         | int                         | Rows or records rendered by the component.                                            | `3`       |
+| disabled     | bool                        | Whether the component should render disabled.                                         | `False`   |
+| size         | str \| None                 | Text-area size.                                                                       | `None`    |
+| label_hidden | bool \| None                | Whether to visually hide the accessible label.                                        | `None`    |
+| description  | str \| None                 | Helper text displayed with the input.                                                 | `None`    |
+| optional     | bool \| None                | Whether to mark the field optional.                                                   | `None`    |
+| required     | bool \| None                | Whether to mark the field required.                                                   | `None`    |
+| loading      | bool \| None                | Whether to show the loading state.                                                    | `None`    |
+| max_length   | int \| None                 | Maximum length used by the character counter.                                         | `None`    |
+| spell_check  | bool \| None                | Whether browser spell checking is enabled.                                            | `None`    |
+| status       | Mapping\[str, Any\] \| None | Validation status record.                                                             | `None`    |
+| **props      | Any                         | JSON-safe TextArea props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

@@ -44,10 +44,11 @@ def record_click(_button):
     status.value = f"astryx status: clicked {clicks['count']}"
 
 
-title = ax.Text("Astryx component render check", props={"type": "large", "weight": "semibold"})
+title = ax.Text("Astryx component render check", text_type="large", weight="semibold")
 subtitle = ax.Text(
     "Notebook-safe Astryx controls, display widgets, generated lists, tables, and composed layouts.",
-    props={"type": "supporting", "color": "secondary"},
+    text_type="supporting",
+    color="secondary",
 )
 breadcrumbs = ax.Breadcrumbs(
     [
@@ -57,9 +58,11 @@ breadcrumbs = ax.Breadcrumbs(
     ],
     variant="supporting",
 )
-connected = ax.StatusDot("Connected", variant="success", isPulsing=True)
+connected = ax.StatusDot("Connected", variant="success", pulsing=True)
 badge = ax.Badge("Live", variant="success")
-progress = ax.ProgressBar(58, label="Render coverage", variant="success", hasValueLabel=True)
+progress = ax.ProgressBar(
+    58, label="Render coverage", variant="success", value_label=True
+)
 banner = ax.Banner(
     "Astryx widgets loaded",
     status="success",
@@ -90,10 +93,18 @@ header = ax.Section(
 )
 
 
-symbol = ax.TextInput(value="AAPL", label="Symbol", placeholder="Ticker", hasClear=True, width="220px")
-notes = ax.TextArea(value="Watch opening auction imbalance.", label="Notes", rows=3, width="320px")
-limit = ax.NumberInput(value=250, label="Order limit", min=0, max=1000, step=10, units="sh", width="180px")
-risk = ax.Slider(value=42, label="Risk budget", min=0, max=100, valueDisplay="text", width="260px")
+symbol = ax.TextInput(
+    value="AAPL", label="Symbol", placeholder="Ticker", clear=True, width="220px"
+)
+notes = ax.TextArea(
+    value="Watch opening auction imbalance.", label="Notes", rows=3, width="320px"
+)
+limit = ax.NumberInput(
+    value=250, label="Order limit", min=0, max=1000, step=10, units="sh", width="180px"
+)
+risk = ax.Slider(
+    value=42, label="Risk budget", min=0, max=100, value_display="text", width="260px"
+)
 dataset = ax.Selector(
     [("Latency", "latency"), ("Volume", "volume"), ("Fills", "fills")],
     value="latency",
@@ -104,7 +115,7 @@ fields = ax.MultiSelector(
     ["Bid", "Ask", "Last", "Size", "Venue"],
     value=["Bid", "Ask", "Last"],
     label="Fields",
-    triggerDisplay="badges",
+    trigger_display="badges",
     width="260px",
 )
 symbol_search = ax.Typeahead(
@@ -117,9 +128,14 @@ symbol_search = ax.Typeahead(
     label="Symbol search",
     width="220px",
 )
-field_tokens = ax.Tokenizer(["Bid", "Ask", "Last", "Size", "Venue"], value=["Bid", "Ask"], label="Tokenized fields", width="280px")
+field_tokens = ax.Tokenizer(
+    ["Bid", "Ask", "Last", "Size", "Venue"],
+    value=["Bid", "Ask"],
+    label="Tokenized fields",
+    width="280px",
+)
 trade_date = ax.DateInput(value="2026-07-09", label="Trade date", width="180px")
-trade_time = ax.TimeInput(value="14:30", label="Time", hourFormat="24h", width="160px")
+trade_time = ax.TimeInput(value="14:30", label="Time", hour_format="24h", width="160px")
 enabled = ax.Checkbox(value=True, label="Enabled")
 stream = ax.Switch(value=False, label="Stream")
 pinned = ax.ToggleButton(value=True, label="Pinned")
@@ -129,8 +145,12 @@ density = ax.SegmentedControl(
     label="Density",
     size="sm",
 )
-mode = ax.RadioList(["Auto", "Manual"], value="Auto", label="Mode", orientation="horizontal")
-streams = ax.CheckboxList(["Quotes", "Trades", "Depth"], value=["Quotes", "Trades"], label="Streams")
+mode = ax.RadioList(
+    ["Auto", "Manual"], value="Auto", label="Mode", orientation="horizontal"
+)
+streams = ax.CheckboxList(
+    ["Quotes", "Trades", "Depth"], value=["Quotes", "Trades"], label="Streams"
+)
 
 
 controls = ax.Grid(
@@ -162,19 +182,21 @@ controls = ax.Grid(
 )
 
 wrapped_symbol = ax.Field(
-    ax.TextInput(value="NVDA", label="Symbol", isLabelHidden=True, width="180px"),
+    ax.TextInput(value="NVDA", label="Symbol", label_hidden=True, width="180px"),
     label="Wrapped symbol",
     description="Field wrapper around a custom input",
     width="220px",
 )
 grouped_qty = ax.InputGroup(
-    ax.NumberInput(value=100, label="Quantity", isLabelHidden=True),
+    ax.NumberInput(value=100, label="Quantity", label_hidden=True),
     label="Quantity",
     suffix="sh",
     width="220px",
 )
-calendar = ax.Calendar("2026-07-09", hasWeekNumbers=True)
-file_input = ax.FileInput(label="Upload CSV", accept=".csv", mode="input", width="240px")
+calendar = ax.Calendar("2026-07-09", week_numbers=True)
+file_input = ax.FileInput(
+    label="Upload CSV", accept=".csv", mode="input", width="240px"
+)
 form_layout = ax.FormLayout(
     {"field": wrapped_symbol, "quantity": grouped_qty, "file": file_input},
     direction="vertical",
@@ -189,13 +211,21 @@ rows = [
 orders = ax.Table(
     rows,
     [
-        {"key": "symbol", "header": "Symbol", "width": {"kind": "proportional", "value": 1}},
+        {
+            "key": "symbol",
+            "header": "Symbol",
+            "width": {"kind": "proportional", "value": 1},
+        },
         {"key": "side", "header": "Side", "width": {"kind": "pixel", "value": 90}},
-        {"key": "status", "header": "Status", "width": {"kind": "proportional", "value": 1}},
+        {
+            "key": "status",
+            "header": "Status",
+            "width": {"kind": "proportional", "value": 1},
+        },
     ],
     density="compact",
     dividers="grid",
-    hasHover=True,
+    hover=True,
 )
 watchlist = ax.List(
     [
@@ -204,7 +234,7 @@ watchlist = ax.List(
         {"label": "Risk checks", "description": "Pre-trade guardrails"},
     ],
     header="Watchlist",
-    hasDividers=True,
+    dividers=True,
     density="compact",
 )
 metadata = ax.MetadataList(
@@ -215,7 +245,9 @@ metadata = ax.MetadataList(
     ],
     columns="multi",
 )
-tabs = ax.TabList(["Summary", "Orders", "Risk"], value="Summary", layout="fill", hasDivider=True)
+tabs = ax.TabList(
+    ["Summary", "Orders", "Risk"], value="Summary", layout="fill", divider=True
+)
 button_group = ax.ButtonGroup(
     [
         {"label": "Apply", "variant": "primary"},
@@ -226,7 +258,9 @@ button_group = ax.ButtonGroup(
     callbacks=[record_click],
 )
 apply_button = ax.Button("Apply", variant="primary", callbacks=[record_click])
-more_button = ax.IconButton("More actions", icon="moreHorizontal", variant="ghost", callbacks=[record_click])
+more_button = ax.IconButton(
+    "More actions", icon="moreHorizontal", variant="ghost", callbacks=[record_click]
+)
 dropdown = ax.DropdownMenu(
     [
         {"label": "Refresh", "value": "refresh"},
@@ -247,7 +281,13 @@ data_section = ax.Grid(
             {
                 "tabs": tabs,
                 "actions": ax.Stack(
-                    {"group": button_group, "apply": apply_button, "menu": dropdown, "more_menu": more_menu, "more": more_button},
+                    {
+                        "group": button_group,
+                        "apply": apply_button,
+                        "menu": dropdown,
+                        "more_menu": more_menu,
+                        "more": more_button,
+                    },
                     direction="horizontal",
                     gap=2,
                     align="center",
@@ -264,19 +304,36 @@ data_section = ax.Grid(
 
 
 avatar = ax.Avatar("Ada Lovelace", size="medium")
-avatar_group = ax.AvatarGroup(["Ada Lovelace", "Grace Hopper", "Katherine Johnson"], overflow_count=2, size="small")
+avatar_group = ax.AvatarGroup(
+    ["Ada Lovelace", "Grace Hopper", "Katherine Johnson"],
+    overflow_count=2,
+    size="small",
+)
 icon = ax.Icon("check", size="md", color="success")
 token = ax.Token("sim", color="blue")
 kbd = ax.Kbd("mod+enter")
 skeleton = ax.Skeleton(width=160, height=16)
 spinner = ax.Spinner(size="sm", label="Loading")
-empty = ax.EmptyState("No rejected orders", description="Rejected order events will appear here.", isCompact=True)
-code = ax.CodeBlock("order = {'symbol': 'AAPL', 'side': 'BUY'}", language="python", hasLineNumbers=False)
+empty = ax.EmptyState(
+    "No rejected orders",
+    description="Rejected order events will appear here.",
+    compact=True,
+)
+code = ax.CodeBlock(
+    "order = {'symbol': 'AAPL', 'side': 'BUY'}", language="python", line_numbers=False
+)
 inline_code = ax.Code("order_id")
-markdown = ax.Markdown("**Markdown** with `inline code` and a compact list:\n\n- quotes\n- trades", density="compact")
-quote = ax.Blockquote("Design system widgets can compose cleanly inside Jupyter outputs.")
-timestamp = ax.Timestamp("2026-07-09T14:30:00Z", format="system_date_time", isTimezoneShown=True)
-thumbnail = ax.Thumbnail(label="preview.png", isLoading=True)
+markdown = ax.Markdown(
+    "**Markdown** with `inline code` and a compact list:\n\n- quotes\n- trades",
+    density="compact",
+)
+quote = ax.Blockquote(
+    "Design system widgets can compose cleanly inside Jupyter outputs."
+)
+timestamp = ax.Timestamp(
+    "2026-07-09T14:30:00Z", format="system_date_time", timezone=True
+)
+thumbnail = ax.Thumbnail(label="preview.png", loading=True)
 citation = ax.Citation({"title": "Run report", "url": "#"}, number=1)
 outline = ax.Outline(
     [
@@ -304,8 +361,14 @@ tree = ax.TreeList(
 )
 tooltip = ax.Tooltip("Runs validation", ax.Button("Validate", variant="secondary"))
 hover = ax.HoverCard(ax.Text("Last run: success"), ax.Button("Run state"))
-popover = ax.Popover(ax.Text("Compact popover content"), ax.Button("Open"), label="Details")
-details = ax.Collapsible(ax.Markdown("Verbose diagnostics can live here."), trigger="Diagnostics", default_open=False)
+popover = ax.Popover(
+    ax.Text("Compact popover content"), ax.Button("Open"), label="Details"
+)
+details = ax.Collapsible(
+    ax.Markdown("Verbose diagnostics can live here."),
+    trigger="Diagnostics",
+    default_open=False,
+)
 palette = ax.CommandPalette(
     [
         {"id": "refresh", "label": "Refresh", "auxiliaryData": {"group": "Data"}},
@@ -314,8 +377,16 @@ palette = ax.CommandPalette(
     value="refresh",
     width=420,
 )
-dialog = ax.Dialog(ax.Text("Inline dialog content stays inside the notebook output."), open=True, width=360)
-alert_dialog = ax.AlertDialog("Confirm action", "This inline preview uses the alert dialog surface.", action_label="Confirm")
+dialog = ax.Dialog(
+    ax.Text("Inline dialog content stays inside the notebook output."),
+    open=True,
+    width=360,
+)
+alert_dialog = ax.AlertDialog(
+    "Confirm action",
+    "This inline preview uses the alert dialog surface.",
+    action_label="Confirm",
+)
 
 
 visuals = ax.Grid(
@@ -323,7 +394,14 @@ visuals = ax.Grid(
         "identity": ax.Card(
             {
                 "row": ax.Stack(
-                    {"avatar": avatar, "group": avatar_group, "icon": icon, "token": token, "kbd": kbd, "time": timestamp},
+                    {
+                        "avatar": avatar,
+                        "group": avatar_group,
+                        "icon": icon,
+                        "token": token,
+                        "kbd": kbd,
+                        "time": timestamp,
+                    },
                     direction="horizontal",
                     gap=3,
                     align="center",

@@ -7,6 +7,12 @@ astryx.CommandPalette(
     *,
     label='Command palette',
     search=None,
+    open=True,
+    inline=True,
+    width=None,
+    max_height=None,
+    empty_search_text=None,
+    empty_bootstrap_text=None,
     **props,
 )
 ```
@@ -15,13 +21,19 @@ Render an inline Astryx command palette for notebook output areas.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                                         | Description                                                                                                                                                                                                                                               | Default             |
-|---------|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
-| items   | Iterable\[Any\] \| Mapping\[str, Any\]       | Command records. Mappings, pairs, strings, and dictionaries are normalized into ``{"id": ..., "label": ...}`` records.                                                                                                                                    | _required_          |
-| value   | str \| None                                  | Selected command id synchronized back to Python.                                                                                                                                                                                                          | `None`              |
-| label   | str                                          | Accessible dialog label.                                                                                                                                                                                                                                  | `'Command palette'` |
-| search  | Callable\[\[str\], Iterable\[Any\]\] \| None | Optional Python search callback. When provided, Astryx search queries are sent to Python and callback results are normalized into ``{"id": ..., "label": ...}`` command records. When omitted, the frontend builds a static search source from ``items``. | `None`              |
-| **props | Any                                          | JSON-safe CommandPalette props forwarded to Astryx. See the ``Astryx Props`` section below.                                                                                                                                                               | `{}`                |
+| Name                 | Type                                         | Description                                                                                                                                                                                                                                               | Default             |
+|----------------------|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| items                | Iterable\[Any\] \| Mapping\[str, Any\]       | Command records. Mappings, pairs, strings, and dictionaries are normalized into ``{"id": ..., "label": ...}`` records.                                                                                                                                    | _required_          |
+| value                | str \| None                                  | Selected command id synchronized back to Python.                                                                                                                                                                                                          | `None`              |
+| label                | str                                          | Accessible dialog label.                                                                                                                                                                                                                                  | `'Command palette'` |
+| search               | Callable\[\[str\], Iterable\[Any\]\] \| None | Optional Python search callback. When provided, Astryx search queries are sent to Python and callback results are normalized into ``{"id": ..., "label": ...}`` command records. When omitted, the frontend builds a static search source from ``items``. | `None`              |
+| open                 | bool                                         | Controlled palette visibility.                                                                                                                                                                                                                            | `True`              |
+| inline               | bool                                         | Whether to render inside the notebook output instead of as a modal.                                                                                                                                                                                       | `True`              |
+| width                | int \| float \| str \| None                  | Palette width.                                                                                                                                                                                                                                            | `None`              |
+| max_height           | int \| float \| str \| None                  | Maximum palette height.                                                                                                                                                                                                                                   | `None`              |
+| empty_search_text    | str \| None                                  | Message shown when a query has no results.                                                                                                                                                                                                                | `None`              |
+| empty_bootstrap_text | str \| None                                  | Message shown when the initial item source is empty.                                                                                                                                                                                                      | `None`              |
+| **props              | Any                                          | JSON-safe CommandPalette props forwarded to Astryx. See the ``Astryx Props`` section below.                                                                                                                                                               | `{}`                |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

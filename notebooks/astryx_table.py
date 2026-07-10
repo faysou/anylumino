@@ -29,17 +29,68 @@ from anylumino.astryx import Table
 
 table = Table(
     rows=[
-        {"symbol": "AAPL", "price": 195.12, "venue": "XNAS", "status": "Open", "qty": 400},
-        {"symbol": "MSFT", "price": 423.85, "venue": "XNAS", "status": "Open", "qty": 250},
-        {"symbol": "NVDA", "price": 141.36, "venue": "XNAS", "status": "Closed", "qty": 900},
-        {"symbol": "ASML", "price": 931.44, "venue": "XAMS", "status": "Open", "qty": 80},
+        {
+            "symbol": "AAPL",
+            "price": 195.12,
+            "venue": "XNAS",
+            "status": "Open",
+            "qty": 400,
+        },
+        {
+            "symbol": "MSFT",
+            "price": 423.85,
+            "venue": "XNAS",
+            "status": "Open",
+            "qty": 250,
+        },
+        {
+            "symbol": "NVDA",
+            "price": 141.36,
+            "venue": "XNAS",
+            "status": "Closed",
+            "qty": 900,
+        },
+        {
+            "symbol": "ASML",
+            "price": 931.44,
+            "venue": "XAMS",
+            "status": "Open",
+            "qty": 80,
+        },
     ],
     columns=[
-        {"key": "symbol", "header": "Symbol", "sortable": True, "width": {"kind": "proportional", "value": 1}},
-        {"key": "price", "header": "Price", "sortable": True, "align": "end", "width": {"kind": "pixel", "value": 96}},
-        {"key": "qty", "header": "Qty", "sortable": True, "align": "end", "width": {"kind": "pixel", "value": 72}},
-        {"key": "venue", "header": "Venue", "sortable": True, "width": {"kind": "pixel", "value": 88}},
-        {"key": "status", "header": "Status", "sortable": True, "width": {"kind": "proportional", "value": 1}},
+        {
+            "key": "symbol",
+            "header": "Symbol",
+            "sortable": True,
+            "width": {"kind": "proportional", "value": 1},
+        },
+        {
+            "key": "price",
+            "header": "Price",
+            "sortable": True,
+            "align": "end",
+            "width": {"kind": "pixel", "value": 96},
+        },
+        {
+            "key": "qty",
+            "header": "Qty",
+            "sortable": True,
+            "align": "end",
+            "width": {"kind": "pixel", "value": 72},
+        },
+        {
+            "key": "venue",
+            "header": "Venue",
+            "sortable": True,
+            "width": {"kind": "pixel", "value": 88},
+        },
+        {
+            "key": "status",
+            "header": "Status",
+            "sortable": True,
+            "width": {"kind": "proportional", "value": 1},
+        },
     ],
     row_key="symbol",
     selected=["AAPL"],
@@ -49,8 +100,8 @@ table = Table(
     sort_direction="desc",
     density="compact",
     dividers="grid",
-    hasHover=True,
-    textOverflow="truncate",
+    hover=True,
+    text_overflow="truncate",
     width="100%",
 )
 
@@ -83,10 +134,14 @@ panel = Card(
 panel
 
 # %%
-table.append_row({"symbol": "TSLA", "price": 187.42, "venue": "XNAS", "status": "Open", "qty": 120})
+table.append_row(
+    {"symbol": "TSLA", "price": 187.42, "venue": "XNAS", "status": "Open", "qty": 120}
+)
 
 # %%
-table.prepend_row({"symbol": "AMD", "price": 159.55, "venue": "XNAS", "status": "Open", "qty": 600})
+table.prepend_row(
+    {"symbol": "AMD", "price": 159.55, "venue": "XNAS", "status": "Open", "qty": 600}
+)
 
 # %%
 table.update_row("MSFT", {"price": 426.11, "status": "Filled"})

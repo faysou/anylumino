@@ -1,18 +1,27 @@
 # astryx.StatusDot { #anylumino.astryx.StatusDot }
 
 ```python
-astryx.StatusDot(label, *, variant='neutral', **props)
+astryx.StatusDot(
+    label,
+    *,
+    variant='neutral',
+    pulsing=None,
+    tooltip=None,
+    **props,
+)
 ```
 
 Render an inline Astryx status indicator.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                            | Default     |
-|---------|--------|----------------------------------------------------------------------------------------|-------------|
-| label   | str    | Visible or accessible label for the component.                                         | _required_  |
-| variant | str    | Astryx visual variant.                                                                 | `'neutral'` |
-| **props | Any    | JSON-safe StatusDot props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
+| Name    | Type         | Description                                                                            | Default     |
+|---------|--------------|----------------------------------------------------------------------------------------|-------------|
+| label   | str          | Visible or accessible label for the component.                                         | _required_  |
+| variant | str          | Astryx visual variant.                                                                 | `'neutral'` |
+| pulsing | bool \| None | Whether to animate the status dot.                                                     | `None`      |
+| tooltip | str \| None  | Hover explanation for the status.                                                      | `None`      |
+| **props | Any          | JSON-safe StatusDot props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

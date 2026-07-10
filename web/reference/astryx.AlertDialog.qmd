@@ -10,6 +10,10 @@ astryx.AlertDialog(
     open=True,
     inline=True,
     callbacks=None,
+    action_callbacks=None,
+    action_variant=None,
+    action_loading=None,
+    width=None,
     **props,
 )
 ```
@@ -18,16 +22,20 @@ Render an inline Astryx alert dialog for confirmations.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name         | Type                                                      | Description                                                                              | Default    |
-|--------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------|------------|
-| title        | str                                                       | Dialog title linked to the alert for accessibility.                                      | _required_ |
-| description  | str                                                       | Consequence or confirmation text linked to the alert for accessibility.                  | _required_ |
-| action_label | str                                                       | Primary action button label.                                                             | _required_ |
-| cancel_label | str                                                       | Cancel button label.                                                                     | `'Cancel'` |
-| open         | bool                                                      | Initial open state synchronized through ``value``.                                       | `True`     |
-| inline       | bool                                                      | Whether dialog content renders inline instead of using native modal behavior.            | `True`     |
-| callbacks    | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked when the primary action is activated.                           | `None`     |
-| **props      | Any                                                       | JSON-safe AlertDialog props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name             | Type                                                           | Description                                                                              | Default    |
+|------------------|----------------------------------------------------------------|------------------------------------------------------------------------------------------|------------|
+| title            | str                                                            | Dialog title linked to the alert for accessibility.                                      | _required_ |
+| description      | str                                                            | Consequence or confirmation text linked to the alert for accessibility.                  | _required_ |
+| action_label     | str                                                            | Primary action button label.                                                             | _required_ |
+| cancel_label     | str                                                            | Cancel button label.                                                                     | `'Cancel'` |
+| open             | bool                                                           | Controlled open state synchronized through ``is_open``.                                  | `True`     |
+| inline           | bool                                                           | Whether dialog content renders inline instead of using native modal behavior.            | `True`     |
+| callbacks        | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None      | Python callbacks invoked when the primary action is activated.                           | `None`     |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving the ``"confirm"`` action identifier.                          | `None`     |
+| action_variant   | str \| None                                                    | Primary action button variant.                                                           | `None`     |
+| action_loading   | bool \| None                                                   | Whether the primary action shows a loading state.                                        | `None`     |
+| width            | int \| float \| str \| None                                    | Dialog width.                                                                            | `None`     |
+| **props          | Any                                                            | JSON-safe AlertDialog props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

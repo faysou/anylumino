@@ -1,18 +1,31 @@
 # astryx.TabList { #anylumino.astryx.TabList }
 
 ```python
-astryx.TabList(items, value, **props)
+astryx.TabList(
+    items,
+    value,
+    *,
+    size=None,
+    layout=None,
+    divider=None,
+    orientation=None,
+    **props,
+)
 ```
 
 Render an Astryx tab list.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type            | Description                                                                          | Default    |
-|---------|-----------------|--------------------------------------------------------------------------------------|------------|
-| items   | Iterable\[Any\] | Item records used by generated child components or static search sources.            | _required_ |
-| value   | str             | Synchronized component value.                                                        | _required_ |
-| **props | Any             | JSON-safe TabList props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name        | Type            | Description                                                                          | Default    |
+|-------------|-----------------|--------------------------------------------------------------------------------------|------------|
+| items       | Iterable\[Any\] | Item records used by generated child components or static search sources.            | _required_ |
+| value       | str             | Synchronized component value.                                                        | _required_ |
+| size        | str \| None     | Tab size.                                                                            | `None`     |
+| layout      | str \| None     | Hug or fill tab layout.                                                              | `None`     |
+| divider     | bool \| None    | Whether to show the tab-list divider.                                                | `None`     |
+| orientation | str \| None     | Horizontal or vertical tab orientation.                                              | `None`     |
+| **props     | Any             | JSON-safe TabList props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

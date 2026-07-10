@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs",
-    "build": "node scripts/build-frontend.mjs"
+    "build": "node scripts/build-frontend.mjs",
+    "test": "node --test tests/frontend/*.test.mjs"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.1.2",

@@ -1,20 +1,47 @@
 # astryx.TextInput { #anylumino.astryx.TextInput }
 
 ```python
-astryx.TextInput(value='', *, label='', placeholder='', disabled=False, **props)
+astryx.TextInput(
+    value='',
+    *,
+    label='',
+    placeholder='',
+    disabled=False,
+    input_type=None,
+    size=None,
+    label_hidden=None,
+    description=None,
+    optional=None,
+    required=None,
+    loading=None,
+    status=None,
+    clear=None,
+    auto_focus=None,
+    **props,
+)
 ```
 
 Render a single-line Astryx text input.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type   | Description                                                                            | Default   |
-|-------------|--------|----------------------------------------------------------------------------------------|-----------|
-| value       | str    | Synchronized component value.                                                          | `''`      |
-| label       | str    | Visible or accessible label for the component.                                         | `''`      |
-| placeholder | str    | Placeholder text shown when the control is empty.                                      | `''`      |
-| disabled    | bool   | Whether the component should render disabled.                                          | `False`   |
-| **props     | Any    | JSON-safe TextInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name         | Type                        | Description                                                                            | Default   |
+|--------------|-----------------------------|----------------------------------------------------------------------------------------|-----------|
+| value        | str                         | Synchronized component value.                                                          | `''`      |
+| label        | str                         | Visible or accessible label for the component.                                         | `''`      |
+| placeholder  | str                         | Placeholder text shown when the control is empty.                                      | `''`      |
+| disabled     | bool                        | Whether the component should render disabled.                                          | `False`   |
+| input_type   | str \| None                 | HTML text input type.                                                                  | `None`    |
+| size         | str \| None                 | Input size.                                                                            | `None`    |
+| label_hidden | bool \| None                | Whether to visually hide the accessible label.                                         | `None`    |
+| description  | str \| None                 | Helper text displayed with the input.                                                  | `None`    |
+| optional     | bool \| None                | Whether to mark the field optional.                                                    | `None`    |
+| required     | bool \| None                | Whether to mark the field required.                                                    | `None`    |
+| loading      | bool \| None                | Whether to show the loading state.                                                     | `None`    |
+| status       | Mapping\[str, Any\] \| None | Validation status record.                                                              | `None`    |
+| clear        | bool \| None                | Whether to show a clear button.                                                        | `None`    |
+| auto_focus   | bool \| None                | Whether to focus the input when mounted.                                               | `None`    |
+| **props      | Any                         | JSON-safe TextInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

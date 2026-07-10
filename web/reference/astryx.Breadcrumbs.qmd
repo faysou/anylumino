@@ -1,17 +1,20 @@
 # astryx.Breadcrumbs { #anylumino.astryx.Breadcrumbs }
 
 ```python
-astryx.Breadcrumbs(items, **props)
+astryx.Breadcrumbs(items, *, separator=None, variant=None, label=None, **props)
 ```
 
 Render Astryx breadcrumbs from item records.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type            | Description                                                                              | Default    |
-|---------|-----------------|------------------------------------------------------------------------------------------|------------|
-| items   | Iterable\[Any\] | Item records used by generated child components or static search sources.                | _required_ |
-| **props | Any             | JSON-safe Breadcrumbs props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name      | Type            | Description                                                                              | Default    |
+|-----------|-----------------|------------------------------------------------------------------------------------------|------------|
+| items     | Iterable\[Any\] | Item records used by generated child components or static search sources.                | _required_ |
+| separator | str \| None     | Separator text between breadcrumb items.                                                 | `None`     |
+| variant   | str \| None     | Default or supporting visual treatment.                                                  | `None`     |
+| label     | str \| None     | Accessible navigation label.                                                             | `None`     |
+| **props   | Any             | JSON-safe Breadcrumbs props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

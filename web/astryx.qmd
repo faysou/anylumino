@@ -6,6 +6,13 @@ Astryx widgets are the component family for notebook UIs in `anylumino`. They
 provide JupyterLab-friendly controls, tables, surfaces, and theme support while
 keeping Python state synchronized through anywidget traits.
 
+Useful appearance and behavior options are keyword-only constructor arguments
+with Python snake-case names. Unmodeled JSON-safe upstream options remain
+available through `**props`; React nodes, refs, render functions, and
+JavaScript-only test props are not promoted to the Python API. See the
+[Astryx component documentation](https://astryx.atmeta.com/components) for the
+upstream component reference.
+
 ## Notebook dashboard
 
 ```python

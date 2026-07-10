@@ -1,19 +1,37 @@
 # astryx.Checkbox { #anylumino.astryx.Checkbox }
 
 ```python
-astryx.Checkbox(value=False, *, label='', disabled=False, **props)
+astryx.Checkbox(
+    value=False,
+    *,
+    label='',
+    disabled=False,
+    size=None,
+    label_hidden=None,
+    description=None,
+    loading=None,
+    read_only=None,
+    status=None,
+    **props,
+)
 ```
 
 Render an Astryx checkbox input.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type   | Description                                                                                | Default   |
-|----------|--------|--------------------------------------------------------------------------------------------|-----------|
-| value    | bool   | Synchronized component value.                                                              | `False`   |
-| label    | str    | Visible or accessible label for the component.                                             | `''`      |
-| disabled | bool   | Whether the component should render disabled.                                              | `False`   |
-| **props  | Any    | JSON-safe CheckboxInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name         | Type                        | Description                                                                                | Default   |
+|--------------|-----------------------------|--------------------------------------------------------------------------------------------|-----------|
+| value        | bool                        | Synchronized component value.                                                              | `False`   |
+| label        | str                         | Visible or accessible label for the component.                                             | `''`      |
+| disabled     | bool                        | Whether the component should render disabled.                                              | `False`   |
+| size         | str \| None                 | Checkbox size.                                                                             | `None`    |
+| label_hidden | bool \| None                | Whether to visually hide the accessible label.                                             | `None`    |
+| description  | str \| None                 | Helper text displayed below the label.                                                     | `None`    |
+| loading      | bool \| None                | Whether to show the loading state.                                                         | `None`    |
+| read_only    | bool \| None                | Whether interaction is disabled without dimming the value.                                 | `None`    |
+| status       | Mapping\[str, Any\] \| None | Validation status record.                                                                  | `None`    |
+| **props      | Any                         | JSON-safe CheckboxInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

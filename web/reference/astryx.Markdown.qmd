@@ -1,17 +1,39 @@
 # astryx.Markdown { #anylumino.astryx.Markdown }
 
 ```python
-astryx.Markdown(text, **props)
+astryx.Markdown(
+    text,
+    *,
+    display=None,
+    density=None,
+    heading_level_start=None,
+    streaming=None,
+    sources=None,
+    citation_style=None,
+    content_width=None,
+    content_align=None,
+    autolink=None,
+    **props,
+)
 ```
 
 Render Markdown content through Astryx.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type   | Description                                                                           | Default    |
-|---------|--------|---------------------------------------------------------------------------------------|------------|
-| text    | str    | Text content synchronized to the frontend component.                                  | _required_ |
-| **props | Any    | JSON-safe Markdown props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name                | Type                        | Description                                                                           | Default    |
+|---------------------|-----------------------------|---------------------------------------------------------------------------------------|------------|
+| text                | str                         | Text content synchronized to the frontend component.                                  | _required_ |
+| display             | str \| None                 | Block or inline display.                                                              | `None`     |
+| density             | str \| None                 | Default or compact block spacing.                                                     | `None`     |
+| heading_level_start | int \| None                 | Heading level corresponding to Markdown ``#``.                                        | `None`     |
+| streaming           | bool \| None                | Whether to use incremental streaming presentation.                                    | `None`     |
+| sources             | Mapping\[str, Any\] \| None | Citation sources keyed by identifier.                                                 | `None`     |
+| citation_style      | str \| None                 | Label or numeric citations.                                                           | `None`     |
+| content_width       | int \| float \| str \| None | Maximum prose width.                                                                  | `None`     |
+| content_align       | str \| None                 | Prose alignment inside the available width.                                           | `None`     |
+| autolink            | str \| None                 | Optional GFM bare-link handling.                                                      | `None`     |
+| **props             | Any                         | JSON-safe Markdown props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

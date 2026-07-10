@@ -1,20 +1,33 @@
 # astryx.Toolbar { #anylumino.astryx.Toolbar }
 
 ```python
-astryx.Toolbar(children=None, *, label, size='sm', gap=1, **props)
+astryx.Toolbar(
+    children=None,
+    *,
+    label,
+    size='sm',
+    gap=1,
+    orientation=None,
+    variant=None,
+    dividers=None,
+    **props,
+)
 ```
 
 Render an Astryx toolbar with optional slots.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type         | Description                                                                          | Default    |
-|----------|--------------|--------------------------------------------------------------------------------------|------------|
-| children | ChildInput   | Child widget, sequence of widgets, or mapping of slot names to widgets.              | `None`     |
-| label    | str          | Visible or accessible label for the component.                                       | _required_ |
-| size     | str          | Astryx component option.                                                             | `'sm'`     |
-| gap      | int \| float | Astryx spacing step between children.                                                | `1`        |
-| **props  | Any          | JSON-safe Toolbar props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name        | Type                    | Description                                                                          | Default    |
+|-------------|-------------------------|--------------------------------------------------------------------------------------|------------|
+| children    | ChildInput              | Child widget, sequence of widgets, or mapping of slot names to widgets.              | `None`     |
+| label       | str                     | Visible or accessible label for the component.                                       | _required_ |
+| size        | str                     | Astryx component option.                                                             | `'sm'`     |
+| gap         | int \| float            | Astryx spacing step between children.                                                | `1`        |
+| orientation | str \| None             | Horizontal or vertical keyboard navigation.                                          | `None`     |
+| variant     | str \| None             | Toolbar section visual variant.                                                      | `None`     |
+| dividers    | Iterable\[str\] \| None | Toolbar sides that display divider borders.                                          | `None`     |
+| **props     | Any                     | JSON-safe Toolbar props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

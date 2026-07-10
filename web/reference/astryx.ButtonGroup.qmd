@@ -1,19 +1,33 @@
 # astryx.ButtonGroup { #anylumino.astryx.ButtonGroup }
 
 ```python
-astryx.ButtonGroup(items, *, label, callbacks=None, **props)
+astryx.ButtonGroup(
+    items,
+    *,
+    label,
+    callbacks=None,
+    action_callbacks=None,
+    orientation=None,
+    size=None,
+    disabled=False,
+    **props,
+)
 ```
 
 Render an Astryx button group from item records.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                      | Description                                                                              | Default    |
-|-----------|-----------------------------------------------------------|------------------------------------------------------------------------------------------|------------|
-| items     | Iterable\[Any\]                                           | Item records used by generated child components or static search sources.                | _required_ |
-| label     | str                                                       | Visible or accessible label for the component.                                           | _required_ |
-| callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                       | `None`     |
-| **props   | Any                                                       | JSON-safe ButtonGroup props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name             | Type                                                           | Description                                                                              | Default    |
+|------------------|----------------------------------------------------------------|------------------------------------------------------------------------------------------|------------|
+| items            | Iterable\[Any\]                                                | Item records used by generated child components or static search sources.                | _required_ |
+| label            | str                                                            | Visible or accessible label for the component.                                           | _required_ |
+| callbacks        | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None      | Python callbacks invoked for frontend activations.                                       | `None`     |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving the selected item value.                                      | `None`     |
+| orientation      | str \| None                                                    | Horizontal or vertical group orientation.                                                | `None`     |
+| size             | str \| None                                                    | Default child button size.                                                               | `None`     |
+| disabled         | bool                                                           | Whether all buttons are disabled.                                                        | `False`    |
+| **props          | Any                                                            | JSON-safe ButtonGroup props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

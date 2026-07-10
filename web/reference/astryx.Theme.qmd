@@ -9,6 +9,13 @@ astryx.Theme(
     mode=None,
     direction='vertical',
     gap=2,
+    align=None,
+    justify=None,
+    width=None,
+    height=None,
+    padding=None,
+    wrap=None,
+    scrollable=None,
     **props,
 )
 ```
@@ -25,6 +32,13 @@ Apply a reusable Astryx theme to child widgets.
 | mode       | str \| None                 | Alias for ``color_mode`` matching the Astryx ``Theme`` prop name. When provided, it takes precedence over ``color_mode``. | `None`       |
 | direction  | str                         | Layout direction.                                                                                                         | `'vertical'` |
 | gap        | int \| float                | Astryx spacing step between children.                                                                                     | `2`          |
+| align      | str \| None                 | Cross-axis alignment.                                                                                                     | `None`       |
+| justify    | str \| None                 | Main-axis alignment.                                                                                                      | `None`       |
+| width      | int \| float \| str \| None | Theme container width.                                                                                                    | `None`       |
+| height     | int \| float \| str \| None | Theme container height.                                                                                                   | `None`       |
+| padding    | int \| float \| None        | Inner padding using the Astryx spacing scale.                                                                             | `None`       |
+| wrap       | str \| None                 | Stack wrapping behavior.                                                                                                  | `None`       |
+| scrollable | bool \| None                | Whether overflow should scroll.                                                                                           | `None`       |
 | **props    | Any                         | JSON-safe Stack props forwarded to Astryx. See the ``Astryx Props`` section below.                                        | `{}`         |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}

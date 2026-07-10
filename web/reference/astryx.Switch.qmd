@@ -1,19 +1,37 @@
 # astryx.Switch { #anylumino.astryx.Switch }
 
 ```python
-astryx.Switch(value=False, *, label='', disabled=False, **props)
+astryx.Switch(
+    value=False,
+    *,
+    label='',
+    disabled=False,
+    label_hidden=None,
+    description=None,
+    loading=None,
+    status=None,
+    label_position=None,
+    label_spacing=None,
+    **props,
+)
 ```
 
 Render an Astryx switch for binary settings.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type   | Description                                                                         | Default   |
-|----------|--------|-------------------------------------------------------------------------------------|-----------|
-| value    | bool   | Synchronized component value.                                                       | `False`   |
-| label    | str    | Visible or accessible label for the component.                                      | `''`      |
-| disabled | bool   | Whether the component should render disabled.                                       | `False`   |
-| **props  | Any    | JSON-safe Switch props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name           | Type                        | Description                                                                         | Default   |
+|----------------|-----------------------------|-------------------------------------------------------------------------------------|-----------|
+| value          | bool                        | Synchronized component value.                                                       | `False`   |
+| label          | str                         | Visible or accessible label for the component.                                      | `''`      |
+| disabled       | bool                        | Whether the component should render disabled.                                       | `False`   |
+| label_hidden   | bool \| None                | Whether to visually hide the accessible label.                                      | `None`    |
+| description    | str \| None                 | Helper text displayed below the label.                                              | `None`    |
+| loading        | bool \| None                | Whether to show the loading state.                                                  | `None`    |
+| status         | Mapping\[str, Any\] \| None | Validation status record.                                                           | `None`    |
+| label_position | str \| None                 | Whether the label appears before or after the switch.                               | `None`    |
+| label_spacing  | str \| None                 | Default or spread label spacing.                                                    | `None`    |
+| **props        | Any                         | JSON-safe Switch props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

@@ -1,19 +1,45 @@
 # astryx.NumberInput { #anylumino.astryx.NumberInput }
 
 ```python
-astryx.NumberInput(value=None, *, label='', disabled=False, **props)
+astryx.NumberInput(
+    value=None,
+    *,
+    label='',
+    disabled=False,
+    min=None,
+    max=None,
+    step=None,
+    units=None,
+    size=None,
+    placeholder=None,
+    integer_only=None,
+    clear=None,
+    description=None,
+    status=None,
+    **props,
+)
 ```
 
 Render an Astryx numeric input.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type                 | Description                                                                              | Default   |
-|----------|----------------------|------------------------------------------------------------------------------------------|-----------|
-| value    | int \| float \| None | Synchronized component value.                                                            | `None`    |
-| label    | str                  | Visible or accessible label for the component.                                           | `''`      |
-| disabled | bool                 | Whether the component should render disabled.                                            | `False`   |
-| **props  | Any                  | JSON-safe NumberInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name         | Type                        | Description                                                                              | Default   |
+|--------------|-----------------------------|------------------------------------------------------------------------------------------|-----------|
+| value        | int \| float \| None        | Synchronized component value.                                                            | `None`    |
+| label        | str                         | Visible or accessible label for the component.                                           | `''`      |
+| disabled     | bool                        | Whether the component should render disabled.                                            | `False`   |
+| min          | int \| float \| None        | Minimum accepted value.                                                                  | `None`    |
+| max          | int \| float \| None        | Maximum accepted value.                                                                  | `None`    |
+| step         | int \| float \| None        | Numeric step increment.                                                                  | `None`    |
+| units        | str \| None                 | Units displayed after the value.                                                         | `None`    |
+| size         | str \| None                 | Input size.                                                                              | `None`    |
+| placeholder  | str \| None                 | Placeholder text.                                                                        | `None`    |
+| integer_only | bool \| None                | Whether to accept only integer values.                                                   | `None`    |
+| clear        | bool \| None                | Whether to show a clear button.                                                          | `None`    |
+| description  | str \| None                 | Helper text displayed with the input.                                                    | `None`    |
+| status       | Mapping\[str, Any\] \| None | Validation status record.                                                                | `None`    |
+| **props      | Any                         | JSON-safe NumberInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

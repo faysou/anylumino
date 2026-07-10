@@ -1,19 +1,39 @@
 # astryx.Stack { #anylumino.astryx.Stack }
 
 ```python
-astryx.Stack(children=None, *, direction='vertical', gap=2, **props)
+astryx.Stack(
+    children=None,
+    *,
+    direction='vertical',
+    gap=2,
+    align=None,
+    justify=None,
+    width=None,
+    height=None,
+    padding=None,
+    wrap=None,
+    scrollable=None,
+    **props,
+)
 ```
 
 Arrange child widgets in an Astryx stack.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type         | Description                                                                        | Default      |
-|-----------|--------------|------------------------------------------------------------------------------------|--------------|
-| children  | ChildInput   | Child widget, sequence of widgets, or mapping of slot names to widgets.            | `None`       |
-| direction | str          | Layout direction.                                                                  | `'vertical'` |
-| gap       | int \| float | Astryx spacing step between children.                                              | `2`          |
-| **props   | Any          | JSON-safe Stack props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`         |
+| Name       | Type                        | Description                                                                        | Default      |
+|------------|-----------------------------|------------------------------------------------------------------------------------|--------------|
+| children   | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.            | `None`       |
+| direction  | str                         | Layout direction.                                                                  | `'vertical'` |
+| gap        | int \| float                | Astryx spacing step between children.                                              | `2`          |
+| align      | str \| None                 | Cross-axis alignment.                                                              | `None`       |
+| justify    | str \| None                 | Main-axis alignment.                                                               | `None`       |
+| width      | int \| float \| str \| None | Container width.                                                                   | `None`       |
+| height     | int \| float \| str \| None | Container height.                                                                  | `None`       |
+| padding    | int \| float \| None        | Inner padding using the Astryx spacing scale.                                      | `None`       |
+| wrap       | str \| None                 | Stack wrapping behavior.                                                           | `None`       |
+| scrollable | bool \| None                | Whether overflow should scroll.                                                    | `None`       |
+| **props    | Any                         | JSON-safe Stack props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`         |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

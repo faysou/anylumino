@@ -1,17 +1,39 @@
 # astryx.Timestamp { #anylumino.astryx.Timestamp }
 
 ```python
-astryx.Timestamp(value, **props)
+astryx.Timestamp(
+    value,
+    *,
+    format=None,
+    auto_threshold=None,
+    tooltip=None,
+    timezone=None,
+    live=None,
+    text_type=None,
+    size=None,
+    color=None,
+    weight=None,
+    **props,
+)
 ```
 
 Render a timestamp value with Astryx formatting.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                | Description                                                                            | Default    |
-|---------|---------------------|----------------------------------------------------------------------------------------|------------|
-| value   | str \| int \| float | Synchronized component value.                                                          | _required_ |
-| **props | Any                 | JSON-safe Timestamp props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name           | Type                 | Description                                                                            | Default    |
+|----------------|----------------------|----------------------------------------------------------------------------------------|------------|
+| value          | str \| int \| float  | Synchronized component value.                                                          | _required_ |
+| format         | str \| None          | Relative, automatic, date, time, or system display format.                             | `None`     |
+| auto_threshold | int \| float \| None | Automatic-format threshold in seconds.                                                 | `None`     |
+| tooltip        | bool \| None         | Whether relative timestamps show the full value on hover.                              | `None`     |
+| timezone       | bool \| None         | Whether to append the timezone abbreviation.                                           | `None`     |
+| live           | bool \| None         | Whether relative text updates over time.                                               | `None`     |
+| text_type      | str \| None          | Semantic text type.                                                                    | `None`     |
+| size           | str \| None          | Explicit text-size override.                                                           | `None`     |
+| color          | str \| None          | Theme text color.                                                                      | `None`     |
+| weight         | str \| None          | Font-weight override.                                                                  | `None`     |
+| **props        | Any                  | JSON-safe Timestamp props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

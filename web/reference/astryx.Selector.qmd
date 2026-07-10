@@ -1,19 +1,43 @@
 # astryx.Selector { #anylumino.astryx.Selector }
 
 ```python
-astryx.Selector(options, value=None, *, label='', **props)
+astryx.Selector(
+    options,
+    value=None,
+    *,
+    label='',
+    disabled=False,
+    placeholder=None,
+    size=None,
+    clear=None,
+    search=None,
+    search_placeholder=None,
+    label_hidden=None,
+    description=None,
+    status=None,
+    **props,
+)
 ```
 
 Render a single-value Astryx selector.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type                                   | Description                                                                           | Default    |
-|---------|----------------------------------------|---------------------------------------------------------------------------------------|------------|
-| options | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.            | _required_ |
-| value   | str \| None                            | Synchronized component value.                                                         | `None`     |
-| label   | str                                    | Visible or accessible label for the component.                                        | `''`       |
-| **props | Any                                    | JSON-safe Selector props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name               | Type                                   | Description                                                                           | Default    |
+|--------------------|----------------------------------------|---------------------------------------------------------------------------------------|------------|
+| options            | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.            | _required_ |
+| value              | str \| None                            | Synchronized component value.                                                         | `None`     |
+| label              | str                                    | Visible or accessible label for the component.                                        | `''`       |
+| disabled           | bool                                   | Whether the selector is disabled.                                                     | `False`    |
+| placeholder        | str \| None                            | Placeholder shown when no option is selected.                                         | `None`     |
+| size               | str \| None                            | Selector size.                                                                        | `None`     |
+| clear              | bool \| None                           | Whether to show a clear button.                                                       | `None`     |
+| search             | bool \| None                           | Whether to show option filtering.                                                     | `None`     |
+| search_placeholder | str \| None                            | Placeholder for the search input.                                                     | `None`     |
+| label_hidden       | bool \| None                           | Whether to visually hide the accessible label.                                        | `None`     |
+| description        | str \| None                            | Helper text displayed with the selector.                                              | `None`     |
+| status             | Mapping\[str, Any\] \| None            | Validation status record.                                                             | `None`     |
+| **props            | Any                                    | JSON-safe Selector props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

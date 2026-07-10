@@ -8,6 +8,12 @@ astryx.DropdownMenu(
     variant='secondary',
     disabled=False,
     callbacks=None,
+    action_callbacks=None,
+    open=False,
+    menu_width=None,
+    chevron=None,
+    placement=None,
+    auto_focus=None,
     **props,
 )
 ```
@@ -16,14 +22,20 @@ Render a button-backed Astryx dropdown menu.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                      | Description                                                                               | Default       |
-|-----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------|---------------|
-| items     | Iterable\[Any\]                                           | Item records used by generated child components or static search sources.                 | _required_    |
-| label     | str                                                       | Visible or accessible label for the component.                                            | _required_    |
-| variant   | str                                                       | Astryx visual variant.                                                                    | `'secondary'` |
-| disabled  | bool                                                      | Whether the component should render disabled.                                             | `False`       |
-| callbacks | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None | Python callbacks invoked for frontend activations.                                        | `None`        |
-| **props   | Any                                                       | JSON-safe DropdownMenu props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`          |
+| Name             | Type                                                           | Description                                                                               | Default       |
+|------------------|----------------------------------------------------------------|-------------------------------------------------------------------------------------------|---------------|
+| items            | Iterable\[Any\]                                                | Item records used by generated child components or static search sources.                 | _required_    |
+| label            | str                                                            | Visible or accessible label for the component.                                            | _required_    |
+| variant          | str                                                            | Astryx visual variant.                                                                    | `'secondary'` |
+| disabled         | bool                                                           | Whether the component should render disabled.                                             | `False`       |
+| callbacks        | Iterable\[Callable\[\[ComponentWidget\], None\]\] \| None      | Python callbacks invoked for frontend activations.                                        | `None`        |
+| action_callbacks | Iterable\[Callable\[\[ComponentWidget, Any\], None\]\] \| None | Python callbacks receiving the selected menu value.                                       | `None`        |
+| open             | bool                                                           | Controlled menu visibility.                                                               | `False`       |
+| menu_width       | int \| float \| str \| None                                    | Menu width; defaults to the trigger width.                                                | `None`        |
+| chevron          | bool \| None                                                   | Whether the trigger shows a chevron.                                                      | `None`        |
+| placement        | str \| None                                                    | Menu placement relative to the trigger.                                                   | `None`        |
+| auto_focus       | bool \| None                                                   | Whether the first menu item receives focus on open.                                       | `None`        |
+| **props          | Any                                                            | JSON-safe DropdownMenu props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`          |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

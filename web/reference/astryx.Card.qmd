@@ -1,18 +1,33 @@
 # astryx.Card { #anylumino.astryx.Card }
 
 ```python
-astryx.Card(children=None, *, variant='default', **props)
+astryx.Card(
+    children=None,
+    *,
+    variant='default',
+    padding=None,
+    width=None,
+    height=None,
+    max_width=None,
+    min_height=None,
+    **props,
+)
 ```
 
 Render an Astryx card container.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type       | Description                                                                       | Default     |
-|----------|------------|-----------------------------------------------------------------------------------|-------------|
-| children | ChildInput | Child widget, sequence of widgets, or mapping of slot names to widgets.           | `None`      |
-| variant  | str        | Astryx visual variant.                                                            | `'default'` |
-| **props  | Any        | JSON-safe Card props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
+| Name       | Type                        | Description                                                                       | Default     |
+|------------|-----------------------------|-----------------------------------------------------------------------------------|-------------|
+| children   | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.           | `None`      |
+| variant    | str                         | Astryx visual variant.                                                            | `'default'` |
+| padding    | int \| float \| None        | Inner padding using the Astryx spacing scale.                                     | `None`      |
+| width      | int \| float \| str \| None | Card width.                                                                       | `None`      |
+| height     | int \| float \| str \| None | Card height.                                                                      | `None`      |
+| max_width  | int \| float \| str \| None | Maximum card width.                                                               | `None`      |
+| min_height | int \| float \| str \| None | Minimum card height.                                                              | `None`      |
+| **props    | Any                         | JSON-safe Card props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

@@ -1,18 +1,35 @@
 # astryx.Section { #anylumino.astryx.Section }
 
 ```python
-astryx.Section(children=None, *, variant='section', **props)
+astryx.Section(
+    children=None,
+    *,
+    variant='section',
+    padding=None,
+    padding_block=None,
+    dividers=None,
+    width=None,
+    height=None,
+    max_width=None,
+    **props,
+)
 ```
 
 Render an Astryx section container.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type       | Description                                                                          | Default     |
-|----------|------------|--------------------------------------------------------------------------------------|-------------|
-| children | ChildInput | Child widget, sequence of widgets, or mapping of slot names to widgets.              | `None`      |
-| variant  | str        | Astryx visual variant.                                                               | `'section'` |
-| **props  | Any        | JSON-safe Section props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
+| Name          | Type                        | Description                                                                          | Default     |
+|---------------|-----------------------------|--------------------------------------------------------------------------------------|-------------|
+| children      | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.              | `None`      |
+| variant       | str                         | Astryx visual variant.                                                               | `'section'` |
+| padding       | int \| float \| None        | Inner padding using the Astryx spacing scale.                                        | `None`      |
+| padding_block | int \| float \| None        | Block-axis padding override.                                                         | `None`      |
+| dividers      | Iterable\[str\] \| None     | Section sides that display divider borders.                                          | `None`      |
+| width         | int \| float \| str \| None | Section width.                                                                       | `None`      |
+| height        | int \| float \| str \| None | Section height.                                                                      | `None`      |
+| max_width     | int \| float \| str \| None | Maximum section width.                                                               | `None`      |
+| **props       | Any                         | JSON-safe Section props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`        |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

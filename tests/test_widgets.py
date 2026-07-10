@@ -1,4 +1,5 @@
 from datetime import datetime
+from inspect import signature
 from pathlib import Path
 
 import pytest
@@ -43,7 +44,9 @@ def test_tab_panel_serializes_child_widgets_as_anywidget_refs() -> None:
 
     panel = TabPanel([first, second], titles=["One", "Two"], selected_index=1)
 
-    assert panel.get_state(key=["widgets", "child_keys", "titles", "selected_index"]) == {
+    assert panel.get_state(
+        key=["widgets", "child_keys", "titles", "selected_index"]
+    ) == {
         "widgets": [f"anywidget:{first.model_id}", f"anywidget:{second.model_id}"],
         "child_keys": ["widget-1", "widget-2"],
         "titles": ["One", "Two"],
@@ -407,7 +410,9 @@ def test_menubar_and_command_palette_store_actions() -> None:
 def test_anylumino_controls_are_composable_children() -> None:
     button = sx.Button(description="Run")
     symbol = sx.TextInput(value="Greenhouse A", description="Dataset")
-    interval = sx.Dropdown(options=["Daily", "Weekly"], value="Daily", description="Interval")
+    interval = sx.Dropdown(
+        options=["Daily", "Weekly"], value="Daily", description="Interval"
+    )
     live = sx.Checkbox(value=True, description="Enabled")
     rows = sx.IntSlider(value=100, min=10, max=250, description="Rows")
 
@@ -426,7 +431,9 @@ def test_anylumino_controls_are_composable_children() -> None:
     assert panel.get_widget("button") is button
     assert panel["symbol"] is symbol
     assert panel.child_keys == ["button", "symbol", "interval", "live", "rows"]
-    assert panel.get_state(key=["widgets"])["widgets"][0] == f"anywidget:{button.model_id}"
+    assert (
+        panel.get_state(key=["widgets"])["widgets"][0] == f"anywidget:{button.model_id}"
+    )
 
 
 def test_date_controls_are_native_family_not_spectrum_controls() -> None:
@@ -488,7 +495,9 @@ def test_spectrum_component_wrappers_sync_kind_and_metadata() -> None:
         "switch": sx.Switch(value=True, description="Enabled"),
         "status": sx.StatusLight(value=True, description="Ready", variant="positive"),
         "badge": sx.Badge(value="Ready", variant="informative", icon="InfoCircle"),
-        "meter": sx.Meter(value=64, description="Coverage", variant="positive", readout=True),
+        "meter": sx.Meter(
+            value=64, description="Coverage", variant="positive", readout=True
+        ),
         "link": sx.Link("https://example.com", description="Docs"),
         "divider": sx.Divider(spectrum_size="l"),
     }
@@ -530,8 +539,14 @@ def test_spectrum_table_normalizes_mapping_rows_and_columns() -> None:
         {"key": "status", "label": "status", "sortable": False, "align": ""},
     ]
     assert table.rows == [
-        {"value": "AAPL", "cells": {"symbol": "AAPL", "price": 195.12, "status": "Open"}},
-        {"value": "MSFT", "cells": {"symbol": "MSFT", "price": 423.85, "status": "Closed"}},
+        {
+            "value": "AAPL",
+            "cells": {"symbol": "AAPL", "price": 195.12, "status": "Open"},
+        },
+        {
+            "value": "MSFT",
+            "cells": {"symbol": "MSFT", "price": 423.85, "status": "Closed"},
+        },
     ]
     assert table.selected == ["AAPL"]
     assert table.selects == "multiple"
@@ -557,7 +572,12 @@ def test_spectrum_table_normalizes_sequence_rows_without_columns() -> None:
 def test_spectrum_table_helpers_replace_append_update_and_remove_rows() -> None:
     table = sx.Table(
         rows=[{"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"}],
-        columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+        columns={
+            "order_id": "Order",
+            "symbol": "Symbol",
+            "qty": "Qty",
+            "status": "Status",
+        },
         row_key="order_id",
         selected=["O-1"],
         selects="multiple",
@@ -576,7 +596,12 @@ def test_spectrum_table_helpers_replace_append_update_and_remove_rows() -> None:
     assert table.rows == [
         {
             "value": "O-2",
-            "cells": {"order_id": "O-2", "symbol": "MSFT", "qty": 7, "status": "FILLED"},
+            "cells": {
+                "order_id": "O-2",
+                "symbol": "MSFT",
+                "qty": 7,
+                "status": "FILLED",
+            },
         },
     ]
     assert table.selected == []
@@ -585,11 +610,21 @@ def test_spectrum_table_helpers_replace_append_update_and_remove_rows() -> None:
 def test_spectrum_table_prepend_row_inserts_before_existing_rows() -> None:
     table = sx.Table(
         rows=[{"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "NEW"}],
-        columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+        columns={
+            "order_id": "Order",
+            "symbol": "Symbol",
+            "qty": "Qty",
+            "status": "Status",
+        },
         row_key="order_id",
     )
 
-    assert table.prepend_row({"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"}) == "O-1"
+    assert (
+        table.prepend_row(
+            {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"}
+        )
+        == "O-1"
+    )
     assert table.rows == [
         {
             "value": "O-1",
@@ -603,7 +638,9 @@ def test_spectrum_table_prepend_row_inserts_before_existing_rows() -> None:
 
 
 def test_spectrum_table_set_rows_accepts_live_raw_rows() -> None:
-    table = sx.Table(columns=["order_id", "status"], row_key="order_id", selected=["O-1", "O-3"])
+    table = sx.Table(
+        columns=["order_id", "status"], row_key="order_id", selected=["O-1", "O-3"]
+    )
 
     table.set_rows(
         [
@@ -620,7 +657,9 @@ def test_spectrum_table_set_rows_accepts_live_raw_rows() -> None:
 
 
 def test_spectrum_table_append_row_skips_existing_auto_values_after_removal() -> None:
-    table = sx.Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS"), ("Quarterly", "DOC")])
+    table = sx.Table(
+        rows=[("Budget", "PDF"), ("Onboarding", "XLS"), ("Quarterly", "DOC")]
+    )
 
     table.remove_row("1")
 
@@ -691,8 +730,12 @@ def test_spectrum_widgets_share_generic_component_base() -> None:
         sx.Modal({"body": TextWidget("Confirm")}, title="Confirm"),
     ]
 
-    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
-    assert [isinstance(widget, sx.SpectrumWidget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(
+        widgets
+    )
+    assert [isinstance(widget, sx.SpectrumWidget) for widget in widgets] == [
+        True
+    ] * len(widgets)
 
 
 def test_spectrum_widget_children_are_keyed_and_composable() -> None:
@@ -735,8 +778,12 @@ def test_astryx_widgets_share_generic_component_base() -> None:
         ax.Stack({"button": ax.Button("Run")}, direction="horizontal", gap=1),
     ]
 
-    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
-    assert [isinstance(widget, ax.Widget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(
+        widgets
+    )
+    assert [isinstance(widget, ax.Widget) for widget in widgets] == [True] * len(
+        widgets
+    )
     assert widgets[0].component_family == "astryx"
     assert widgets[0].component_name == "Button"
     assert widgets[0].label == "Run"
@@ -745,6 +792,83 @@ def test_astryx_widgets_share_generic_component_base() -> None:
     assert widgets[1].value == "AAPL"
     assert widgets[1].props == {"placeholder": "Ticker"}
     assert widgets[2].props == {"variant": "success"}
+
+
+def test_astryx_useful_props_are_named_and_keep_the_escape_hatch() -> None:
+    text = ax.Text(
+        "P&L",
+        text_type="supporting",
+        color="secondary",
+        weight="semibold",
+        max_lines=1,
+        data_attribute="kept",
+    )
+    params = signature(ax.Text).parameters
+
+    assert [
+        name for name in ("text_type", "color", "weight", "max_lines") if name in params
+    ] == [
+        "text_type",
+        "color",
+        "weight",
+        "max_lines",
+    ]
+    assert "data-testid" not in params
+    assert params["props"].kind.name == "VAR_KEYWORD"
+    assert text.props == {
+        "data_attribute": "kept",
+        "type": "supporting",
+        "color": "secondary",
+        "weight": "semibold",
+        "maxLines": 1,
+    }
+
+
+def test_astryx_classes_live_in_named_family_modules() -> None:
+    assert ax.Widget.__module__ == "anylumino.astryx.base"
+    assert ax.Text.__module__ == "anylumino.astryx.inputs"
+    assert ax.Stack.__module__ == "anylumino.astryx.surfaces"
+    assert ax.Table.__module__ == "anylumino.astryx.data"
+
+
+def test_astryx_wrappers_do_not_swallow_shared_widget_arguments() -> None:
+    brand = ax.Brand("desk", **{"color-accent": "#0057b8"})
+    button = ax.Button("Run", color_mode="dark")
+    heading = ax.Heading("Orders", brand=brand)
+    card = ax.ClickableCard(label="Open", isDisabled=True)
+
+    assert button.color_mode == "dark"
+    assert "color_mode" not in button.props
+    assert heading.brand == brand
+    assert "brand" not in heading.props
+    assert card.disabled is True
+
+
+def test_astryx_component_rejects_unknown_names_and_preserves_data_props() -> None:
+    component = ax.Component("List", props={"items": ["one"], "density": "compact"})
+
+    assert component.props == {"items": ["one"], "density": "compact"}
+    with pytest.raises(ValueError, match="unknown Astryx component 'Stak'"):
+        ax.Component("Stak")
+
+
+def test_astryx_open_state_and_action_payloads_are_synchronized() -> None:
+    dialog = ax.Dialog(open=True)
+    actions = []
+    menu = ax.DropdownMenu(
+        [{"label": "Export", "value": "export"}],
+        label="Actions",
+        action_callbacks=[lambda widget, action: actions.append((widget, action))],
+    )
+
+    assert dialog.is_open is True
+    dialog.hide()
+    assert dialog.is_open is False
+    menu._handle_frontend_message(menu, {"type": "open", "is_open": False}, None)
+    assert menu.is_open is False
+    menu._handle_frontend_message(menu, {"type": "click", "value": "export"}, None)
+    assert menu.last_action == "export"
+    assert actions == [(menu, "export")]
 
 
 def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
@@ -760,7 +884,11 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
         ax.NumberInput(value=25, label="Limit", min=0, max=100),
         ax.Slider(value=42, label="Risk", min=0, max=100),
         ax.ToggleButton(value=True, label="Pinned"),
-        ax.Selector([("Latency", "latency"), ("Volume", "volume")], value="latency", label="Metric"),
+        ax.Selector(
+            [("Latency", "latency"), ("Volume", "volume")],
+            value="latency",
+            label="Metric",
+        ),
         ax.MultiSelector(["Bid", "Ask", "Last"], value=["Bid", "Last"], label="Fields"),
         ax.TabList(["Summary", "Orders", "Fills"], value="Summary"),
         ax.SegmentedControl(["Compact", "Detailed"], value="Compact", label="Density"),
@@ -770,19 +898,39 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
         ax.Card({"body": ax.Text("Card body")}),
         ax.AvatarGroup(["Ada", "Grace"], overflow_count=1),
         ax.FormLayout({"symbol": ax.TextInput(value="AAPL", label="Symbol")}),
-        ax.Field(ax.TextInput(value="MSFT", label="Symbol", isLabelHidden=True), label="Field symbol"),
-        ax.InputGroup(ax.NumberInput(value=10, label="Qty", isLabelHidden=True), label="Quantity", suffix="sh"),
+        ax.Field(
+            ax.TextInput(value="MSFT", label="Symbol", label_hidden=True),
+            label="Field symbol",
+        ),
+        ax.InputGroup(
+            ax.NumberInput(value=10, label="Qty", label_hidden=True),
+            label="Quantity",
+            suffix="sh",
+        ),
         ax.Calendar("2026-07-09"),
         ax.FileInput(label="Upload", accept=".csv"),
         ax.StatusDot("Connected", variant="success"),
         ax.ProgressBar(55, label="Progress", variant="success"),
-        ax.EmptyState("No orders", description="The selected account has no open orders."),
+        ax.EmptyState(
+            "No orders", description="The selected account has no open orders."
+        ),
         ax.Banner("Market data connected", status="success"),
         ax.Code("symbol"),
         ax.CodeBlock("print('ready')", language="python"),
         ax.Outline([{"id": "summary", "label": "Summary", "level": 1}]),
-        ax.TreeList([{"id": "src", "label": "src", "isExpanded": True, "children": [{"id": "app", "label": "app.py"}]}]),
-        ax.DropdownMenu(["Refresh", {"label": "Export", "value": "export"}], label="Actions"),
+        ax.TreeList(
+            [
+                {
+                    "id": "src",
+                    "label": "src",
+                    "isExpanded": True,
+                    "children": [{"id": "app", "label": "app.py"}],
+                }
+            ]
+        ),
+        ax.DropdownMenu(
+            ["Refresh", {"label": "Export", "value": "export"}], label="Actions"
+        ),
         ax.MoreMenu(["Edit", "Delete"]),
         ax.Tooltip("Run cell", ax.Button("Run")),
         ax.HoverCard(ax.Text("Preview"), ax.Button("Preview")),
@@ -794,8 +942,12 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
         ax.AlertDialog("Confirm", "Continue?", action_label="Continue"),
     ]
 
-    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(widgets)
-    assert [isinstance(widget, ax.Widget) for widget in widgets] == [True] * len(widgets)
+    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(
+        widgets
+    )
+    assert [isinstance(widget, ax.Widget) for widget in widgets] == [True] * len(
+        widgets
+    )
     assert widgets[1].component_name == "Heading"
     assert widgets[1].props == {"level": 3}
     assert widgets[3].component_name == "TextArea"
@@ -806,8 +958,16 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
     assert widgets[9].props["items"] == ["Summary", "Orders", "Fills"]
     assert widgets[13].props["rows"] == rows
     assert widgets[13].props["columns"] == [
-        {"key": "symbol", "header": "Symbol", "width": {"kind": "proportional", "value": 1}},
-        {"key": "status", "header": "Status", "width": {"kind": "proportional", "value": 1}},
+        {
+            "key": "symbol",
+            "header": "Symbol",
+            "width": {"kind": "proportional", "value": 1},
+        },
+        {
+            "key": "status",
+            "header": "Status",
+            "width": {"kind": "proportional", "value": 1},
+        },
     ]
     assert widgets[14].child_keys == ["body"]
     assert widgets[15].component_name == "AvatarGroup"
@@ -856,7 +1016,9 @@ def test_astryx_theme_applies_reusable_brand_to_child_widgets() -> None:
     assert button.color_mode == "system"
 
 
-def test_astryx_built_theme_applies_precompiled_theme_descriptor_to_child_widgets(tmp_path: Path) -> None:
+def test_astryx_built_theme_applies_precompiled_theme_descriptor_to_child_widgets(
+    tmp_path: Path,
+) -> None:
     css_path = tmp_path / "desk-theme.css"
     css_path.write_text(
         '[data-astryx-theme="desk-built"] { --color-accent: #0057b8; }',
@@ -884,13 +1046,23 @@ def test_astryx_built_theme_applies_precompiled_theme_descriptor_to_child_widget
 
 
 @pytest.mark.parametrize("mode", ["light", "dark", "system"])
-def test_astryx_theme_accepts_supported_modes_for_runtime_and_built_themes(mode: str) -> None:
-    runtime = ax.Theme(brand=ax.Brand("runtime", **{"color-accent": ("#111111", "#eeeeee")}), mode=mode)
+def test_astryx_theme_accepts_supported_modes_for_runtime_and_built_themes(
+    mode: str,
+) -> None:
+    runtime = ax.Theme(
+        brand=ax.Brand("runtime", **{"color-accent": ("#111111", "#eeeeee")}), mode=mode
+    )
     built = ax.Theme(brand=ax.BuiltTheme("neutral"), mode=mode)
 
     assert runtime.color_mode == mode
     assert built.color_mode == mode
-    assert built.brand == {"name": "neutral", "built": True, "tokens": {}, "css": "", "components": {}}
+    assert built.brand == {
+        "name": "neutral",
+        "built": True,
+        "tokens": {},
+        "css": "",
+        "components": {},
+    }
 
 
 def test_astryx_theme_rejects_invalid_theme_modes() -> None:
@@ -898,14 +1070,18 @@ def test_astryx_theme_rejects_invalid_theme_modes() -> None:
         ax.Theme(color_mode="sepia")
 
 
-def test_astryx_typeahead_can_use_python_backed_search(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_astryx_typeahead_can_use_python_backed_search(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     widget = ax.Typeahead(
         ["AAPL", "MSFT"],
         label="Symbol",
         search=lambda query: [{"id": f"{query}-1", "label": query.upper()}],
     )
     sent: list[dict[str, object]] = []
-    monkeypatch.setattr(widget, "send", lambda content, buffers=None: sent.append(content))
+    monkeypatch.setattr(
+        widget, "send", lambda content, buffers=None: sent.append(content)
+    )
 
     widget._handle_frontend_message(
         widget,
@@ -928,16 +1104,23 @@ def test_astryx_tokenizer_static_search_remains_default() -> None:
     widget = ax.Tokenizer(["Bid", "Ask"], value=["Bid"], label="Fields")
 
     assert widget.search_mode == "static"
-    assert widget.props["items"] == [{"id": "Bid", "label": "Bid"}, {"id": "Ask", "label": "Ask"}]
+    assert widget.props["items"] == [
+        {"id": "Bid", "label": "Bid"},
+        {"id": "Ask", "label": "Ask"},
+    ]
 
 
-def test_astryx_command_palette_can_use_python_backed_search(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_astryx_command_palette_can_use_python_backed_search(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     widget = ax.CommandPalette(
         [{"id": "refresh", "label": "Refresh"}],
         search=lambda query: [{"id": f"{query}-cmd", "label": f"Run {query}"}],
     )
     sent: list[dict[str, object]] = []
-    monkeypatch.setattr(widget, "send", lambda content, buffers=None: sent.append(content))
+    monkeypatch.setattr(
+        widget, "send", lambda content, buffers=None: sent.append(content)
+    )
 
     widget._handle_frontend_message(
         widget,
@@ -964,7 +1147,12 @@ def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> Non
         ],
         columns=[
             {"key": "symbol", "header": "Symbol", "sortable": True, "width": 1},
-            {"key": "price", "header": "Price", "align": "end", "width": {"kind": "pixel", "value": 96}},
+            {
+                "key": "price",
+                "header": "Price",
+                "align": "end",
+                "width": {"kind": "pixel", "value": 96},
+            },
             ("Venue", "venue"),
             "status",
         ],
@@ -976,7 +1164,7 @@ def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> Non
         sort_direction="desc",
         density="compact",
         dividers="grid",
-        hasHover=True,
+        hover=True,
         width="720px",
     )
 
@@ -989,18 +1177,46 @@ def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> Non
     assert table.sort_key == "price"
     assert table.sort_direction == "desc"
     assert table.columns == [
-        {"key": "symbol", "header": "Symbol", "sortable": True, "width": {"kind": "proportional", "value": 1}},
-        {"key": "price", "header": "Price", "align": "end", "width": {"kind": "pixel", "value": 96}},
-        {"key": "venue", "header": "Venue", "width": {"kind": "proportional", "value": 1}},
-        {"key": "status", "header": "status", "width": {"kind": "proportional", "value": 1}},
+        {
+            "key": "symbol",
+            "header": "Symbol",
+            "sortable": True,
+            "width": {"kind": "proportional", "value": 1},
+        },
+        {
+            "key": "price",
+            "header": "Price",
+            "align": "end",
+            "width": {"kind": "pixel", "value": 96},
+        },
+        {
+            "key": "venue",
+            "header": "Venue",
+            "width": {"kind": "proportional", "value": 1},
+        },
+        {
+            "key": "status",
+            "header": "status",
+            "width": {"kind": "proportional", "value": 1},
+        },
     ]
     assert table.rows == [
         {"symbol": "AAPL", "price": 195.12, "venue": "XNAS", "status": "Open"},
         {"symbol": "MSFT", "price": 423.85, "venue": "XNAS", "status": "Open"},
     ]
 
-    assert table.append_row({"symbol": "TSLA", "price": 187.42, "venue": "XNAS", "status": "Open"}) == "TSLA"
-    assert table.prepend_row({"symbol": "AMD", "price": 159.55, "venue": "XNAS", "status": "Open"}) == "AMD"
+    assert (
+        table.append_row(
+            {"symbol": "TSLA", "price": 187.42, "venue": "XNAS", "status": "Open"}
+        )
+        == "TSLA"
+    )
+    assert (
+        table.prepend_row(
+            {"symbol": "AMD", "price": 159.55, "venue": "XNAS", "status": "Open"}
+        )
+        == "AMD"
+    )
     table.update_row("MSFT", {"price": 426.11, "status": "Filled"})
     table.remove_row("AAPL")
 
@@ -1009,7 +1225,9 @@ def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> Non
     assert table.rows[1]["price"] == 426.11
     assert table.rows[1]["status"] == "Filled"
     with pytest.raises(ValueError, match="table row already exists: MSFT"):
-        table.append_row({"symbol": "MSFT", "price": 1, "venue": "XNAS", "status": "Duplicate"})
+        table.append_row(
+            {"symbol": "MSFT", "price": 1, "venue": "XNAS", "status": "Duplicate"}
+        )
     with pytest.raises(KeyError, match="table row not found: AAPL"):
         table.remove_row("AAPL")
 
@@ -1033,12 +1251,18 @@ def test_astryx_table_selection_and_sort_callbacks_match_spectrum_table_api() ->
     sort_calls = []
 
     table.on_select(lambda widget: selected_calls.append(widget.selected))
-    table.on_sort(lambda widget: sort_calls.append((widget.sort_key, widget.sort_direction)))
+    table.on_sort(
+        lambda widget: sort_calls.append((widget.sort_key, widget.sort_direction))
+    )
     table.selected = ["AAPL", "MSFT"]
-    table._handle_frontend_message(table, {"type": "selection", "selected": table.selected}, None)
+    table._handle_frontend_message(
+        table, {"type": "selection", "selected": table.selected}, None
+    )
     table.sort_key = "price"
     table.sort_direction = "asc"
-    table._handle_frontend_message(table, {"type": "sort", "sort_key": "price", "sort_direction": "asc"}, None)
+    table._handle_frontend_message(
+        table, {"type": "sort", "sort_key": "price", "sort_direction": "asc"}, None
+    )
 
     assert selected_calls == [["AAPL", "MSFT"]]
     assert sort_calls == [("price", "asc")]
@@ -1049,8 +1273,16 @@ def test_astryx_table_accepts_sequence_rows_without_columns() -> None:
 
     assert table.row_key == "__row_id"
     assert table.columns == [
-        {"key": "column_1", "header": "column_1", "width": {"kind": "proportional", "value": 1}},
-        {"key": "column_2", "header": "column_2", "width": {"kind": "proportional", "value": 1}},
+        {
+            "key": "column_1",
+            "header": "column_1",
+            "width": {"kind": "proportional", "value": 1},
+        },
+        {
+            "key": "column_2",
+            "header": "column_2",
+            "width": {"kind": "proportional", "value": 1},
+        },
     ]
     assert table.rows == [
         {"column_1": "Budget", "column_2": "PDF", "__row_id": "0"},
@@ -1062,7 +1294,9 @@ def test_astryx_table_accepts_sequence_rows_without_columns() -> None:
 def test_astryx_widget_children_are_keyed_and_composable() -> None:
     button = ax.Button("Run")
     symbol = ax.TextInput(value="AAPL", label="Symbol")
-    stack = ax.Stack({"button": button, "symbol": symbol}, direction="horizontal", gap=2)
+    stack = ax.Stack(
+        {"button": button, "symbol": symbol}, direction="horizontal", gap=2
+    )
 
     assert stack.component_name == "Stack"
     assert stack.child_keys == ["button", "symbol"]

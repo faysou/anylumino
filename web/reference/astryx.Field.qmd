@@ -9,6 +9,11 @@ astryx.Field(
     description='',
     status=None,
     disabled=False,
+    label_hidden=None,
+    optional=None,
+    required=None,
+    status_variant=None,
+    width=None,
     **props,
 )
 ```
@@ -17,15 +22,20 @@ Wrap a custom control with an Astryx field label.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name        | Type                        | Description                                                                        | Default    |
-|-------------|-----------------------------|------------------------------------------------------------------------------------|------------|
-| children    | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.            | `None`     |
-| label       | str                         | Visible or accessible label for the component.                                     | _required_ |
-| input_id    | str                         | ID associated with the wrapped input element.                                      | `''`       |
-| description | str                         | Supporting description text.                                                       | `''`       |
-| status      | Mapping\[str, Any\] \| None | Validation or status record displayed by Astryx.                                   | `None`     |
-| disabled    | bool                        | Whether the component should render disabled.                                      | `False`    |
-| **props     | Any                         | JSON-safe Field props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
+| Name           | Type                        | Description                                                                        | Default    |
+|----------------|-----------------------------|------------------------------------------------------------------------------------|------------|
+| children       | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.            | `None`     |
+| label          | str                         | Visible or accessible label for the component.                                     | _required_ |
+| input_id       | str                         | ID associated with the wrapped input element.                                      | `''`       |
+| description    | str                         | Supporting description text.                                                       | `''`       |
+| status         | Mapping\[str, Any\] \| None | Validation or status record displayed by Astryx.                                   | `None`     |
+| disabled       | bool                        | Whether the component should render disabled.                                      | `False`    |
+| label_hidden   | bool \| None                | Whether to visually hide the accessible label.                                     | `None`     |
+| optional       | bool \| None                | Whether to mark the field optional.                                                | `None`     |
+| required       | bool \| None                | Whether to mark the field required.                                                | `None`     |
+| status_variant | str \| None                 | Attached or detached status presentation.                                          | `None`     |
+| width          | int \| float \| str \| None | Width of the complete field.                                                       | `None`     |
+| **props        | Any                         | JSON-safe Field props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`       |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

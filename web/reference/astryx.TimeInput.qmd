@@ -1,18 +1,41 @@
 # astryx.TimeInput { #anylumino.astryx.TimeInput }
 
 ```python
-astryx.TimeInput(value=None, *, label='', **props)
+astryx.TimeInput(
+    value=None,
+    *,
+    label='',
+    disabled=False,
+    min=None,
+    max=None,
+    seconds=None,
+    clear=None,
+    hour_format=None,
+    increment=None,
+    placeholder=None,
+    size=None,
+    **props,
+)
 ```
 
 Render an Astryx time input.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name    | Type        | Description                                                                            | Default   |
-|---------|-------------|----------------------------------------------------------------------------------------|-----------|
-| value   | str \| None | Synchronized component value.                                                          | `None`    |
-| label   | str         | Visible or accessible label for the component.                                         | `''`      |
-| **props | Any         | JSON-safe TimeInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
+| Name        | Type         | Description                                                                            | Default   |
+|-------------|--------------|----------------------------------------------------------------------------------------|-----------|
+| value       | str \| None  | Synchronized component value.                                                          | `None`    |
+| label       | str          | Visible or accessible label for the component.                                         | `''`      |
+| disabled    | bool         | Whether the input is disabled.                                                         | `False`   |
+| min         | str \| None  | Minimum ISO time.                                                                      | `None`    |
+| max         | str \| None  | Maximum ISO time.                                                                      | `None`    |
+| seconds     | bool \| None | Whether to include seconds.                                                            | `None`    |
+| clear       | bool \| None | Whether to show a clear button.                                                        | `None`    |
+| hour_format | str \| None  | Twelve- or twenty-four-hour display format.                                            | `None`    |
+| increment   | int \| None  | Arrow-key minute increment.                                                            | `None`    |
+| placeholder | str \| None  | Placeholder text.                                                                      | `None`    |
+| size        | str \| None  | Input size.                                                                            | `None`    |
+| **props     | Any          | JSON-safe TimeInput props forwarded to Astryx. See the ``Astryx Props`` section below. | `{}`      |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 
