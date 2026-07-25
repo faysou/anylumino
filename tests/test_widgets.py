@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from inspect import signature
 from pathlib import Path
@@ -1605,3 +1606,84 @@ def test_astryx_continuous_update_defers_input_values() -> None:
     assert deferred.continuous_update is False
     assert slider.continuous_update is False
     assert "continuous_update" not in deferred.props
+
+
+def test_every_frontend_message_type_has_a_python_handler() -> None:
+    """Guard the cross-language message contract.
+
+    A frontend ``model.send`` with no matching Python branch is traffic nobody
+    reads, sent once per keystroke for input components. Adding a message type
+    means wiring a handler and naming it here.
+    """
+    handled = {
+        "activate",  # _ActionWidget._handle_frontend_event
+        "click",  # ComponentWidget and ControlWidget
+        "close",  # ComponentWidget._handle_frontend_message
+        "move",  # LayoutWidget._handle_frontend_message
+        "open",  # ComponentWidget._handle_frontend_message
+        "search",  # astryx Widget._handle_frontend_message
+        "selection",  # astryx and spectrum Table
+        "sort",  # astryx and spectrum Table
+    }
+    static_dir = Path(static_asset("astryx/astryx_widget.js")).parent.parent
+    sources = [
+        path
+        for path in static_dir.rglob("*")
+        if path.suffix in {".js", ".mjs"} and not path.name.endswith(".bundle.js")
+    ]
+    assert sources, "no frontend sources found"
+
+    sent = set()
+    for path in sources:
+        text = path.read_text(encoding="utf-8")
+        sent.update(re.findall(r"""\.send\(\{\s*type:\s*["'](\w[\w-]*)["']""", text))
+        sent.update(re.findall(r"""message\.type\s*=\s*["'](\w[\w-]*)["']""", text))
+
+    assert sent, "no frontend message types found"
+    assert sent <= handled, f"unhandled frontend message types: {sorted(sent - handled)}"
+
+
+def test_astryx_log_slider_drives_the_slider_in_exponent_space() -> None:
+    slider = ax.LogSlider(100, label="Learning rate", base=10, min_exponent=-4, max_exponent=2)
+
+    assert slider.component_name == "LogSlider"
+    assert slider.value == 100
+    assert slider.props == {
+        "base": 10,
+        "minExponent": -4,
+        "maxExponent": 2,
+        "step": 0.1,
+    }
+
+
+def test_astryx_selection_slider_normalizes_every_option_shape() -> None:
+    scalars = ax.SelectionSlider(["XS", "S", "M"], label="Size", marks=True)
+    pairs = ax.SelectionSlider([("Small", "s"), ("Large", "l")], label="Size")
+    mapping = ax.SelectionSlider({"Low": 1, "High": 9}, label="Level")
+    chosen = ax.SelectionSlider(["s", "m", "l"], value="m", label="Size")
+    ranged = ax.SelectionSlider(["s", "m", "l"], value=["s", "l"], label="Range")
+
+    assert scalars.component_name == "SelectionSlider"
+    assert scalars.value == "XS"
+    assert scalars.props["options"] == ["XS", "S", "M"]
+    assert scalars.props["marks"] is True
+    assert pairs.value == "s"
+    assert pairs.props["options"] == [
+        {"label": "Small", "value": "s"},
+        {"label": "Large", "value": "l"},
+    ]
+    assert mapping.value == "1"
+    assert chosen.value == "m"
+    assert ranged.value == ["s", "l"]
+    assert "marks" not in chosen.props
+
+
+def test_astryx_option_sliders_accept_shared_widget_arguments() -> None:
+    log = ax.LogSlider(10, label="Rate", continuous_update=False, width="240px")
+    selection = ax.SelectionSlider(["a", "b"], label="Pick", disabled=True)
+
+    assert log.continuous_update is False
+    assert log.width == "240px"
+    assert "continuous_update" not in log.props
+    assert selection.disabled is True
+    assert selection.continuous_update is True

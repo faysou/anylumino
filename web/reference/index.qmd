@@ -83,6 +83,8 @@ Form composition and direct value-entry controls.
 | [TextArea](TextArea.qmd#anylumino.astryx.TextArea) | Render a multiline Astryx text area. |
 | [NumberInput](NumberInput.qmd#anylumino.astryx.NumberInput) | Render an Astryx numeric input. |
 | [Slider](Slider.qmd#anylumino.astryx.Slider) | Render an Astryx slider control. |
+| [LogSlider](LogSlider.qmd#anylumino.astryx.LogSlider) | Render an Astryx slider on a logarithmic scale. |
+| [SelectionSlider](SelectionSlider.qmd#anylumino.astryx.SelectionSlider) | Render an Astryx slider that steps through discrete options. |
 | [Checkbox](Checkbox.qmd#anylumino.astryx.Checkbox) | Render an Astryx checkbox input. |
 | [Switch](Switch.qmd#anylumino.astryx.Switch) | Render an Astryx switch for binary settings. |
 | [ToggleButton](ToggleButton.qmd#anylumino.astryx.ToggleButton) | Render a two-state Astryx toggle button. |

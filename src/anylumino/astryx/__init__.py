@@ -28,8 +28,10 @@ from .inputs import DateRangeInput
 from .inputs import DateTimeInput
 from .inputs import Heading
 from .inputs import IconButton
+from .inputs import LogSlider
 from .inputs import MultiSelector
 from .inputs import NumberInput
+from .inputs import SelectionSlider
 from .inputs import Selector
 from .inputs import Slider
 from .inputs import Switch
@@ -132,6 +134,7 @@ __all__ = [
     "Markdown",
     "MetadataList",
     "MoreMenu",
+    "LogSlider",
     "MultiSelector",
     "NumberInput",
     "Outline",
@@ -142,6 +145,7 @@ __all__ = [
     "Section",
     "SegmentedControl",
     "SelectableCard",
+    "SelectionSlider",
     "Selector",
     "Skeleton",
     "Slider",

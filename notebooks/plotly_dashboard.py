@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.3
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -28,26 +28,21 @@ import math
 import pandas as pd
 import plotly.graph_objects as go
 
+import anylumino.astryx as ax
+
 from anylumino import (
     AccordionPanel,
-    Badge,
     BoxPanel,
-    Button,
-    Checkbox,
     CommandPalette,
     DockPanel,
-    Dropdown,
     GridPanel,
     HBox,
-    IntSlider,
-    Meter,
     MenuBar,
     ResponsivePanel,
     ScrollBox,
     SplitPanel,
     StackedPanel,
     TabPanel,
-    TextInput,
     TextWidget,
     Toolbar,
     VBox,
@@ -81,8 +76,8 @@ help_text = TextWidget(
 metric_dataset = TextWidget("Dataset: greenhouse")
 metric_rows = TextWidget(f"Samples: {len(data)}")
 metric_action = TextWidget("Last action: none")
-state_badge = Badge(value="Ready", variant="positive", icon="InfoCircle")
-completion_meter = Meter(value=75, description="Review coverage", variant="informative", readout=True)
+state_badge = ax.Badge("Ready", variant="info")
+completion_meter = ax.ProgressBar(75, label="Review coverage", variant="accent", value_label=True)
 notes = TextWidget("Dock panel: command palette and notes can sit beside the main dashboard.")
 accordion_status = TextWidget("Accordion demo status section.")
 accordion_metrics = TextWidget("Accordion demo metrics section.")
@@ -93,12 +88,12 @@ layout_lab_primary = TextWidget("BoxPanel stretch 2")
 layout_lab_secondary = TextWidget("BoxPanel stretch 1")
 layout_lab_wide = TextWidget("Responsive wide pane")
 layout_lab_narrow = TextWidget("Responsive narrow pane")
-dataset_input = TextInput(value="greenhouse", description="Dataset")
-samples_input = IntSlider(value=180, min=60, max=len(data), step=20, description="Samples")
-metric_input = Dropdown(options=["temperature", "humidity", "co2"], value="temperature", description="Metric")
-theme_input = Dropdown(options=["light", "dark"], value="light", description="Theme")
-auto_focus_input = Checkbox(value=True, description="Auto focus")
-apply_inputs_button = Button(description="Apply inputs", variant="accent", icon="CheckmarkCircle")
+dataset_input = ax.TextInput(value="greenhouse", label="Dataset")
+samples_input = ax.Slider(180, min=60, max=len(data), step=20, label="Samples", value_display="text")
+metric_input = ax.Selector(["temperature", "humidity", "co2"], value="temperature", label="Metric")
+theme_input = ax.Selector(["light", "dark"], value="light", label="Theme")
+auto_focus_input = ax.Checkbox(True, label="Auto focus")
+apply_inputs_button = ax.Button("Apply inputs", variant="primary")
 
 figures: dict[str, go.FigureWidget] = {}
 figure_count = 0
@@ -119,7 +114,7 @@ def active_figure() -> go.FigureWidget:
 def log(message: str) -> None:
     status.value = message
     metric_action.value = f"Last action: {message}"
-    state_badge.value = "Updated"
+    state_badge.label = "Updated"
 
 
 def template_for_theme(theme: str) -> str:
@@ -498,5 +493,7 @@ dashboard = VBox(
 )
 
 dashboard
+
+# %%
 
 # %%

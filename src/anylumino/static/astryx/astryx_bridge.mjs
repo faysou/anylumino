@@ -93,3 +93,22 @@ export function observeJupyterLabTheme(onChange, documentRef = globalThis.docume
   observer.observe(body, { attributeFilter: [JUPYTERLAB_LIGHT_ATTRIBUTE] });
   return () => observer.disconnect();
 }
+
+
+/**
+ * Astryx `Slider` works in linear steps, so a logarithmic control drives it in
+ * exponent space and reports `base ** exponent` as its value.
+ */
+export function logExponent(value, base, minExponent, maxExponent) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric <= 0) {
+    return minExponent;
+  }
+  const exponent = Math.log(numeric) / Math.log(base);
+  return Math.min(maxExponent, Math.max(minExponent, exponent));
+}
+
+export function logValue(exponent, base) {
+  return base ** Number(exponent);
+}
+

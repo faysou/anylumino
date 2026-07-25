@@ -22,41 +22,28 @@
 # %%
 from __future__ import annotations
 
-from anylumino import (
-    Badge,
-    Button,
-    Checkbox,
-    Divider,
-    Dropdown,
-    HBox,
-    Link,
-    Meter,
-    SearchInput,
-    StatusLight,
-    Switch,
-    TextInput,
-    TextWidget,
-    ToggleButton,
-    ToggleButtons,
-    VBox,
-)
+import anylumino.spectrum as sx
+
+from anylumino import HBox
+from anylumino import TextWidget
+from anylumino import VBox
 
 
-status = StatusLight(value=True, description="Ready", variant="positive")
-badge = Badge(value="Idle", variant="informative", icon="InfoCircle")
-meter = Meter(value=35, description="Progress", variant="informative", readout=True)
+status = sx.StatusLight(value=True, description="Ready", variant="positive")
+badge = sx.Badge(value="Idle", variant="informative", icon="InfoCircle")
+meter = sx.Meter(value=35, description="Progress", variant="informative", readout=True)
 log = TextWidget("Use the controls to update this panel.")
 
 
-search = SearchInput(value="iris", description="Search", placeholder="Search records")
-dataset = Dropdown(
+search = sx.SearchInput(value="iris", description="Search", placeholder="Search records")
+dataset = sx.Dropdown(
     options=["Iris", "Daisy", "Lupine"],
     value="Iris",
     description="Dataset",
 )
-enabled = Switch(value=True, description="Live updates")
-pinned = Checkbox(value=False, description="Pinned")
-view_mode = ToggleButtons(
+enabled = sx.Switch(value=True, description="Live updates")
+pinned = sx.Checkbox(value=False, description="Pinned")
+view_mode = sx.ToggleButtons(
     options=["Compact", "Standard", "Detailed"],
     value="Standard",
     description="View",
@@ -87,26 +74,26 @@ def reset_filters(_button: Button) -> None:
     set_state("Reset", "positive")
 
 
-apply_button = Button(
+apply_button = sx.Button(
     description="Apply",
     icon="CheckmarkCircle",
     variant="accent",
     callbacks=[apply_filters],
 )
-reset_button = Button(
+reset_button = sx.Button(
     description="Reset",
     icon="RotateRight",
     variant="secondary",
     quiet=True,
     callbacks=[reset_filters],
 )
-favorite_button = ToggleButton(
+favorite_button = sx.ToggleButton(
     value=False,
     description="Favorite",
     icon="Star",
     variant="secondary",
 )
-docs_link = Link(
+docs_link = sx.Link(
     "https://opensource.adobe.com/spectrum-web-components/",
     description="Spectrum docs",
 )
@@ -145,7 +132,7 @@ form = VBox(
             fit_content=True,
         ),
         "view-mode": view_mode,
-        "divider": Divider(),
+        "divider": sx.Divider(),
         "actions": HBox(
             {
                 "apply": apply_button,

@@ -974,6 +974,136 @@ class Slider(Widget):
         )
 
 
+class LogSlider(Widget):
+    """Render an Astryx slider on a logarithmic scale.
+
+    Astryx ``Slider`` steps linearly, so this wrapper drives it in exponent
+    space and synchronizes ``base ** exponent`` as the value. Everything else,
+    including ``continuous_update``, behaves like :class:`Slider`.
+
+    Parameters
+    ----------
+    value : int | float, default 1
+        Synchronized component value on the real scale, not the exponent.
+    label : str, default ''
+        Visible or accessible label for the component.
+    base : int | float, default 10
+        Logarithm base.
+    min_exponent : int | float, default 0
+        Smallest exponent the slider can reach.
+    max_exponent : int | float, default 4
+        Largest exponent the slider can reach.
+    step : int | float, default 0.1
+        Exponent step between slider positions.
+    disabled : bool, default False
+        Whether the component should render disabled.
+    value_display : str | None, default None
+        Tooltip, text, or hidden value presentation.
+    description : str | None, default None
+        Helper text displayed with the input.
+    **props : Any
+        JSON-safe Slider props forwarded to Astryx.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Slider>.
+    """
+
+    def __init__(
+        self,
+        value: int | float = 1,
+        *,
+        label: str = "",
+        base: int | float = 10,
+        min_exponent: int | float = 0,
+        max_exponent: int | float = 4,
+        step: int | float = 0.1,
+        disabled: bool = False,
+        value_display: str | None = None,
+        description: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "LogSlider",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                base=base,
+                minExponent=min_exponent,
+                maxExponent=max_exponent,
+                step=step,
+                valueDisplay=value_display,
+                description=description,
+            ),
+        )
+
+
+class SelectionSlider(Widget):
+    """Render an Astryx slider that steps through discrete options.
+
+    Astryx ``Slider`` works on a linear numeric scale, so this wrapper drives it
+    over option indices and synchronizes the selected option value. Pass a
+    two-item ``value`` to select a range instead of a single option.
+
+    Parameters
+    ----------
+    options : Iterable[Any] | Mapping[str, Any]
+        Option labels, ``(label, value)`` pairs, or a label to value mapping.
+    value : Any, default None
+        Selected option value, or a two-item sequence for a range. Defaults to
+        the first option.
+    label : str, default ''
+        Visible or accessible label for the component.
+    marks : bool, default False
+        Whether to draw a labelled tick for every option.
+    disabled : bool, default False
+        Whether the component should render disabled.
+    value_display : str | None, default None
+        Tooltip, text, or hidden value presentation.
+    description : str | None, default None
+        Helper text displayed with the input.
+    **props : Any
+        JSON-safe Slider props forwarded to Astryx.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Slider>.
+    """
+
+    def __init__(
+        self,
+        options: Iterable[Any] | Mapping[str, Any],
+        value: Any = None,
+        *,
+        label: str = "",
+        marks: bool = False,
+        disabled: bool = False,
+        value_display: str | None = None,
+        description: str | None = None,
+        **props: Any,
+    ) -> None:
+        records = _option_records(options)
+        if value is None and records:
+            first = records[0]
+            # Scalar options stay scalars, matching the frontend option helpers.
+            value = (
+                first.get("value", first.get("label"))
+                if isinstance(first, Mapping)
+                else first
+            )
+        super().__init__(
+            "SelectionSlider",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                options=records,
+                marks=marks or None,
+                valueDisplay=value_display,
+                description=description,
+            ),
+        )
+
+
 class Checkbox(Widget):
     """Render an Astryx checkbox input.
 

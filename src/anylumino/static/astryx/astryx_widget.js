@@ -91,6 +91,7 @@ import { Typeahead, createStaticSource } from "@astryxdesign/core/Typeahead";
 import { Theme, defineTheme, generateThemeCSS } from "@astryxdesign/core/theme";
 import { neutralTheme } from "@astryxdesign/theme-neutral/built";
 import {
+  clampIndex,
   combineSignals,
   cssSize,
   removeModelListener,
@@ -98,6 +99,8 @@ import {
 } from "../layout/composition.js";
 import {
   childSignature,
+  logExponent,
+  logValue,
   modelProps,
   observeJupyterLabTheme,
   registeredComponent,
@@ -223,6 +226,8 @@ const PROP_DRIVEN_COMPONENTS = new Set([
   "ProgressBar",
   "SelectableCard",
   "Selector",
+  "LogSlider",
+  "SelectionSlider",
   "Skeleton",
   "Slider",
   "Spinner",
@@ -677,7 +682,11 @@ function componentProps(model, draft, elementId) {
     ? ["items", "tabs", "segments", "metadata"]
     : ["Typeahead", "Tokenizer", "CommandPalette"].includes(name)
       ? ["items"]
-      : [];
+      : name === "SelectionSlider"
+        ? ["options", "marks"]
+        : name === "LogSlider"
+          ? ["base", "minExponent", "maxExponent"]
+          : [];
   const props = modelProps(model, reserved);
   const label = String(model.get("label") || props.label || textFor(model));
   const variant = String(model.get("variant") || props.variant || "");
@@ -783,6 +792,65 @@ function componentProps(model, draft, elementId) {
       onChangeEnd: (nextValue) => {
         draft.clear();
         setModelValue(model, nextValue);
+      },
+    };
+  }
+
+  // Astryx `Slider` only steps linearly, so a logarithmic control drives it in
+  // exponent space and reports `base ** exponent`.
+  if (name === "LogSlider") {
+    const raw = rawProps(model);
+    const base = Number(raw.base ?? 10);
+    const minExponent = Number(raw.minExponent ?? 0);
+    const maxExponent = Number(raw.maxExponent ?? 4);
+    const commit = (exponent) => setModelValue(model, logValue(exponent, base));
+    return {
+      ...props,
+      label: label || "Slider",
+      min: minExponent,
+      max: maxExponent,
+      value: logExponent(editedValue, base, minExponent, maxExponent),
+      isDisabled: disabled,
+      formatValue: (exponent) => String(Number(logValue(exponent, base).toPrecision(6))),
+      onChange: (exponent) => (isContinuous ? commit(exponent) : draft.set(logValue(exponent, base))),
+      onChangeEnd: (exponent) => {
+        draft.clear();
+        commit(exponent);
+      },
+    };
+  }
+
+  // Discrete option sliders drive the same linear slider over option indices and
+  // report the option value, single or range depending on the value shape.
+  if (name === "SelectionSlider") {
+    const raw = rawProps(model);
+    const options = asArray(raw.options);
+    const labels = options.map((item, index) => itemLabel(item, `Option ${index + 1}`));
+    const values = options.map((item, index) => itemValue(item, index));
+    // The draft holds option values, matching the trait, so a deferred drag reads
+    // back in the same units the slider reports.
+    const selected = (index) => values[clampIndex(index, values.length)];
+    const asOptions = (next) => (Array.isArray(next) ? next.map(selected) : selected(next));
+    const indexOf = (candidate) => Math.max(0, values.indexOf(String(candidate)));
+    const isRange = Array.isArray(editedValue);
+    const commit = (next) =>
+      Array.isArray(next) ? setArrayValue(model, asOptions(next)) : setModelValue(model, asOptions(next));
+    return {
+      ...props,
+      label: label || "Slider",
+      min: 0,
+      max: Math.max(0, values.length - 1),
+      step: 1,
+      marks: raw.marks ? labels.map((text, index) => ({ value: index, label: text })) : undefined,
+      value: isRange
+        ? [indexOf(editedValue[0]), indexOf(editedValue[1] ?? editedValue[0])]
+        : indexOf(editedValue),
+      isDisabled: disabled || values.length === 0,
+      formatValue: (index) => labels[clampIndex(index, labels.length)] ?? "",
+      onChange: (next) => (isContinuous ? commit(next) : draft.set(asOptions(next))),
+      onChangeEnd: (next) => {
+        draft.clear();
+        commit(next);
       },
     };
   }
@@ -903,7 +971,6 @@ function componentProps(model, draft, elementId) {
       searchSource: searchSourceFor(model, items),
       isDisabled: disabled,
       onChange: (item) => setItemValue(model, item),
-      onChangeQuery: (query) => model.send({ type: "query", query }),
       onOpenChange: (isOpen) => setModelOpen(model, isOpen),
     };
   }
@@ -917,7 +984,6 @@ function componentProps(model, draft, elementId) {
       searchSource: searchSourceFor(model, items),
       isDisabled: disabled,
       onChange: (nextItems) => setItemArrayValue(model, nextItems),
-      onChangeQuery: (query) => model.send({ type: "query", query }),
     };
   }
 
@@ -1263,6 +1329,9 @@ function componentProps(model, draft, elementId) {
 function componentFor(name, props) {
   if (name === "Stack") {
     return String(props.direction || "vertical") === "horizontal" ? HStack : VStack;
+  }
+  if (name === "LogSlider" || name === "SelectionSlider") {
+    return Slider;
   }
   return registeredComponent(COMPONENTS, name);
 }

@@ -125,6 +125,8 @@ quartodoc:
         - TextArea
         - NumberInput
         - Slider
+        - LogSlider
+        - SelectionSlider
         - Checkbox
         - Switch
         - ToggleButton

@@ -3,6 +3,8 @@ import test from "node:test";
 
 import {
   childSignature,
+  logExponent,
+  logValue,
   modelProps,
   registeredComponent,
   resolveColorMode,
@@ -122,4 +124,19 @@ test("resolveColorMode maps the JupyterLab theme attribute onto Astryx modes", (
   assert.equal(resolveColorMode("jupyterlab", withLight("false")), "dark");
   assert.equal(resolveColorMode("jupyterlab", withLight(null)), "system");
   assert.equal(resolveColorMode("jupyterlab", undefined), "system");
+});
+
+
+test("logExponent and logValue round-trip a logarithmic slider position", () => {
+  // Astryx Slider steps linearly, so the control lives in exponent space.
+  assert.equal(logValue(logExponent(100, 10, 0, 4), 10), 100);
+  assert.equal(logValue(logExponent(8, 2, 0, 10), 2), 8);
+  assert.equal(logExponent(1, 10, 0, 4), 0);
+
+  // Out-of-range and non-positive values clamp instead of producing NaN or -Infinity.
+  assert.equal(logExponent(0, 10, -2, 4), -2);
+  assert.equal(logExponent(-5, 10, -2, 4), -2);
+  assert.equal(logExponent("nonsense", 10, -2, 4), -2);
+  assert.equal(logExponent(1e9, 10, 0, 4), 4);
+  assert.equal(logExponent(1e-9, 10, 0, 4), 0);
 });

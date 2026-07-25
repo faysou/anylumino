@@ -61,6 +61,7 @@ _ASTRYX_COMPONENT_NAMES = {
     "Link",
     "List",
     "Lightbox",
+    "LogSlider",
     "Markdown",
     "MetadataList",
     "MoreMenu",
@@ -75,6 +76,7 @@ _ASTRYX_COMPONENT_NAMES = {
     "Section",
     "SegmentedControl",
     "SelectableCard",
+    "SelectionSlider",
     "Selector",
     "Skeleton",
     "Slider",
@@ -343,7 +345,13 @@ class Widget(ComponentWidget):
         while the user edits. When ``False`` the value syncs on blur, on Enter,
         and at the end of a slider drag.
     search : Callable[[str], Iterable[Any]] | None, default None
-        Optional Python-backed search callback.
+        Optional Python-backed search callback for ``Typeahead``, ``Tokenizer``,
+        and ``CommandPalette``. It receives the typed query and returns the
+        matching items, and is the only path by which the query reaches Python.
+        Astryx debounces the call by its ``debounceMs`` prop, 150ms by default;
+        pass ``debounceMs=0`` for a local source that needs no debouncing.
+        Without a callback the component filters its own items in the browser
+        and nothing is sent per keystroke.
     callbacks : Iterable[Callable[[ComponentWidget], None]] | None, default None
         Python activation callbacks.
     action_callbacks : Iterable[Callable[[ComponentWidget, Any], None]] | None, default None

@@ -213,6 +213,17 @@ notes = ax.TextArea(value="", label="Notes", continuous_update=False)
 risk = ax.Slider(value=42, label="Risk budget", continuous_update=False)
 ```
 
+Astryx `Slider` steps linearly, so two wrappers adapt it for scales it does not
+model directly. `LogSlider` drives it in exponent space and reports
+`base ** exponent`; `SelectionSlider` drives it over option indices and reports
+the option, taking a two-item value for a range.
+
+```python
+rate = ax.LogSlider(1e-3, label="Learning rate", base=10, min_exponent=-4, max_exponent=0)
+size = ax.SelectionSlider(["XS", "S", "M", "L"], value="M", label="Size", marks=True)
+window = ax.SelectionSlider(["Mon", "Tue", "Wed", "Thu", "Fri"], value=["Tue", "Thu"], label="Window")
+```
+
 To mirror one widget's state onto another, prefer `traitlets.link` over a
 callback:
 

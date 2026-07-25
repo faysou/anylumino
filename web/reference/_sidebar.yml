@@ -60,6 +60,8 @@ website:
       - reference/TextArea.qmd
       - reference/NumberInput.qmd
       - reference/Slider.qmd
+      - reference/LogSlider.qmd
+      - reference/SelectionSlider.qmd
       - reference/Checkbox.qmd
       - reference/Switch.qmd
       - reference/ToggleButton.qmd

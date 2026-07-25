@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.3
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -24,13 +24,12 @@
 # %%
 from __future__ import annotations
 
-import anylumino.spectrum as sx
+import anylumino.astryx as ax
 import pandas as pd
 from itables.widget import ITable
 
 from anylumino import SplitPanel
 from anylumino import TabPanel
-from anylumino import TextWidget
 from anylumino import Toolbar
 from anylumino import VBox
 
@@ -52,9 +51,9 @@ def mean_height(df: pd.DataFrame) -> float:
 
 def make_summary(df: pd.DataFrame) -> str:
     return (
-        f"Rows: {len(df)}\n"
-        f"Total count: {int(df['count'].sum())}\n"
-        f"Mean height: {mean_height(df):.1f} cm"
+        f"- Rows: {len(df)}\n"
+        f"- Total count: {int(df['count'].sum())}\n"
+        f"- Mean height: {mean_height(df):.1f} cm"
     )
 
 
@@ -64,14 +63,14 @@ state = {
     "next_sample_id": 4,
 }
 
-site_input = sx.TextInput(value="East bed", description="Site")
-species_input = sx.Dropdown(options=["Iris", "Daisy", "Lupine"], value="Iris", description="Species")
-count_input = sx.IntSlider(value=10, min=1, max=50, step=1, description="Count")
-height_input = sx.IntSlider(value=30, min=5, max=80, step=1, description="Height cm")
-add_button = sx.Button(description="Add row", variant="accent", icon="AddContent")
-reset_button = sx.Button(description="Reset", icon="RotateRight")
-status = TextWidget("Ready. Press Add row to append to the DataFrame and refresh the ITable.")
-summary = TextWidget(make_summary(state["df"]))
+site_input = ax.TextInput(value="East bed", label="Site")
+species_input = ax.Selector(["Iris", "Daisy", "Lupine"], value="Iris", label="Species")
+count_input = ax.Slider(10, min=1, max=50, step=1, label="Count", value_display="text")
+height_input = ax.Slider(30, min=5, max=80, step=1, label="Height cm", value_display="text")
+add_button = ax.Button("Add row", variant="primary")
+reset_button = ax.Button("Reset")
+status = ax.Text("Ready. Press Add row to append to the DataFrame and refresh the ITable.")
+summary = ax.Markdown(make_summary(state["df"]))
 
 table = ITable(
     state["df"],
@@ -91,7 +90,7 @@ def refresh_table(selected_row: int | None = None) -> None:
         caption=f"Plant samples ({len(state['df'])} rows)",
         selected_rows=selected_rows,
     )
-    summary.value = make_summary(state["df"])
+    summary.text = make_summary(state["df"])
 
 
 def append_sample(_event: object | None = None) -> None:
@@ -106,14 +105,14 @@ def append_sample(_event: object | None = None) -> None:
     state["df"] = pd.concat([state["df"], pd.DataFrame([row])], ignore_index=True)
     state["next_sample_id"] = sample_id + 1
     refresh_table(selected_row=len(state["df"]) - 1)
-    status.value = f"Added sample {sample_id} to the DataFrame and refreshed the table."
+    status.text = f"Added sample {sample_id} to the DataFrame and refreshed the table."
 
 
 def reset_samples(_event: object | None = None) -> None:
     state["df"] = initial_samples()
     state["next_sample_id"] = 4
     refresh_table(selected_row=len(state["df"]) - 1)
-    status.value = "Reset the DataFrame and refreshed the table."
+    status.text = "Reset the DataFrame and refreshed the table."
 
 
 add_button.on_click(append_sample)
@@ -178,3 +177,5 @@ dashboard
 #
 # That is the part that pushes the updated DataFrame to the already-displayed
 # table widget inside the anylumino tab.
+
+# %%
