@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.3
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -36,12 +36,12 @@ brand = ax.Brand(
     },
 )
 clicks = {"count": 0}
-status = al.TextWidget("astryx status: ready")
+status = ax.Text("astryx status: ready", text_type="supporting", color="secondary")
 
 
 def record_click(_button):
     clicks["count"] += 1
-    status.value = f"astryx status: clicked {clicks['count']}"
+    status.text = f"astryx status: clicked {clicks['count']}"
 
 
 title = ax.Text("Astryx component render check", text_type="large", weight="semibold")
@@ -176,7 +176,7 @@ controls = ax.Grid(
         "mode": mode,
         "streams": streams,
     },
-    columns={"minWidth": 220, "repeat": "fit"},
+    columns={"minWidth": 320, "repeat": "fit"},
     gap=4,
     width="100%",
 )
@@ -263,9 +263,8 @@ view_toggle = ax.ToggleButtonGroup(
     label="View mode",
     size="sm",
 )
-apply_button = ax.Button("Apply", variant="primary", callbacks=[record_click])
 more_button = ax.IconButton(
-    "More actions", icon="moreHorizontal", variant="ghost", callbacks=[record_click]
+    "Refresh view", icon="rotate", variant="ghost", callbacks=[record_click]
 )
 dropdown = ax.DropdownMenu(
     [
@@ -275,7 +274,9 @@ dropdown = ax.DropdownMenu(
     label="Actions",
     callbacks=[record_click],
 )
-more_menu = ax.MoreMenu(["Edit", "Duplicate", "Archive"], callbacks=[record_click])
+more_menu = ax.MoreMenu(
+    ["Edit", "Duplicate", "Archive"], label="Row actions", callbacks=[record_click]
+)
 
 
 data_section = ax.Grid(
@@ -290,7 +291,6 @@ data_section = ax.Grid(
                     {
                         "group": button_group,
                         "view": view_toggle,
-                        "apply": apply_button,
                         "menu": dropdown,
                         "more_menu": more_menu,
                         "more": more_button,
@@ -396,7 +396,15 @@ alert_dialog = ax.AlertDialog(
 )
 preview_image = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='640' height='360' fill='%230057b8'/%3E%3C/svg%3E"
 overlay = ax.Overlay(
-    ax.Thumbnail(label="Market preview", src=preview_image, alt="Blue market preview"),
+    ax.Card(
+        {
+            "preview": ax.Thumbnail(
+                label="Market preview", src=preview_image, alt="Blue market preview"
+            )
+        },
+        padding=2,
+        width=220,
+    ),
     ax.Button("Quick view", variant="ghost"),
     show_on="always",
     position="bottom",
@@ -469,35 +477,50 @@ visuals = ax.Grid(
             },
             padding=3,
         ),
-        "structure": ax.Card(
-            {
-                "form": form_layout,
-                "calendar": calendar,
-                "outline": outline,
-                "tree": tree,
-                "overlays": ax.Stack(
-                    {
-                        "tooltip": tooltip,
-                        "hover": hover,
-                        "popover": popover,
-                        "overlay": overlay,
-                        "open_lightbox": open_lightbox,
-                        "lightbox": lightbox,
-                    },
-                    direction="horizontal",
-                    gap=2,
-                    wrap="wrap",
-                ),
-                "details": details,
-                "palette": palette,
-                "dialog": dialog,
-                "alert": alert_dialog,
-            },
-            padding=3,
-        ),
     },
     columns={"minWidth": 300, "repeat": "fit"},
     gap=3,
+    width="100%",
+)
+
+
+# The structure card is much taller than the visuals cards, so it gets its own
+# full-width row instead of leaving a blank cell beside it.
+structure = ax.Card(
+    {
+        "form": form_layout,
+        "calendar": calendar,
+        "outline": outline,
+        "tree": tree,
+        "overlays": ax.Stack(
+            {
+                "tooltip": tooltip,
+                "hover": hover,
+                "popover": popover,
+                "overlay": overlay,
+                "open_lightbox": open_lightbox,
+                "lightbox": lightbox,
+            },
+            direction="horizontal",
+            gap=2,
+            wrap="wrap",
+        ),
+        "details": details,
+    },
+    padding=3,
+    width="100%",
+)
+
+
+# The palette and dialogs are wider than a responsive grid cell, so they get a
+# full-width section of their own rather than clipping inside one.
+surfaces = ax.Card(
+    {
+        "palette": palette,
+        "dialog": dialog,
+        "alert": alert_dialog,
+    },
+    padding=3,
     width="100%",
 )
 
@@ -510,11 +533,13 @@ app = al.VBox(
                 "controls": controls,
                 "data": data_section,
                 "visuals": visuals,
+                "structure": structure,
+                "surfaces": surfaces,
+                "status": status,
             },
             brand=brand,
             gap=3,
         ),
-        "status": status,
     },
     width="100%",
     height=780,
@@ -558,7 +583,9 @@ assert button_group.props["items"][0]["label"] == "Apply"
 assert view_toggle.value == "grid"
 assert form_layout.component_name == "FormLayout"
 assert wrapped_symbol.component_name == "Field"
+assert wrapped_symbol.get_widget(0).value == "NVDA"
 assert grouped_qty.component_name == "InputGroup"
+assert grouped_qty.get_widget(0).value == 100
 assert calendar.component_name == "Calendar"
 assert dropdown.component_name == "DropdownMenu"
 assert more_menu.component_name == "MoreMenu"
@@ -572,3 +599,17 @@ assert palette.component_name == "CommandPalette"
 assert dialog.component_name == "Dialog"
 assert alert_dialog.component_name == "AlertDialog"
 assert header.brand == brand
+assert status.brand == brand
+assert structure.child_keys == [
+    "form",
+    "calendar",
+    "outline",
+    "tree",
+    "overlays",
+    "details",
+]
+assert surfaces.child_keys == ["palette", "dialog", "alert"]
+
+# %%
+
+# %%

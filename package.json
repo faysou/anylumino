@@ -1,6 +1,7 @@
 {
   "name": "anylumino-frontend",
   "private": true,
+  "type": "module",
   "scripts": {
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs",
     "build": "node scripts/build-frontend.mjs",

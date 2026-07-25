@@ -485,10 +485,15 @@ class Banner(Widget):
 class StatusDot(Widget):
     """Render an inline Astryx status indicator.
 
+    Astryx renders a fixed 8px dot and surfaces ``label`` as ``aria-label``, so
+    the label never appears as visible text. Pair the dot with a ``Text``
+    widget in a horizontal ``Stack`` when the status needs a visible caption.
+
     Parameters
     ----------
     label : str
-        Visible or accessible label for the component.
+        Accessible label describing the status. Screen readers announce it; it
+        is not rendered as visible text.
     variant : str, default 'neutral'
         Astryx visual variant.
     pulsing : bool | None, default None

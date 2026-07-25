@@ -88,7 +88,7 @@ import { Toolbar } from "@astryxdesign/core/Toolbar";
 import { Tooltip } from "@astryxdesign/core/Tooltip";
 import { TreeList } from "@astryxdesign/core/TreeList";
 import { Typeahead, createStaticSource } from "@astryxdesign/core/Typeahead";
-import { Theme, defineTheme } from "@astryxdesign/core/theme";
+import { Theme, defineTheme, generateThemeCSS } from "@astryxdesign/core/theme";
 import { neutralTheme } from "@astryxdesign/theme-neutral/built";
 import {
   combineSignals,
@@ -97,12 +97,16 @@ import {
   renderWidgetRef,
 } from "../layout/composition.js";
 import {
+  childSignature,
   modelProps,
+  observeJupyterLabTheme,
   registeredComponent,
+  resolveColorMode,
   sendModelAction,
   setModelOpen,
   toggleGroupValue,
 } from "./astryx_bridge.mjs";
+import { claimDocumentTheme, claimThemeCSS } from "./astryx_theme.mjs";
 import "./astryx_widget.css";
 
 const COMPONENTS = {
@@ -254,10 +258,13 @@ function textFor(model) {
   return String(model.get("text") || model.get("label") || model.get("value") || "");
 }
 
-function setModelValue(model, value, type = "change") {
+function setModelValue(model, value) {
   model.set("value", value);
   model.save_changes();
-  model.send({ type, value });
+}
+
+function continuousUpdate(model) {
+  return model.get("continuous_update") !== false;
 }
 
 function setBooleanValue(model, value) {
@@ -310,65 +317,7 @@ function rawProps(model) {
   return { ...(model.get("props") ?? {}) };
 }
 
-function hashString(value) {
-  let hash = 5381;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 33) ^ value.charCodeAt(index);
-  }
-  return (hash >>> 0).toString(36);
-}
-
-function useBuiltThemeCSS(themeRecord) {
-  const themeName = String(themeRecord?.name ?? "neutral");
-  const css = typeof themeRecord?.css === "string" ? themeRecord.css.trim() : "";
-  React.useInsertionEffect(() => {
-    if (!css || typeof document === "undefined") {
-      return undefined;
-    }
-    const styleKey = `${themeName}-${hashString(css)}`;
-    const selector = `style[data-anylumino-astryx-built-theme-id="${styleKey}"]`;
-    const matches = [...document.querySelectorAll(selector)];
-    const existing = matches[0];
-    if (existing) {
-      for (const duplicate of matches.slice(1)) {
-        duplicate.remove();
-      }
-      existing.setAttribute(
-        "data-anylumino-astryx-built-theme-count",
-        String(Number(existing.getAttribute("data-anylumino-astryx-built-theme-count") || "0") + 1),
-      );
-      return () => {
-        const count = Number(existing.getAttribute("data-anylumino-astryx-built-theme-count") || "1") - 1;
-        if (count <= 0) {
-          existing.remove();
-        } else {
-          existing.setAttribute("data-anylumino-astryx-built-theme-count", String(count));
-        }
-      };
-    }
-
-    const element = document.createElement("style");
-    element.setAttribute("data-anylumino-astryx-built-theme", themeName);
-    element.setAttribute("data-anylumino-astryx-built-theme-id", styleKey);
-    element.setAttribute("data-anylumino-astryx-built-theme-count", "1");
-    element.textContent = css;
-    document.head.appendChild(element);
-    return () => {
-      if (!element.isConnected) {
-        return;
-      }
-      const count = Number(element.getAttribute("data-anylumino-astryx-built-theme-count") || "1") - 1;
-      if (count <= 0) {
-        element.remove();
-      } else {
-        element.setAttribute("data-anylumino-astryx-built-theme-count", String(count));
-      }
-    };
-  }, [themeName, css]);
-}
-
-function brandTheme(model) {
-  const brand = model.get("brand") ?? {};
+function brandTheme(brand) {
   if (brand.built || brand.__built) {
     return {
       name: String(brand.name ?? "neutral"),
@@ -386,10 +335,74 @@ function brandTheme(model) {
     const tokenName = String(name).startsWith("--") ? String(name) : `--${name}`;
     normalizedTokens[tokenName] = value;
   }
-  return defineTheme({
-    name: String(brand.name ?? "anylumino-brand"),
-    tokens: normalizedTokens,
-  });
+  // Runtime brands are marked built so Astryx skips its own injection: it
+  // dedupes by theme name and drops the shared style tag when the first
+  // injecting widget unmounts, stripping tokens from the widgets that remain.
+  return { ...defineTheme({ name: String(brand.name ?? "anylumino-brand"), tokens: normalizedTokens }), __built: true };
+}
+
+function themeCSS(brand, theme) {
+  if (brand.built || brand.__built) {
+    return typeof brand.css === "string" ? brand.css : "";
+  }
+  if (theme === neutralTheme) {
+    return "";
+  }
+  const { prose, component } = generateThemeCSS(theme);
+  return [prose && `@layer reset {\n${prose}\n}`, component && `@layer astryx-theme {\n${component}\n}`]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function useThemeCSS(themeName, css) {
+  React.useInsertionEffect(() => claimThemeCSS(themeName, css), [themeName, css]);
+}
+
+function useDocumentThemeGuard() {
+  React.useInsertionEffect(() => claimDocumentTheme(), []);
+}
+
+function useColorMode(mode) {
+  const [resolved, setResolved] = React.useState(() => resolveColorMode(mode));
+  React.useEffect(() => {
+    setResolved(resolveColorMode(mode));
+    if (mode !== "jupyterlab") {
+      return undefined;
+    }
+    return observeJupyterLabTheme(setResolved);
+  }, [mode]);
+  return resolved;
+}
+
+/**
+ * Uncommitted editing state for controls whose model updates are deferred by
+ * `continuous_update=False`. The draft keeps the control responsive while
+ * Python only sees the value once the edit ends.
+ */
+function useDraft() {
+  const [draft, setDraft] = React.useState(null);
+  const pending = React.useRef(null);
+  pending.current = draft;
+  return {
+    has: draft !== null,
+    value: draft?.value,
+    set: (next) => {
+      pending.current = { value: next };
+      setDraft(pending.current);
+    },
+    clear: () => {
+      pending.current = null;
+      setDraft(null);
+    },
+    commit: (model) => {
+      const edit = pending.current;
+      pending.current = null;
+      setDraft(null);
+      if (edit !== null) {
+        setModelValue(model, edit.value);
+      }
+    },
+  };
 }
 
 function searchableItems(items) {
@@ -410,6 +423,15 @@ function searchableItems(items) {
 }
 
 let searchRequestCounter = 0;
+
+/**
+ * Distinct id per React root, counted on the global so it stays unique when the
+ * host loads this module more than once, which JupyterLab does per widget.
+ */
+function nextReactRootId() {
+  globalThis.__anyluminoReactRoots = (globalThis.__anyluminoReactRoots ?? 0) + 1;
+  return globalThis.__anyluminoReactRoots;
+}
 
 function requestPythonSearch(model, query) {
   const requestId = `${model.model_id ?? "model"}-${Date.now()}-${++searchRequestCounter}`;
@@ -576,14 +598,7 @@ function slotChildren(model) {
     return null;
   }
   const keys = model.get("child_keys") ?? [];
-  return refs.map((_ref, index) =>
-    React.createElement("div", {
-      className: "anylumino-AstryxChild",
-      "data-anylumino-key": keys[index] ?? "",
-      "data-anylumino-index": String(index),
-      key: `${keys[index] ?? "widget"}-${index}`,
-    }),
-  );
+  return refs.map((_ref, index) => slotChild(model, keys[index] ?? "", index));
 }
 
 function slotChild(model, key, index) {
@@ -593,6 +608,36 @@ function slotChild(model, key, index) {
     "data-anylumino-index": String(index),
     key: `${key ?? "widget"}-${index}`,
   });
+}
+
+/**
+ * Whether a slot belongs to the widget rooted at `rootElement` rather than to
+ * one of its mounted children. Children mount inside a slot, so every slot they
+ * contribute has one of ours between it and the root.
+ */
+function isOwnSlot(slot, rootElement) {
+  for (let node = slot.parentElement; node && node !== rootElement; node = node.parentElement) {
+    if (node.classList.contains("anylumino-AstryxChild")) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * This widget's own slots, keyed by the index they hold. Component DOM order
+ * such as Toolbar start, center, and end need not follow key order, so slots are
+ * matched by index rather than by document position.
+ */
+function ownSlots(model, rootElement) {
+  const slots = new Map();
+  for (const slot of rootElement.querySelectorAll(".anylumino-AstryxChild")) {
+    const index = slot.dataset.anyluminoIndex;
+    if (index !== undefined && !slots.has(index) && isOwnSlot(slot, rootElement)) {
+      slots.set(index, slot);
+    }
+  }
+  return slots;
 }
 
 function keyedSlotChildren(model) {
@@ -614,7 +659,19 @@ function slotByKey(model, key) {
   return slotChild(model, key, index);
 }
 
-function componentProps(model) {
+/**
+ * Wire a deferred-update control: the draft drives the visible value and the
+ * model only learns about it when the edit ends.
+ */
+function draftHandlers(model, draft, { commitOnEnter = false } = {}) {
+  return {
+    onChange: (nextValue) => draft.set(nextValue),
+    onBlur: () => draft.commit(model),
+    ...(commitOnEnter ? { onEnter: () => draft.commit(model) } : {}),
+  };
+}
+
+function componentProps(model, draft, elementId) {
   const name = String(model.get("component_name") || model.get("component_kind") || "Stack");
   const reserved = GENERATED_CHILD_COMPONENTS.has(name)
     ? ["items", "tabs", "segments", "metadata"]
@@ -680,13 +737,17 @@ function componentProps(model) {
     };
   }
 
+  const isContinuous = continuousUpdate(model);
+  const editedValue = isContinuous || !draft.has ? value : draft.value;
+
   if (name === "TextInput") {
     return {
       ...props,
       label: label || "Text input",
-      value: String(value ?? ""),
+      value: String(editedValue ?? ""),
       isDisabled: disabled,
-      onChange: (nextValue) => setModelValue(model, nextValue),
+      onChange: (nextValue) => setStringValue(model, nextValue),
+      ...(isContinuous ? {} : draftHandlers(model, draft, { commitOnEnter: true })),
     };
   }
 
@@ -694,9 +755,10 @@ function componentProps(model) {
     return {
       ...props,
       label: label || "Text area",
-      value: String(value ?? ""),
+      value: String(editedValue ?? ""),
       isDisabled: disabled,
       onChange: (nextValue) => setStringValue(model, nextValue),
+      ...(isContinuous ? {} : draftHandlers(model, draft)),
     };
   }
 
@@ -704,9 +766,10 @@ function componentProps(model) {
     return {
       ...props,
       label: label || "Number",
-      value: value == null || value === "" ? null : Number(value),
+      value: editedValue == null || editedValue === "" ? null : Number(editedValue),
       isDisabled: disabled,
       onChange: (nextValue) => setNumberValue(model, nextValue),
+      ...(isContinuous ? {} : draftHandlers(model, draft, { commitOnEnter: true })),
     };
   }
 
@@ -714,10 +777,13 @@ function componentProps(model) {
     return {
       ...props,
       label: label || "Slider",
-      value: Array.isArray(value) ? value : Number(value ?? props.min ?? 0),
+      value: Array.isArray(editedValue) ? editedValue : Number(editedValue ?? props.min ?? 0),
       isDisabled: disabled,
-      onChange: (nextValue) => setModelValue(model, nextValue),
-      onChangeEnd: (nextValue) => setModelValue(model, nextValue),
+      onChange: (nextValue) => (isContinuous ? setModelValue(model, nextValue) : draft.set(nextValue)),
+      onChangeEnd: (nextValue) => {
+        draft.clear();
+        setModelValue(model, nextValue);
+      },
     };
   }
 
@@ -990,7 +1056,7 @@ function componentProps(model) {
     return {
       ...props,
       label: label || props.label || "Field",
-      inputID: props.inputID || props.inputId || `anylumino-field-${model.model_id}`,
+      inputID: props.inputID || props.inputId || elementId,
       isDisabled: disabled || props.isDisabled,
     };
   }
@@ -1490,10 +1556,14 @@ function AstryxTableView({ model }) {
 
 function AstryxModelView({ model }) {
   const name = String(model.get("component_name") || model.get("component_kind") || "Stack");
-  const mode = String(model.get("color_mode") || "light");
-  useBuiltThemeCSS(model.get("brand") ?? {});
-  const theme = React.useMemo(() => brandTheme(model), [JSON.stringify(model.get("brand") ?? {})]);
-  const props = componentProps(model);
+  const mode = useColorMode(String(model.get("color_mode") || "light"));
+  const brandKey = JSON.stringify(model.get("brand") ?? {});
+  const theme = React.useMemo(() => brandTheme(model.get("brand") ?? {}), [brandKey]);
+  const css = React.useMemo(() => themeCSS(model.get("brand") ?? {}, theme), [brandKey, theme]);
+  useThemeCSS(theme.name, css);
+  useDocumentThemeGuard();
+  const draft = useDraft();
+  const props = componentProps(model, draft, React.useId());
   const Component = componentFor(name, props);
   const children = componentChildren(model);
 
@@ -1516,19 +1586,33 @@ function AstryxModelView({ model }) {
   );
 }
 
-async function renderChildren(model, host, rootElement, signal, childController) {
+/**
+ * Render each composed child into the slot React laid out for it. Slots that
+ * already hold a rendered child are left alone.
+ */
+async function renderChildren(model, host, rootElement, childSignal, reset) {
   const refs = model.get("widgets") ?? [];
   if (refs.length === 0) {
     return;
   }
   await Promise.resolve();
-  const slots = rootElement.querySelectorAll(".anylumino-AstryxChild");
+  // Resolved before the first child mounts, because a mounted child contributes
+  // slots of its own and a later lookup would find those instead of ours.
+  const slots = ownSlots(model, rootElement);
   for (const [index, ref] of refs.entries()) {
-    const slot = slots[index];
-    if (!slot) {
+    const slot = slots.get(String(index));
+    if (!slot || childSignal.aborted) {
       continue;
     }
-    await renderWidgetRef(model, host, ref, slot, combineSignals(signal, childController.signal));
+    if (reset) {
+      // React reuses a slot element whose key survived, so the previous child
+      // has to be cleared out before a different one renders into it.
+      slot.replaceChildren();
+    } else if (slot.dataset.anyluminoRendered === "true") {
+      continue;
+    }
+    await renderWidgetRef(model, host, ref, slot, childSignal);
+    slot.dataset.anyluminoRendered = "true";
   }
 }
 
@@ -1544,16 +1628,42 @@ export default {
       throw new Error("[anylumino] The current anywidget host does not support widget composition.");
     }
 
-    const reactRoot = createRoot(el);
+    // Astryx names CSS anchors from React useId values. Every widget is its own
+    // React root, and roots restart useId from the same counter, so without a
+    // distinct prefix per root the anchor names collide and a popover positions
+    // against another widget's trigger.
+    const reactRoot = createRoot(el, { identifierPrefix: `al${nextReactRootId()}-` });
     let childController = new AbortController();
+    let childKey = childSignature(model);
+    let scheduled = false;
 
     const renderCurrent = () => {
-      childController.abort();
-      childController = new AbortController();
+      const nextChildKey = childSignature(model);
+      const childrenChanged = nextChildKey !== childKey;
+      if (childrenChanged) {
+        childController.abort();
+        childController = new AbortController();
+        childKey = nextChildKey;
+      }
       flushSync(() => {
         reactRoot.render(React.createElement(AstryxModelView, { model }));
       });
-      void renderChildren(model, host, el, signal, childController);
+      void renderChildren(model, host, el, combineSignals(signal, childController.signal), childrenChanged);
+    };
+
+    // A single Python mutation lands as several trait changes, so renders are
+    // coalesced into one pass instead of one flushSync per trait.
+    const scheduleRender = () => {
+      if (scheduled) {
+        return;
+      }
+      scheduled = true;
+      queueMicrotask(() => {
+        scheduled = false;
+        if (!signal.aborted) {
+          renderCurrent();
+        }
+      });
     };
 
     const watched = [
@@ -1579,15 +1689,16 @@ export default {
       "color_mode",
       "theme",
       "brand",
+      "continuous_update",
       "search_mode",
     ];
 
-    watched.forEach((name) => model.on(`change:${name}`, renderCurrent));
+    watched.forEach((name) => model.on(`change:${name}`, scheduleRender));
     signal.addEventListener(
       "abort",
       () => {
         childController.abort();
-        watched.forEach((name) => removeModelListener(model, `change:${name}`, renderCurrent));
+        watched.forEach((name) => removeModelListener(model, `change:${name}`, scheduleRender));
         reactRoot.unmount();
       },
       { once: true },

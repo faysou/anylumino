@@ -9,6 +9,7 @@ import anywidget
 import traitlets as t
 
 from .common import REQUIRED as _REQUIRED
+from .common import ActivationCallbacks
 from .common import doc as _doc
 from .common import document_control as _document_control
 from .common import json_value as _json_value
@@ -96,12 +97,16 @@ def _normalize_table_rows(
     return normalized
 
 
-class ControlWidget(anywidget.AnyWidget):
+class ControlWidget(ActivationCallbacks, anywidget.AnyWidget):
     """Base class for Spectrum-backed anylumino controls.
 
     Controls are anywidget-native and render Spectrum Web Components where a
     matching Spectrum component exists. They do not use the classic Jupyter
     controls frontend.
+
+    ``on_click`` runs for every activation and ``on_action`` runs only for
+    activations that carry a value. Both accept ``remove=True`` to unregister a
+    callback.
     """
 
     _esm = static_asset("spectrum/control_widget.bundle.js")
@@ -159,29 +164,17 @@ class ControlWidget(anywidget.AnyWidget):
         for name in ("min", "max"):
             if name in kwargs:
                 kwargs[name] = _json_value(kwargs[name])
-        self._click_callbacks: list[Callable[[ControlWidget], None]] = []
+        self._init_callbacks()
         super().__init__(**kwargs)
         self.on_msg(self._handle_frontend_message)
-        if callbacks is not None:
-            for callback in callbacks:
-                self.on_click(callback)
-
-    def on_click(
-        self,
-        callback: Callable[[ControlWidget], None],
-        remove: bool = False,
-    ) -> None:
-        """Register or unregister a callback for button-like activations."""
-        if remove:
-            self._click_callbacks = [item for item in self._click_callbacks if item is not callback]
-            return
-        self._click_callbacks.append(callback)
+        self._register_callbacks(callbacks)
 
     def _handle_frontend_message(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
         if content.get("type") != "click":
             return
-        for callback in list(self._click_callbacks):
-            callback(self)
+        if "value" in content or "action" in content:
+            self._notify_action(content.get("value", content.get("action")))
+        self._notify_click()
 
 
 class Text(ControlWidget):

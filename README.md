@@ -69,7 +69,7 @@ controls = ax.Theme(
         "refresh": ax.Button(
             "Refresh",
             variant="primary",
-            callbacks=[lambda _button: setattr(status, "value", "Refreshed")],
+            callbacks=[lambda _button: setattr(status, "text", "Refreshed")],
         ),
         "orders": orders,
     },
@@ -203,20 +203,52 @@ quantity.value
 symbol.observe(lambda change: print(change["new"]), names="value")
 ```
 
+Text inputs, number inputs, and sliders send every keystroke and drag step to
+Python. Pass `continuous_update=False` when a value should arrive only once the
+edit ends, which for inputs means blur or Enter and for sliders means the end of
+the drag.
+
+```python
+notes = ax.TextArea(value="", label="Notes", continuous_update=False)
+risk = ax.Slider(value=42, label="Risk budget", continuous_update=False)
+```
+
+To mirror one widget's state onto another, prefer `traitlets.link` over a
+callback:
+
+```python
+import traitlets
+
+mirror = ax.Text("AAPL")
+traitlets.link((symbol, "value"), (mirror, "text"))
+```
+
 Button-like widgets use callbacks because a click is an event, not a persistent
-value.
+value. Every anylumino widget family registers activations the same way:
+`on_click(callback)` runs for each activation and receives the widget, while
+`on_action(callback)` runs only for activations that carry a value and receives
+the widget and that value. Pass `remove=True` to unregister the same callable.
+The `callbacks` and `action_callbacks` constructor arguments register the same
+two lists.
 
 ```python
 status = ax.Text("Ready")
 button = ax.Button(
     "Submit",
     variant="primary",
-    callbacks=[lambda _button: setattr(status, "value", "Submitted")],
+    callbacks=[lambda _button: setattr(status, "text", "Submitted")],
 )
+
+menu = ax.DropdownMenu(
+    [{"label": "Export", "value": "export"}],
+    label="Actions",
+)
+menu.on_action(lambda _menu, action: setattr(status, "text", f"Chose {action}"))
 ```
 
-Menus and grouped actions additionally expose `action_callbacks`, which receive
-both the widget and the selected action value.
+Choosing a menu item is both an activation and a value, so it runs `on_click`
+and `on_action`. `Toolbar`, `MenuBar`, and `CommandPalette` also keep their
+id-keyed `callbacks` mapping, which stays mutable after construction.
 
 ## Astryx tables
 
@@ -272,6 +304,12 @@ panel = ax.Theme(
     gap=2,
 )
 ```
+
+`mode` accepts `"light"`, `"dark"`, `"system"` to follow the OS
+`prefers-color-scheme`, and `"jupyterlab"` to follow the JupyterLab theme.
+Astryx syncs the active mode to the page's `html[data-theme]`; anylumino restores
+what the page started with once the last Astryx widget unmounts, so clearing one
+output does not leave the notebook with no mode.
 
 `Theme` propagates the brand to nested Astryx children because every
 anywidget child is mounted in its own frontend root. See

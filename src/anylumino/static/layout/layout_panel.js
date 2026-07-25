@@ -8,32 +8,21 @@ import {
   Widget,
 } from "@lumino/widgets";
 import {
+  clampIndex,
+  coalesce,
   combineSignals,
   cssSize,
   disposeLuminoWidget,
+  fitContentEnabled,
   installResizeHandle,
+  labelSlot,
+  measuredContentHeight,
+  modelListeners,
   notifyLuminoWidgetVisible,
-  removeModelListener,
+  renderChildError,
   renderWidgetRef,
+  reusableSlots,
 } from "./composition.js";
-
-function clampIndex(index, length) {
-  if (length <= 0) {
-    return -1;
-  }
-  if (!Number.isFinite(index)) {
-    return 0;
-  }
-  return Math.max(0, Math.min(length - 1, Math.trunc(index)));
-}
-
-function titleFor(index, titles) {
-  const title = titles[index];
-  if (typeof title === "string" && title.trim()) {
-    return title;
-  }
-  return `Widget ${index + 1}`;
-}
 
 function slotIsVisible(slot) {
   if (!slot || slot.isHidden) {
@@ -46,13 +35,13 @@ function notifySlotVisible(slot) {
   notifyLuminoWidgetVisible(slot);
 }
 
-function syncScroll(root, slots, model) {
+function syncScroll(root, viewport, slots, model) {
   const scrollX = Boolean(model.get("scroll_x"));
   const scrollY = Boolean(model.get("scroll_y"));
   root.classList.toggle("anylumino-mod-scrollX", scrollX);
   root.classList.toggle("anylumino-mod-scrollY", scrollY);
-  root.style.overflowX = scrollX ? "auto" : "hidden";
-  root.style.overflowY = scrollY ? "auto" : "hidden";
+  viewport.style.overflowX = scrollX ? "auto" : "hidden";
+  viewport.style.overflowY = scrollY ? "auto" : "hidden";
 
   const childMinWidth = cssSize(model.get("child_min_width"), "0px");
   const childMinHeight = cssSize(model.get("child_min_height"), "0px");
@@ -62,48 +51,36 @@ function syncScroll(root, slots, model) {
   }
 }
 
-function fitContentEnabled(model) {
-  return Boolean(model.get("fit_content"));
-}
-
-function measuredContentHeight(node, options = {}) {
-  if (!node) {
-    return 0;
-  }
-
-  const includeSelf = options.includeSelf ?? true;
-  const nodeRect = node.getBoundingClientRect();
-  let height = includeSelf ? Math.max(node.scrollHeight, node.offsetHeight, nodeRect.height) : 0;
-  for (const child of node.children) {
-    const childRect = child.getBoundingClientRect();
-    height = Math.max(height, child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
-  }
-  return Math.ceil(height);
-}
-
 function measureSlotHeight(slot) {
   return measuredContentHeight(slot?.node, { includeSelf: false });
 }
 
-function createSlot(index, ref, titles, keys, model) {
+function createSlot(index, ref, titles, keys, model, parentSignal) {
   const node = document.createElement("div");
   node.className = "anylumino-LayoutChild";
   node.dataset.anyluminoRef = ref;
-  node.dataset.anyluminoKey = keys[index] ?? "";
   node.dataset.anyluminoRendered = "false";
   node.dataset.anyluminoRendering = "false";
   node.style.minWidth = cssSize(model.get("child_min_width"), "0px");
   node.style.minHeight = cssSize(model.get("child_min_height"), "0px");
 
   const slot = new Widget({ node });
-  slot.title.label = titleFor(index, titles);
-  slot.title.caption = slot.title.label;
+  labelSlot(slot, index, titles, keys, "Widget");
+  // Each child owns its abort signal so rebuilding the panel only tears down
+  // the children that actually left.
+  slot.anyluminoController = new AbortController();
+  slot.anyluminoSignal = combineSignals(parentSignal, slot.anyluminoController.signal);
+  return slot;
+}
+
+function reuseSlot(slot, index, titles, keys) {
+  slot.parent = null;
+  labelSlot(slot, index, titles, keys, "Widget");
   return slot;
 }
 
 function createPanel(model, root, slots, onSplitSizesChanged) {
   const kind = model.get("layout_kind");
-  const titles = model.get("titles") ?? [];
 
   if (kind === "box" || kind === "responsive") {
     const direction =
@@ -188,10 +165,7 @@ function createPanel(model, root, slots, onSplitSizesChanged) {
   if (kind === "accordion") {
     const panel = new AccordionPanel();
     panel.addClass("anylumino-accordion");
-    slots.forEach((slot, index) => {
-      slot.title.label = titleFor(index, titles);
-      panel.addWidget(slot);
-    });
+    slots.forEach((slot) => panel.addWidget(slot));
     return panel;
   }
 
@@ -243,9 +217,14 @@ export default {
     root.style.height = cssSize(model.get("height"), "420px");
     el.replaceChildren(root);
 
+    // Scrolling happens inside the viewport so the resize handle, which is
+    // positioned against the host, stays put instead of scrolling away.
+    const viewport = document.createElement("div");
+    viewport.className = "anylumino-LayoutViewport";
+    root.appendChild(viewport);
+
     let panel = null;
     let slots = [];
-    let childController = new AbortController();
     let splitSizesFromFrontend = false;
     let lastFitHeight = 0;
 
@@ -271,14 +250,12 @@ export default {
 
     const syncSize = () => {
       root.style.width = cssSize(model.get("width"), "100%");
-      if (fitContentEnabled(model)) {
-        root.style.height = cssSize(model.get("height"), "420px");
-      } else {
-        root.style.height = cssSize(model.get("height"), "420px");
+      root.style.height = cssSize(model.get("height"), "420px");
+      if (!fitContentEnabled(model)) {
         lastFitHeight = 0;
       }
       root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
-      syncScroll(root, slots, model);
+      syncScroll(root, viewport, slots, model);
       notifyResize();
     };
 
@@ -352,41 +329,41 @@ export default {
       }
     };
 
-    const resizeHandle = installResizeHandle(model, root, notifyResize, signal);
+    installResizeHandle(model, root, notifyResize, signal);
 
     const renderChild = async (slot) => {
-      if (slot.node.dataset.anyluminoRendered === "true") {
+      if (slot.node.dataset.anyluminoRendered !== "false") {
         notifySlotVisible(slot);
         return;
       }
-      if (slot.node.dataset.anyluminoRendering === "true") {
-        return;
-      }
-      if (!slotIsVisible(slot)) {
+      if (slot.node.dataset.anyluminoRendering === "true" || !slotIsVisible(slot)) {
         return;
       }
 
       slot.node.dataset.anyluminoRendering = "true";
-      await new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve));
-      });
-      if (childController.signal.aborted || !slotIsVisible(slot)) {
-        slot.node.dataset.anyluminoRendering = "false";
-        return;
-      }
+      try {
+        await new Promise((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(resolve));
+        });
+        if (slot.anyluminoSignal.aborted || !slotIsVisible(slot)) {
+          return;
+        }
 
-      const ref = slot.node.dataset.anyluminoRef;
-      const childSignal = combineSignals(signal, childController.signal);
-      if (childSignal.aborted || !slotIsVisible(slot)) {
+        await renderWidgetRef(model, host, slot.node.dataset.anyluminoRef, slot.node, slot.anyluminoSignal);
+        slot.node.dataset.anyluminoRendered = "true";
+        notifySlotVisible(slot);
+        scheduleFitContent();
+      } catch (error) {
+        // Children render one after another, so a throw here would otherwise
+        // leave every later sibling blank with no explanation.
+        if (!slot.anyluminoSignal.aborted) {
+          slot.node.dataset.anyluminoRendered = "error";
+          renderChildError(slot.node, error);
+          console.error("[anylumino] Child widget failed to render.", error);
+        }
+      } finally {
         slot.node.dataset.anyluminoRendering = "false";
-        return;
       }
-
-      await renderWidgetRef(model, host, ref, slot.node, childSignal);
-      slot.node.dataset.anyluminoRendered = "true";
-      slot.node.dataset.anyluminoRendering = "false";
-      notifySlotVisible(slot);
-      scheduleFitContent();
     };
 
     const renderVisibleChildren = async () => {
@@ -413,26 +390,45 @@ export default {
       void renderVisibleChildren();
     };
 
-    const clearPanel = () => {
-      childController.abort();
-      childController = new AbortController();
-      if (panel) {
-        disposeLuminoWidget(panel);
+    const syncTitles = () => {
+      const titles = model.get("titles") ?? [];
+      const keys = model.get("child_keys") ?? [];
+      slots.forEach((slot, index) => labelSlot(slot, index, titles, keys, "Widget"));
+      panel?.update();
+    };
+
+    const disposeSlots = (targets) => {
+      for (const slot of targets) {
+        slot.anyluminoController.abort();
+        disposeLuminoWidget(slot);
       }
-      slots = [];
-      root.replaceChildren(resizeHandle);
-      panel = null;
     };
 
     const renderPanel = async () => {
-      clearPanel();
       const refs = model.get("widgets") ?? [];
       const titles = model.get("titles") ?? [];
       const keys = model.get("child_keys") ?? [];
-      slots = refs.map((ref, index) => createSlot(index, ref, titles, keys, model));
-      syncScroll(root, slots, model);
+
+      // Reuse the slot of any child that is still composed, so adding a sibling
+      // or renaming a section does not remount every iframe and plot.
+      const reusable = reusableSlots(slots);
+      const nextSlots = refs.map((ref, index) => {
+        const existing = reusable.take(ref);
+        return existing === undefined
+          ? createSlot(index, ref, titles, keys, model, signal)
+          : reuseSlot(existing, index, titles, keys);
+      });
+
+      disposeSlots(reusable.rest());
+      if (panel) {
+        disposeLuminoWidget(panel);
+      }
+      viewport.replaceChildren();
+      slots = nextSlots;
+
+      syncScroll(root, viewport, slots, model);
       panel = createPanel(model, root, slots, saveSplitSizes);
-      Widget.attach(panel, root);
+      Widget.attach(panel, viewport);
       root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
       syncStackedIndex();
       panel.update();
@@ -440,67 +436,53 @@ export default {
       scheduleFitContent();
     };
 
-    const rerender = () => {
-      void renderPanel();
-    };
+    const rerender = coalesce(() => {
+      if (!signal.aborted) {
+        void renderPanel();
+      }
+    });
 
     root.addEventListener("click", () => setTimeout(() => void renderVisibleChildren(), 0), { signal });
     window.addEventListener("resize", syncSize, { signal });
-    model.on("change:widgets", rerender);
-    model.on("change:child_keys", rerender);
-    model.on("change:titles", rerender);
-    model.on("change:layout_kind", rerender);
-    model.on("change:direction", rerender);
-    model.on("change:orientation", rerender);
-    model.on("change:spacing", rerender);
-    model.on("change:stretches", rerender);
-    model.on("change:sizes", syncSplitSizesFromModel);
-    model.on("change:mode", rerender);
-    model.on("change:columns", rerender);
-    model.on("change:rows", rerender);
-    model.on("change:gap", rerender);
-    model.on("change:areas", rerender);
-    model.on("change:breakpoint", rerender);
-    model.on("change:wide_direction", rerender);
-    model.on("change:narrow_direction", rerender);
-    model.on("change:scroll_x", syncSize);
-    model.on("change:scroll_y", syncSize);
-    model.on("change:child_min_width", syncSize);
-    model.on("change:child_min_height", syncSize);
-    model.on("change:fit_content", syncSize);
-    model.on("change:selected_index", syncStackedIndex);
-    model.on("change:width", syncSize);
-    model.on("change:height", syncSize);
+
+    const unbind = modelListeners(model, [
+      ["widgets", rerender],
+      ["child_keys", rerender],
+      ["layout_kind", rerender],
+      ["direction", rerender],
+      ["orientation", rerender],
+      ["spacing", rerender],
+      ["stretches", rerender],
+      ["mode", rerender],
+      ["columns", rerender],
+      ["rows", rerender],
+      ["gap", rerender],
+      ["areas", rerender],
+      ["breakpoint", rerender],
+      ["wide_direction", rerender],
+      ["narrow_direction", rerender],
+      ["titles", syncTitles],
+      ["sizes", syncSplitSizesFromModel],
+      ["scroll_x", syncSize],
+      ["scroll_y", syncSize],
+      ["child_min_width", syncSize],
+      ["child_min_height", syncSize],
+      ["fit_content", syncSize],
+      ["selected_index", syncStackedIndex],
+      ["width", syncSize],
+      ["height", syncSize],
+    ]);
 
     signal.addEventListener(
       "abort",
       () => {
-        clearPanel();
-        removeModelListener(model, "change:widgets", rerender);
-        removeModelListener(model, "change:child_keys", rerender);
-        removeModelListener(model, "change:titles", rerender);
-        removeModelListener(model, "change:layout_kind", rerender);
-        removeModelListener(model, "change:direction", rerender);
-        removeModelListener(model, "change:orientation", rerender);
-        removeModelListener(model, "change:spacing", rerender);
-        removeModelListener(model, "change:stretches", rerender);
-        removeModelListener(model, "change:sizes", syncSplitSizesFromModel);
-        removeModelListener(model, "change:mode", rerender);
-        removeModelListener(model, "change:columns", rerender);
-        removeModelListener(model, "change:rows", rerender);
-        removeModelListener(model, "change:gap", rerender);
-        removeModelListener(model, "change:areas", rerender);
-        removeModelListener(model, "change:breakpoint", rerender);
-        removeModelListener(model, "change:wide_direction", rerender);
-        removeModelListener(model, "change:narrow_direction", rerender);
-        removeModelListener(model, "change:scroll_x", syncSize);
-        removeModelListener(model, "change:scroll_y", syncSize);
-        removeModelListener(model, "change:child_min_width", syncSize);
-        removeModelListener(model, "change:child_min_height", syncSize);
-        removeModelListener(model, "change:fit_content", syncSize);
-        removeModelListener(model, "change:selected_index", syncStackedIndex);
-        removeModelListener(model, "change:width", syncSize);
-        removeModelListener(model, "change:height", syncSize);
+        disposeSlots(slots);
+        slots = [];
+        if (panel) {
+          disposeLuminoWidget(panel);
+          panel = null;
+        }
+        unbind();
         root.remove();
       },
       { once: true },

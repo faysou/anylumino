@@ -25,3 +25,30 @@ layout that displays those children.
 | [titles](#anylumino.LayoutWidget.titles) | An instance of a Python list. |
 | [widgets](#anylumino.LayoutWidget.widgets) | An instance of a Python list. |
 | [width](#anylumino.LayoutWidget.width) | A trait for unicode strings. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [move_widget](#anylumino.LayoutWidget.move_widget) | Move a child to a new position, keeping keys and titles aligned. |
+| [remove_widget](#anylumino.LayoutWidget.remove_widget) | Remove a child and return the owner that was passed in. |
+
+### move_widget { #anylumino.LayoutWidget.move_widget }
+
+```python
+move_widget(key_or_index, index)
+```
+
+Move a child to a new position, keeping keys and titles aligned.
+
+### remove_widget { #anylumino.LayoutWidget.remove_widget }
+
+```python
+remove_widget(key_or_index, *, close=False)
+```
+
+Remove a child and return the owner that was passed in.
+
+Pass ``close=True`` to also close the removed widget models. Closing
+releases them from the ipywidgets registry and makes them unusable, so
+the default keeps the returned owner alive for the caller to reuse.

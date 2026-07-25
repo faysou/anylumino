@@ -9,6 +9,7 @@ import traitlets as t
 
 from .layout import ChildInput
 from .layout import TitleInput
+from .layout import _KeyedChildren
 from .layout import _normalize_children
 from .layout import _size_to_css
 from .layout import _widget_list_from_json
@@ -18,12 +19,17 @@ from .layout import _widget_list_to_json
 ActionCallback = Callable[["ComponentWidget", Any], None]
 
 
-class ComponentWidget(anywidget.AnyWidget):
+class ComponentWidget(_KeyedChildren, anywidget.AnyWidget):
     """Base class for composable component-library anywidgets.
 
     Component families such as ``SpectrumWidget`` inherit this class to share
     child composition, keyed access, open/close state, size traits, and
     activation callbacks.
+
+    ``on_click`` runs for every activation and ``on_action`` runs only for
+    activations that carry a value, so a menu item choice runs both. To mirror
+    state between sibling widgets use ``traitlets.link`` or ``observe`` rather
+    than callbacks.
     """
 
     component_family = t.Unicode("").tag(sync=True)
@@ -70,34 +76,22 @@ class ComponentWidget(anywidget.AnyWidget):
             children, titles, keys
         )
         self._owners_by_key = dict(zip(key_list, owner_list, strict=True))
-        self._click_callbacks: list[Callable[[ComponentWidget], None]] = []
-        self._action_callbacks: list[ActionCallback] = []
-        super().__init__(
-            widgets=widget_list,
-            child_keys=key_list,
-            titles=title_list,
-            width=_size_to_css(width, ""),
-            height=_size_to_css(height, ""),
-            **kwargs,
-        )
+        self._init_callbacks()
+        self._syncing_children = True
+        try:
+            super().__init__(
+                widgets=widget_list,
+                child_keys=key_list,
+                titles=title_list,
+                width=_size_to_css(width, ""),
+                height=_size_to_css(height, ""),
+                **kwargs,
+            )
+        finally:
+            self._syncing_children = False
+        self.observe(self._observe_widgets, names="widgets")
         self.on_msg(self._handle_frontend_message)
-        if callbacks is not None:
-            for callback in callbacks:
-                self.on_click(callback)
-        if action_callbacks is not None:
-            for callback in action_callbacks:
-                self.on_action(callback)
-
-    def __contains__(self, key: object) -> bool:
-        return str(key) in self.child_keys
-
-    def __getitem__(self, key: str) -> object:
-        return self.get_owner(key)
-
-    def get_owner(self, key_or_index: str | int) -> object:
-        index = self._resolve_index(key_or_index)
-        key = self.child_keys[index]
-        return self._owners_by_key.get(key, self.widgets[index])
+        self._register_callbacks(callbacks, action_callbacks)
 
     def show(self) -> None:
         """Open overlay-like components."""
@@ -111,37 +105,6 @@ class ComponentWidget(anywidget.AnyWidget):
         """Toggle overlay-like components."""
         self.is_open = not self.is_open
 
-    def on_click(
-        self,
-        callback: Callable[[ComponentWidget], None],
-        remove: bool = False,
-    ) -> None:
-        """Register or unregister a callback for activations."""
-        if remove:
-            self._click_callbacks = [
-                item for item in self._click_callbacks if item is not callback
-            ]
-            return
-        self._click_callbacks.append(callback)
-
-    def on_action(
-        self,
-        callback: ActionCallback,
-        remove: bool = False,
-    ) -> None:
-        """Register or unregister a callback for a named component action."""
-        if remove:
-            self._action_callbacks = [
-                item for item in self._action_callbacks if item is not callback
-            ]
-            return
-        self._action_callbacks.append(callback)
-
-    def _resolve_index(self, key_or_index: str | int) -> int:
-        if isinstance(key_or_index, int):
-            return key_or_index
-        return self.child_keys.index(str(key_or_index))
-
     def _handle_frontend_message(
         self, _widget: object, content: dict[str, Any], _buffers: object
     ) -> None:
@@ -154,13 +117,10 @@ class ComponentWidget(anywidget.AnyWidget):
             return
         if msg_type != "click":
             return
-        has_action = "value" in content or "action" in content
-        if has_action:
+        if "value" in content or "action" in content:
             self.last_action = content.get("value", content.get("action"))
-            for callback in list(self._action_callbacks):
-                callback(self, self.last_action)
-        for callback in list(self._click_callbacks):
-            callback(self)
+            self._notify_action(self.last_action)
+        self._notify_click()
 
 
 __all__ = ["ComponentWidget"]

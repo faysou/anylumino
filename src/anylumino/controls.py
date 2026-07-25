@@ -8,13 +8,18 @@ from typing import Any
 import anywidget
 import traitlets as t
 
+from .common import ActivationCallbacks
 from .common import document_control as _document_control
 from .common import json_value as _json_value
 from .common import static_asset
 
 
-class _NativeControlWidget(anywidget.AnyWidget):
-    """Base class for browser-native anylumino controls."""
+class _NativeControlWidget(ActivationCallbacks, anywidget.AnyWidget):
+    """Base class for browser-native anylumino controls.
+
+    ``on_click`` runs for every value change and ``on_action`` also receives the
+    new value. Both accept ``remove=True`` to unregister a callback.
+    """
 
     _esm = static_asset("spectrum/native_control_widget.bundle.js")
     _css = static_asset("spectrum/native_control_widget.css")
@@ -32,12 +37,14 @@ class _NativeControlWidget(anywidget.AnyWidget):
 
     def __init__(self, **kwargs: Any) -> None:
         callbacks = kwargs.pop("callbacks", None)
+        self._init_callbacks()
         super().__init__(**kwargs)
-        self._callbacks: list[Any] = []
-        if callbacks is not None:
-            for callback in callbacks:
-                self.observe(lambda _change, callback=callback: callback(self), names="value")
-                self._callbacks.append(callback)
+        self.observe(self._notify_value_change, names="value")
+        self._register_callbacks(callbacks)
+
+    def _notify_value_change(self, change: dict[str, Any]) -> None:
+        self._notify_action(change["new"])
+        self._notify_click()
 
 
 class DatePicker(_NativeControlWidget):

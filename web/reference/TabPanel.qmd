@@ -24,17 +24,17 @@ stable child identifiers and default tab titles. Use ``select_key`` or
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name           | Type                                       | Description                                                                                                                                       | Default   |
-|----------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| widgets        | iterable or mapping                        | Child anywidget-compatible widgets or owner objects exposing a ``widget`` attribute. When a mapping is passed, its keys become stable child keys. | `None`    |
-| titles         | iterable or mapping                        | Tab titles. A mapping is resolved by child key. When ``widgets`` is a mapping and titles are omitted, keys are used as titles.                    | `None`    |
-| keys           | iterable of str                            | Stable child keys for iterable ``widgets``. Do not pass this when ``widgets`` is a mapping.                                                       | `None`    |
-| selected_index | int                                        | Initially selected tab index.                                                                                                                     | `0`       |
-| tab_placement  | (\'top\', \'bottom\', \'left\', \'right\') | Where Lumino should place the tab bar.                                                                                                            | `"top"`   |
-| tabs_movable   | bool                                       | Whether tabs can be reordered in the frontend.                                                                                                    | `False`   |
-| width          | int, float, str, or None                   | Widget width. Numbers above 1 are pixels, numbers between 0 and 1 are percentages, and strings are passed through as CSS sizes.                   | `'100%'`  |
-| height         | int, float, str, or None                   | Widget height. Numbers above 1 are pixels, numbers between 0 and 1 are percentages, and strings are passed through as CSS sizes.                  | `420`     |
-| resizable      | bool                                       | Whether the panel receives a notebook-friendly resize handle.                                                                                     | `True`    |
+| Name           | Type                                       | Description                                                                                                                                                                   | Default   |
+|----------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| widgets        | iterable or mapping                        | Child anywidget-compatible widgets or owner objects exposing a ``widget`` attribute. When a mapping is passed, its keys become stable child keys.                             | `None`    |
+| titles         | iterable or mapping                        | Tab titles. A mapping is resolved by child key. When ``widgets`` is a mapping and titles are omitted, keys are used as titles.                                                | `None`    |
+| keys           | iterable of str                            | Stable child keys for iterable ``widgets``. Do not pass this when ``widgets`` is a mapping.                                                                                   | `None`    |
+| selected_index | int                                        | Initially selected tab index.                                                                                                                                                 | `0`       |
+| tab_placement  | (\'top\', \'bottom\', \'left\', \'right\') | Where Lumino should place the tab bar.                                                                                                                                        | `"top"`   |
+| tabs_movable   | bool                                       | Whether tabs can be reordered in the frontend. A drag reorders ``widgets``, ``child_keys``, and ``titles`` in Python too, so ``selected_key`` keeps naming the visible child. | `False`   |
+| width          | int, float, str, or None                   | Widget width. Numbers above 1 are pixels, numbers between 0 and 1 are percentages, and strings are passed through as CSS sizes.                                               | `'100%'`  |
+| height         | int, float, str, or None                   | Widget height. Numbers above 1 are pixels, numbers between 0 and 1 are percentages, and strings are passed through as CSS sizes.                                              | `420`     |
+| resizable      | bool                                       | Whether the panel receives a notebook-friendly resize handle.                                                                                                                 | `True`    |
 
 ## Attributes
 

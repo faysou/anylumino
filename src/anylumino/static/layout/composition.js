@@ -16,6 +16,125 @@ export function cssSize(value, fallback) {
   return fallback;
 }
 
+export function clampIndex(index, length) {
+  if (length <= 0) {
+    return -1;
+  }
+  if (!Number.isFinite(index)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(length - 1, Math.trunc(index)));
+}
+
+export function titleFor(index, titles, prefix) {
+  const title = titles[index];
+  if (typeof title === "string" && title.trim()) {
+    return title;
+  }
+  return `${prefix} ${index + 1}`;
+}
+
+export function fitContentEnabled(model) {
+  return Boolean(model.get("fit_content"));
+}
+
+/**
+ * Point a child slot at the key and title it holds at `index`.
+ */
+export function labelSlot(slot, index, titles, keys, prefix) {
+  slot.node.dataset.anyluminoKey = keys[index] ?? "";
+  slot.title.label = titleFor(index, titles, prefix);
+  slot.title.caption = slot.title.label;
+}
+
+export function measuredContentHeight(node, options = {}) {
+  if (!node) {
+    return 0;
+  }
+
+  const includeSelf = options.includeSelf ?? true;
+  const nodeRect = node.getBoundingClientRect();
+  let height = includeSelf ? Math.max(node.scrollHeight, node.offsetHeight, nodeRect.height) : 0;
+  for (const child of node.children) {
+    const childRect = child.getBoundingClientRect();
+    height = Math.max(height, child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
+  }
+  return Math.ceil(height);
+}
+
+/**
+ * Collapse a burst of trait changes into one pass. A single Python mutation
+ * arrives as several change events, and rebuilding once per event remounts
+ * every child repeatedly.
+ */
+export function coalesce(callback) {
+  let scheduled = false;
+  return () => {
+    if (scheduled) {
+      return;
+    }
+    scheduled = true;
+    queueMicrotask(() => {
+      scheduled = false;
+      callback();
+    });
+  };
+}
+
+/**
+ * Index existing child slots by the widget ref they render, so rebuilding a
+ * panel can reuse them instead of remounting every child. `take` hands back one
+ * slot per matching ref and `rest` reports the slots that are no longer
+ * composed.
+ */
+export function reusableSlots(slots) {
+  const byRef = new Map();
+  for (const slot of slots) {
+    const ref = slot.node.dataset.anyluminoRef;
+    byRef.set(ref, [...(byRef.get(ref) ?? []), slot]);
+  }
+  return {
+    take: (ref) => byRef.get(ref)?.shift(),
+    rest: () => [...byRef.values()].flat(),
+  };
+}
+
+/**
+ * Bind and unbind a set of model listeners as one unit.
+ */
+export function modelListeners(model, bindings) {
+  for (const [name, callback] of bindings) {
+    model.on(`change:${name}`, callback);
+  }
+  return () => {
+    for (const [name, callback] of bindings) {
+      removeModelListener(model, `change:${name}`, callback);
+    }
+  };
+}
+
+const CHILD_ERROR_STYLE = [
+  "padding: 8px 10px",
+  "color: #b42318",
+  "background: #fef3f2",
+  "border: 1px solid #fda29b",
+  "border-radius: 4px",
+  "font-size: 12px",
+  "white-space: pre-wrap",
+].join("; ");
+
+/**
+ * Replace a child slot with an inline failure notice. Styled here rather than
+ * in a stylesheet because every layout family ships its own CSS asset.
+ */
+export function renderChildError(node, error) {
+  const message = document.createElement("div");
+  message.className = "anylumino-ChildError";
+  message.setAttribute("style", CHILD_ERROR_STYLE);
+  message.textContent = `[anylumino] Child failed to render: ${String(error?.message ?? error)}`;
+  node.replaceChildren(message);
+}
+
 export function removeModelListener(model, eventName, callback) {
   try {
     model.off(eventName, callback);

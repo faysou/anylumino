@@ -16,7 +16,7 @@ from ..components import ComponentWidget
 from ..layout import ChildInput
 
 
-_ASTRYX_THEME_MODES = ("light", "dark", "system")
+_ASTRYX_THEME_MODES = ("light", "dark", "system", "jupyterlab")
 _ASTRYX_COMPONENT_NAMES = {
     "AlertDialog",
     "AspectRatio",
@@ -335,7 +335,13 @@ class Widget(ComponentWidget):
     brand : Mapping[str, Any] | None, default None
         Runtime or built Astryx theme descriptor.
     color_mode : str, default 'light'
-        Astryx ``Theme`` mode. Use ``"light"``, ``"dark"``, or ``"system"``.
+        Astryx ``Theme`` mode. Use ``"light"``, ``"dark"``, ``"system"`` to
+        follow the OS ``prefers-color-scheme``, or ``"jupyterlab"`` to follow
+        the JupyterLab theme.
+    continuous_update : bool, default True
+        Whether Python receives text input, number input, and slider values
+        while the user edits. When ``False`` the value syncs on blur, on Enter,
+        and at the end of a slider drag.
     search : Callable[[str], Iterable[Any]] | None, default None
         Optional Python-backed search callback.
     callbacks : Iterable[Callable[[ComponentWidget], None]] | None, default None
@@ -359,6 +365,7 @@ class Widget(ComponentWidget):
     color_mode = t.Enum(_ASTRYX_THEME_MODES, default_value="light").tag(sync=True)
     theme = t.Unicode("neutral").tag(sync=True)
     brand = t.Dict(default_value={}).tag(sync=True)
+    continuous_update = t.Bool(True).tag(sync=True)
     search_mode = t.Unicode("static").tag(sync=True)
 
     def __init__(
@@ -374,6 +381,7 @@ class Widget(ComponentWidget):
         variant: str = "",
         brand: Mapping[str, Any] | None = None,
         color_mode: str = "light",
+        continuous_update: bool = True,
         search: Callable[[str], Iterable[Any]] | None = None,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
@@ -386,6 +394,7 @@ class Widget(ComponentWidget):
         raw_props = dict(props or {})
         brand = raw_props.pop("brand", brand)
         color_mode = str(raw_props.pop("color_mode", color_mode))
+        continuous_update = bool(raw_props.pop("continuous_update", continuous_update))
         callbacks = raw_props.pop("callbacks", callbacks)
         action_callbacks = raw_props.pop("action_callbacks", action_callbacks)
         if width is None:
@@ -397,6 +406,7 @@ class Widget(ComponentWidget):
         if open is None and "isOpen" in raw_props:
             open = bool(raw_props["isOpen"])
         self._search_callback = search
+        self._propagates_theme = False
         super().__init__(
             children,
             component_kind=component_name,
@@ -409,6 +419,7 @@ class Widget(ComponentWidget):
             variant=variant,
             brand=_clean_brand(brand),
             color_mode=_clean_theme_mode(color_mode),
+            continuous_update=continuous_update,
             search_mode="python" if search is not None else "static",
             callbacks=callbacks,
             action_callbacks=action_callbacks,
@@ -425,9 +436,15 @@ class Widget(ComponentWidget):
         self.brand = _clean_brand(brand)
         if color_mode is not None:
             self.color_mode = _clean_theme_mode(color_mode)
-        for child in self.widgets:
+        self._propagates_theme = True
+        self._adopt_children(self.widgets)
+
+    def _adopt_children(self, views: Iterable[object]) -> None:
+        if not self._propagates_theme:
+            return
+        for child in views:
             if isinstance(child, Widget):
-                child.apply_brand(self.brand, color_mode=color_mode)
+                child.apply_brand(self.brand, color_mode=self.color_mode)
 
     def _handle_frontend_message(
         self, widget: object, content: dict[str, Any], buffers: object
@@ -613,7 +630,8 @@ class Theme(Widget):
         :func:`BuiltTheme`.
     color_mode : str, default 'light'
         Astryx ``Theme`` mode for this component or subtree. Use ``"light"``,
-        ``"dark"``, or ``"system"``.
+        ``"dark"``, ``"system"`` to follow the OS ``prefers-color-scheme``, or
+        ``"jupyterlab"`` to follow the JupyterLab theme.
     mode : str | None
         Alias for ``color_mode`` matching the Astryx ``Theme`` prop name. When
         provided, it takes precedence over ``color_mode``.

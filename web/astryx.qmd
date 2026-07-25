@@ -72,7 +72,7 @@ workspace = ax.Theme(
         "refresh": ax.Button(
             "Refresh",
             variant="primary",
-            callbacks=[lambda _button: setattr(status, "value", "Refreshed")],
+            callbacks=[lambda _button: setattr(status, "text", "Refreshed")],
         ),
         "orders": orders,
     },
@@ -241,7 +241,7 @@ status = ax.Text("Ready")
 submit = ax.Button(
     "Submit",
     variant="primary",
-    callbacks=[lambda _button: setattr(status, "value", "Submitted")],
+    callbacks=[lambda _button: setattr(status, "text", "Submitted")],
 )
 ```
 

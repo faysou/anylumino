@@ -156,10 +156,13 @@ Each Astryx widget receives the synced `brand` trait and renders inside an
 Astryx `Theme` provider. The frontend bridge:
 
 1. Reads the widget `brand`.
-2. For runtime brands, calls Astryx `defineTheme({name, tokens})`.
-3. For built themes, injects supplied generated CSS once per unique theme/CSS
-   pair and passes a `__built` theme object to Astryx.
-4. Wraps the rendered component in `<Theme theme={theme} mode={color_mode}>`.
+2. For runtime brands, calls Astryx `defineTheme({name, tokens})` and generates
+   the theme CSS with Astryx `generateThemeCSS()`.
+3. For built themes, uses the supplied generated CSS.
+4. Injects that CSS once per unique theme/CSS pair, reference counted, and
+   passes a `__built` theme object to Astryx so Astryx skips its own injection.
+5. Resolves `color_mode` and wraps the rendered component in
+   `<Theme theme={theme} mode={resolved_mode}>`.
 
 If no brand tokens are provided, the widget uses the neutral Astryx theme.
 Custom icon registries are not serialized from Python because Astryx icon
@@ -182,18 +185,48 @@ parent output would not automatically reach those separate roots, so the theme
 identity is synchronized on each child model instead.
 
 Runtime brands are converted in the browser with Astryx `defineTheme()`.
-Precompiled themes are different: the generated CSS is inserted into
-`document.head` using a `data-anylumino-astryx-built-theme-id` attribute based
-on the theme name and CSS hash. Multiple notebook outputs using the same built
-theme share one style element. The bridge increments
-`data-anylumino-astryx-built-theme-count` for each mounted user and removes the
-style element after the last themed output unmounts.
+anylumino then marks the result `__built` and injects the CSS itself, on the
+same path as precompiled themes: the CSS is inserted into `document.head` using
+a `data-anylumino-astryx-theme-id` attribute based on the theme name and CSS
+hash. Multiple notebook outputs using the same theme share one style element.
+The bridge increments `data-anylumino-astryx-theme-count` for each mounted user
+and removes the style element after the last themed output unmounts.
+
+Owning the injection matters because Astryx dedupes runtime themes by name in a
+module-level set and drops the shared style tag when the first injecting widget
+unmounts. In a notebook, closing one output would then strip brand tokens from
+every output that remains.
 
 This DOM-level deduplication is deliberate. JupyterLab and anywidget can load
 the same bundled frontend module more than once across notebooks, workspaces,
 or development reloads. A module-local JavaScript cache would not be reliable
 in that environment, while a `document.head` lookup is shared by all widget
 roots in the page.
+
+## Color modes and the host page
+
+`color_mode` accepts `"light"`, `"dark"`, `"system"`, and `"jupyterlab"`.
+`"system"` follows the OS `prefers-color-scheme`. `"jupyterlab"` resolves to
+light or dark from `body[data-jp-theme-light]` and follows later theme changes
+through one shared `MutationObserver`.
+
+An Astryx `Theme` with no parent `Theme` syncs `html[data-theme]` to the
+document so browser chrome matches the mode. Every anywidget is its own React
+root, so in a notebook every widget is a root theme: the last output to mount
+decides the page attribute, and the first to unmount clears it even though other
+outputs are still on screen.
+
+anylumino records the value the host page had before any Astryx widget mounted
+and restores it once the last Astryx widget unmounts, so clearing one output does
+not leave the page with no mode. While widgets are mounted the upstream
+last-mount-wins behavior stands: a widget with `mode="dark"` does set the page
+attribute.
+
+Correcting each write instead is not viable. Writing to `html` invalidates style
+for the whole document, so reverting every write from a `MutationObserver` turns
+into a style-recalc war with Astryx's own layout effect. In a notebook with a
+hundred widgets that measured as thousands of full-document style recalculations
+and paints, which stalls the browser for long enough to look like a hang.
 
 ## Testing in JupyterLab
 
@@ -215,9 +248,12 @@ uv run --no-sync jupyter lab . --port=8888 --no-browser --ServerApp.token='' --S
 
 Then open `notebooks/astryx_themes.py`, run all cells, and inspect the rendered
 outputs. A correct run shows the runtime light, runtime dark, runtime system,
-and built system panels. In the browser DOM, repeated uses of the same built
-theme should produce one `style[data-anylumino-astryx-built-theme-id]` element
-with a reference count rather than one duplicate style element per output.
+runtime JupyterLab, built system, and built JupyterLab panels. Toggle the
+JupyterLab theme and confirm the two JupyterLab panels follow it while the
+others do not, and that the surrounding notebook chrome never changes with a
+dark panel on screen. In the browser DOM, repeated uses of the same theme should
+produce one `style[data-anylumino-astryx-theme-id]` element with a reference
+count rather than one duplicate style element per output.
 
 During frontend development, restart the Jupyter server and use a fresh browser
 task space or clear the browser cache after rebuilding. JupyterLab can otherwise

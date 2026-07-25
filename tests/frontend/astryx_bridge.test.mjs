@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  childSignature,
   modelProps,
   registeredComponent,
+  resolveColorMode,
   sendModelAction,
   setModelOpen,
   toggleGroupValue,
@@ -85,4 +87,39 @@ test("registeredComponent rejects misspelled component names", () => {
     () => registeredComponent({ Stack }, "Stak"),
     /Unknown Astryx component "Stak"/,
   );
+});
+
+
+test("childSignature only changes when the composed children or layout change", () => {
+  const model = fakeModel();
+  model.set("component_name", "Stack");
+  model.set("widgets", ["anywidget:one", "anywidget:two"]);
+  model.set("child_keys", ["first", "second"]);
+  const baseline = childSignature(model);
+
+  model.set("value", "edited");
+  assert.equal(childSignature(model), baseline);
+
+  model.set("child_keys", ["first", "renamed"]);
+  const renamed = childSignature(model);
+  assert.notEqual(renamed, baseline);
+
+  model.set("widgets", ["anywidget:two", "anywidget:one"]);
+  const reordered = childSignature(model);
+  assert.notEqual(reordered, renamed);
+
+  model.set("component_name", "Toolbar");
+  assert.notEqual(childSignature(model), reordered);
+});
+
+
+test("resolveColorMode maps the JupyterLab theme attribute onto Astryx modes", () => {
+  const withLight = (value) => ({ body: { getAttribute: () => value } });
+
+  assert.equal(resolveColorMode("dark", withLight("true")), "dark");
+  assert.equal(resolveColorMode("system", withLight("false")), "system");
+  assert.equal(resolveColorMode("jupyterlab", withLight("true")), "light");
+  assert.equal(resolveColorMode("jupyterlab", withLight("false")), "dark");
+  assert.equal(resolveColorMode("jupyterlab", withLight(null)), "system");
+  assert.equal(resolveColorMode("jupyterlab", undefined), "system");
 });

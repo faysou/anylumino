@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Mapping
@@ -14,6 +15,36 @@ from .base import _clean_value
 from .base import _named_props
 from .base import _option_records
 from .base import _search_records
+
+
+_GRID_REPEAT_COLUMNS = re.compile(
+    r"^\s*repeat\(\s*auto-(?P<repeat>fit|fill)\s*,\s*minmax\(\s*(?P<min_width>\d+(?:\.\d+)?)px\s*,\s*1fr\s*\)\s*\)\s*$"
+)
+
+
+def _grid_columns(columns: int | str | Mapping[str, Any]) -> int | dict[str, Any]:
+    if isinstance(columns, Mapping):
+        return _clean_value(columns)
+    if isinstance(columns, bool):
+        msg = "Grid columns must be an int or a {'minWidth': int} mapping"
+        raise TypeError(msg)
+    if isinstance(columns, int):
+        return columns
+    if isinstance(columns, str):
+        match = _GRID_REPEAT_COLUMNS.match(columns)
+        if match is not None:
+            return {
+                "minWidth": int(float(match["min_width"])),
+                "repeat": match["repeat"],
+            }
+        msg = (
+            f"Grid columns string {columns!r} is not supported. Pass an int, a "
+            "{'minWidth': int, 'repeat': 'fit'|'fill', 'max': int} mapping, or the CSS form "
+            "'repeat(auto-fit, minmax(280px, 1fr))'."
+        )
+        raise TypeError(msg)
+    msg = f"Grid columns must be an int, a mapping, or a repeat() string, not {type(columns).__name__}"
+    raise TypeError(msg)
 
 
 def _lightbox_media(
@@ -154,8 +185,12 @@ class Grid(Widget):
     ----------
     children : ChildInput
         Child widget, sequence of widgets, or mapping of slot names to widgets.
-    columns : int | Mapping[str, Any], default 2
-        Grid or table column definition.
+    columns : int | str | Mapping[str, Any], default 2
+        Grid column definition. Pass an int for fixed columns, a
+        ``{"minWidth": int, "repeat": "fit" | "fill", "max": int}`` mapping for
+        responsive columns, or the equivalent CSS string
+        ``"repeat(auto-fit, minmax(280px, 1fr))"``. Other CSS strings raise a
+        ``TypeError`` because Astryx cannot render them.
     gap : int | float, default 3
         Astryx spacing step between children.
     row_gap : int | float | None, default None
@@ -209,7 +244,7 @@ class Grid(Widget):
         self,
         children: ChildInput = None,
         *,
-        columns: int | Mapping[str, Any] = 2,
+        columns: int | str | Mapping[str, Any] = 2,
         gap: int | float = 3,
         row_gap: int | float | None = None,
         column_gap: int | float | None = None,
@@ -226,7 +261,7 @@ class Grid(Widget):
             height=height,
             props=_named_props(
                 props,
-                columns=_clean_value(columns),
+                columns=_grid_columns(columns),
                 gap=gap,
                 rowGap=row_gap,
                 columnGap=column_gap,

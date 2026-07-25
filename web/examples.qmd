@@ -73,7 +73,7 @@ filters = ax.Theme(
         "refresh": ax.Button(
             "Refresh",
             variant="primary",
-            callbacks=[lambda _button: setattr(status, "value", "Refreshed")],
+            callbacks=[lambda _button: setattr(status, "text", "Refreshed")],
         ),
     },
     gap=3,

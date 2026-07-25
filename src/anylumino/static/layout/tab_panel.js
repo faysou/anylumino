@@ -1,49 +1,33 @@
 import { TabPanel, Widget } from "@lumino/widgets";
 import {
+  clampIndex,
+  coalesce,
   combineSignals,
   cssSize,
   disposeLuminoWidget,
+  fitContentEnabled,
   installResizeHandle,
+  labelSlot,
+  measuredContentHeight,
+  modelListeners,
   notifyLuminoWidgetVisible,
-  removeModelListener,
+  renderChildError,
   renderWidgetRef,
+  reusableSlots,
 } from "./composition.js";
 
-function clampIndex(index, length) {
-  if (length <= 0) {
-    return -1;
-  }
-  if (!Number.isFinite(index)) {
-    return 0;
-  }
-  return Math.max(0, Math.min(length - 1, Math.trunc(index)));
-}
+function createSlot(index, ref, titles, keys, parentSignal) {
+  const node = document.createElement("div");
+  node.className = "anylumino-TabPanelChild";
+  node.dataset.anyluminoRef = ref;
+  node.dataset.anyluminoRendered = "false";
+  node.dataset.anyluminoRendering = "false";
 
-function titleFor(index, titles) {
-  const title = titles[index];
-  if (typeof title === "string" && title.trim()) {
-    return title;
-  }
-  return `Tab ${index + 1}`;
-}
-
-function fitContentEnabled(model) {
-  return Boolean(model.get("fit_content"));
-}
-
-function measuredContentHeight(node, options = {}) {
-  if (!node) {
-    return 0;
-  }
-
-  const includeSelf = options.includeSelf ?? true;
-  const nodeRect = node.getBoundingClientRect();
-  let height = includeSelf ? Math.max(node.scrollHeight, node.offsetHeight, nodeRect.height) : 0;
-  for (const child of node.children) {
-    const childRect = child.getBoundingClientRect();
-    height = Math.max(height, child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
-  }
-  return Math.ceil(height);
+  const slot = new Widget({ node });
+  labelSlot(slot, index, titles, keys, "Tab");
+  slot.anyluminoController = new AbortController();
+  slot.anyluminoSignal = combineSignals(parentSignal, slot.anyluminoController.signal);
+  return slot;
 }
 
 export default {
@@ -85,7 +69,6 @@ export default {
     panel.tabsMovable = Boolean(model.get("tabs_movable"));
     Widget.attach(panel, root);
 
-    let childController = new AbortController();
     let selectionFromFrontend = false;
     let syncingFromModel = false;
     let lastFitHeight = 0;
@@ -138,10 +121,8 @@ export default {
 
     const syncSize = () => {
       root.style.width = cssSize(model.get("width"), "100%");
-      if (fitContentEnabled(model)) {
-        root.style.height = cssSize(model.get("height"), "420px");
-      } else {
-        root.style.height = cssSize(model.get("height"), "420px");
+      root.style.height = cssSize(model.get("height"), "420px");
+      if (!fitContentEnabled(model)) {
         lastFitHeight = 0;
       }
       root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
@@ -173,70 +154,98 @@ export default {
       notifyCurrentWidgetVisible();
     };
 
-    const clearPanel = () => {
-      childController.abort();
-      childController = new AbortController();
-      for (const widget of [...panel.widgets]) {
-        disposeLuminoWidget(widget);
-      }
-    };
-
     const renderCurrentChild = async () => {
-      const currentWidget = panel.currentWidget;
-      if (!currentWidget || currentWidget.node.dataset.anyluminoRendered === "true") {
+      const slot = panel.currentWidget;
+      if (!slot) {
+        return;
+      }
+      if (slot.node.dataset.anyluminoRendered !== "false") {
         notifyCurrentWidgetVisible();
         return;
       }
-      if (currentWidget.node.dataset.anyluminoRendering === "true") {
+      if (slot.node.dataset.anyluminoRendering === "true") {
         return;
       }
 
-      currentWidget.node.dataset.anyluminoRendering = "true";
-      await new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve));
-      });
-      if (childController.signal.aborted || !currentWidget.isVisible) {
-        currentWidget.node.dataset.anyluminoRendering = "false";
-        return;
-      }
+      slot.node.dataset.anyluminoRendering = "true";
+      try {
+        await new Promise((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(resolve));
+        });
+        if (slot.anyluminoSignal.aborted || !slot.isVisible) {
+          return;
+        }
 
-      const ref = currentWidget.node.dataset.anyluminoRef;
-      if (!ref) {
-        currentWidget.node.dataset.anyluminoRendering = "false";
-        return;
-      }
+        const ref = slot.node.dataset.anyluminoRef;
+        if (!ref) {
+          return;
+        }
 
-      const childSignal = combineSignals(signal, childController.signal);
-      if (childSignal.aborted || !currentWidget.isVisible) {
-        currentWidget.node.dataset.anyluminoRendering = "false";
-        return;
+        await renderWidgetRef(model, host, ref, slot.node, slot.anyluminoSignal);
+        slot.node.dataset.anyluminoRendered = "true";
+        notifyCurrentWidgetVisible();
+        scheduleFitContent();
+      } catch (error) {
+        // Show the failure in the tab that owns it instead of leaving it blank.
+        if (!slot.anyluminoSignal.aborted) {
+          slot.node.dataset.anyluminoRendered = "error";
+          renderChildError(slot.node, error);
+          console.error("[anylumino] Child widget failed to render.", error);
+        }
+      } finally {
+        slot.node.dataset.anyluminoRendering = "false";
       }
+    };
 
-      await renderWidgetRef(model, host, ref, currentWidget.node, childSignal);
-      currentWidget.node.dataset.anyluminoRendered = "true";
-      currentWidget.node.dataset.anyluminoRendering = "false";
-      notifyCurrentWidgetVisible();
-      scheduleFitContent();
+    const panelMatchesModel = () => {
+      const refs = model.get("widgets") ?? [];
+      const slots = [...panel.widgets];
+      return (
+        slots.length === refs.length &&
+        slots.every((slot, index) => slot.node.dataset.anyluminoRef === refs[index])
+      );
+    };
+
+    const syncTitles = () => {
+      const titles = model.get("titles") ?? [];
+      const keys = model.get("child_keys") ?? [];
+      [...panel.widgets].forEach((slot, index) => labelSlot(slot, index, titles, keys, "Tab"));
+      updatePanel();
     };
 
     const renderChildren = async () => {
+      // A tab drag already moved the tab, and Python echoes the new order back.
+      // Rebuilding then would remount every child and snap the tabs back.
+      if (panelMatchesModel()) {
+        syncTitles();
+        syncSelectedIndex();
+        await renderCurrentChild();
+        return;
+      }
+
       const refs = model.get("widgets") ?? [];
       const titles = model.get("titles") ?? [];
       const keys = model.get("child_keys") ?? [];
 
+      const reusable = reusableSlots([...panel.widgets]);
+      const nextSlots = refs.map((ref, index) => {
+        const existing = reusable.take(ref);
+        if (existing === undefined) {
+          return createSlot(index, ref, titles, keys, signal);
+        }
+        existing.parent = null;
+        labelSlot(existing, index, titles, keys, "Tab");
+        return existing;
+      });
+
+      for (const slot of reusable.rest()) {
+        slot.anyluminoController.abort();
+        disposeLuminoWidget(slot);
+      }
+
       try {
         syncingFromModel = true;
-        clearPanel();
-        for (let index = 0; index < refs.length; index += 1) {
-          const node = document.createElement("div");
-          node.className = "anylumino-TabPanelChild";
-          node.dataset.anyluminoRef = refs[index];
-          node.dataset.anyluminoKey = keys[index] ?? "";
-          node.dataset.anyluminoRendered = "false";
-          node.dataset.anyluminoRendering = "false";
-          const slot = new Widget({ node });
-          slot.title.label = titleFor(index, titles);
-          slot.title.caption = slot.title.label;
+        for (const slot of nextSlots) {
           panel.addWidget(slot);
         }
       } finally {
@@ -267,45 +276,45 @@ export default {
       }
     };
 
-    const onWidgetsChanged = () => {
-      void renderChildren();
+    // Lumino reorders its own tabs on a drag; Python has to learn the new order
+    // or selected_key would point at the wrong child. The echoed widgets order
+    // already matches the panel, so it does not cause a rebuild.
+    const onTabMoved = (_sender, args) => {
+      model.send({ type: "move", from: args.fromIndex, to: args.toIndex });
     };
 
-    const onTitlesChanged = () => {
-      const titles = model.get("titles") ?? [];
-      [...panel.widgets].forEach((widget, index) => {
-        widget.title.label = titleFor(index, titles);
-        widget.title.caption = widget.title.label;
-      });
-      updatePanel();
-    };
+    const rerender = coalesce(() => {
+      if (!signal.aborted) {
+        void renderChildren();
+      }
+    });
 
     panel.currentChanged.connect(onCurrentChanged);
+    panel.tabBar.tabMoved.connect(onTabMoved);
     window.addEventListener("resize", updatePanel, { signal });
-    model.on("change:widgets", onWidgetsChanged);
-    model.on("change:child_keys", onWidgetsChanged);
-    model.on("change:titles", onTitlesChanged);
-    model.on("change:selected_index", syncSelectedIndex);
-    model.on("change:tab_placement", syncPlacement);
-    model.on("change:tabs_movable", syncMovable);
-    model.on("change:fit_content", syncSize);
-    model.on("change:width", syncSize);
-    model.on("change:height", syncSize);
+
+    const unbind = modelListeners(model, [
+      ["widgets", rerender],
+      ["child_keys", rerender],
+      ["titles", syncTitles],
+      ["selected_index", syncSelectedIndex],
+      ["tab_placement", syncPlacement],
+      ["tabs_movable", syncMovable],
+      ["fit_content", syncSize],
+      ["width", syncSize],
+      ["height", syncSize],
+    ]);
 
     signal.addEventListener(
       "abort",
       () => {
-        clearPanel();
+        for (const slot of [...panel.widgets]) {
+          slot.anyluminoController.abort();
+          disposeLuminoWidget(slot);
+        }
         panel.currentChanged.disconnect(onCurrentChanged);
-        removeModelListener(model, "change:widgets", onWidgetsChanged);
-        removeModelListener(model, "change:child_keys", onWidgetsChanged);
-        removeModelListener(model, "change:titles", onTitlesChanged);
-        removeModelListener(model, "change:selected_index", syncSelectedIndex);
-        removeModelListener(model, "change:tab_placement", syncPlacement);
-        removeModelListener(model, "change:tabs_movable", syncMovable);
-        removeModelListener(model, "change:fit_content", syncSize);
-        removeModelListener(model, "change:width", syncSize);
-        removeModelListener(model, "change:height", syncSize);
+        panel.tabBar.tabMoved.disconnect(onTabMoved);
+        unbind();
         panel.dispose();
         root.remove();
       },

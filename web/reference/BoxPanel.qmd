@@ -46,6 +46,14 @@ Lumino box layout with configurable direction, spacing, and stretch.
 | child_min_width  | int, float, str, or None                                                     | Minimum child sizes used when scrolling is enabled.                                                                                            | `None`            |
 | child_min_height | int, float, str, or None                                                     | Minimum child sizes used when scrolling is enabled.                                                                                            | `None`            |
 
+## Notes {.doc-section .doc-section-notes}
+
+A scrolling panel establishes an overflow boundary. Hosts that cap output
+height, such as VS Code notebooks, then show a scrollbar inside a scrollbar,
+and children that position popups within their own subtree are clipped at
+that boundary. Set ``fit_content=True`` instead when the panel should grow
+to its content rather than scroll.
+
 ## Attributes
 
 | Name | Description |

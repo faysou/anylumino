@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.3
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -84,7 +84,10 @@ def theme_panel(title: str, theme: dict[str, object], mode: str) -> ax.Theme:
                         {
                             "button": ax.Button("Primary", variant="primary"),
                             "badge": ax.Badge("Ready", variant="success"),
+                            # StatusDot renders only the dot and exposes its
+                            # label to screen readers, so the caption is a Text.
                             "status": ax.StatusDot("Connected", variant="success"),
+                            "status_label": ax.Text("Connected"),
                         },
                         direction="horizontal",
                         gap=2,
@@ -109,9 +112,11 @@ themes = ax.Grid(
         "runtime_light": theme_panel("Runtime blue light", runtime_blue, "light"),
         "runtime_dark": theme_panel("Runtime blue dark", runtime_blue, "dark"),
         "runtime_system": theme_panel("Runtime green system", runtime_green, "system"),
+        "runtime_lab": theme_panel("Runtime green JupyterLab", runtime_green, "jupyterlab"),
         "built_plum": theme_panel("Built plum system", built_plum, "system"),
+        "built_lab": theme_panel("Built plum JupyterLab", built_plum, "jupyterlab"),
     },
-    columns="repeat(auto-fit, minmax(260px, 1fr))",
+    columns={"minWidth": 260, "repeat": "fit"},
     gap=3,
     width="100%",
 )
@@ -123,3 +128,6 @@ assert runtime_blue["name"] == "runtime-blue"
 assert built_plum["built"] is True
 assert built_plum["name"] == "built-plum"
 assert 'data-astryx-theme="built-plum"' in built_plum["css"]
+assert themes.props["columns"] == {"minWidth": 260, "repeat": "fit"}
+assert themes["runtime_lab"].color_mode == "jupyterlab"
+assert themes["runtime_lab"].get_widget("widget-1").color_mode == "jupyterlab"

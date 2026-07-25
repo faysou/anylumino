@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.3
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -134,12 +134,14 @@ panel = Card(
 panel
 
 # %%
-table.append_row(
+# The row helpers return the normalized row id; binding it keeps the cell from
+# echoing the id next to the table.
+appended = table.append_row(
     {"symbol": "TSLA", "price": 187.42, "venue": "XNAS", "status": "Open", "qty": 120}
 )
 
 # %%
-table.prepend_row(
+prepended = table.prepend_row(
     {"symbol": "AMD", "price": 159.55, "venue": "XNAS", "status": "Open", "qty": 600}
 )
 
@@ -151,6 +153,8 @@ table.remove_row("NVDA")
 
 # %%
 assert table.row_key == "symbol"
+assert appended == "TSLA"
+assert prepended == "AMD"
 assert [row["symbol"] for row in table.rows] == ["AMD", "AAPL", "MSFT", "ASML", "TSLA"]
 assert table.rows[2]["price"] == 426.11
 assert table.rows[2]["status"] == "Filled"

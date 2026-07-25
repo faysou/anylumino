@@ -12,21 +12,7 @@ import "@spectrum-web-components/theme/scale-medium.js";
 import "@spectrum-web-components/action-button/sp-action-button.js";
 import "@spectrum-web-components/icon/sp-icon.js";
 import "../spectrum/spectrum_icons.js";
-
-function cssSize(value, fallback) {
-  if (typeof value === "string" && value.trim()) {
-    return value;
-  }
-  return fallback;
-}
-
-function removeModelListener(model, eventName, callback) {
-  try {
-    model.off(eventName, callback);
-  } catch {
-    model.off(eventName, callback, null);
-  }
-}
+import { cssSize, modelListeners } from "./composition.js";
 
 function actionId(action) {
   return String(action?.id ?? action?.label ?? "");
@@ -301,19 +287,18 @@ export default {
       panel?.update();
     };
 
-    model.on("change:actions", renderPanel);
-    model.on("change:action_kind", renderPanel);
-    model.on("change:width", syncSize);
-    model.on("change:height", syncSize);
+    const unbind = modelListeners(model, [
+      ["actions", renderPanel],
+      ["action_kind", renderPanel],
+      ["width", syncSize],
+      ["height", syncSize],
+    ]);
 
     signal.addEventListener(
       "abort",
       () => {
         clearPanel();
-        removeModelListener(model, "change:actions", renderPanel);
-        removeModelListener(model, "change:action_kind", renderPanel);
-        removeModelListener(model, "change:width", syncSize);
-        removeModelListener(model, "change:height", syncSize);
+        unbind();
         theme.remove();
       },
       { once: true },

@@ -1392,3 +1392,216 @@ def test_astryx_widget_children_are_keyed_and_composable() -> None:
         f"anywidget:{button.model_id}",
         f"anywidget:{symbol.model_id}",
     ]
+
+
+def test_single_widget_child_is_wrapped_instead_of_iterated() -> None:
+    symbol = ax.TextInput(value="NVDA", label="Symbol")
+    field = ax.Field(symbol, label="Wrapped symbol")
+    quantity = ax.NumberInput(value=100, label="Quantity")
+    group = ax.InputGroup(quantity, label="Quantity", suffix="sh")
+    card = ax.Card({"body": ax.Text("Body")})
+    theme = ax.Theme(card, brand=ax.Brand("desk", **{"color-accent": "#0057b8"}))
+
+    assert field.child_keys == ["widget-1"]
+    assert field.get_widget(0) is symbol
+    assert group.child_keys == ["widget-1"]
+    assert group.get_widget(0) is quantity
+    assert theme.child_keys == ["widget-1"]
+    assert theme.get_widget(0) is card
+    assert card.brand == theme.brand
+
+
+def test_keyed_children_widgets_reject_iteration() -> None:
+    field = ax.Field(ax.TextInput(value="NVDA"), label="Wrapped symbol")
+    panel = TabPanel({"first": TextWidget("First")})
+
+    with pytest.raises(TypeError, match="Field is not iterable"):
+        list(field)
+    with pytest.raises(TypeError, match="TabPanel is not iterable"):
+        list(panel)
+
+
+def test_keyed_access_matches_across_layouts_and_components() -> None:
+    first = TextWidget("First")
+    second = TextWidget("Second")
+    panel = TabPanel({"first": first, " second ": second})
+    stack = ax.Stack({"first": ax.Text("First"), " second ": ax.Text("Second")})
+
+    for keyed in (panel, stack):
+        assert keyed.child_keys == ["first", "second"]
+        assert 0 in keyed
+        assert -2 in keyed
+        assert 2 not in keyed
+        assert "second" in keyed
+        assert " second " in keyed
+        assert "missing" not in keyed
+        assert keyed[0] is keyed["first"]
+        assert keyed.get_key(-1) == "second"
+        assert keyed.get_index("second") == 1
+        with pytest.raises(KeyError, match="unknown widget key 'missing'"):
+            keyed["missing"]
+        with pytest.raises(IndexError, match="widget index out of range: 5"):
+            keyed[5]
+
+
+def test_remove_widget_drops_per_child_metadata() -> None:
+    split = SplitPanel(
+        [TextWidget("One"), TextWidget("Two"), TextWidget("Three")],
+        sizes=[1.0, 2.0, 3.0],
+    )
+    box = HBox([TextWidget("One"), TextWidget("Two")], stretches=[1, 5])
+    grid = GridPanel(
+        [TextWidget("One"), TextWidget("Two")],
+        areas=[{"column": "1"}, {"column": "2"}],
+    )
+
+    split.remove_widget(1)
+    box.remove_widget(0)
+    grid.remove_widget(0)
+
+    assert split.sizes == [1.0, 3.0]
+    assert split.child_keys == ["widget-1", "widget-3"]
+    assert box.stretches == [5]
+    assert grid.areas == [{"column": "2"}]
+
+
+def test_remove_widget_can_close_the_removed_child() -> None:
+    kept = TextWidget("Kept")
+    closed = TextWidget("Closed")
+    panel = TabPanel({"kept": kept, "closed": closed})
+
+    assert panel.remove_widget("closed", close=True) is closed
+    assert closed.comm is None
+    assert kept.comm is not None
+
+
+def test_assigning_widgets_rekeys_and_readopts_children() -> None:
+    first = TextWidget("First")
+    second = TextWidget("Second")
+    panel = TabPanel({"first": first, "second": second})
+
+    added = TextWidget("Added")
+    panel.widgets = [second, added]
+
+    assert panel.child_keys == ["second", "widget-3"]
+    assert panel.titles == ["second", ""]
+    assert panel["second"] is second
+    assert panel["widget-3"] is added
+
+
+def test_assigning_astryx_widgets_propagates_the_brand() -> None:
+    brand = ax.Brand("desk", **{"color-accent": "#0057b8"})
+    theme = ax.Theme({"first": ax.Text("First")}, brand=brand, mode="dark")
+    added = ax.Text("Added")
+
+    theme.widgets = [*theme.widgets, added]
+
+    assert theme.child_keys == ["first", "widget-2"]
+    assert added.brand == brand
+    assert added.color_mode == "dark"
+
+
+def test_move_widget_keeps_keys_titles_and_selection_aligned() -> None:
+    panel = TabPanel(
+        {"alpha": TextWidget("A"), "beta": TextWidget("B"), "gamma": TextWidget("C")},
+        selected_index=2,
+    )
+    gamma = panel["gamma"]
+
+    panel._handle_frontend_message(panel, {"type": "move", "from": 0, "to": 2}, None)
+
+    assert panel.child_keys == ["beta", "gamma", "alpha"]
+    assert panel.titles == ["beta", "gamma", "alpha"]
+    assert panel.selected_index == 1
+    assert panel.selected_key == "gamma"
+    assert panel["gamma"] is gamma
+
+
+def test_activation_callbacks_share_one_registration_idiom() -> None:
+    clicks: list[object] = []
+    actions: list[object] = []
+    toolbar = Toolbar([{"id": "reset", "label": "Reset"}])
+    menu = ax.DropdownMenu([{"label": "Export", "value": "export"}], label="Actions")
+    picker = DatePicker("2026-07-09")
+    spectrum_button = sx.Button(description="Run")
+
+    for widget in (toolbar, menu, picker, spectrum_button):
+        widget.on_click(lambda source: clicks.append(source))
+        widget.on_action(lambda source, value: actions.append((source, value)))
+
+    toolbar._handle_frontend_event(toolbar, {"type": "activate", "id": "reset"}, None)
+    menu._handle_frontend_message(menu, {"type": "click", "value": "export"}, None)
+    picker.value = "2026-07-10"
+    spectrum_button._handle_frontend_message(spectrum_button, {"type": "click"}, None)
+
+    assert clicks == [toolbar, menu, picker, spectrum_button]
+    assert actions == [(toolbar, "reset"), (menu, "export"), (picker, "2026-07-10")]
+
+
+def test_activation_callbacks_can_be_unregistered() -> None:
+    calls: list[str] = []
+
+    def on_click(_widget: object) -> None:
+        calls.append("click")
+
+    def on_action(_widget: object, _value: object) -> None:
+        calls.append("action")
+
+    picker = DatePicker("2026-07-09", callbacks=[on_click])
+    picker.on_action(on_action)
+    picker.value = "2026-07-10"
+    picker.on_click(on_click, remove=True)
+    picker.on_action(on_action, remove=True)
+    picker.value = "2026-07-11"
+
+    assert calls == ["action", "click"]
+
+
+def test_toolbar_callback_map_stays_mutable() -> None:
+    calls: list[str] = []
+    toolbar = Toolbar([{"id": "reset", "label": "Reset"}])
+
+    toolbar.callbacks["reset"] = lambda action_id: calls.append(action_id)
+    toolbar._handle_frontend_event(toolbar, {"type": "activate", "id": "reset"}, None)
+    del toolbar.callbacks["reset"]
+    toolbar._handle_frontend_event(toolbar, {"type": "activate", "id": "reset"}, None)
+
+    assert calls == ["reset"]
+
+
+def test_astryx_grid_columns_accept_ints_mappings_and_repeat_strings() -> None:
+    fixed = ax.Grid(columns=3)
+    mapped = ax.Grid(columns={"minWidth": 280, "repeat": "fit", "max": 4})
+    translated = ax.Grid(columns="repeat(auto-fit, minmax(260px, 1fr))")
+    filled = ax.Grid(columns="repeat(auto-fill, minmax(300px, 1fr))")
+
+    assert fixed.props["columns"] == 3
+    assert mapped.props["columns"] == {"minWidth": 280, "repeat": "fit", "max": 4}
+    assert translated.props["columns"] == {"minWidth": 260, "repeat": "fit"}
+    assert filled.props["columns"] == {"minWidth": 300, "repeat": "fill"}
+
+
+def test_astryx_grid_rejects_css_columns_astryx_cannot_render() -> None:
+    with pytest.raises(TypeError, match="'1fr 1fr' is not supported"):
+        ax.Grid(columns="1fr 1fr")
+    with pytest.raises(TypeError, match="must be an int, a mapping, or a repeat"):
+        ax.Grid(columns=2.5)
+
+
+def test_astryx_color_mode_supports_the_jupyterlab_theme() -> None:
+    button = ax.Button("Run")
+    theme = ax.Theme({"button": button}, mode="jupyterlab")
+
+    assert theme.color_mode == "jupyterlab"
+    assert button.color_mode == "jupyterlab"
+
+
+def test_astryx_continuous_update_defers_input_values() -> None:
+    live = ax.TextInput(value="AAPL", label="Symbol")
+    deferred = ax.TextInput(value="AAPL", label="Symbol", continuous_update=False)
+    slider = ax.Slider(value=42, label="Risk", continuous_update=False)
+
+    assert live.continuous_update is True
+    assert deferred.continuous_update is False
+    assert slider.continuous_update is False
+    assert "continuous_update" not in deferred.props

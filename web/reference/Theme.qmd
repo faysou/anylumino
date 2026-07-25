@@ -24,22 +24,22 @@ Apply a reusable Astryx theme to child widgets.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name       | Type                        | Description                                                                                                               | Default      |
-|------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------|--------------|
-| children   | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.                                                   | `None`       |
-| brand      | Mapping\[str, Any\] \| None | Reusable Astryx theme descriptor created by :func:`Brand` or :func:`BuiltTheme`.                                          | `None`       |
-| color_mode | str                         | Astryx ``Theme`` mode for this component or subtree. Use ``"light"``, ``"dark"``, or ``"system"``.                        | `'light'`    |
-| mode       | str \| None                 | Alias for ``color_mode`` matching the Astryx ``Theme`` prop name. When provided, it takes precedence over ``color_mode``. | `None`       |
-| direction  | str                         | Layout direction.                                                                                                         | `'vertical'` |
-| gap        | int \| float                | Astryx spacing step between children.                                                                                     | `2`          |
-| align      | str \| None                 | Cross-axis alignment.                                                                                                     | `None`       |
-| justify    | str \| None                 | Main-axis alignment.                                                                                                      | `None`       |
-| width      | int \| float \| str \| None | Theme container width.                                                                                                    | `None`       |
-| height     | int \| float \| str \| None | Theme container height.                                                                                                   | `None`       |
-| padding    | int \| float \| None        | Inner padding using the Astryx spacing scale.                                                                             | `None`       |
-| wrap       | str \| None                 | Stack wrapping behavior.                                                                                                  | `None`       |
-| scrollable | bool \| None                | Whether overflow should scroll.                                                                                           | `None`       |
-| **props    | Any                         | JSON-safe Stack props forwarded to Astryx. See the ``Astryx Props`` section below.                                        | `{}`         |
+| Name       | Type                        | Description                                                                                                                                                                                   | Default      |
+|------------|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| children   | ChildInput                  | Child widget, sequence of widgets, or mapping of slot names to widgets.                                                                                                                       | `None`       |
+| brand      | Mapping\[str, Any\] \| None | Reusable Astryx theme descriptor created by :func:`Brand` or :func:`BuiltTheme`.                                                                                                              | `None`       |
+| color_mode | str                         | Astryx ``Theme`` mode for this component or subtree. Use ``"light"``, ``"dark"``, ``"system"`` to follow the OS ``prefers-color-scheme``, or ``"jupyterlab"`` to follow the JupyterLab theme. | `'light'`    |
+| mode       | str \| None                 | Alias for ``color_mode`` matching the Astryx ``Theme`` prop name. When provided, it takes precedence over ``color_mode``.                                                                     | `None`       |
+| direction  | str                         | Layout direction.                                                                                                                                                                             | `'vertical'` |
+| gap        | int \| float                | Astryx spacing step between children.                                                                                                                                                         | `2`          |
+| align      | str \| None                 | Cross-axis alignment.                                                                                                                                                                         | `None`       |
+| justify    | str \| None                 | Main-axis alignment.                                                                                                                                                                          | `None`       |
+| width      | int \| float \| str \| None | Theme container width.                                                                                                                                                                        | `None`       |
+| height     | int \| float \| str \| None | Theme container height.                                                                                                                                                                       | `None`       |
+| padding    | int \| float \| None        | Inner padding using the Astryx spacing scale.                                                                                                                                                 | `None`       |
+| wrap       | str \| None                 | Stack wrapping behavior.                                                                                                                                                                      | `None`       |
+| scrollable | bool \| None                | Whether overflow should scroll.                                                                                                                                                               | `None`       |
+| **props    | Any                         | JSON-safe Stack props forwarded to Astryx. See the ``Astryx Props`` section below.                                                                                                            | `{}`         |
 
 ## Astryx Props {.doc-section .doc-section-astryx-props}
 

@@ -7,9 +7,21 @@
 
 .anylumino-AstryxWidgetHost {
   display: block;
+  width: 100%;
   min-width: 0;
   color: var(--color-text-primary, #111111);
   font: 13px / 1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/*
+ * Components that lay their content out across the full width need a definite
+ * width to work with. A child host in a shrink-to-fit context such as a
+ * horizontal Stack otherwise collapses to max-content, which leaves a
+ * space-between header with no free space and the label touching the value.
+ */
+.anylumino-ProgressBarHost,
+.anylumino-SliderHost {
+  min-width: 180px;
 }
 
 .anylumino-AstryxChild {

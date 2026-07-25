@@ -6,6 +6,7 @@ from typing import Any, Iterable
 import anywidget
 import traitlets as t
 
+from .common import ActivationCallbacks
 from .common import static_asset
 
 
@@ -79,6 +80,20 @@ def _view_for_child(child: object) -> object:
     return child
 
 
+def _is_child(value: object) -> bool:
+    if isinstance(getattr(value, "model_id", None), str):
+        return True
+    return isinstance(getattr(getattr(value, "widget", None), "model_id", None), str)
+
+
+def _as_child_list(children: ChildInput) -> list[Any]:
+    if children is None:
+        return []
+    if _is_child(children):
+        return [children]
+    return list(children)
+
+
 def _normalize_keys(keys: Iterable[str] | None, length: int) -> list[str]:
     if keys is None:
         key_list = [f"widget-{index + 1}" for index in range(length)]
@@ -122,7 +137,7 @@ def _normalize_children(
         owner_list = list(children.values())
         title_list = _normalize_titles(titles, key_list, default_to_keys=True)
     else:
-        owner_list = _as_list(children)
+        owner_list = _as_child_list(children)
         key_list = _normalize_keys(keys, len(owner_list))
         title_list = _normalize_titles(titles, key_list, default_to_keys=False)
 
@@ -131,7 +146,112 @@ def _normalize_children(
     return widget_list, owner_list, key_list, title_list
 
 
-class LayoutWidget(anywidget.AnyWidget):
+class _KeyedChildren(ActivationCallbacks):
+    """Keyed access to the children of a composed anylumino widget.
+
+    Children are stored as a synced ``widgets`` list of rendered views plus a
+    parallel ``child_keys`` list. ``get_widget`` returns the view that renders
+    in the browser and ``get_owner`` returns the object that was passed in, so
+    wrapper objects exposing a ``widget`` attribute keep their own API.
+    Subscripting returns the owner.
+    """
+
+    widgets: list[Any]
+    child_keys: list[str]
+    titles: list[str]
+    _owners_by_key: dict[str, Any]
+    _syncing_children: bool
+
+    def __contains__(self, key: object) -> bool:
+        if isinstance(key, bool):
+            return False
+        if isinstance(key, int):
+            return -len(self.child_keys) <= key < len(self.child_keys)
+        return str(key).strip() in self.child_keys
+
+    def __getitem__(self, key_or_index: str | int) -> object:
+        return self.get_owner(key_or_index)
+
+    def __iter__(self) -> Any:
+        msg = (
+            f"{type(self).__name__} is not iterable. Pass children as a list or mapping, "
+            "and read one child with get_widget or get_owner."
+        )
+        raise TypeError(msg)
+
+    def get_index(self, key: str) -> int:
+        return self._resolve_index(key)
+
+    def get_key(self, index: int) -> str:
+        return self.child_keys[self._resolve_index(index)]
+
+    def get_widget(self, key_or_index: str | int) -> object:
+        return self.widgets[self._resolve_index(key_or_index)]
+
+    def get_owner(self, key_or_index: str | int) -> object:
+        index = self._resolve_index(key_or_index)
+        return self._owners_by_key.get(self.child_keys[index], self.widgets[index])
+
+    def _resolve_index(self, key_or_index: str | int) -> int:
+        count = len(self.child_keys)
+        if isinstance(key_or_index, int) and not isinstance(key_or_index, bool):
+            if -count <= key_or_index < count:
+                return key_or_index if key_or_index >= 0 else count + key_or_index
+            msg = f"widget index out of range: {key_or_index}"
+            raise IndexError(msg)
+        key = str(key_or_index).strip()
+        try:
+            return self.child_keys.index(key)
+        except ValueError:
+            available = ", ".join(self.child_keys) or "none"
+            msg = f"unknown widget key {key!r}; available keys: {available}"
+            raise KeyError(msg) from None
+
+    def _adopt_children(self, views: Iterable[object]) -> None:
+        """Apply parent-owned state to newly attached children."""
+
+    def _drop_child_metadata(self, index: int) -> None:
+        """Drop per-child metadata for a child that was removed."""
+
+    def _rekey_children(self, previous: list[object], current: list[object]) -> None:
+        previous_keys = {id(view): key for view, key in zip(previous, self.child_keys)}
+        titles_by_key = dict(zip(self.child_keys, self._complete_titles()))
+        key_list: list[str] = []
+        adopted: list[object] = []
+        for view in current:
+            key = previous_keys.pop(id(view), None)
+            if key is None:
+                key = self._unused_key(key_list)
+                adopted.append(view)
+            key_list.append(key)
+        owners = {key: self._owners_by_key.get(key, view) for key, view in zip(key_list, current)}
+        self._syncing_children = True
+        try:
+            with self.hold_sync():
+                self.child_keys = key_list
+                self.titles = [titles_by_key.get(key, "") for key in key_list]
+                self._owners_by_key = owners
+        finally:
+            self._syncing_children = False
+        self._adopt_children(adopted)
+
+    def _observe_widgets(self, change: dict[str, Any]) -> None:
+        if self._syncing_children:
+            return
+        self._rekey_children(list(change["old"]), list(change["new"]))
+
+    def _unused_key(self, taken: Iterable[str]) -> str:
+        used = set(self.child_keys) | set(taken)
+        index = len(used) + 1
+        while f"widget-{index}" in used:
+            index += 1
+        return f"widget-{index}"
+
+    def _complete_titles(self) -> list[str]:
+        return list(self.titles)
+
+
+class LayoutWidget(_KeyedChildren, anywidget.AnyWidget):
     """Base class for keyed anywidget composition layouts.
 
     ``LayoutWidget`` stores child widgets in a keyed map while syncing the
@@ -174,26 +294,27 @@ class LayoutWidget(anywidget.AnyWidget):
     ) -> None:
         widget_list, owner_list, key_list, title_list = _normalize_children(widgets, titles, keys)
         self._owners_by_key = dict(zip(key_list, owner_list, strict=True))
-        super().__init__(
-            widgets=widget_list,
-            child_keys=key_list,
-            titles=title_list,
-            width=_size_to_css(width, "100%"),
-            height=_size_to_css(height, "420px"),
-            resizable=resizable,
-            scroll_x=scroll_x,
-            scroll_y=scroll_y,
-            child_min_width=_size_to_css(child_min_width, "0px"),
-            child_min_height=_size_to_css(child_min_height, "0px"),
-            fit_content=fit_content,
-            **kwargs,
-        )
-
-    def __contains__(self, key: object) -> bool:
-        return str(key) in self.child_keys
-
-    def __getitem__(self, key: str) -> object:
-        return self.get_owner(key)
+        self._init_callbacks()
+        self._syncing_children = True
+        try:
+            super().__init__(
+                widgets=widget_list,
+                child_keys=key_list,
+                titles=title_list,
+                width=_size_to_css(width, "100%"),
+                height=_size_to_css(height, "420px"),
+                resizable=resizable,
+                scroll_x=scroll_x,
+                scroll_y=scroll_y,
+                child_min_width=_size_to_css(child_min_width, "0px"),
+                child_min_height=_size_to_css(child_min_height, "0px"),
+                fit_content=fit_content,
+                **kwargs,
+            )
+        finally:
+            self._syncing_children = False
+        self.observe(self._observe_widgets, names="widgets")
+        self.on_msg(self._handle_frontend_message)
 
     @property
     def selected_key(self) -> str | None:
@@ -213,19 +334,6 @@ class LayoutWidget(anywidget.AnyWidget):
     def selected_owner(self) -> object | None:
         selected_key = self.selected_key
         return self.get_owner(selected_key) if selected_key is not None else None
-
-    def get_index(self, key: str) -> int:
-        return self.child_keys.index(_key_to_string(key))
-
-    def get_key(self, index: int) -> str:
-        return self.child_keys[index]
-
-    def get_widget(self, key_or_index: str | int) -> object:
-        return self.widgets[self._resolve_index(key_or_index)]
-
-    def get_owner(self, key_or_index: str | int) -> object:
-        key = self.child_keys[self._resolve_index(key_or_index)]
-        return self._owners_by_key.get(key, self.get_widget(key))
 
     def select_key(self, key: str) -> None:
         if not hasattr(self, "selected_index"):
@@ -269,27 +377,70 @@ class LayoutWidget(anywidget.AnyWidget):
         child_title = title or (child_key if has_explicit_key else f"{self._title_prefix} {next_index + 1}")
         view = _view_for_child(widget)
         titles = self._complete_titles()
-        with self.hold_sync():
-            self.widgets = [*self.widgets, view]
-            self.child_keys = [*self.child_keys, child_key]
-            self.titles = [*titles, child_title]
-            self._owners_by_key[child_key] = widget
-            if select and hasattr(self, "selected_index"):
-                self.selected_index = next_index
+        self._syncing_children = True
+        try:
+            with self.hold_sync():
+                self.widgets = [*self.widgets, view]
+                self.child_keys = [*self.child_keys, child_key]
+                self.titles = [*titles, child_title]
+                self._owners_by_key[child_key] = widget
+                if select and hasattr(self, "selected_index"):
+                    self.selected_index = next_index
+        finally:
+            self._syncing_children = False
+        self._adopt_children([view])
 
-    def remove_widget(self, key_or_index: str | int) -> object:
+    def remove_widget(self, key_or_index: str | int, *, close: bool = False) -> object:
+        """Remove a child and return the owner that was passed in.
+
+        Pass ``close=True`` to also close the removed widget models. Closing
+        releases them from the ipywidgets registry and makes them unusable, so
+        the default keeps the returned owner alive for the caller to reuse.
+        """
         index = self._resolve_index(key_or_index)
         key = self.child_keys[index]
         owner = self.get_owner(index)
+        view = self.widgets[index]
         titles = self._complete_titles()
-        with self.hold_sync():
-            self.widgets = [*self.widgets[:index], *self.widgets[index + 1 :]]
-            self.child_keys = [*self.child_keys[:index], *self.child_keys[index + 1 :]]
-            self.titles = [*titles[:index], *titles[index + 1 :]]
-            self._owners_by_key.pop(key, None)
-            if hasattr(self, "selected_index"):
-                self.selected_index = min(self.selected_index, len(self.widgets) - 1) if self.widgets else 0
+        self._syncing_children = True
+        try:
+            with self.hold_sync():
+                self.widgets = [*self.widgets[:index], *self.widgets[index + 1 :]]
+                self.child_keys = [*self.child_keys[:index], *self.child_keys[index + 1 :]]
+                self.titles = [*titles[:index], *titles[index + 1 :]]
+                self._owners_by_key.pop(key, None)
+                self._drop_child_metadata(index)
+                if hasattr(self, "selected_index"):
+                    self.selected_index = min(self.selected_index, len(self.widgets) - 1) if self.widgets else 0
+        finally:
+            self._syncing_children = False
+        if close:
+            for target in {id(view): view, id(owner): owner}.values():
+                closer = getattr(target, "close", None)
+                if callable(closer):
+                    closer()
         return owner
+
+    def move_widget(self, key_or_index: str | int, index: int) -> None:
+        """Move a child to a new position, keeping keys and titles aligned."""
+        current = self._resolve_index(key_or_index)
+        target = max(0, min(len(self.child_keys) - 1, index))
+        if current == target:
+            return
+        selected_key = self.selected_key
+        titles = self._complete_titles()
+        order = [position for position in range(len(self.child_keys)) if position != current]
+        order.insert(target, current)
+        self._syncing_children = True
+        try:
+            with self.hold_sync():
+                self.widgets = [self.widgets[position] for position in order]
+                self.child_keys = [self.child_keys[position] for position in order]
+                self.titles = [titles[position] for position in order]
+                if selected_key is not None and hasattr(self, "selected_index"):
+                    self.selected_index = self.child_keys.index(selected_key)
+        finally:
+            self._syncing_children = False
 
     def rename_widget(self, key_or_index: str | int, title: str) -> None:
         index = self._resolve_index(key_or_index)
@@ -297,10 +448,16 @@ class LayoutWidget(anywidget.AnyWidget):
         titles[index] = title
         self.titles = titles
 
-    def _resolve_index(self, key_or_index: str | int) -> int:
-        if isinstance(key_or_index, int):
-            return key_or_index
-        return self.get_index(key_or_index)
+    def _handle_frontend_message(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
+        if content.get("type") != "move":
+            return
+        from_index = content.get("from")
+        to_index = content.get("to")
+        if not isinstance(from_index, int) or not isinstance(to_index, int):
+            return
+        if not 0 <= from_index < len(self.child_keys):
+            return
+        self.move_widget(from_index, to_index)
 
     def _next_key(self, key: str | None = None) -> str:
         if key is not None:
@@ -309,10 +466,7 @@ class LayoutWidget(anywidget.AnyWidget):
                 msg = f"widget key already exists: {child_key}"
                 raise ValueError(msg)
             return child_key
-        index = len(self.child_keys) + 1
-        while f"widget-{index}" in self.child_keys:
-            index += 1
-        return f"widget-{index}"
+        return self._unused_key(())
 
     def _complete_titles(self) -> list[str]:
         titles = list(self.titles)
@@ -354,7 +508,9 @@ class TabPanel(LayoutWidget):
     tab_placement : {"top", "bottom", "left", "right"}, default "top"
         Where Lumino should place the tab bar.
     tabs_movable : bool, default False
-        Whether tabs can be reordered in the frontend.
+        Whether tabs can be reordered in the frontend. A drag reorders
+        ``widgets``, ``child_keys``, and ``titles`` in Python too, so
+        ``selected_key`` keeps naming the visible child.
     width : int, float, str, or None
         Widget width. Numbers above 1 are pixels, numbers between 0 and 1 are
         percentages, and strings are passed through as CSS sizes.
@@ -450,6 +606,14 @@ class BoxPanel(LayoutWidget):
         Explicit horizontal or vertical overflow controls.
     child_min_width, child_min_height : int, float, str, or None
         Minimum child sizes used when scrolling is enabled.
+
+    Notes
+    -----
+    A scrolling panel establishes an overflow boundary. Hosts that cap output
+    height, such as VS Code notebooks, then show a scrollbar inside a scrollbar,
+    and children that position popups within their own subtree are clipped at
+    that boundary. Set ``fit_content=True`` instead when the panel should grow
+    to its content rather than scroll.
     """
 
     _esm = static_asset("layout/layout_panel.bundle.js")
@@ -500,6 +664,10 @@ class BoxPanel(LayoutWidget):
             spacing=spacing,
             stretches=_as_list(stretches),
         )
+
+    def _drop_child_metadata(self, index: int) -> None:
+        if index < len(self.stretches):
+            self.stretches = [*self.stretches[:index], *self.stretches[index + 1 :]]
 
 
 class HBox(BoxPanel):
@@ -762,6 +930,10 @@ class SplitPanel(LayoutWidget):
             sizes=_as_list(sizes),
         )
 
+    def _drop_child_metadata(self, index: int) -> None:
+        if index < len(self.sizes):
+            self.sizes = [*self.sizes[:index], *self.sizes[index + 1 :]]
+
 
 class DockPanel(LayoutWidget):
     """Lumino dock panel for tabbed or split workspace-style layouts.
@@ -966,6 +1138,10 @@ class GridPanel(LayoutWidget):
             areas=_as_list(areas),
         )
 
+    def _drop_child_metadata(self, index: int) -> None:
+        if index < len(self.areas):
+            self.areas = [*self.areas[:index], *self.areas[index + 1 :]]
+
 
 class ResponsivePanel(LayoutWidget):
     """Box layout that switches direction when its width crosses a breakpoint.
@@ -1033,7 +1209,7 @@ class ResponsivePanel(LayoutWidget):
         )
 
 
-class _ActionWidget(anywidget.AnyWidget):
+class _ActionWidget(ActivationCallbacks, anywidget.AnyWidget):
     _esm = static_asset("layout/action_panel.bundle.js")
     _css = static_asset("layout/action_panel.css")
 
@@ -1051,7 +1227,8 @@ class _ActionWidget(anywidget.AnyWidget):
         height: int | float | str | None = "auto",
         **kwargs: Any,
     ) -> None:
-        self._callbacks = callbacks or {}
+        self._init_callbacks()
+        self.callbacks = dict(callbacks or {})
         super().__init__(
             actions=_as_list(actions),
             width=_size_to_css(width, "100%"),
@@ -1066,9 +1243,11 @@ class _ActionWidget(anywidget.AnyWidget):
         action_id = content.get("id")
         if not isinstance(action_id, str):
             return
-        callback = self._callbacks.get(action_id)
+        callback = self.callbacks.get(action_id)
         if callback is not None:
             callback(action_id)
+        self._notify_action(action_id)
+        self._notify_click()
 
 
 class Toolbar(_ActionWidget):
@@ -1083,7 +1262,8 @@ class Toolbar(_ActionWidget):
         frontend. ``icon`` uses Spectrum workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by action id. A callback receives the activated
-        action id.
+        action id. The map stays available as the ``callbacks`` attribute, and
+        ``on_click`` or ``on_action`` register callbacks for every activation.
     width : int, float, str, or None
         Widget width.
     height : int, float, str, or None
@@ -1114,7 +1294,8 @@ class MenuBar(_ActionWidget):
         workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by menu item id. A callback receives the activated
-        item id.
+        item id. The map stays available as the ``callbacks`` attribute, and
+        ``on_click`` or ``on_action`` register callbacks for every activation.
     width : int, float, str, or None
         Widget width.
     height : int, float, str, or None
@@ -1144,7 +1325,8 @@ class CommandPalette(_ActionWidget):
         frontend. ``icon`` uses Spectrum workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by command id. A callback receives the activated
-        command id.
+        command id. The map stays available as the ``callbacks`` attribute, and
+        ``on_click`` or ``on_action`` register callbacks for every activation.
     width : int, float, str, or None
         Widget width.
     height : int, float, str, or None
