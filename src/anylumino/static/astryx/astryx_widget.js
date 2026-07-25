@@ -16,6 +16,7 @@ import { Button } from "@astryxdesign/core/Button";
 import { ButtonGroup } from "@astryxdesign/core/ButtonGroup";
 import { Calendar } from "@astryxdesign/core/Calendar";
 import { Card } from "@astryxdesign/core/Card";
+import { Carousel } from "@astryxdesign/core/Carousel";
 import { Center } from "@astryxdesign/core/Center";
 import { CheckboxInput } from "@astryxdesign/core/CheckboxInput";
 import { CheckboxList, CheckboxListItem } from "@astryxdesign/core/CheckboxList";
@@ -25,6 +26,7 @@ import { Code } from "@astryxdesign/core/Code";
 import { CodeBlock } from "@astryxdesign/core/CodeBlock";
 import { Collapsible } from "@astryxdesign/core/Collapsible";
 import { CommandPalette } from "@astryxdesign/core/CommandPalette";
+import { ContextMenu } from "@astryxdesign/core/ContextMenu";
 import { DateInput } from "@astryxdesign/core/DateInput";
 import { DateRangeInput } from "@astryxdesign/core/DateRangeInput";
 import { DateTimeInput } from "@astryxdesign/core/DateTimeInput";
@@ -55,6 +57,7 @@ import { Outline } from "@astryxdesign/core/Outline";
 import { Overlay } from "@astryxdesign/core/Overlay";
 import { Pagination } from "@astryxdesign/core/Pagination";
 import { Popover } from "@astryxdesign/core/Popover";
+import { PowerSearch } from "@astryxdesign/core/PowerSearch";
 import { ProgressBar } from "@astryxdesign/core/ProgressBar";
 import { RadioList, RadioListItem } from "@astryxdesign/core/RadioList";
 import { Section } from "@astryxdesign/core/Section";
@@ -125,6 +128,7 @@ const COMPONENTS = {
   ButtonGroup,
   Calendar,
   Card,
+  Carousel,
   Center,
   CheckboxInput,
   CheckboxList,
@@ -134,6 +138,7 @@ const COMPONENTS = {
   CodeBlock,
   Collapsible,
   CommandPalette,
+  ContextMenu,
   DateInput,
   DateRangeInput,
   DateTimeInput,
@@ -165,6 +170,7 @@ const COMPONENTS = {
   Overlay,
   Pagination,
   Popover,
+  PowerSearch,
   ProgressBar,
   RadioList,
   Section,
@@ -223,6 +229,7 @@ const PROP_DRIVEN_COMPONENTS = new Set([
   "NumberInput",
   "Outline",
   "Pagination",
+  "PowerSearch",
   "ProgressBar",
   "SelectableCard",
   "Selector",
@@ -1092,6 +1099,9 @@ function componentProps(model, draft, elementId) {
       ...props,
       page: Number(value ?? props.page ?? 1),
       onChange: (nextValue) => setNumberValue(model, nextValue),
+      onPageSizeChange: props.pageSizeOptions
+        ? (pageSize) => sendModelAction(model, pageSize, "pageSize")
+        : undefined,
     };
   }
 
@@ -1261,6 +1271,24 @@ function componentProps(model, draft, elementId) {
         ...(props.button ?? {}),
       },
       onOpenChange: (isOpen) => setModelOpen(model, isOpen),
+    };
+  }
+
+  if (name === "ContextMenu") {
+    return {
+      ...props,
+      items: menuItems(model, rawProps(model).items),
+      onOpenChange: (isOpen) => setModelOpen(model, isOpen),
+    };
+  }
+
+  if (name === "PowerSearch") {
+    return {
+      ...props,
+      label: label || props.label || "Search",
+      filters: asArray(value),
+      isDisabled: disabled,
+      onChange: (filters) => setArrayValue(model, filters),
     };
   }
 

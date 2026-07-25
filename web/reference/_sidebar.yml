@@ -43,6 +43,7 @@ website:
       - reference/Stack.qmd
       - reference/Grid.qmd
       - reference/Center.qmd
+      - reference/Carousel.qmd
       - reference/Section.qmd
       - reference/Card.qmd
       - reference/ClickableCard.qmd
@@ -75,6 +76,7 @@ website:
     - contents:
       - reference/Selector.qmd
       - reference/MultiSelector.qmd
+      - reference/PowerSearch.qmd
       - reference/SegmentedControl.qmd
       - reference/RadioList.qmd
       - reference/CheckboxList.qmd
@@ -87,6 +89,7 @@ website:
       - reference/ButtonGroup.qmd
       - reference/ToggleButtonGroup.qmd
       - reference/Toolbar.qmd
+      - reference/ContextMenu.qmd
       - reference/DropdownMenu.qmd
       - reference/MoreMenu.qmd
       - reference/CommandPalette.qmd
@@ -118,6 +121,7 @@ website:
       - reference/Outline.qmd
       - reference/TreeList.qmd
       - reference/Table.qmd
+      - reference/Pagination.qmd
       section: Astryx navigation and data
     id: reference
   - id: dummy-sidebar

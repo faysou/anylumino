@@ -1687,3 +1687,68 @@ def test_astryx_option_sliders_accept_shared_widget_arguments() -> None:
     assert "continuous_update" not in log.props
     assert selection.disabled is True
     assert selection.continuous_update is True
+
+
+def test_astryx_pagination_syncs_the_page_and_reports_page_size_as_an_action() -> None:
+    pages = ax.Pagination(3, total_items=120, page_size=20, page_size_options=[10, 20, 50])
+    sizes: list[object] = []
+    pages.on_action(lambda _widget, value: sizes.append(value))
+
+    pages._handle_frontend_message(pages, {"type": "click", "value": 50}, None)
+
+    assert pages.component_name == "Pagination"
+    assert pages.value == 3
+    assert pages.props == {
+        "totalItems": 120,
+        "pageSize": 20,
+        "pageSizeOptions": [10, 20, 50],
+    }
+    assert sizes == [50]
+
+
+def test_astryx_carousel_composes_children() -> None:
+    carousel = ax.Carousel({"first": ax.Text("A"), "second": ax.Text("B")}, buttons=True, snap=True)
+
+    assert carousel.component_name == "Carousel"
+    assert carousel.child_keys == ["first", "second"]
+    assert carousel.props == {"gap": 1, "hasButtons": True, "hasSnap": True}
+
+
+def test_astryx_context_menu_dispatches_items_like_a_dropdown() -> None:
+    chosen: list[object] = []
+    target = ax.Text("Right-click me")
+    menu = ax.ContextMenu(
+        [("Copy", "copy"), ("Delete", "delete")],
+        target,
+        action_callbacks=[lambda _widget, value: chosen.append(value)],
+    )
+
+    menu._handle_frontend_message(menu, {"type": "click", "value": "delete"}, None)
+
+    assert menu.component_name == "ContextMenu"
+    assert menu.get_widget(0) is target
+    assert menu.props["items"] == [
+        {"label": "Copy", "value": "copy"},
+        {"label": "Delete", "value": "delete"},
+    ]
+    assert menu.last_action == "delete"
+    assert chosen == ["delete"]
+
+
+def test_astryx_power_search_syncs_filters_as_the_value() -> None:
+    config = {
+        "name": "orders",
+        "fields": [{"key": "symbol", "label": "Symbol", "operators": [{"key": "is", "label": "is"}]}],
+    }
+    search = ax.PowerSearch(
+        config,
+        filters=[{"field": "symbol", "operator": "is", "value": "AAPL"}],
+        label="Filter",
+        clear=True,
+    )
+
+    assert search.component_name == "PowerSearch"
+    assert search.value == [{"field": "symbol", "operator": "is", "value": "AAPL"}]
+    assert search.props["config"] == config
+    assert search.props["hasClear"] is True
+    assert search.label == "Filter"

@@ -974,6 +974,72 @@ class Slider(Widget):
         )
 
 
+class PowerSearch(Widget):
+    """Build structured filters with the Astryx power search field.
+
+    ``config`` describes the searchable fields and their operators, and ``value``
+    holds the current filter records, each ``{"field": ..., "operator": ...,
+    "value": ...}``. Both are plain JSON, matching how :class:`Table` and
+    :class:`TreeList` take their data.
+
+    Parameters
+    ----------
+    config : Mapping[str, Any]
+        Search configuration: ``{"name": ..., "fields": [...]}``, where each
+        field takes a ``key``, a ``label``, and an ``operators`` sequence.
+    filters : Iterable[Mapping[str, Any]], default ()
+        Active filter records, synchronized as ``value``.
+    label : str, default ''
+        Visible or accessible label for the component.
+    placeholder : str | None, default None
+        Placeholder text shown when no filter is set.
+    disabled : bool, default False
+        Whether the component should render disabled.
+    read_only : bool | None, default None
+        Whether existing filters can be edited.
+    clear : bool | None, default None
+        Whether to show a clear control.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
+    menu_width : int | None, default None
+        Fixed suggestion menu width in pixels.
+    **props : Any
+        JSON-safe PowerSearch props forwarded to Astryx.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/PowerSearch>.
+    """
+
+    def __init__(
+        self,
+        config: Mapping[str, Any],
+        filters: Iterable[Mapping[str, Any]] = (),
+        *,
+        label: str = "",
+        placeholder: str | None = None,
+        disabled: bool = False,
+        read_only: bool | None = None,
+        clear: bool | None = None,
+        label_hidden: bool | None = None,
+        menu_width: int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "PowerSearch",
+            label=label,
+            value=list(filters),
+            disabled=disabled,
+            props=_named_props(
+                props,
+                config=config,
+                placeholder=placeholder,
+                isReadOnly=read_only,
+                hasClear=clear,
+                isLabelHidden=label_hidden,
+                menuWidth=menu_width,
+            ),
+        )
+
+
 class LogSlider(Widget):
     """Render an Astryx slider on a logarithmic scale.
 

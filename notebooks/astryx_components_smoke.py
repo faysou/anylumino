@@ -525,6 +525,53 @@ surfaces = ax.Card(
 )
 
 
+order_pages = ax.Pagination(1, total_items=120, page_size=20, page_size_options=[10, 20, 50])
+preview_carousel = ax.Carousel(
+    {
+        "first": ax.Card({"caption": ax.Text("Panel one")}, padding=3, width=220),
+        "second": ax.Card({"caption": ax.Text("Panel two")}, padding=3, width=220),
+        "third": ax.Card({"caption": ax.Text("Panel three")}, padding=3, width=220),
+    },
+    snap=True,
+)
+row_menu = ax.ContextMenu(
+    [("Copy row", "copy"), ("Export row", "export")],
+    ax.Card({"hint": ax.Text("Right-click for row actions")}, padding=3, width="100%"),
+    action_callbacks=[lambda _widget, action: record_click(_widget)],
+)
+order_filter = ax.PowerSearch(
+    {
+        "name": "orders",
+        "fields": [
+            {
+                "key": "symbol",
+                "label": "Symbol",
+                "operators": [{"key": "is", "label": "is"}, {"key": "isNot", "label": "is not"}],
+            },
+            {
+                "key": "side",
+                "label": "Side",
+                "operators": [{"key": "is", "label": "is"}],
+            },
+        ],
+    },
+    filters=[{"field": "symbol", "operator": "is", "value": "AAPL"}],
+    label="Filter orders",
+    clear=True,
+)
+
+navigation = ax.Card(
+    {
+        "filter": order_filter,
+        "carousel": preview_carousel,
+        "menu": row_menu,
+        "pages": order_pages,
+    },
+    padding=3,
+    width="100%",
+)
+
+
 app = al.VBox(
     {
         "theme": ax.Theme(
@@ -535,6 +582,7 @@ app = al.VBox(
                 "visuals": visuals,
                 "structure": structure,
                 "surfaces": surfaces,
+                "navigation": navigation,
                 "status": status,
             },
             brand=brand,
@@ -609,6 +657,12 @@ assert structure.child_keys == [
     "details",
 ]
 assert surfaces.child_keys == ["palette", "dialog", "alert"]
+assert navigation.child_keys == ["filter", "carousel", "menu", "pages"]
+assert order_pages.value == 1
+assert order_pages.props["pageSizeOptions"] == [10, 20, 50]
+assert preview_carousel.child_keys == ["first", "second", "third"]
+assert row_menu.props["items"][0] == {"label": "Copy row", "value": "copy"}
+assert order_filter.value == [{"field": "symbol", "operator": "is", "value": "AAPL"}]
 
 # %%
 

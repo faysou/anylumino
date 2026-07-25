@@ -1,0 +1,43 @@
+# Pagination { #anylumino.astryx.Pagination }
+
+```python
+Pagination(
+    page=1,
+    *,
+    total_items=None,
+    total_pages=None,
+    page_size=None,
+    page_size_options=None,
+    more=None,
+    sibling_count=None,
+    variant='',
+    size=None,
+    label='',
+    disabled=False,
+    **props,
+)
+```
+
+Page through a data set with an Astryx pagination control.
+
+``value`` holds the current one-based page. When ``page_size_options`` is
+given, choosing a new page size arrives through ``on_action`` rather than
+``value``, so the page number stays the synchronized state.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name              | Type                    | Description                                               | Default    |
+|-------------------|-------------------------|-----------------------------------------------------------|------------|
+| page              | int                     | Current one-based page, synchronized as ``value``.        | `1`        |
+| total_items       | int \| None             | Total row count, used to derive the page count.           | `None`     |
+| total_pages       | int \| None             | Explicit page count when the total row count is unknown.  | `None`     |
+| page_size         | int \| None             | Rows per page.                                            | `None`     |
+| page_size_options | Iterable\[int\] \| None | Selectable page sizes. Selecting one fires ``on_action``. | `None`     |
+| more              | bool \| None            | Whether more pages exist, for cursor-style paging.        | `None`     |
+| sibling_count     | int \| None             | Page buttons shown either side of the current page.       | `None`     |
+| variant           | str                     | Astryx visual variant.                                    | `''`       |
+| size              | str \| None             | Control size.                                             | `None`     |
+| label             | str                     | Accessible label for the control.                         | `''`       |
+| disabled          | bool                    | Whether the component should render disabled.             | `False`    |
+| **props           | Any                     | JSON-safe Pagination props forwarded to Astryx.           | `{}`       |
+| See               |                         |                                                           | _required_ |

@@ -12,6 +12,7 @@ from .data import Icon
 from .data import Kbd
 from .data import Link
 from .data import Markdown
+from .data import Pagination
 from .data import ProgressBar
 from .data import Skeleton
 from .data import Spinner
@@ -32,6 +33,7 @@ from .inputs import LogSlider
 from .inputs import MultiSelector
 from .inputs import NumberInput
 from .inputs import SelectionSlider
+from .inputs import PowerSearch
 from .inputs import Selector
 from .inputs import Slider
 from .inputs import Switch
@@ -47,6 +49,7 @@ from .surfaces import Breadcrumbs
 from .surfaces import ButtonGroup
 from .surfaces import Calendar
 from .surfaces import Card
+from .surfaces import Carousel
 from .surfaces import Center
 from .surfaces import CheckboxList
 from .surfaces import Citation
@@ -56,6 +59,7 @@ from .surfaces import Collapsible
 from .surfaces import CommandPalette
 from .surfaces import Dialog
 from .surfaces import Divider
+from .surfaces import ContextMenu
 from .surfaces import DropdownMenu
 from .surfaces import Field
 from .surfaces import FieldStatus
@@ -100,6 +104,7 @@ __all__ = [
     "ButtonGroup",
     "Calendar",
     "Card",
+    "Carousel",
     "Center",
     "Checkbox",
     "CheckboxList",
@@ -115,6 +120,7 @@ __all__ = [
     "DateTimeInput",
     "Dialog",
     "Divider",
+    "ContextMenu",
     "DropdownMenu",
     "EmptyState",
     "Field",
@@ -140,6 +146,8 @@ __all__ = [
     "Outline",
     "Overlay",
     "Popover",
+    "Pagination",
+    "PowerSearch",
     "ProgressBar",
     "RadioList",
     "Section",

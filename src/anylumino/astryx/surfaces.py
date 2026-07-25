@@ -273,6 +273,112 @@ class Grid(Widget):
         )
 
 
+class Carousel(Widget):
+    """Scroll child widgets horizontally in an Astryx carousel.
+
+    Parameters
+    ----------
+    children : ChildInput
+        Child widget, sequence of widgets, or mapping of slot names to widgets.
+    gap : int | float, default 1
+        Astryx spacing step between children.
+    buttons : bool | None, default None
+        Whether to show the previous and next controls.
+    edge_fade : bool | None, default None
+        Whether to fade content at the scroll edges.
+    snap : bool | None, default None
+        Whether scrolling snaps to each child.
+    padding : int | float | None, default None
+        Inner padding using the Astryx spacing scale.
+    **props : Any
+        JSON-safe Carousel props forwarded to Astryx.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Carousel>.
+    """
+
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        gap: int | float = 1,
+        buttons: bool | None = None,
+        edge_fade: bool | None = None,
+        snap: bool | None = None,
+        padding: int | float | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Carousel",
+            children,
+            props=_named_props(
+                props,
+                gap=gap,
+                hasButtons=buttons,
+                hasEdgeFade=edge_fade,
+                hasSnap=snap,
+                padding=padding,
+            ),
+        )
+
+
+class ContextMenu(Widget):
+    """Attach a right-click menu to child widgets.
+
+    Menu items dispatch to Python the same way :class:`DropdownMenu` items do,
+    through ``on_action`` and ``last_action``.
+
+    JupyterLab installs its own context menu on notebook outputs, so a right
+    click inside Lab opens both menus. Prefer :class:`DropdownMenu` or
+    :class:`MoreMenu` for a notebook-facing menu, and reach for this one when
+    the output is embedded somewhere Lab does not claim the event.
+
+    Parameters
+    ----------
+    items : Iterable[Any]
+        Menu item records. Each item takes a ``label`` and a ``value``, and may
+        set ``disabled`` or ``{"type": "divider"}``.
+    children : ChildInput
+        The widgets that respond to a right click.
+    size : str | None, default None
+        Menu item size.
+    menu_width : int | None, default None
+        Fixed menu width in pixels.
+    disabled : bool, default False
+        Whether the menu is suppressed.
+    action_callbacks : Iterable[Callable[[ComponentWidget, Any], None]] | None
+        Python callbacks receiving the chosen item value.
+    **props : Any
+        JSON-safe ContextMenu props forwarded to Astryx.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/ContextMenu>.
+    """
+
+    def __init__(
+        self,
+        items: Iterable[Any],
+        children: ChildInput = None,
+        *,
+        size: str | None = None,
+        menu_width: int | None = None,
+        disabled: bool = False,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "ContextMenu",
+            children,
+            disabled=disabled,
+            action_callbacks=action_callbacks,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                size=size,
+                menuWidth=menu_width,
+            ),
+        )
+
+
 class Center(Widget):
     """Center child content in an Astryx container.
 

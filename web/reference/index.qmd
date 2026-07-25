@@ -61,6 +61,7 @@ Containers for arranging Astryx content inside notebook outputs.
 | [Stack](Stack.qmd#anylumino.astryx.Stack) | Arrange child widgets in an Astryx stack. |
 | [Grid](Grid.qmd#anylumino.astryx.Grid) | Arrange child widgets in an Astryx grid. |
 | [Center](Center.qmd#anylumino.astryx.Center) | Center child content in an Astryx container. |
+| [Carousel](Carousel.qmd#anylumino.astryx.Carousel) | Scroll child widgets horizontally in an Astryx carousel. |
 | [Section](Section.qmd#anylumino.astryx.Section) | Render an Astryx section container. |
 | [Card](Card.qmd#anylumino.astryx.Card) | Render an Astryx card container. |
 | [ClickableCard](ClickableCard.qmd#anylumino.astryx.ClickableCard) | Render an Astryx card that behaves like an action target. |
@@ -103,6 +104,7 @@ Choice controls, searchable fields, and tokenized filters.
 | --- | --- |
 | [Selector](Selector.qmd#anylumino.astryx.Selector) | Render a single-value Astryx selector. |
 | [MultiSelector](MultiSelector.qmd#anylumino.astryx.MultiSelector) | Render an Astryx selector that accepts multiple values. |
+| [PowerSearch](PowerSearch.qmd#anylumino.astryx.PowerSearch) | Build structured filters with the Astryx power search field. |
 | [SegmentedControl](SegmentedControl.qmd#anylumino.astryx.SegmentedControl) | Render a compact Astryx segmented control. |
 | [RadioList](RadioList.qmd#anylumino.astryx.RadioList) | Render a single-choice Astryx radio list. |
 | [CheckboxList](CheckboxList.qmd#anylumino.astryx.CheckboxList) | Render a multi-choice Astryx checkbox list. |
@@ -120,6 +122,7 @@ Buttons, toolbars, menus, and command launchers.
 | [ButtonGroup](ButtonGroup.qmd#anylumino.astryx.ButtonGroup) | Render an Astryx button group from item records. |
 | [ToggleButtonGroup](ToggleButtonGroup.qmd#anylumino.astryx.ToggleButtonGroup) | Render a single- or multiple-selection group of toggle buttons. |
 | [Toolbar](Toolbar.qmd#anylumino.astryx.Toolbar) | Render an Astryx toolbar with optional slots. |
+| [ContextMenu](ContextMenu.qmd#anylumino.astryx.ContextMenu) | Attach a right-click menu to child widgets. |
 | [DropdownMenu](DropdownMenu.qmd#anylumino.astryx.DropdownMenu) | Render a button-backed Astryx dropdown menu. |
 | [MoreMenu](MoreMenu.qmd#anylumino.astryx.MoreMenu) | Render a compact overflow action menu. |
 | [CommandPalette](CommandPalette.qmd#anylumino.astryx.CommandPalette) | Render an inline Astryx command palette for notebook output areas. |
@@ -166,3 +169,4 @@ Tabs, lists, outlines, tree views, metadata, and tables.
 | [Outline](Outline.qmd#anylumino.astryx.Outline) | Render a table-of-contents outline. |
 | [TreeList](TreeList.qmd#anylumino.astryx.TreeList) | Render hierarchical notebook data as an expandable tree. |
 | [Table](Table.qmd#anylumino.astryx.Table) | Render a data-driven Astryx table for notebook use. |
+| [Pagination](Pagination.qmd#anylumino.astryx.Pagination) | Page through a data set with an Astryx pagination control. |

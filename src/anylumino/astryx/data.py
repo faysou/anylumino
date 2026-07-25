@@ -482,6 +482,80 @@ class Banner(Widget):
         )
 
 
+class Pagination(Widget):
+    """Page through a data set with an Astryx pagination control.
+
+    ``value`` holds the current one-based page. When ``page_size_options`` is
+    given, choosing a new page size arrives through ``on_action`` rather than
+    ``value``, so the page number stays the synchronized state.
+
+    Parameters
+    ----------
+    page : int, default 1
+        Current one-based page, synchronized as ``value``.
+    total_items : int | None, default None
+        Total row count, used to derive the page count.
+    total_pages : int | None, default None
+        Explicit page count when the total row count is unknown.
+    page_size : int | None, default None
+        Rows per page.
+    page_size_options : Iterable[int] | None, default None
+        Selectable page sizes. Selecting one fires ``on_action``.
+    more : bool | None, default None
+        Whether more pages exist, for cursor-style paging.
+    sibling_count : int | None, default None
+        Page buttons shown either side of the current page.
+    variant : str, default ''
+        Astryx visual variant.
+    size : str | None, default None
+        Control size.
+    label : str, default ''
+        Accessible label for the control.
+    disabled : bool, default False
+        Whether the component should render disabled.
+    **props : Any
+        JSON-safe Pagination props forwarded to Astryx.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Pagination>.
+    """
+
+    def __init__(
+        self,
+        page: int = 1,
+        *,
+        total_items: int | None = None,
+        total_pages: int | None = None,
+        page_size: int | None = None,
+        page_size_options: Iterable[int] | None = None,
+        more: bool | None = None,
+        sibling_count: int | None = None,
+        variant: str = "",
+        size: str | None = None,
+        label: str = "",
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Pagination",
+            value=page,
+            label=label,
+            variant=variant,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                totalItems=total_items,
+                totalPages=total_pages,
+                pageSize=page_size,
+                pageSizeOptions=list(page_size_options)
+                if page_size_options is not None
+                else None,
+                hasMore=more,
+                siblingCount=sibling_count,
+                size=size,
+            ),
+        )
+
+
 class StatusDot(Widget):
     """Render an inline Astryx status indicator.
 

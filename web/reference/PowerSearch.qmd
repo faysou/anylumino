@@ -1,0 +1,40 @@
+# PowerSearch { #anylumino.astryx.PowerSearch }
+
+```python
+PowerSearch(
+    config,
+    filters=(),
+    *,
+    label='',
+    placeholder=None,
+    disabled=False,
+    read_only=None,
+    clear=None,
+    label_hidden=None,
+    menu_width=None,
+    **props,
+)
+```
+
+Build structured filters with the Astryx power search field.
+
+``config`` describes the searchable fields and their operators, and ``value``
+holds the current filter records, each ``{"field": ..., "operator": ...,
+"value": ...}``. Both are plain JSON, matching how :class:`Table` and
+:class:`TreeList` take their data.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                            | Description                                                                                                                             | Default    |
+|--------------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|------------|
+| config       | Mapping\[str, Any\]             | Search configuration: ``{"name": ..., "fields": [...]}``, where each field takes a ``key``, a ``label``, and an ``operators`` sequence. | _required_ |
+| filters      | Iterable\[Mapping\[str, Any\]\] | Active filter records, synchronized as ``value``.                                                                                       | `()`       |
+| label        | str                             | Visible or accessible label for the component.                                                                                          | `''`       |
+| placeholder  | str \| None                     | Placeholder text shown when no filter is set.                                                                                           | `None`     |
+| disabled     | bool                            | Whether the component should render disabled.                                                                                           | `False`    |
+| read_only    | bool \| None                    | Whether existing filters can be edited.                                                                                                 | `None`     |
+| clear        | bool \| None                    | Whether to show a clear control.                                                                                                        | `None`     |
+| label_hidden | bool \| None                    | Whether to visually hide the accessible label.                                                                                          | `None`     |
+| menu_width   | int \| None                     | Fixed suggestion menu width in pixels.                                                                                                  | `None`     |
+| **props      | Any                             | JSON-safe PowerSearch props forwarded to Astryx.                                                                                        | `{}`       |
+| See          |                                 |                                                                                                                                         | _required_ |
