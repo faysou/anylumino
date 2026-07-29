@@ -17,8 +17,7 @@
 # # anylumino input controls
 #
 # Every Astryx input wrapper in one scrollable panel, each reporting its value to
-# the status line below. Astryx covers the whole set apart from the numeric list
-# inputs, which fall back to the Spectrum family.
+# the status line below.
 
 # %%
 from __future__ import annotations
@@ -27,7 +26,6 @@ from typing import Any
 
 import anylumino as al
 import anylumino.astryx as ax
-import anylumino.spectrum as sx
 
 
 def describe_value(value: Any) -> str:
@@ -82,9 +80,8 @@ controls = {
     "datetime": ax.DateTimeInput("2026-05-31T09:30", label="Datetime"),
     "time": ax.TimeInput("09:30", label="Time"),
     "tags": ax.Tokenizer(["review", "field", "lab"], value=["review", "field"], label="Tags"),
-    # Astryx has no numeric list input, so these stay on the Spectrum family.
-    "ints": sx.IntsInput(value=[1, 2, 3], description="Ints"),
-    "floats": sx.FloatsInput(value=[1.5, 2.5], description="Floats"),
+    "ints": ax.TextInput(value="1, 2, 3", label="Ints"),
+    "floats": ax.TextInput(value="1.5, 2.5", label="Floats"),
     "upload": ax.FileInput(label="Upload", mode="input"),
     "apply": ax.Button("Apply", variant="primary"),
     "valid": ax.FieldStatus("Valid", type="success"),
@@ -127,7 +124,7 @@ assert controls["selection"].value == "Medium"
 assert controls["selection-range"].value == ["Tue", "Thu"]
 assert controls["int-range"].value == [20, 80]
 assert controls["password"].props["type"] == "password"
-assert controls["ints"].value == [1, 2, 3]
-assert controls["floats"].value == [1.5, 2.5]
+assert controls["ints"].value == "1, 2, 3"
+assert controls["floats"].value == "1.5, 2.5"
 
 # %%

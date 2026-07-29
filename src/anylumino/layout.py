@@ -1259,7 +1259,7 @@ class Toolbar(_ActionWidget):
         Action definitions. Each action should include an ``id`` and ``label``;
         optional keys such as ``icon``, ``icon_src``, ``icon_size``,
         ``tooltip``, ``disabled``, or ``separator`` are forwarded to the
-        frontend. ``icon`` uses Spectrum workflow icon names.
+        frontend. ``icon`` uses bundled workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by action id. A callback receives the activated
         action id. The map stays available as the ``callbacks`` attribute, and
@@ -1290,7 +1290,7 @@ class MenuBar(_ActionWidget):
         Menu definitions. A menu normally has a ``label`` and an ``items``
         sequence. Item dictionaries should include an ``id`` and ``label`` and
         may include frontend options such as ``icon``, ``icon_src``,
-        ``icon_size``, ``disabled``, or ``separator``. ``icon`` uses Spectrum
+        ``icon_size``, ``disabled``, or ``separator``. ``icon`` uses bundled
         workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by menu item id. A callback receives the activated
@@ -1322,7 +1322,7 @@ class CommandPalette(_ActionWidget):
         Command definitions. Each command should include an ``id`` and
         ``label``; optional keys such as ``category``, ``caption``, ``icon``,
         ``icon_src``, ``icon_size``, or ``disabled`` are forwarded to the
-        frontend. ``icon`` uses Spectrum workflow icon names.
+        frontend. ``icon`` uses bundled workflow icon names.
     callbacks : dict[str, callable], optional
         Callback map keyed by command id. A callback receives the activated
         command id. The map stays available as the ``callbacks`` attribute, and

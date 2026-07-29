@@ -1,20 +1,6 @@
-import { readFile, writeFile } from "node:fs/promises";
-
 import { build } from "esbuild";
 
 const shared = {
-  banner: {
-    js: `if (!globalThis.__anyluminoSpectrumDefineGuard) {
-  const define = globalThis.customElements?.define.bind(globalThis.customElements);
-  if (define) {
-    globalThis.customElements.define = (name, constructor, options) => {
-      if (String(name).startsWith("sp-") && globalThis.customElements.get(name)) return;
-      return define(name, constructor, options);
-    };
-    globalThis.__anyluminoSpectrumDefineGuard = true;
-  }
-}`,
-  },
   bundle: true,
   format: "esm",
   minify: true,
@@ -26,9 +12,7 @@ const entries = [
   ["src/anylumino/static/layout/tab_panel.js", "src/anylumino/static/layout/tab_panel.bundle.js"],
   ["src/anylumino/static/layout/layout_panel.js", "src/anylumino/static/layout/layout_panel.bundle.js"],
   ["src/anylumino/static/layout/action_panel.js", "src/anylumino/static/layout/action_panel.bundle.js"],
-  ["src/anylumino/static/spectrum/control_widget.js", "src/anylumino/static/spectrum/control_widget.bundle.js"],
-  ["src/anylumino/static/spectrum/native_control_widget.js", "src/anylumino/static/spectrum/native_control_widget.bundle.js"],
-  ["src/anylumino/static/spectrum/spectrum_widget.js", "src/anylumino/static/spectrum/spectrum_widget.bundle.js"],
+  ["src/anylumino/static/controls/native_control_widget.js", "src/anylumino/static/controls/native_control_widget.bundle.js"],
   ["src/anylumino/static/astryx/astryx_widget.js", "src/anylumino/static/astryx/astryx_widget.bundle.js"],
 ];
 
@@ -38,15 +22,4 @@ for (const [entryPoint, outfile] of entries) {
     entryPoints: [entryPoint],
     outfile,
   });
-  if (outfile.endsWith("spectrum_widget.bundle.js")) {
-    await normalizeGeneratedWhitespace(outfile);
-  }
-}
-
-async function normalizeGeneratedWhitespace(outfile) {
-  let text = await readFile(outfile, "utf8");
-  text = text
-    .replaceAll("Gs=`[ \t\n\\f\\r]`", 'Gs="[\\\\s]"')
-    .replaceAll("[^ \t\n\\f\\r", "[^\\\\s");
-  await writeFile(outfile, text);
 }

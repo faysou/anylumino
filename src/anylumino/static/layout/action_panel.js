@@ -6,13 +6,41 @@ import {
   Widget,
 } from "@lumino/widgets";
 import { CommandRegistry } from "@lumino/commands";
-import "@spectrum-web-components/theme/sp-theme.js";
-import "@spectrum-web-components/theme/theme-light.js";
-import "@spectrum-web-components/theme/scale-medium.js";
-import "@spectrum-web-components/action-button/sp-action-button.js";
-import "@spectrum-web-components/icon/sp-icon.js";
-import "../spectrum/spectrum_icons.js";
 import { cssSize, modelListeners } from "./composition.js";
+
+const ICON_PATHS = {
+  AddContent: ["M12 5v14", "M5 12h14"],
+  ArrowDown: ["m6 9 6 6 6-6"],
+  ArrowUp: ["m18 15-6-6-6 6"],
+  CheckmarkCircle: ["M22 11.1V12a10 10 0 1 1-5.9-9.1", "m9 11 3 3L22 4"],
+  Circle: ["M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20"],
+  CircleFilled: ["M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20"],
+  ClockPending: ["M12 8v5l3 2", "M12 2a10 10 0 1 0 10 10"],
+  Comment: ["M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"],
+  Date: ["M3 5h18v16H3Z", "M16 3v4", "M8 3v4", "M3 10h18"],
+  FullScreen: ["M8 3H3v5", "M16 3h5v5", "M8 21H3v-5", "M16 21h5v-5"],
+  GraphTrend: ["m3 17 6-6 4 4 8-9", "M17 6h4v4"],
+  HelpCircle: [
+    "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20",
+    "M9.1 9a3 3 0 1 1 4.8 2.4c-1.2.8-1.9 1.4-1.9 2.6",
+    "M12 18h.01",
+  ],
+  InfoCircle: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20", "M12 10v6", "M12 7h.01"],
+  Light: ["M12 2a7 7 0 0 0 0 14Z", "M12 2v20"],
+  Magnify: ["M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16", "m21 21-4.4-4.4"],
+  RotateRight: ["M21 12a9 9 0 1 1-2.6-6.4L21 8", "M21 3v5h-5"],
+  Star: ["m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.2L5.8 21 7 14.2 2 9.3l6.9-1Z"],
+  StepForward: ["m5 4 10 8L5 20Z", "M19 5v14"],
+  Upload: ["M12 16V3", "m7 8 5-5 5 5", "M5 21h14"],
+};
+
+const ICON_SIZES = {
+  s: 16,
+  m: 18,
+  l: 20,
+  xl: 24,
+  xxl: 28,
+};
 
 function actionId(action) {
   return String(action?.id ?? action?.label ?? "");
@@ -52,13 +80,6 @@ function workflowIconName(rawName) {
     .join("");
 }
 
-function kebabName(name) {
-  return String(name)
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .replace(/_/g, "-")
-    .toLowerCase();
-}
-
 function iconSpec(action) {
   const name = String(action?.icon ?? "").trim();
   const src = String(action?.icon_src ?? "").trim();
@@ -78,26 +99,45 @@ function createIcon(action) {
   if (!spec) {
     return null;
   }
+  const size = ICON_SIZES[spec.size] ?? ICON_SIZES.s;
   if (spec.src) {
-    const icon = document.createElement("sp-icon");
+    const icon = document.createElement("img");
     icon.className = "anylumino-ToolbarIcon";
     icon.src = spec.src;
-    icon.size = spec.size;
-    icon.slot = "icon";
+    icon.width = size;
+    icon.height = size;
     if (spec.label) {
-      icon.label = spec.label;
+      icon.alt = spec.label;
     } else {
+      icon.alt = "";
       icon.setAttribute("aria-hidden", "true");
     }
     return icon;
   }
-  const tagName = `sp-icon-${kebabName(spec.name)}`;
-  const icon = document.createElement(tagName);
-  icon.className = "anylumino-ToolbarIcon";
-  icon.size = spec.size;
-  icon.slot = "icon";
+
+  const paths = ICON_PATHS[spec.name];
+  if (!paths) {
+    return null;
+  }
+
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  icon.setAttribute("class", "anylumino-ToolbarIcon");
+  icon.setAttribute("viewBox", "0 0 24 24");
+  icon.setAttribute("width", String(size));
+  icon.setAttribute("height", String(size));
+  icon.setAttribute("fill", spec.name === "CircleFilled" ? "currentColor" : "none");
+  icon.setAttribute("stroke", "currentColor");
+  icon.setAttribute("stroke-width", "2");
+  icon.setAttribute("stroke-linecap", "round");
+  icon.setAttribute("stroke-linejoin", "round");
+  for (const pathData of paths) {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", pathData);
+    icon.append(path);
+  }
   if (spec.label) {
-    icon.label = spec.label;
+    icon.setAttribute("role", "img");
+    icon.setAttribute("aria-label", spec.label);
   } else {
     icon.setAttribute("aria-hidden", "true");
   }
@@ -168,20 +208,19 @@ function createToolbar(model, activate) {
   panel.addClass("anylumino-Toolbar");
   for (const action of model.get("actions") ?? []) {
     const id = actionId(action);
-    const button = document.createElement("sp-action-button");
+    const button = document.createElement("button");
+    button.type = "button";
     button.className = "anylumino-ToolbarButton";
     button.dataset.actionId = id;
+    button.dataset.size = String(action.size ?? "s");
     button.disabled = Boolean(action.disabled);
     button.title = String(action.tooltip ?? action.caption ?? actionLabel(action));
-    button.label = actionLabel(action);
-    button.size = String(action.size ?? "s");
-    if (action.quiet ?? true) {
-      button.setAttribute("quiet", "");
-    }
+    button.classList.toggle("anylumino-mod-quiet", action.quiet ?? true);
 
     const icon = createIcon(action);
     if (icon) {
       button.classList.add("anylumino-ToolbarButtonIconOnly");
+      button.setAttribute("aria-label", actionLabel(action));
       button.appendChild(icon);
     } else {
       button.textContent = actionLabel(action);
@@ -243,12 +282,7 @@ export default {
     root.className = `anylumino-ActionHost anylumino-${model.get("action_kind")}Host`;
     root.style.width = cssSize(model.get("width"), "100%");
     root.style.height = cssSize(model.get("height"), "auto");
-    const theme = document.createElement("sp-theme");
-    theme.className = "anylumino-ActionTheme";
-    theme.color = "light";
-    theme.scale = "medium";
-    theme.append(root);
-    el.replaceChildren(theme);
+    el.replaceChildren(root);
 
     let panel = null;
     let iconObserver = null;
@@ -299,7 +333,7 @@ export default {
       () => {
         clearPanel();
         unbind();
-        theme.remove();
+        root.remove();
       },
       { once: true },
     );

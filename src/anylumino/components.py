@@ -22,9 +22,8 @@ ActionCallback = Callable[["ComponentWidget", Any], None]
 class ComponentWidget(_KeyedChildren, anywidget.AnyWidget):
     """Base class for composable component-library anywidgets.
 
-    Component families such as ``SpectrumWidget`` inherit this class to share
-    child composition, keyed access, open/close state, size traits, and
-    activation callbacks.
+    Component families inherit this class to share child composition, keyed
+    access, open/close state, size traits, and activation callbacks.
 
     ``on_click`` runs for every activation and ``on_action`` runs only for
     activations that carry a value, so a menu item choice runs both. To mirror

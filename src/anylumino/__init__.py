@@ -1,7 +1,6 @@
 from . import astryx
 from .components import ComponentWidget
 from .controls import DatePicker, DatetimePicker, TimePicker
-from . import spectrum
 from .layout import (
     AccordionPanel,
     BoxPanel,
@@ -23,7 +22,6 @@ from .layout import (
 
 __all__ = [
     "astryx",
-    "spectrum",
     "AccordionPanel",
     "BoxPanel",
     "CommandPalette",

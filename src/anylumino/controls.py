@@ -21,8 +21,8 @@ class _NativeControlWidget(ActivationCallbacks, anywidget.AnyWidget):
     new value. Both accept ``remove=True`` to unregister a callback.
     """
 
-    _esm = static_asset("spectrum/native_control_widget.bundle.js")
-    _css = static_asset("spectrum/native_control_widget.css")
+    _esm = static_asset("controls/native_control_widget.bundle.js")
+    _css = static_asset("controls/native_control_widget.css")
 
     control_family = t.Unicode("native").tag(sync=True)
     control_kind = t.Unicode("date").tag(sync=True)

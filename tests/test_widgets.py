@@ -1,14 +1,14 @@
+import importlib
 import re
 from datetime import datetime
 from inspect import signature
 from pathlib import Path
 
 import pytest
-
-from anylumino import astryx as ax
-from anylumino import spectrum as sx
 import traitlets as t
 
+import anylumino
+from anylumino import astryx as ax
 from anylumino import (
     AccordionPanel,
     BoxPanel,
@@ -371,17 +371,6 @@ def test_action_widget_invokes_registered_callback() -> None:
     assert calls == ["reset"]
 
 
-def test_control_icon_metadata_is_synced() -> None:
-    button = sx.Button(
-        description="Help",
-        icon="HelpCircle",
-        icon_size="m",
-    )
-
-    assert button.icon == "HelpCircle"
-    assert button.icon_size == "m"
-
-
 def test_menubar_and_command_palette_store_actions() -> None:
     menu_actions = [
         {
@@ -408,57 +397,25 @@ def test_menubar_and_command_palette_store_actions() -> None:
     assert palette.actions == palette_actions
 
 
-def test_anylumino_controls_are_composable_children() -> None:
-    button = sx.Button(description="Run")
-    symbol = sx.TextInput(value="Greenhouse A", description="Dataset")
-    interval = sx.Dropdown(
-        options=["Daily", "Weekly"], value="Daily", description="Interval"
-    )
-    live = sx.Checkbox(value=True, description="Enabled")
-    rows = sx.IntSlider(value=100, min=10, max=250, description="Rows")
-
-    panel = GridPanel(
-        {
-            "button": button,
-            "symbol": symbol,
-            "interval": interval,
-            "live": live,
-            "rows": rows,
-        },
-        columns="1fr",
-    )
-
-    assert isinstance(button, sx.ControlWidget)
-    assert panel.get_widget("button") is button
-    assert panel["symbol"] is symbol
-    assert panel.child_keys == ["button", "symbol", "interval", "live", "rows"]
-    assert (
-        panel.get_state(key=["widgets"])["widgets"][0] == f"anywidget:{button.model_id}"
-    )
-
-
-def test_date_controls_are_native_family_not_spectrum_controls() -> None:
-    picker = DatePicker()
-
-    assert picker.control_family == "native"
-    assert isinstance(picker, sx.ControlWidget) is False
+def test_date_controls_use_native_family() -> None:
+    assert DatePicker().control_family == "native"
 
 
 def test_widget_frontend_assets_are_lazy_paths() -> None:
     assert _asset_path(TabPanel._esm).parent.name == "layout"
     assert _asset_path(TextWidget._esm).parent.name == "layout"
-    assert _asset_path(sx.ControlWidget._esm).name == "control_widget.bundle.js"
-    assert _asset_path(sx.ControlWidget._esm).parent.name == "spectrum"
-    assert _asset_path(sx.ControlWidget._css).name == "control_widget.css"
     assert _asset_path(DatePicker._esm).name == "native_control_widget.bundle.js"
-    assert _asset_path(DatePicker._esm).parent.name == "spectrum"
+    assert _asset_path(DatePicker._esm).parent.name == "controls"
     assert _asset_path(DatePicker._css).name == "native_control_widget.css"
-    assert _asset_path(sx.SpectrumWidget._esm).name == "spectrum_widget.bundle.js"
-    assert _asset_path(sx.SpectrumWidget._esm).parent.name == "spectrum"
-    assert _asset_path(sx.SpectrumWidget._css).name == "spectrum_widget.css"
     assert _asset_path(ax.Widget._esm).name == "astryx_widget.bundle.js"
     assert _asset_path(ax.Widget._esm).parent.name == "astryx"
     assert _asset_path(ax.Widget._css).name == "astryx_widget.bundle.css"
+
+
+def test_spectrum_namespace_is_removed() -> None:
+    assert "spectrum" not in anylumino.__all__
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("anylumino.spectrum")
 
 
 def test_missing_static_asset_is_import_safe_until_loaded() -> None:
@@ -473,302 +430,6 @@ def test_datetime_picker_preserves_iso_precision() -> None:
     picker = DatetimePicker(value=datetime(2026, 6, 4, 12, 30, 15, 123456))
 
     assert picker.value == "2026-06-04T12:30:15.123456"
-
-
-def test_dropdown_option_pairs_are_normalized_once() -> None:
-    control = sx.Dropdown(options=[("One", 1), ("Two", 2)], index=1)
-
-    assert control.options == (("One", 1), ("Two", 2))
-    assert control.value == 2
-
-
-def test_html_math_is_html_alias() -> None:
-    widget = sx.HTMLMath(value="<strong>x</strong>", description="Value")
-
-    assert widget.control_kind == "html"
-    assert widget.html is True
-    assert widget.value == "<strong>x</strong>"
-
-
-def test_spectrum_component_wrappers_sync_kind_and_metadata() -> None:
-    controls = {
-        "search": sx.SearchInput(value="iris", description="Search"),
-        "switch": sx.Switch(value=True, description="Enabled"),
-        "status": sx.StatusLight(value=True, description="Ready", variant="positive"),
-        "badge": sx.Badge(value="Ready", variant="informative", icon="InfoCircle"),
-        "meter": sx.Meter(
-            value=64, description="Coverage", variant="positive", readout=True
-        ),
-        "link": sx.Link("https://example.com", description="Docs"),
-        "divider": sx.Divider(spectrum_size="l"),
-    }
-
-    assert controls["search"].control_kind == "search"
-    assert controls["switch"].control_kind == "switch"
-    assert controls["status"].variant == "positive"
-    assert controls["badge"].icon == "InfoCircle"
-    assert controls["meter"].readout is True
-    assert controls["link"].href == "https://example.com"
-    assert controls["divider"].spectrum_size == "l"
-
-
-def test_spectrum_table_normalizes_mapping_rows_and_columns() -> None:
-    table = sx.Table(
-        rows=[
-            {"symbol": "AAPL", "price": 195.12, "status": "Open"},
-            {"symbol": "MSFT", "price": 423.85, "status": "Closed"},
-        ],
-        columns=[
-            {"key": "symbol", "label": "Symbol", "sortable": True},
-            {"key": "price", "label": "Price", "align": "end"},
-            "status",
-        ],
-        row_key="symbol",
-        selected=["AAPL"],
-        selects="multiple",
-        sortable=True,
-        sort_key="price",
-        sort_direction="desc",
-        density="compact",
-        quiet=True,
-    )
-
-    assert table.component_kind == "table"
-    assert table.columns == [
-        {"key": "symbol", "label": "Symbol", "sortable": True, "align": ""},
-        {"key": "price", "label": "Price", "sortable": False, "align": "end"},
-        {"key": "status", "label": "status", "sortable": False, "align": ""},
-    ]
-    assert table.rows == [
-        {
-            "value": "AAPL",
-            "cells": {"symbol": "AAPL", "price": 195.12, "status": "Open"},
-        },
-        {
-            "value": "MSFT",
-            "cells": {"symbol": "MSFT", "price": 423.85, "status": "Closed"},
-        },
-    ]
-    assert table.selected == ["AAPL"]
-    assert table.selects == "multiple"
-    assert table.sort_key == "price"
-    assert table.sort_direction == "desc"
-    assert table.density == "compact"
-    assert table.quiet is True
-
-
-def test_spectrum_table_normalizes_sequence_rows_without_columns() -> None:
-    table = sx.Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")])
-
-    assert table.columns == [
-        {"key": "column_1", "label": "column_1", "sortable": False, "align": ""},
-        {"key": "column_2", "label": "column_2", "sortable": False, "align": ""},
-    ]
-    assert table.rows == [
-        {"value": "0", "cells": {"column_1": "Budget", "column_2": "PDF"}},
-        {"value": "1", "cells": {"column_1": "Onboarding", "column_2": "XLS"}},
-    ]
-
-
-def test_spectrum_table_helpers_replace_append_update_and_remove_rows() -> None:
-    table = sx.Table(
-        rows=[{"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"}],
-        columns={
-            "order_id": "Order",
-            "symbol": "Symbol",
-            "qty": "Qty",
-            "status": "Status",
-        },
-        row_key="order_id",
-        selected=["O-1"],
-        selects="multiple",
-    )
-
-    table.append_row({"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "NEW"})
-    table.update_row("O-2", {"qty": 7, "status": "FILLED"})
-    table.remove_row("O-1")
-
-    assert table.columns == [
-        {"key": "order_id", "label": "Order", "sortable": False, "align": ""},
-        {"key": "symbol", "label": "Symbol", "sortable": False, "align": ""},
-        {"key": "qty", "label": "Qty", "sortable": False, "align": ""},
-        {"key": "status", "label": "Status", "sortable": False, "align": ""},
-    ]
-    assert table.rows == [
-        {
-            "value": "O-2",
-            "cells": {
-                "order_id": "O-2",
-                "symbol": "MSFT",
-                "qty": 7,
-                "status": "FILLED",
-            },
-        },
-    ]
-    assert table.selected == []
-
-
-def test_spectrum_table_prepend_row_inserts_before_existing_rows() -> None:
-    table = sx.Table(
-        rows=[{"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "NEW"}],
-        columns={
-            "order_id": "Order",
-            "symbol": "Symbol",
-            "qty": "Qty",
-            "status": "Status",
-        },
-        row_key="order_id",
-    )
-
-    assert (
-        table.prepend_row(
-            {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"}
-        )
-        == "O-1"
-    )
-    assert table.rows == [
-        {
-            "value": "O-1",
-            "cells": {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
-        },
-        {
-            "value": "O-2",
-            "cells": {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "NEW"},
-        },
-    ]
-
-
-def test_spectrum_table_set_rows_accepts_live_raw_rows() -> None:
-    table = sx.Table(
-        columns=["order_id", "status"], row_key="order_id", selected=["O-1", "O-3"]
-    )
-
-    table.set_rows(
-        [
-            {"order_id": "O-1", "status": "NEW"},
-            {"order_id": "O-2", "status": "PARTIAL"},
-        ],
-    )
-
-    assert table.rows == [
-        {"value": "O-1", "cells": {"order_id": "O-1", "status": "NEW"}},
-        {"value": "O-2", "cells": {"order_id": "O-2", "status": "PARTIAL"}},
-    ]
-    assert table.selected == ["O-1"]
-
-
-def test_spectrum_table_append_row_skips_existing_auto_values_after_removal() -> None:
-    table = sx.Table(
-        rows=[("Budget", "PDF"), ("Onboarding", "XLS"), ("Quarterly", "DOC")]
-    )
-
-    table.remove_row("1")
-
-    assert table.append_row(("Roadmap", "MD")) == "3"
-    assert table.rows == [
-        {"value": "0", "cells": {"column_1": "Budget", "column_2": "PDF"}},
-        {"value": "2", "cells": {"column_1": "Quarterly", "column_2": "DOC"}},
-        {"value": "3", "cells": {"column_1": "Roadmap", "column_2": "MD"}},
-    ]
-
-
-def test_spectrum_table_prepend_row_skips_existing_auto_values() -> None:
-    table = sx.Table(rows=[("Budget", "PDF"), ("Onboarding", "XLS")])
-
-    assert table.prepend_row(("Roadmap", "MD")) == "2"
-    assert table.rows == [
-        {"value": "2", "cells": {"column_1": "Roadmap", "column_2": "MD"}},
-        {"value": "0", "cells": {"column_1": "Budget", "column_2": "PDF"}},
-        {"value": "1", "cells": {"column_1": "Onboarding", "column_2": "XLS"}},
-    ]
-
-
-def test_spectrum_table_row_helpers_reject_duplicate_and_missing_rows() -> None:
-    table = sx.Table(
-        rows=[{"order_id": "O-1", "status": "NEW"}],
-        columns=["order_id", "status"],
-        row_key="order_id",
-    )
-
-    with pytest.raises(ValueError, match="table row already exists: O-1"):
-        table.append_row({"order_id": "O-1", "status": "FILLED"})
-    with pytest.raises(ValueError, match="table row already exists: O-1"):
-        table.prepend_row({"order_id": "O-1", "status": "FILLED"})
-    with pytest.raises(KeyError, match="table row not found: O-2"):
-        table.update_row("O-2", {"status": "FILLED"})
-    with pytest.raises(KeyError, match="table row not found: O-2"):
-        table.remove_row("O-2")
-
-
-def test_selection_range_slider_resolves_index_to_values() -> None:
-    slider = sx.SelectionRangeSlider(
-        options=["Mon", "Tue", "Wed", "Thu", "Fri"],
-        index=(1, 3),
-    )
-
-    assert slider.value == ["Tue", "Thu"]
-    assert slider.index == (1, 3)
-
-
-def test_list_box_alias_uses_anylumino_select_control() -> None:
-    control = sx.ListBox(options=["Greenhouse A", "Greenhouse B"], value="Greenhouse A")
-
-    assert control.value == "Greenhouse A"
-    assert control.options == ("Greenhouse A", "Greenhouse B")
-    assert control.control_kind == "select"
-
-
-def test_spectrum_widgets_share_generic_component_base() -> None:
-    widgets = [
-        sx.SpectrumElement("section"),
-        sx.ClearButton(),
-        sx.CloseButton(),
-        sx.FieldGroup({"field": sx.TextInput(value="x")}),
-        sx.Tooltip("More detail", {"trigger": sx.Button(description="Info")}),
-        sx.OpacityCheckerboard(),
-        sx.Table(rows=[{"name": "Budget", "type": "PDF"}]),
-        sx.DialogBox({"body": TextWidget("Settings")}, title="Settings"),
-        sx.Modal({"body": TextWidget("Confirm")}, title="Confirm"),
-    ]
-
-    assert [isinstance(widget, ComponentWidget) for widget in widgets] == [True] * len(
-        widgets
-    )
-    assert [isinstance(widget, sx.SpectrumWidget) for widget in widgets] == [
-        True
-    ] * len(widgets)
-
-
-def test_spectrum_widget_children_are_keyed_and_composable() -> None:
-    text = sx.TextInput(value="Dataset")
-    switch = sx.Switch(value=True, description="Enabled")
-    group = sx.FieldGroup({"name": text, "enabled": switch}, orientation="vertical")
-
-    assert group.component_kind == "field-group"
-    assert group.child_keys == ["name", "enabled"]
-    assert group["name"] is text
-    assert group.get_owner("enabled") is switch
-    assert group.orientation == "vertical"
-    assert group.get_state(key=["widgets"])["widgets"] == [
-        f"anywidget:{text.model_id}",
-        f"anywidget:{switch.model_id}",
-    ]
-
-
-def test_spectrum_overlay_state_uses_is_open_without_shadowing_widget_open() -> None:
-    dialog = sx.DialogBox({"body": TextWidget("Dialog")}, title="Settings", open=False)
-
-    assert callable(dialog.open)
-    assert dialog.is_open is False
-
-    dialog.show()
-    assert dialog.is_open is True
-
-    dialog.hide()
-    assert dialog.is_open is False
-
-    dialog.toggle()
-    assert dialog.is_open is True
 
 
 def test_astryx_widgets_share_generic_component_base() -> None:
@@ -1318,7 +979,7 @@ def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> Non
         table.remove_row("AAPL")
 
 
-def test_astryx_table_selection_and_sort_callbacks_match_spectrum_table_api() -> None:
+def test_astryx_table_selection_and_sort_callbacks() -> None:
     table = ax.Table(
         rows=[
             {"symbol": "AAPL", "price": 195.12},
@@ -1524,18 +1185,18 @@ def test_activation_callbacks_share_one_registration_idiom() -> None:
     toolbar = Toolbar([{"id": "reset", "label": "Reset"}])
     menu = ax.DropdownMenu([{"label": "Export", "value": "export"}], label="Actions")
     picker = DatePicker("2026-07-09")
-    spectrum_button = sx.Button(description="Run")
+    button = ax.Button("Run")
 
-    for widget in (toolbar, menu, picker, spectrum_button):
+    for widget in (toolbar, menu, picker, button):
         widget.on_click(lambda source: clicks.append(source))
         widget.on_action(lambda source, value: actions.append((source, value)))
 
     toolbar._handle_frontend_event(toolbar, {"type": "activate", "id": "reset"}, None)
     menu._handle_frontend_message(menu, {"type": "click", "value": "export"}, None)
     picker.value = "2026-07-10"
-    spectrum_button._handle_frontend_message(spectrum_button, {"type": "click"}, None)
+    button._handle_frontend_message(button, {"type": "click"}, None)
 
-    assert clicks == [toolbar, menu, picker, spectrum_button]
+    assert clicks == [toolbar, menu, picker, button]
     assert actions == [(toolbar, "reset"), (menu, "export"), (picker, "2026-07-10")]
 
 
@@ -1617,13 +1278,13 @@ def test_every_frontend_message_type_has_a_python_handler() -> None:
     """
     handled = {
         "activate",  # _ActionWidget._handle_frontend_event
-        "click",  # ComponentWidget and ControlWidget
+        "click",  # ComponentWidget
         "close",  # ComponentWidget._handle_frontend_message
         "move",  # LayoutWidget._handle_frontend_message
         "open",  # ComponentWidget._handle_frontend_message
         "search",  # astryx Widget._handle_frontend_message
-        "selection",  # astryx and spectrum Table
-        "sort",  # astryx and spectrum Table
+        "selection",  # astryx Table
+        "sort",  # astryx Table
     }
     static_dir = Path(static_asset("astryx/astryx_widget.js")).parent.parent
     sources = [
