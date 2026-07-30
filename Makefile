@@ -10,6 +10,18 @@ install-dev:
 	npm run build
 	uv run --no-sync jupytext-config set-default-viewer
 
+.PHONY: update-dependencies
+update-dependencies:
+	uv lock \
+		--upgrade-package anywidget \
+		--upgrade-package jupyter \
+		--upgrade-package jupyterlab \
+		--upgrade-package jupyter-builder
+	npm install --save-exact @lumino/commands@latest @lumino/widgets@latest
+	npm install --save-prefix='^' @astryxdesign/core@latest @astryxdesign/theme-neutral@latest
+	npm install --save-dev --save-prefix='^' @astryxdesign/cli@latest
+	npm run build
+
 .PHONY: frontend
 frontend:
 	npm run build

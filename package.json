@@ -8,15 +8,15 @@
     "test": "node --test tests/frontend/*.test.mjs"
   },
   "dependencies": {
-    "@astryxdesign/core": "^0.1.2",
-    "@astryxdesign/theme-neutral": "^0.1.2",
-    "@lumino/commands": "2.3.3",
-    "@lumino/widgets": "2.8.0",
+    "@astryxdesign/core": "^0.1.9",
+    "@astryxdesign/theme-neutral": "^0.1.9",
+    "@lumino/commands": "2.3.4",
+    "@lumino/widgets": "2.9.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
-    "@astryxdesign/cli": "^0.1.2",
+    "@astryxdesign/cli": "^0.1.9",
     "esbuild": "0.28.0"
   }
 }
