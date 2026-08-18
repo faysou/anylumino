@@ -672,6 +672,18 @@ function slotByKey(model, key) {
 }
 
 /**
+ * Select the current content when a field gains focus, so clicking into a
+ * value and typing replaces it instead of merging with the old text. The
+ * timeout lets the browser finish placing the caret before the selection.
+ */
+function selectAllOnFocus(event) {
+  const input = event?.target;
+  if (input && typeof input.select === "function") {
+    setTimeout(() => input.select(), 0);
+  }
+}
+
+/**
  * Wire a deferred-update control: the draft drives the visible value and the
  * model only learns about it when the edit ends.
  */
@@ -757,12 +769,14 @@ function componentProps(model, draft, elementId) {
   const editedValue = isContinuous || !draft.has ? value : draft.value;
 
   if (name === "TextInput") {
+    const { selectOnFocus, ...inputProps } = props;
     return {
-      ...props,
+      ...inputProps,
       label: label || "Text input",
       value: String(editedValue ?? ""),
       isDisabled: disabled,
       onChange: (nextValue) => setStringValue(model, nextValue),
+      ...(selectOnFocus ? { onFocus: selectAllOnFocus } : {}),
       ...(isContinuous ? {} : draftHandlers(model, draft, { commitOnEnter: true })),
     };
   }
@@ -779,12 +793,14 @@ function componentProps(model, draft, elementId) {
   }
 
   if (name === "NumberInput") {
+    const { selectOnFocus, ...inputProps } = props;
     return {
-      ...props,
+      ...inputProps,
       label: label || "Number",
       value: editedValue == null || editedValue === "" ? null : Number(editedValue),
       isDisabled: disabled,
       onChange: (nextValue) => setNumberValue(model, nextValue),
+      ...(selectOnFocus === false ? {} : { onFocus: selectAllOnFocus }),
       ...(isContinuous ? {} : draftHandlers(model, draft, { commitOnEnter: true })),
     };
   }

@@ -525,6 +525,9 @@ class TextInput(Widget):
         Whether to show a clear button.
     auto_focus : bool | None, default None
         Whether to focus the input when mounted.
+    select_on_focus : bool | None, default None
+        Whether focusing the input selects its content, so typing replaces the
+        value. Off by default for text inputs.
     **props : Any
         JSON-safe TextInput props forwarded to Astryx. See the ``Astryx Props`` section below.
 
@@ -589,6 +592,7 @@ class TextInput(Widget):
         status: Mapping[str, Any] | None = None,
         clear: bool | None = None,
         auto_focus: bool | None = None,
+        select_on_focus: bool | None = None,
         **props: Any,
     ) -> None:
         super().__init__(
@@ -609,6 +613,7 @@ class TextInput(Widget):
                 status=status,
                 hasClear=clear,
                 hasAutoFocus=auto_focus,
+                selectOnFocus=select_on_focus,
             ),
         )
 
@@ -778,6 +783,9 @@ class NumberInput(Widget):
         Helper text displayed with the input.
     status : Mapping[str, Any] | None, default None
         Validation status record.
+    select_on_focus : bool | None, default None
+        Whether focusing the input selects its content, so typing replaces the
+        value. On by default for numeric inputs; pass ``False`` to opt out.
     **props : Any
         JSON-safe NumberInput props forwarded to Astryx. See the ``Astryx Props`` section below.
 
@@ -844,6 +852,7 @@ class NumberInput(Widget):
         clear: bool | None = None,
         description: str | None = None,
         status: Mapping[str, Any] | None = None,
+        select_on_focus: bool | None = None,
         **props: Any,
     ) -> None:
         super().__init__(
@@ -863,6 +872,7 @@ class NumberInput(Widget):
                 hasClear=clear,
                 description=description,
                 status=status,
+                selectOnFocus=select_on_focus,
             ),
         )
 
@@ -1113,7 +1123,7 @@ class SelectionSlider(Widget):
 
     Parameters
     ----------
-    options : Iterable[Any] | Mapping[str, Any]
+    items : Iterable[Any] | Mapping[str, Any]
         Option labels, ``(label, value)`` pairs, or a label to value mapping.
     value : Any, default None
         Selected option value, or a two-item sequence for a range. Defaults to
@@ -1136,7 +1146,7 @@ class SelectionSlider(Widget):
 
     def __init__(
         self,
-        options: Iterable[Any] | Mapping[str, Any],
+        items: Iterable[Any] | Mapping[str, Any],
         value: Any = None,
         *,
         label: str = "",
@@ -1146,7 +1156,7 @@ class SelectionSlider(Widget):
         description: str | None = None,
         **props: Any,
     ) -> None:
-        records = _option_records(options)
+        records = _option_records(items)
         if value is None and records:
             first = records[0]
             # Scalar options stay scalars, matching the frontend option helpers.
@@ -1376,7 +1386,7 @@ class Selector(Widget):
 
     Parameters
     ----------
-    options : Iterable[Any] | Mapping[str, Any]
+    items : Iterable[Any] | Mapping[str, Any]
         Option records. Mappings, pairs, strings, and dictionaries are normalized.
     value : str | None
         Synchronized component value.
@@ -1443,7 +1453,7 @@ class Selector(Widget):
 
     def __init__(
         self,
-        options: Iterable[Any] | Mapping[str, Any],
+        items: Iterable[Any] | Mapping[str, Any],
         value: str | None = None,
         *,
         label: str = "",
@@ -1465,7 +1475,7 @@ class Selector(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
-                options=_option_records(options),
+                options=_option_records(items),
                 placeholder=placeholder,
                 size=size,
                 hasClear=clear,
@@ -1483,7 +1493,7 @@ class MultiSelector(Widget):
 
     Parameters
     ----------
-    options : Iterable[Any] | Mapping[str, Any]
+    items : Iterable[Any] | Mapping[str, Any]
         Option records. Mappings, pairs, strings, and dictionaries are normalized.
     value : Iterable[str], default ()
         Synchronized component value.
@@ -1568,7 +1578,7 @@ class MultiSelector(Widget):
 
     def __init__(
         self,
-        options: Iterable[Any] | Mapping[str, Any],
+        items: Iterable[Any] | Mapping[str, Any],
         value: Iterable[str] = (),
         *,
         label: str = "",
@@ -1592,7 +1602,7 @@ class MultiSelector(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
-                options=_option_records(options),
+                options=_option_records(items),
                 placeholder=placeholder,
                 size=size,
                 isLoading=loading,

@@ -440,6 +440,25 @@ class Widget(ComponentWidget):
             **kwargs,
         )
 
+    @property
+    def items(self) -> list[Any]:
+        """Option records of the component.
+
+        Components store their records under the Astryx prop they render with,
+        ``items`` for most components and ``options`` for the selector family.
+        This accessor reads and writes the right key, so notebooks can update
+        any record-backed component the same way::
+
+            selector.items = ["call", "put1"]
+        """
+        key = "items" if "items" in self.props else "options"
+        return list(self.props.get(key, []))
+
+    @items.setter
+    def items(self, records: Iterable[Any] | Mapping[str, Any]) -> None:
+        key = "options" if "options" in self.props and "items" not in self.props else "items"
+        self.props = {**self.props, key: _option_records(records)}
+
     def apply_brand(
         self, brand: Mapping[str, Any] | None, *, color_mode: str | None = None
     ) -> None:

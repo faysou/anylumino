@@ -296,7 +296,13 @@ export default {
         }
 
         nextHeight = Math.max(160, Math.ceil(nextHeight));
-        if (!Number.isFinite(nextHeight) || Math.abs(nextHeight - lastFitHeight) < 2) {
+        // Compare against the rendered height too: syncSize can reset the root
+        // to the model height after a fit, which makes the cache stale.
+        const renderedHeight = root.getBoundingClientRect().height;
+        if (
+          !Number.isFinite(nextHeight)
+          || (Math.abs(nextHeight - lastFitHeight) < 2 && Math.abs(nextHeight - renderedHeight) < 2)
+        ) {
           return;
         }
         lastFitHeight = nextHeight;

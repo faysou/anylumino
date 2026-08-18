@@ -2,7 +2,7 @@
 
 ```python
 Selector(
-    options,
+    items,
     value=None,
     *,
     label='',
@@ -25,7 +25,7 @@ Render a single-value Astryx selector.
 
 | Name               | Type                                   | Description                                                                           | Default    |
 |--------------------|----------------------------------------|---------------------------------------------------------------------------------------|------------|
-| options            | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.            | _required_ |
+| items              | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.            | _required_ |
 | value              | str \| None                            | Synchronized component value.                                                         | `None`     |
 | label              | str                                    | Visible or accessible label for the component.                                        | `''`       |
 | disabled           | bool                                   | Whether the selector is disabled.                                                     | `False`    |

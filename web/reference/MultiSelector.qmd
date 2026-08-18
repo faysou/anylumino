@@ -2,7 +2,7 @@
 
 ```python
 MultiSelector(
-    options,
+    items,
     value=(),
     *,
     label='',
@@ -27,7 +27,7 @@ Render an Astryx selector that accepts multiple values.
 
 | Name            | Type                                   | Description                                                                                | Default    |
 |-----------------|----------------------------------------|--------------------------------------------------------------------------------------------|------------|
-| options         | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.                 | _required_ |
+| items           | Iterable\[Any\] \| Mapping\[str, Any\] | Option records. Mappings, pairs, strings, and dictionaries are normalized.                 | _required_ |
 | value           | Iterable\[str\]                        | Synchronized component value.                                                              | `()`       |
 | label           | str                                    | Visible or accessible label for the component.                                             | `''`       |
 | disabled        | bool                                   | Whether the selector is disabled.                                                          | `False`    |

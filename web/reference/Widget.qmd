@@ -57,6 +57,7 @@ Base anywidget for Astryx-backed components.
 | [component_family](#anylumino.astryx.Widget.component_family) | A trait for unicode strings. |
 | [component_name](#anylumino.astryx.Widget.component_name) | A trait for unicode strings. |
 | [continuous_update](#anylumino.astryx.Widget.continuous_update) | A boolean (True, False) trait. |
+| [items](#anylumino.astryx.Widget.items) | Option records of the component. |
 | [props](#anylumino.astryx.Widget.props) | An instance of a Python dict. |
 | [search_mode](#anylumino.astryx.Widget.search_mode) | A trait for unicode strings. |
 | [theme](#anylumino.astryx.Widget.theme) | A trait for unicode strings. |

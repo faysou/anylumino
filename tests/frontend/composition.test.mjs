@@ -109,3 +109,24 @@ test("reusableSlots hands back one slot per ref and reports the rest", () => {
   assert.equal(reusable.take("anywidget:missing"), undefined);
   assert.deepEqual(reusable.rest(), [second]);
 });
+
+function fakeElement(height, children = []) {
+  return {
+    scrollHeight: height,
+    offsetHeight: height,
+    children,
+    getBoundingClientRect: () => ({ top: 0, bottom: height, height }),
+  };
+}
+
+test("measuredContentHeight measures through zero-box wrappers", async () => {
+  const { measuredContentHeight } = await import("../../src/anylumino/static/layout/composition.js");
+  const plain = fakeElement(0, [fakeElement(120)]);
+  assert.equal(measuredContentHeight(plain, { includeSelf: false }), 120);
+
+  const wrapped = fakeElement(0, [fakeElement(0, [fakeElement(56), fakeElement(32)])]);
+  assert.equal(measuredContentHeight(wrapped, { includeSelf: false }), 56);
+
+  const empty = fakeElement(0, [fakeElement(0, [])]);
+  assert.equal(measuredContentHeight(empty, { includeSelf: false }), 0);
+});

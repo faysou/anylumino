@@ -1413,3 +1413,42 @@ def test_astryx_power_search_syncs_filters_as_the_value() -> None:
     assert search.props["config"] == config
     assert search.props["hasClear"] is True
     assert search.label == "Filter"
+
+
+def test_record_components_take_items_and_expose_the_items_accessor() -> None:
+    selector = ax.Selector(["call", "put"], value="call", label="Select")
+    assert selector.props["options"] == ["call", "put"]
+    assert selector.items == ["call", "put"]
+
+    checkbox_list = ax.CheckboxList(["a", "b"], value=["a"], label="Streams")
+    assert checkbox_list.props["items"] == ["a", "b"]
+    assert checkbox_list.items == ["a", "b"]
+
+    multi = ax.MultiSelector(["x", "y"], value=["x"], label="Fields")
+    assert multi.props["options"] == ["x", "y"]
+
+    slider = ax.SelectionSlider(["s", "m", "l"], value="m", label="Size")
+    assert slider.props["options"] == ["s", "m", "l"]
+
+    selector.items = {"Call option": "call2", "Put option": "put2"}
+    assert selector.props["options"] == [
+        {"label": "Call option", "value": "call2"},
+        {"label": "Put option", "value": "put2"},
+    ]
+    checkbox_list.items = ["a", "b", "c"]
+    assert checkbox_list.props["items"] == ["a", "b", "c"]
+    assert "options" not in checkbox_list.props
+
+
+def test_inputs_map_select_on_focus_to_the_frontend_prop() -> None:
+    plain_text = ax.TextInput(value="AAPL", label="Symbol")
+    assert "selectOnFocus" not in plain_text.props
+
+    selecting_text = ax.TextInput(value="AAPL", label="Symbol", select_on_focus=True)
+    assert selecting_text.props["selectOnFocus"] is True
+
+    default_number = ax.NumberInput(10, label="Qty")
+    assert "selectOnFocus" not in default_number.props
+
+    opted_out = ax.NumberInput(10, label="Qty", select_on_focus=False)
+    assert opted_out.props["selectOnFocus"] is False

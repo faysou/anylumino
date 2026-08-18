@@ -2,7 +2,7 @@
 
 ```python
 SelectionSlider(
-    options,
+    items,
     value=None,
     *,
     label='',
@@ -24,7 +24,7 @@ two-item ``value`` to select a range instead of a single option.
 
 | Name          | Type                                   | Description                                                                              | Default    |
 |---------------|----------------------------------------|------------------------------------------------------------------------------------------|------------|
-| options       | Iterable\[Any\] \| Mapping\[str, Any\] | Option labels, ``(label, value)`` pairs, or a label to value mapping.                    | _required_ |
+| items         | Iterable\[Any\] \| Mapping\[str, Any\] | Option labels, ``(label, value)`` pairs, or a label to value mapping.                    | _required_ |
 | value         | Any                                    | Selected option value, or a two-item sequence for a range. Defaults to the first option. | `None`     |
 | label         | str                                    | Visible or accessible label for the component.                                           | `''`       |
 | marks         | bool                                   | Whether to draw a labelled tick for every option.                                        | `False`    |

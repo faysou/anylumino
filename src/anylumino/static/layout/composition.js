@@ -55,10 +55,20 @@ export function measuredContentHeight(node, options = {}) {
   const includeSelf = options.includeSelf ?? true;
   const nodeRect = node.getBoundingClientRect();
   let height = includeSelf ? Math.max(node.scrollHeight, node.offsetHeight, nodeRect.height) : 0;
-  for (const child of node.children) {
-    const childRect = child.getBoundingClientRect();
-    height = Math.max(height, child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
-  }
+  const measureChildren = (parent) => {
+    for (const child of parent.children) {
+      const childRect = child.getBoundingClientRect();
+      const childHeight = Math.max(child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
+      // A display:contents wrapper, such as an anywidget mount root, has no
+      // box of its own; measure through it so its content still counts.
+      if (childHeight <= 0 && child.children.length > 0) {
+        measureChildren(child);
+        continue;
+      }
+      height = Math.max(height, childHeight);
+    }
+  };
+  measureChildren(node);
   return Math.ceil(height);
 }
 
