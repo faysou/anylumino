@@ -1,0 +1,171 @@
+---
+title: "TextArea"
+---
+
+Render a multiline Astryx text area.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe TextArea props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `ref` (React.Ref\<HTMLTextAreaElement>): Ref forwarded to the underlying \<textarea> element.
+  * `label` (string; required): Label text for the textarea. Always rendered for accessibility.
+  * `value` (string; required): Current value of the textarea.
+  * `onChange` ((value: string, e: ChangeEvent\<HTMLTextAreaElement>) => void): Callback fired
+    when the textarea value changes.
+  * `changeAction` ((value: string, e: ChangeEvent\<HTMLTextAreaElement>) => void or
+    Promise\<void>): Async action fired after onChange inside a React transition. Enables
+    optimistic updates via useOptimistic.
+  * `isLabelHidden` (boolean): Visually hides the label while keeping it accessible to screen
+    readers.
+  * `description` (string): Helper text displayed between the label and textarea.
+  * `isOptional` (boolean): Displays an "Optional" indicator next to the label. Mutually
+    exclusive with isRequired.
+  * `isRequired` (boolean): Displays a "Required" indicator next to the label and sets
+    aria-required. Mutually exclusive with isOptional.
+  * `isDisabled` (boolean): Disables the textarea, preventing interaction.
+  * `isLoading` (boolean): Puts the textarea in a loading state, showing a spinner inside the
+    input.
+  * `placeholder` (string): Placeholder text shown when the textarea is empty.
+  * `rows` (number): Number of visible text rows.
+  * `maxLength` (number): Maximum number of characters allowed. When set, a character counter
+    (current/max) is displayed below the textarea. Does not enforce the limit natively; the
+    counter shows error styling when exceeded.
+  * `status` (\{ type: 'warning' or 'error' or 'success'; message?: string }): Status indicator
+    that applies a colored border and icon. An optional message is displayed in a floating box
+    below the textarea.
+  * `labelTooltip` (string): Tooltip text displayed in an info icon at the end of the label.
+  * `startIcon` (IconType): Icon component rendered inside the leading edge of the textarea
+    wrapper. See 'npx astryx docs icons' for valid semantic names.
+  * `hasSpellCheck` (boolean): Enables or disables browser spell checking.
+  * `hasAutoFocus` (boolean): Automatically focuses the textarea on mount.
+  * `size` ('sm' or 'md' or 'lg'): Size of the textarea, affecting internal padding. Height is
+    controlled by rows, not size.
+  * `onPaste` ((e: ClipboardEvent\<HTMLTextAreaElement>) => void): Callback fired when content is
+    pasted into the textarea.
+  * `htmlName` (string): HTML name attribute for the textarea element, useful for form
+    submissions.
+  * `onFocus` ((e: FocusEvent\<HTMLTextAreaElement>) => void): Callback fired when the textarea
+    receives focus.
+  * `onBlur` ((e: FocusEvent\<HTMLTextAreaElement>) => void): Callback fired when the textarea
+    loses focus.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/TextArea](https://astryx.atmeta.com/components/TextArea).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value='', *, label='', placeholder='', rows=3, disabled=False, size=None, label_hidden=None, description=None, optional=None, required=None, loading=None, max_length=None, spell_check=None, status=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: str = "",
+        *,
+        label: str = "",
+        placeholder: str = "",
+        rows: int = 3,
+        disabled: bool = False,
+        size: str | None = None,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        optional: bool | None = None,
+        required: bool | None = None,
+        loading: bool | None = None,
+        max_length: int | None = None,
+        spell_check: bool | None = None,
+        status: Mapping[str, Any] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "TextArea",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                placeholder=placeholder,
+                rows=rows,
+                size=size,
+                isLabelHidden=label_hidden,
+                description=description,
+                isOptional=optional,
+                isRequired=required,
+                isLoading=loading,
+                maxLength=max_length,
+                hasSpellCheck=spell_check,
+                status=status,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="str" value="''">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str" value="''">
+      Placeholder text shown when the control is empty.
+    </PyParameter>
+
+    <PyParameter name="rows" type="int" value="3">
+      Rows or records rendered by the component.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Text-area size.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the input.
+    </PyParameter>
+
+    <PyParameter name="optional" type="bool | None" value="None">
+      Whether to mark the field optional.
+    </PyParameter>
+
+    <PyParameter name="required" type="bool | None" value="None">
+      Whether to mark the field required.
+    </PyParameter>
+
+    <PyParameter name="loading" type="bool | None" value="None">
+      Whether to show the loading state.
+    </PyParameter>
+
+    <PyParameter name="max_length" type="int | None" value="None">
+      Maximum length used by the character counter.
+    </PyParameter>
+
+    <PyParameter name="spell_check" type="bool | None" value="None">
+      Whether browser spell checking is enabled.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

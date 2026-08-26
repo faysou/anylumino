@@ -1,0 +1,87 @@
+---
+title: "Overlay"
+---
+
+Render content over a base Astryx surface or media widget.
+
+<Callout title="Astryx Props" type="astryx-props">
+  `children`, `content`, `showOn`, `isOpen`, `scrim`, `position`,
+  and `align` are adapted by the named arguments above. `**props` keeps
+  the wrapper forward-compatible with additional JSON-safe Astryx props.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Overlay](https://astryx.atmeta.com/components/Overlay).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children, content, *, show_on='always', open=None, scrim='dark', position='fill', align='end', **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput,
+        content: str | ChildInput,
+        *,
+        show_on: str = "always",
+        open: bool | None = None,
+        scrim: str | bool = "dark",
+        position: str = "fill",
+        align: str = "end",
+        **props: Any,
+    ) -> None:
+        slots = {"base": children}
+        content_prop: str | None = content if isinstance(content, str) else None
+        if not isinstance(content, str):
+            slots["content"] = content
+        super().__init__(
+            "Overlay",
+            slots,
+            open=open,
+            props=_named_props(
+                props,
+                content=content_prop,
+                showOn=show_on,
+                isOpen=open,
+                scrim=scrim,
+                position=position,
+                align=align,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput">
+      Base widget displayed beneath the overlay.
+    </PyParameter>
+
+    <PyParameter name="content" type="str | ChildInput">
+      Text or widget rendered inside the overlay scrim.
+    </PyParameter>
+
+    <PyParameter name="show_on" type="str" value="'always'">
+      Visibility trigger: `"always"`, `"hover"`, `"focus"`, or
+      `"hover-or-focus"`.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool | None" value="None">
+      Optional visibility override. When omitted, `show_on` controls visibility.
+    </PyParameter>
+
+    <PyParameter name="scrim" type="str | bool" value="'dark'">
+      Dark or light scrim, or `False` for no scrim.
+    </PyParameter>
+
+    <PyParameter name="position" type="str" value="'fill'">
+      Overlay placement: `"fill"`, `"bottom"`, or `"top"`.
+    </PyParameter>
+
+    <PyParameter name="align" type="str" value="'end'">
+      Content alignment: `"start"`, `"center"`, or `"end"`.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

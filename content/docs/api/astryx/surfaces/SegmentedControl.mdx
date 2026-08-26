@@ -1,0 +1,88 @@
+---
+title: "SegmentedControl"
+---
+
+Render a compact Astryx segmented control.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe SegmentedControl props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `value` (string; required): The currently selected value (controlled).
+  * `onChange` ((value: string) => void; required): Callback fired when a segment is selected.
+  * `label` (string; required): Accessible label for the radio group (used as aria-label, never
+    rendered visually).
+  * `size` ('sm' or 'md' or 'lg'): Size variant for the control.
+  * `layout` ('hug' or 'fill'): Layout mode. hug (default) sizes segments to content; fill
+    stretches them equally to fill the container.
+  * `isDisabled` (boolean): Whether the entire control is disabled.
+  * `children` (ReactNode; required): SegmentedControlItem children.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value: not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/SegmentedControl](https://astryx.atmeta.com/components/SegmentedControl).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value, *, label, size=None, layout=None, disabled=False, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str,
+        *,
+        label: str,
+        size: str | None = None,
+        layout: str | None = None,
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "SegmentedControl",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props, items=_option_records(items), size=size, layout=layout
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="value" type="str">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Control size.
+    </PyParameter>
+
+    <PyParameter name="layout" type="str | None" value="None">
+      Hug or fill segment layout.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the entire control is disabled.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

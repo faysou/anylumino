@@ -1,0 +1,165 @@
+---
+title: "TextInput"
+---
+
+Render a single-line Astryx text input.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe TextInput props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `type` ('text' or 'password' or 'email'): The HTML input type.
+  * `label` (string; required): Label text for the input: always rendered for accessibility.
+  * `value` (string; required): Current value of the input.
+  * `onChange` ((value: string, e: ChangeEvent\<HTMLInputElement>) => void): Callback fired when
+    the input value changes.
+  * `changeAction` ((value: string, e: ChangeEvent\<HTMLInputElement>) => void or Promise\<void>):
+    Async action fired after onChange (if not prevented). Triggers optimistic update and shows
+    a loading spinner while pending.
+  * `size` ('sm' or 'md' or 'lg'): Size variant of the input.
+  * `isLabelHidden` (boolean): Visually hides the label while keeping it accessible to screen
+    readers.
+  * `description` (string): Description text displayed between the label and input.
+  * `isOptional` (boolean): Displays an "Optional" indicator next to the label. Mutually
+    exclusive with isRequired.
+  * `isRequired` (boolean): Displays a "Required" indicator next to the label and sets
+    aria-required. Mutually exclusive with isOptional.
+  * `isDisabled` (boolean): Disables the input, preventing interaction and dimming the element.
+  * `isLoading` (boolean): Puts the input in a loading state, showing a spinner and setting
+    aria-busy.
+  * `placeholder` (string): Placeholder text shown when the input is empty.
+  * `labelTooltip` (string): Tooltip text displayed in an info icon at the end of the label.
+  * `startIcon` (IconType): SVG icon component displayed at the start of the input. See 'npx
+    astryx docs icons' for valid semantic names.
+  * `status` (\{type: 'error' or 'warning' or 'success', message?: string}): Validation status:
+    applies a colored border and status icon. If message is provided, displays a floating
+    message below the input. Error type also sets aria-invalid.
+  * `hasClear` (boolean): Shows a clear (x) button when the input has a value. Clicking it
+    clears the value and returns focus to the input.
+  * `hasAutoFocus` (boolean): Automatically focuses the input on mount.
+  * `htmlName` (string): The HTML name attribute for the input, useful for form submissions.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/TextInput](https://astryx.atmeta.com/components/TextInput).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value='', *, label='', placeholder='', disabled=False, input_type=None, size=None, label_hidden=None, description=None, optional=None, required=None, loading=None, status=None, clear=None, auto_focus=None, select_on_focus=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: str = "",
+        *,
+        label: str = "",
+        placeholder: str = "",
+        disabled: bool = False,
+        input_type: str | None = None,
+        size: str | None = None,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        optional: bool | None = None,
+        required: bool | None = None,
+        loading: bool | None = None,
+        status: Mapping[str, Any] | None = None,
+        clear: bool | None = None,
+        auto_focus: bool | None = None,
+        select_on_focus: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "TextInput",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                placeholder=placeholder,
+                type=input_type,
+                size=size,
+                isLabelHidden=label_hidden,
+                description=description,
+                isOptional=optional,
+                isRequired=required,
+                isLoading=loading,
+                status=status,
+                hasClear=clear,
+                hasAutoFocus=auto_focus,
+                selectOnFocus=select_on_focus,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="str" value="''">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str" value="''">
+      Placeholder text shown when the control is empty.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="input_type" type="str | None" value="None">
+      HTML text input type.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Input size.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the input.
+    </PyParameter>
+
+    <PyParameter name="optional" type="bool | None" value="None">
+      Whether to mark the field optional.
+    </PyParameter>
+
+    <PyParameter name="required" type="bool | None" value="None">
+      Whether to mark the field required.
+    </PyParameter>
+
+    <PyParameter name="loading" type="bool | None" value="None">
+      Whether to show the loading state.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="clear" type="bool | None" value="None">
+      Whether to show a clear button.
+    </PyParameter>
+
+    <PyParameter name="auto_focus" type="bool | None" value="None">
+      Whether to focus the input when mounted.
+    </PyParameter>
+
+    <PyParameter name="select_on_focus" type="bool | None" value="None">
+      Whether focusing the input selects its content, so typing replaces the
+      value. Off by default for text inputs.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

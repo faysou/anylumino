@@ -1,0 +1,50 @@
+---
+title: "Badge"
+---
+
+Render a compact status or category badge.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Badge props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `variant` ('neutral' or 'info' or 'success' or 'warning' or 'error' or 'blue' or 'cyan' or
+    'green' or 'orange' or 'pink' or 'purple' or 'red' or 'teal' or 'yellow'): Visual style
+    variant. Semantic variants (neutral, info, success, warning, error) use solid backgrounds.
+    Non-semantic color variants use tinted backgrounds with colored text for categorization
+    and tagging.
+  * `label` (ReactNode): Badge text content.
+  * `icon` (ReactNode): Optional leading icon.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Badge](https://astryx.atmeta.com/components/Badge).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(label, *, variant='neutral', **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, label: str, *, variant: str = "neutral", **props: Any) -> None:
+        super().__init__("Badge", label=label, variant=variant, props=props)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'neutral'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

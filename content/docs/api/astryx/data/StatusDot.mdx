@@ -1,0 +1,76 @@
+---
+title: "StatusDot"
+---
+
+Render an inline Astryx status indicator.
+
+Astryx renders a fixed 8px dot and surfaces `label` as `aria-label`, so
+the label never appears as visible text. Pair the dot with a `Text`
+widget in a horizontal `Stack` when the status needs a visible caption.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe StatusDot props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `variant` ('success' or 'warning' or 'error' or 'accent' or 'neutral'; required): Semantic
+    color variant.
+  * `label` (string; required): Accessible label surfaced via aria-label.
+  * `isPulsing` (boolean): Enables a pulse animation; respects prefers-reduced-motion: reduce.
+  * `tooltip` (string): Tooltip text shown on hover to explain the status meaning.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/StatusDot](https://astryx.atmeta.com/components/StatusDot).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(label, *, variant='neutral', pulsing=None, tooltip=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        label: str,
+        *,
+        variant: str = "neutral",
+        pulsing: bool | None = None,
+        tooltip: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "StatusDot",
+            label=label,
+            variant=variant,
+            props=_named_props(props, isPulsing=pulsing, tooltip=tooltip),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="label" type="str">
+      Accessible label describing the status. Screen readers announce it; it
+      is not rendered as visible text.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'neutral'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="pulsing" type="bool | None" value="None">
+      Whether to animate the status dot.
+    </PyParameter>
+
+    <PyParameter name="tooltip" type="str | None" value="None">
+      Hover explanation for the status.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

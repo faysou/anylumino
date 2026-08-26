@@ -1,0 +1,68 @@
+---
+title: "AvatarGroup"
+---
+
+Render a compact group of Astryx avatars.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe AvatarGroup props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `children` (ReactNode; required): Avatar children, optionally followed by one
+    AvatarGroupOverflow. Consumers handle slicing to the desired visible count.
+  * `size` (AvatarSize): Size applied to all avatars via context.
+  * `ref` (React.Ref\<HTMLDivElement>): Ref forwarded to the root element.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization.
+  * `data-testid` (string): Test selector for automated testing frameworks.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/AvatarGroup](https://astryx.atmeta.com/components/AvatarGroup).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, overflow_count=0, size=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        overflow_count: int = 0,
+        size: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "AvatarGroup",
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                overflowCount=overflow_count,
+                size=size,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="overflow_count" type="int" value="0">
+      Number shown in the avatar-group overflow indicator.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Avatar size used by the group.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,81 @@
+---
+title: "Avatar"
+---
+
+Render an Astryx avatar.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Avatar props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `src` (string): Primary image source URL.
+  * `fallbackSrc` (string): Fallback image when primary fails.
+  * `name` (string): User name for initials and alt text.
+  * `alt` (string): Alt text (falls back to name).
+  * `size` (AvatarSize): Avatar size (named or numeric pixel value).
+  * `status` (ReactNode): Corner content for status indicators.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Avatar](https://astryx.atmeta.com/components/Avatar).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(name, *, src=None, fallback_src=None, alt=None, size=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        name: str,
+        *,
+        src: str | None = None,
+        fallback_src: str | None = None,
+        alt: str | None = None,
+        size: str | int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Avatar",
+            label=name,
+            props=_named_props(
+                props,
+                name=name,
+                src=src,
+                fallbackSrc=fallback_src,
+                alt=alt,
+                size=size,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="name" type="str">
+      Astryx component option.
+    </PyParameter>
+
+    <PyParameter name="src" type="str | None" value="None">
+      Primary image URL.
+    </PyParameter>
+
+    <PyParameter name="fallback_src" type="str | None" value="None">
+      Fallback image URL.
+    </PyParameter>
+
+    <PyParameter name="alt" type="str | None" value="None">
+      Alternative image text.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | int | None" value="None">
+      Named or pixel avatar size.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

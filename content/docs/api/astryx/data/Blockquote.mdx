@@ -1,0 +1,47 @@
+---
+title: "Blockquote"
+---
+
+Render quoted text with Astryx blockquote styling.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Blockquote props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `children` (ReactNode; required): Content of the blockquote.
+  * `cite` (ReactNode): Optional attribution for the quote. Rendered in a \<footer> with \<cite>.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Blockquote](https://astryx.atmeta.com/components/Blockquote).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(text, *, cite=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, text: str, *, cite: str | None = None, **props: Any) -> None:
+        super().__init__("Blockquote", text=text, props=_named_props(props, cite=cite))
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="text" type="str">
+      Text content synchronized to the frontend component.
+    </PyParameter>
+
+    <PyParameter name="cite" type="str | None" value="None">
+      Optional quote attribution.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

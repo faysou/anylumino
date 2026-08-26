@@ -1,0 +1,93 @@
+---
+title: "StackedPanel"
+---
+
+Lumino stacked panel that shows one selected child at a time.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="layout_kind" value="t.Unicode('stacked').tag(sync=True)" />
+
+  <PyAttribute name="selected_index" value="t.Int(0).tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, selected_index=0, width='100%', height=420, resizable=True, fit_content=False) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        selected_index: int = 0,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        fit_content: bool = False,
+    ) -> None:
+        self._init_composed(
+            widgets,
+            titles,
+            keys,
+            width,
+            height,
+            resizable,
+            fit_content=fit_content,
+            selected_index=selected_index,
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="widgets" type="ChildInput" value="None">
+      Child widgets or keyed child mapping.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `widgets`.
+    </PyParameter>
+
+    <PyParameter name="selected_index" type="int" value="0">
+      Initially visible child index.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="420">
+      Widget height.
+    </PyParameter>
+
+    <PyParameter name="resizable" type="bool" value="True">
+      Whether the panel gets a notebook resize handle.
+    </PyParameter>
+
+    <PyParameter name="fit_content" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="select" type="(index) -> None">
+  <PySourceCode>
+    ```python
+    def select(self, index: int) -> None:
+        self.selected_index = index
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="index" type="int" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

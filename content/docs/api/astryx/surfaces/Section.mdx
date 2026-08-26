@@ -1,0 +1,113 @@
+---
+title: "Section"
+---
+
+Render an Astryx section container.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Section props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `variant` ('section' or 'transparent' or 'muted'): Background variant applied to the section
+    container.
+  * `width` (SizeValue): Width of the section; a number is interpreted as pixels, a string is
+    used as-is.
+  * `height` (SizeValue): Height of the section; a number is interpreted as pixels, a string is
+    used as-is.
+  * `maxWidth` (SizeValue): Maximum width of the section.
+  * `minHeight` (SizeValue): Minimum height of the section.
+  * `children` (ReactNode): Content rendered inside the section.
+  * `dividers` (Array\<'top' or 'bottom' or 'start' or 'end'>): Which sides of the section have
+    divider borders.
+  * `padding` (SpacingStep): Internal padding using the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4,
+    5, 6, 8, 10). Use padding=\{0} for edge-to-edge content.
+  * `paddingBlock` (SpacingStep): Block (vertical) padding override. Overrides only the
+    block-axis padding while preserving inline padding from 'padding' or the container theme
+    default. Accepts the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10).
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Section](https://astryx.atmeta.com/components/Section).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, variant='section', padding=None, padding_block=None, dividers=None, width=None, height=None, max_width=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        variant: str = "section",
+        padding: int | float | None = None,
+        padding_block: int | float | None = None,
+        dividers: Iterable[str] | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        max_width: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Section",
+            children,
+            variant=variant,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                variant=variant,
+                padding=padding,
+                paddingBlock=padding_block,
+                dividers=list(dividers) if dividers is not None else None,
+                width=width,
+                height=height,
+                maxWidth=max_width,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'section'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="padding" type="int | float | None" value="None">
+      Inner padding using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="padding_block" type="int | float | None" value="None">
+      Block-axis padding override.
+    </PyParameter>
+
+    <PyParameter name="dividers" type="Iterable[str] | None" value="None">
+      Section sides that display divider borders.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Section width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Section height.
+    </PyParameter>
+
+    <PyParameter name="max_width" type="int | float | str | None" value="None">
+      Maximum section width.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

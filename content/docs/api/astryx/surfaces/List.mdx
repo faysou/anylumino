@@ -1,0 +1,90 @@
+---
+title: "List"
+---
+
+Render an Astryx list from item records.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe List props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `children` (ReactNode): List items (ListItem components).
+  * `density` ('compact' or 'balanced' or 'spacious'): Spacing density for items.
+  * `hasDividers` (boolean): Show dividers between items.
+  * `header` (ReactNode): Header content, associated with the list via aria-labelledby.
+  * `listStyle` ('none' or 'disc' or 'decimal' or 'circle'): List marker style. 'decimal'
+    renders an \<ol> element instead of \<ul>.
+  * `start` (number): Starting number for ordered lists (listStyle='decimal'). Sets the CSS
+    counter to begin at this value.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value: not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/List](https://astryx.atmeta.com/components/List).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, header='', density=None, dividers=None, list_style=None, start=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        header: str = "",
+        density: str | None = None,
+        dividers: bool | None = None,
+        list_style: str | None = None,
+        start: int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "List",
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                header=header or None,
+                density=density,
+                hasDividers=dividers,
+                listStyle=list_style,
+                start=start,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="header" type="str" value="''">
+      Optional header text or content.
+    </PyParameter>
+
+    <PyParameter name="density" type="str | None" value="None">
+      Item spacing density.
+    </PyParameter>
+
+    <PyParameter name="dividers" type="bool | None" value="None">
+      Whether to show dividers between items.
+    </PyParameter>
+
+    <PyParameter name="list_style" type="str | None" value="None">
+      List marker style.
+    </PyParameter>
+
+    <PyParameter name="start" type="int | None" value="None">
+      Starting number for ordered lists.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

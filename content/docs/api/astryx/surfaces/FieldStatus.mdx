@@ -1,0 +1,60 @@
+---
+title: "FieldStatus"
+---
+
+Render an Astryx field status message.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe FieldStatus props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `type` ('error' or 'warning' or 'success'; required): Status type.
+  * `message` (string; required): Status message text.
+  * `id` (string): ID for aria-describedby association.
+  * `variant` ('attached' or 'detached'): Visual variant: attached overlaps the input, detached
+    floats below.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/FieldStatus](https://astryx.atmeta.com/components/FieldStatus).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(message, *, type='success', variant='detached', **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        message: str,
+        *,
+        type: str = "success",
+        variant: str = "detached",
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "FieldStatus",
+            label=message,
+            variant=type,
+            props={"type": type, "message": message, "variant": variant, **props},
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="message" type="str">
+      Astryx component option.
+    </PyParameter>
+
+    <PyParameter name="type" type="str" value="'success'">
+      Astryx component option.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'detached'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,133 @@
+---
+title: "Tooltip"
+---
+
+Attach a tooltip to notebook content.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Tooltip props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `children` (ReactNode): Trigger content. When anchorRef is provided, children may be
+    omitted.
+  * `anchorRef` (React.RefObject\<HTMLElement>): External tooltip anchor used for sibling-mode
+    rendering.
+  * `content` (ReactNode; required): Tooltip content, typically short non-interactive text.
+  * `placement` (LayerPlacement; default 'above'): Placement relative to the anchor.
+  * `alignment` (LayerAlignment; default 'center'): Alignment along the placement axis.
+  * `delay` (number; default 200): Delay in milliseconds before showing on hover.
+  * `hideDelay` (number; default 0): Delay in milliseconds before hiding after mouse or focus
+    leave.
+  * `focusTrigger` ('auto' or 'always' or 'never'; default 'auto'): Controls whether focus opens
+    the tooltip.
+  * `isEnabled` (boolean; default true): Enables or disables hover and focus triggers.
+  * `onOpenChange` ((isOpen: boolean) => void): Called when tooltip visibility changes.
+  * `hasHoverIndication` ('auto' or boolean; default 'auto'): Controls dashed underline hover
+    indication on the trigger.
+  * `isOpen` (boolean): Controlled open state.
+  * `isDefaultOpen` (boolean): Initial uncontrolled open state.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Tooltip](https://astryx.atmeta.com/components/Tooltip).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(content, trigger=None, *, label='', placement=None, alignment=None, delay=None, hide_delay=None, enabled=None, open=None, default_open=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        content: str | ChildInput,
+        trigger: ChildInput = None,
+        *,
+        label: str = "",
+        placement: str | None = None,
+        alignment: str | None = None,
+        delay: int | None = None,
+        hide_delay: int | None = None,
+        enabled: bool | None = None,
+        open: bool | None = None,
+        default_open: bool | None = None,
+        **props: Any,
+    ) -> None:
+        children = {"trigger": trigger} if trigger is not None else None
+        if not isinstance(content, str):
+            children = (
+                {"trigger": trigger, "content": content}
+                if trigger is not None
+                else {"content": content}
+            )
+            content_prop = None
+        else:
+            content_prop = content
+        super().__init__(
+            "Tooltip",
+            children,
+            label=label or content_prop or "",
+            open=open,
+            props=_named_props(
+                props,
+                content=content_prop,
+                placement=placement,
+                alignment=alignment,
+                delay=delay,
+                hideDelay=hide_delay,
+                isEnabled=enabled,
+                isOpen=open,
+                isDefaultOpen=default_open,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="content" type="str | ChildInput">
+      Overlay or tooltip content.
+    </PyParameter>
+
+    <PyParameter name="trigger" type="ChildInput" value="None">
+      Trigger content used by disclosure or overlay components.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="placement" type="str | None" value="None">
+      Placement relative to the trigger.
+    </PyParameter>
+
+    <PyParameter name="alignment" type="str | None" value="None">
+      Alignment along the placement axis.
+    </PyParameter>
+
+    <PyParameter name="delay" type="int | None" value="None">
+      Show delay in milliseconds.
+    </PyParameter>
+
+    <PyParameter name="hide_delay" type="int | None" value="None">
+      Hide delay in milliseconds.
+    </PyParameter>
+
+    <PyParameter name="enabled" type="bool | None" value="None">
+      Whether hover and focus triggers are enabled.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool | None" value="None">
+      Optional controlled open state.
+    </PyParameter>
+
+    <PyParameter name="default_open" type="bool | None" value="None">
+      Initial uncontrolled open state.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,76 @@
+---
+title: "Breadcrumbs"
+---
+
+Render Astryx breadcrumbs from item records.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Breadcrumbs props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `children` (ReactNode; required): BreadcrumbItem elements to render inside the breadcrumb
+    trail.
+  * `separator` (ReactNode): Separator rendered between breadcrumb items.
+  * `variant` ('default' or 'supporting'): Visual variant: supporting is smaller with secondary
+    text styling.
+  * `label` (string): Accessible label for the nav landmark (aria-label).
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value: not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Breadcrumbs](https://astryx.atmeta.com/components/Breadcrumbs).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, separator=None, variant=None, label=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        separator: str | None = None,
+        variant: str | None = None,
+        label: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Breadcrumbs",
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                separator=separator,
+                variant=variant,
+                label=label,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="separator" type="str | None" value="None">
+      Separator text between breadcrumb items.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str | None" value="None">
+      Default or supporting visual treatment.
+    </PyParameter>
+
+    <PyParameter name="label" type="str | None" value="None">
+      Accessible navigation label.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

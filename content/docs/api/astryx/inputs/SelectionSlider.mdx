@@ -1,0 +1,91 @@
+---
+title: "SelectionSlider"
+---
+
+Render an Astryx slider that steps through discrete options.
+
+Astryx `Slider` works on a linear numeric scale, so this wrapper drives it
+over option indices and synchronizes the selected option value. Pass a
+two-item `value` to select a range instead of a single option.
+
+<Callout title="Notes" type="note">
+  See Astryx component docs: [https://astryx.atmeta.com/components/Slider](https://astryx.atmeta.com/components/Slider).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value=None, *, label='', marks=False, disabled=False, value_display=None, description=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any] | Mapping[str, Any],
+        value: Any = None,
+        *,
+        label: str = "",
+        marks: bool = False,
+        disabled: bool = False,
+        value_display: str | None = None,
+        description: str | None = None,
+        **props: Any,
+    ) -> None:
+        records = _option_records(items)
+        if value is None and records:
+            first = records[0]
+            # Scalar options stay scalars, matching the frontend option helpers.
+            value = (
+                first.get("value", first.get("label"))
+                if isinstance(first, Mapping)
+                else first
+            )
+        super().__init__(
+            "SelectionSlider",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                options=records,
+                marks=marks or None,
+                valueDisplay=value_display,
+                description=description,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any] | Mapping[str, Any]">
+      Option labels, `(label, value)` pairs, or a label to value mapping.
+    </PyParameter>
+
+    <PyParameter name="value" type="Any" value="None">
+      Selected option value, or a two-item sequence for a range. Defaults to
+      the first option.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="marks" type="bool" value="False">
+      Whether to draw a labelled tick for every option.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="value_display" type="str | None" value="None">
+      Tooltip, text, or hidden value presentation.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the input.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,127 @@
+---
+title: "Switch"
+---
+
+Render an Astryx switch for binary settings.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Switch props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `ref` (React.Ref\<HTMLInputElement>): Ref forwarded to the underlying \<input> element.
+  * `label` (string; required): Label text for the switch (always rendered for accessibility).
+  * `value` (boolean; required): Whether the switch is on or off.
+  * `onChange` ((checked: boolean, e: ChangeEvent\<HTMLInputElement>) => void): Callback fired
+    when the switch state changes.
+  * `changeAction` ((checked: boolean, e: ChangeEvent\<HTMLInputElement>) => void or
+    Promise\<void>): Async action fired after onChange. Triggers optimistic UI and shows a
+    loading spinner until the promise resolves.
+  * `isLoading` (boolean): Whether the switch is in a loading state, showing a spinner inside
+    the thumb.
+  * `isLabelHidden` (boolean): Visually hides the label while keeping it accessible to screen
+    readers.
+  * `description` (string): Description text displayed below the label.
+  * `isDisabled` (boolean): Whether the switch is disabled.
+  * `isOptional` (boolean): Whether the field is optional. Mutually exclusive with isRequired.
+  * `isRequired` (boolean): Whether the switch is required. Mutually exclusive with isOptional.
+  * `status` (InputStatus): Status indicator with type and message. Displays a colored message
+    box below the switch and sets aria-invalid when type is "error".
+  * `onFocus` ((e: FocusEvent\<HTMLInputElement>) => void): Callback fired when the switch
+    receives focus.
+  * `onBlur` ((e: FocusEvent\<HTMLInputElement>) => void): Callback fired when the switch loses
+    focus.
+  * `labelIcon` (IconType): Icon displayed before the label text. See 'npx astryx docs icons'
+    for valid semantic names.
+  * `labelTooltip` (string): Tooltip text shown in an info icon at the end of the label.
+  * `labelPosition` ('start' or 'end'): Which side of the switch the label appears on. "start"
+    places the label before the switch.
+  * `labelSpacing` ('default' or 'spread'): Spacing behavior between label and switch. "spread"
+    pushes them to opposite ends of the container (full width).
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Switch](https://astryx.atmeta.com/components/Switch).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=False, *, label='', disabled=False, label_hidden=None, description=None, loading=None, status=None, label_position=None, label_spacing=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: bool = False,
+        *,
+        label: str = "",
+        disabled: bool = False,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        loading: bool | None = None,
+        status: Mapping[str, Any] | None = None,
+        label_position: str | None = None,
+        label_spacing: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Switch",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                isLabelHidden=label_hidden,
+                description=description,
+                isLoading=loading,
+                status=status,
+                labelPosition=label_position,
+                labelSpacing=label_spacing,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="bool" value="False">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed below the label.
+    </PyParameter>
+
+    <PyParameter name="loading" type="bool | None" value="None">
+      Whether to show the loading state.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="label_position" type="str | None" value="None">
+      Whether the label appears before or after the switch.
+    </PyParameter>
+
+    <PyParameter name="label_spacing" type="str | None" value="None">
+      Default or spread label spacing.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

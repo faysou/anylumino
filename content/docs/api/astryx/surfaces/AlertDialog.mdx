@@ -1,0 +1,134 @@
+---
+title: "AlertDialog"
+---
+
+Render an inline Astryx alert dialog for confirmations.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe AlertDialog props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `isOpen` (boolean; required): Whether the dialog is open.
+  * `onOpenChange` ((isOpen: boolean) => unknown; required): Visibility change callback.
+  * `title` (string; required): Dialog title. Linked via aria-labelledby.
+  * `description` (string; required): Consequence description. Linked via aria-describedby.
+  * `actionLabel` (string; required): Action button label.
+  * `onAction` (() => unknown; required): Called when action button is clicked. Does NOT
+    auto-close.
+  * `cancelLabel` (string): Cancel button label.
+  * `actionVariant` (ButtonVariant): Action button variant.
+  * `isActionLoading` (boolean): Shows loading spinner on the action button.
+  * `width` (number or string): Dialog width.
+  * `isInline` (boolean): Renders alert dialog content inline without modal behavior. For
+    documentation previews and showcases only.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/AlertDialog](https://astryx.atmeta.com/components/AlertDialog).
+</Callout>
+
+<Callout title="Notes" type="note">
+  The wrapper defaults to inline rendering to avoid modal focus-management
+  conflicts inside Jupyter output areas. The primary action emits a click
+  message with `action="confirm"`.
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(title, description, *, action_label, cancel_label='Cancel', open=True, inline=True, callbacks=None, action_callbacks=None, action_variant=None, action_loading=None, width=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        title: str,
+        description: str,
+        *,
+        action_label: str,
+        cancel_label: str = "Cancel",
+        open: bool = True,
+        inline: bool = True,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        action_variant: str | None = None,
+        action_loading: bool | None = None,
+        width: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "AlertDialog",
+            label=title,
+            text=description,
+            open=open,
+            callbacks=callbacks,
+            action_callbacks=action_callbacks,
+            width=width,
+            props=_named_props(
+                props,
+                title=title,
+                description=description,
+                actionLabel=action_label,
+                cancelLabel=cancel_label,
+                isInline=inline,
+                actionVariant=action_variant,
+                isActionLoading=action_loading,
+                width=width,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="title" type="str">
+      Dialog title linked to the alert for accessibility.
+    </PyParameter>
+
+    <PyParameter name="description" type="str">
+      Consequence or confirmation text linked to the alert for accessibility.
+    </PyParameter>
+
+    <PyParameter name="action_label" type="str">
+      Primary action button label.
+    </PyParameter>
+
+    <PyParameter name="cancel_label" type="str" value="'Cancel'">
+      Cancel button label.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool" value="True">
+      Controlled open state synchronized through `is_open`.
+    </PyParameter>
+
+    <PyParameter name="inline" type="bool" value="True">
+      Whether dialog content renders inline instead of using native modal
+      behavior.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
+      Python callbacks invoked when the primary action is activated.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Python callbacks receiving the `"confirm"` action identifier.
+    </PyParameter>
+
+    <PyParameter name="action_variant" type="str | None" value="None">
+      Primary action button variant.
+    </PyParameter>
+
+    <PyParameter name="action_loading" type="bool | None" value="None">
+      Whether the primary action shows a loading state.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Dialog width.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

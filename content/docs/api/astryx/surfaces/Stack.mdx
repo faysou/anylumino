@@ -1,0 +1,134 @@
+---
+title: "Stack"
+---
+
+Arrange child widgets in an Astryx stack.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Stack props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `direction` ('horizontal' or 'vertical'; default 'vertical'): Direction of the stack layout.
+  * `hAlign` (StackAlignment): Horizontal alignment. With horizontal direction it controls the
+    main axis; with vertical direction it controls the cross axis.
+  * `vAlign` (StackAlignment): Vertical alignment. With horizontal direction it controls the
+    cross axis; with vertical direction it controls the main axis.
+  * `justify` (StackMainAlignment): Main-axis alignment alias resolved from direction, mirroring
+    CSS justify-content.
+  * `align` (StackCrossAlignment): Cross-axis alignment alias resolved from direction, mirroring
+    CSS align-items.
+  * `width` (number or string): Container width. Numbers are pixels; strings are used as CSS
+    values.
+  * `height` (number or string): Container height. Numbers are pixels; strings are used as CSS
+    values.
+  * `gap` (spacing step): Spacing between items. Accepts Astryx spacing steps such as 0, 0.5, 1,
+    2, 3, 4, 6, 8, and 10.
+  * `padding` (spacing step): Inner padding on all sides using the spacing scale.
+  * `paddingInline` (spacing step): Horizontal padding override; takes precedence over padding
+    on the inline axis.
+  * `paddingBlock` (spacing step): Vertical padding override; takes precedence over padding on
+    the block axis.
+  * `isScrollable` (boolean; default false): Enables scrollable overflow on the stack container.
+  * `wrap` ('nowrap' or 'wrap' or 'wrap-reverse'; default 'nowrap'): Controls whether items wrap
+    onto additional lines.
+  * `as` (ElementType; default div): Element type to render for the root element.
+  * `xstyle` (StyleXStyles): StyleX styles created with stylex.create().
+  * `className` (string): CSS class names appended to the root element.
+  * `style` (CSSProperties): Inline styles applied after StyleX styles.
+  * `children` (ReactNode): Content rendered inside the stack.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Stack](https://astryx.atmeta.com/components/Stack).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, direction='vertical', gap=2, align=None, justify=None, width=None, height=None, padding=None, wrap=None, scrollable=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        direction: str = "vertical",
+        gap: int | float = 2,
+        align: str | None = None,
+        justify: str | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        padding: int | float | None = None,
+        wrap: str | None = None,
+        scrollable: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Stack",
+            children,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                direction=direction,
+                gap=gap,
+                align=align,
+                justify=justify,
+                width=width,
+                height=height,
+                padding=padding,
+                wrap=wrap,
+                isScrollable=scrollable,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="direction" type="str" value="'vertical'">
+      Layout direction.
+    </PyParameter>
+
+    <PyParameter name="gap" type="int | float" value="2">
+      Astryx spacing step between children.
+    </PyParameter>
+
+    <PyParameter name="align" type="str | None" value="None">
+      Cross-axis alignment.
+    </PyParameter>
+
+    <PyParameter name="justify" type="str | None" value="None">
+      Main-axis alignment.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Container width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Container height.
+    </PyParameter>
+
+    <PyParameter name="padding" type="int | float | None" value="None">
+      Inner padding using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="wrap" type="str | None" value="None">
+      Stack wrapping behavior.
+    </PyParameter>
+
+    <PyParameter name="scrollable" type="bool | None" value="None">
+      Whether overflow should scroll.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,145 @@
+---
+title: "TimeInput"
+---
+
+Render an Astryx time input.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe TimeInput props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Label text for the input (required for accessibility).
+  * `isLabelHidden` (boolean): Visually hides the label while keeping it accessible to screen
+    readers.
+  * `description` (string): Description text displayed between the label and input.
+  * `isOptional` (boolean): Shows an "(optional)" indicator next to the label. Mutually
+    exclusive with isRequired.
+  * `isRequired` (boolean): Marks the field as required and sets aria-required. Mutually
+    exclusive with isOptional.
+  * `isDisabled` (boolean): Disables the input and suppresses interactions.
+  * `value` (ISOTimeString): Controlled time value in ISO format (HH:MM or HH:MM:SS).
+  * `onChange` ((value: ISOTimeString or undefined) => void): Callback fired when the time
+    changes. Receives undefined when the input is cleared.
+  * `changeAction` ((value: ISOTimeString or undefined) => void or Promise\<void>): Async action
+    fired after onChange. Wrapped in a React transition to provide optimistic UI; triggers the
+    loading spinner while pending.
+  * `isLoading` (boolean): Puts the input into a loading state, displaying a spinner.
+  * `min` (ISOTimeString): Minimum selectable time in ISO format. Values outside the range are
+    rejected.
+  * `max` (ISOTimeString): Maximum selectable time in ISO format. Values outside the range are
+    rejected.
+  * `hasSeconds` (boolean): Includes seconds in the time display and parsing.
+  * `hasClear` (boolean): Shows a clear button when a value is set and the input is not
+    disabled.
+  * `hourFormat` ('12h' or '24h'): Controls the display format. '12h' shows AM/PM (e.g. '2:30
+    PM'); '24h' uses 24-hour notation (e.g. '14:30').
+  * `increment` (number): Number of minutes to add or subtract when the user presses the up or
+    down arrow key.
+  * `placeholder` (string): Placeholder text shown when no time is selected. When the input is
+    focused and empty, a format hint overrides this text.
+  * `size` ('sm' or 'md' or 'lg'): Controls the height of the input element.
+  * `status` (InputStatus): Status indicator that colors the border and displays an icon. When a
+    message is provided it is rendered below the input.
+  * `labelTooltip` (string): Tooltip text rendered as an info icon at the end of the label row.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/TimeInput](https://astryx.atmeta.com/components/TimeInput).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=None, *, label='', disabled=False, min=None, max=None, seconds=None, clear=None, hour_format=None, increment=None, placeholder=None, size=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: str | None = None,
+        *,
+        label: str = "",
+        disabled: bool = False,
+        min: str | None = None,
+        max: str | None = None,
+        seconds: bool | None = None,
+        clear: bool | None = None,
+        hour_format: str | None = None,
+        increment: int | None = None,
+        placeholder: str | None = None,
+        size: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "TimeInput",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                min=min,
+                max=max,
+                hasSeconds=seconds,
+                hasClear=clear,
+                hourFormat=hour_format,
+                increment=increment,
+                placeholder=placeholder,
+                size=size,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="str | None" value="None">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the input is disabled.
+    </PyParameter>
+
+    <PyParameter name="min" type="str | None" value="None">
+      Minimum ISO time.
+    </PyParameter>
+
+    <PyParameter name="max" type="str | None" value="None">
+      Maximum ISO time.
+    </PyParameter>
+
+    <PyParameter name="seconds" type="bool | None" value="None">
+      Whether to include seconds.
+    </PyParameter>
+
+    <PyParameter name="clear" type="bool | None" value="None">
+      Whether to show a clear button.
+    </PyParameter>
+
+    <PyParameter name="hour_format" type="str | None" value="None">
+      Twelve- or twenty-four-hour display format.
+    </PyParameter>
+
+    <PyParameter name="increment" type="int | None" value="None">
+      Arrow-key minute increment.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str | None" value="None">
+      Placeholder text.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Input size.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,140 @@
+---
+title: "Selector"
+---
+
+Render a single-value Astryx selector.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Selector props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Label text for accessibility.
+  * `options` (SelectorOption\[]; required): Array of items: strings, objects with
+    value/label/icon/disabled, dividers (\{type: "divider"}), or sections (\{type: "section",
+    title, items}).
+  * `value` (string): Currently selected value.
+  * `onChange` ((value: string) => void): Callback fired when the selection changes.
+  * `hasClear` (boolean): Shows a clear (x) button when a value is selected. When true, onChange
+    also accepts null to signal the user cleared the selection.
+  * `hasSearch` (boolean): Whether to show a search input for filtering options.
+  * `searchPlaceholder` (string): Placeholder text for the search input.
+  * `placeholder` (string): Placeholder text shown when no value is selected.
+  * `size` ('sm' or 'md' or 'lg'): Size variant for the selector.
+  * `isDisabled` (boolean): Disables the selector.
+  * `isLabelHidden` (boolean): Visually hides the label while keeping it accessible.
+  * `description` (string): Helper text displayed below the label.
+  * `isOptional` (boolean): Marks the field as optional.
+  * `isRequired` (boolean): Marks the field as required.
+  * `status` (\{type: 'error' or 'warning' or 'success', message?: string}): Validation status
+    with an optional message.
+  * `renderOption` ((option: SelectorOptionData) => ReactNode): Custom render function for each
+    selectable option in the dropdown. Use this instead of JSX children; dividers and sections
+    are rendered by the selector.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value: not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Selector](https://astryx.atmeta.com/components/Selector).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value=None, *, label='', disabled=False, placeholder=None, size=None, clear=None, search=None, search_placeholder=None, label_hidden=None, description=None, status=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any] | Mapping[str, Any],
+        value: str | None = None,
+        *,
+        label: str = "",
+        disabled: bool = False,
+        placeholder: str | None = None,
+        size: str | None = None,
+        clear: bool | None = None,
+        search: bool | None = None,
+        search_placeholder: str | None = None,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        status: Mapping[str, Any] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Selector",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                options=_option_records(items),
+                placeholder=placeholder,
+                size=size,
+                hasClear=clear,
+                hasSearch=search,
+                searchPlaceholder=search_placeholder,
+                isLabelHidden=label_hidden,
+                description=description,
+                status=status,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any] | Mapping[str, Any]">
+      Option records. Mappings, pairs, strings, and dictionaries are normalized.
+    </PyParameter>
+
+    <PyParameter name="value" type="str | None" value="None">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the selector is disabled.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str | None" value="None">
+      Placeholder shown when no option is selected.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Selector size.
+    </PyParameter>
+
+    <PyParameter name="clear" type="bool | None" value="None">
+      Whether to show a clear button.
+    </PyParameter>
+
+    <PyParameter name="search" type="bool | None" value="None">
+      Whether to show option filtering.
+    </PyParameter>
+
+    <PyParameter name="search_placeholder" type="str | None" value="None">
+      Placeholder for the search input.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the selector.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

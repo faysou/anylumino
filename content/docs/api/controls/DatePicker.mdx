@@ -1,0 +1,77 @@
+---
+title: "DatePicker"
+---
+
+Browser-native date picker control.
+
+## Functions
+
+<PyFunction name="__init__" type="(value=None, *, description='', disabled=False, min=None, max=None, step=None, continuous_update=True, width='', **kwargs) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: date | str | None = None,
+        *,
+        description: str = "",
+        disabled: bool = False,
+        min: date | str | None = None,
+        max: date | str | None = None,
+        step: int | str | None = None,
+        continuous_update: bool = True,
+        width: str = "",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            control_kind="date",
+            value=_json_value(value),
+            description=description,
+            disabled=disabled,
+            min=_json_value(min),
+            max=_json_value(max),
+            step=step,
+            continuous_update=continuous_update,
+            width=width,
+            **kwargs,
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="date | str | None" value="None">
+      Initial value and synchronized Python value.
+    </PyParameter>
+
+    <PyParameter name="description" type="str" value="''">
+      Label shown above the control.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether user interaction is disabled.
+    </PyParameter>
+
+    <PyParameter name="min" type="date | str | None" value="None">
+      Minimum date value.
+    </PyParameter>
+
+    <PyParameter name="max" type="date | str | None" value="None">
+      Maximum date value.
+    </PyParameter>
+
+    <PyParameter name="step" type="int | str | None" value="None">
+      Native input step value.
+    </PyParameter>
+
+    <PyParameter name="continuous_update" type="bool" value="True">
+      Whether Python receives updates while the user edits the input.
+    </PyParameter>
+
+    <PyParameter name="width" type="str" value="''">
+      CSS width for the control.
+    </PyParameter>
+
+    <PyParameter name="kwargs" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

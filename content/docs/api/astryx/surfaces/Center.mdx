@@ -1,0 +1,79 @@
+---
+title: "Center"
+---
+
+Center child content in an Astryx container.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Center props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `axis` ('both' or 'horizontal' or 'vertical'): Which direction(s) to center.
+  * `width` (number or string): Container width (px or CSS value).
+  * `height` (number or string): Container height (px or CSS value).
+  * `isInline` (boolean): Use inline-flex (useful for text/icons).
+  * `children` (ReactNode): Content to center.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Center](https://astryx.atmeta.com/components/Center).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, axis='both', width=None, height=None, inline=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        axis: str = "both",
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        inline: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Center",
+            children,
+            width=width,
+            height=height,
+            props=_named_props(
+                props, axis=axis, width=width, height=height, isInline=inline
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="axis" type="str" value="'both'">
+      Axis used for centering child content.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Container width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Container height.
+    </PyParameter>
+
+    <PyParameter name="inline" type="bool | None" value="None">
+      Whether to use inline-flex layout.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

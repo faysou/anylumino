@@ -1,0 +1,166 @@
+---
+title: "ComponentWidget"
+---
+
+Base class for composable component-library anywidgets.
+
+Component families inherit this class to share child composition, keyed
+access, open/close state, size traits, and activation callbacks.
+
+`on_click` runs for every activation and `on_action` runs only for
+activations that carry a value, so a menu item choice runs both. To mirror
+state between sibling widgets use `traitlets.link` or `observe` rather
+than callbacks.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="component_family" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="component_kind" value="t.Unicode('element').tag(sync=True)" />
+
+  <PyAttribute name="tag" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="widgets" value="t.List(anywidget.WidgetTrait(), default_value=[]).tag(sync=True, to_json=_widget_list_to_json, from_json=_widget_list_from_json)" />
+
+  <PyAttribute name="child_keys" value="t.List(t.Unicode(), default_value=[]).tag(sync=True)" />
+
+  <PyAttribute name="titles" value="t.List(t.Unicode(), default_value=[]).tag(sync=True)" />
+
+  <PyAttribute name="text" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="label" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="value" value="t.Any(None, allow_none=True).tag(sync=True)" />
+
+  <PyAttribute name="is_open" value="t.Bool(False).tag(sync=True)" />
+
+  <PyAttribute name="disabled" value="t.Bool(False).tag(sync=True)" />
+
+  <PyAttribute name="selected" value="t.Bool(False).tag(sync=True)" />
+
+  <PyAttribute name="indeterminate" value="t.Bool(False).tag(sync=True)" />
+
+  <PyAttribute name="variant" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="placement" value="t.Unicode('bottom').tag(sync=True)" />
+
+  <PyAttribute name="orientation" value="t.Unicode('horizontal').tag(sync=True)" />
+
+  <PyAttribute name="width" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="height" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="icon" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="icon_src" value="t.Unicode('').tag(sync=True)" />
+
+  <PyAttribute name="icon_size" value="t.Unicode('s').tag(sync=True)" />
+
+  <PyAttribute name="attributes" value="t.Dict(default_value={}).tag(sync=True)" />
+
+  <PyAttribute name="last_action" value="t.Any(None, allow_none=True).tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, callbacks=None, action_callbacks=None, width=None, height=None, **kwargs) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        action_callbacks: Iterable[ActionCallback] | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        **kwargs: Any,
+    ) -> None:
+        widget_list, owner_list, key_list, title_list = _normalize_children(
+            children, titles, keys
+        )
+        self._owners_by_key = dict(zip(key_list, owner_list, strict=True))
+        self._init_callbacks()
+        self._syncing_children = True
+        try:
+            super().__init__(
+                widgets=widget_list,
+                child_keys=key_list,
+                titles=title_list,
+                width=_size_to_css(width, ""),
+                height=_size_to_css(height, ""),
+                **kwargs,
+            )
+        finally:
+            self._syncing_children = False
+        self.observe(self._observe_widgets, names="widgets")
+        self.on_msg(self._handle_frontend_message)
+        self._register_callbacks(callbacks, action_callbacks)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None" />
+
+    <PyParameter name="titles" type="TitleInput" value="None" />
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None" />
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None" />
+
+    <PyParameter name="action_callbacks" type="Iterable[ActionCallback] | None" value="None" />
+
+    <PyParameter name="width" type="int | float | str | None" value="None" />
+
+    <PyParameter name="height" type="int | float | str | None" value="None" />
+
+    <PyParameter name="kwargs" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="show" type="() -> None">
+  Open overlay-like components.
+
+  <PySourceCode>
+    ```python
+    def show(self) -> None:
+        """Open overlay-like components."""
+        self.is_open = True
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="hide" type="() -> None">
+  Close overlay-like components.
+
+  <PySourceCode>
+    ```python
+    def hide(self) -> None:
+        """Close overlay-like components."""
+        self.is_open = False
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="toggle" type="() -> None">
+  Toggle overlay-like components.
+
+  <PySourceCode>
+    ```python
+    def toggle(self) -> None:
+        """Toggle overlay-like components."""
+        self.is_open = not self.is_open
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

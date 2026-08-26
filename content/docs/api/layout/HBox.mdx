@@ -1,0 +1,107 @@
+---
+title: "HBox"
+---
+
+Horizontal `BoxPanel` convenience wrapper.
+
+## Functions
+
+<PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, spacing=8, stretches=None, width='100%', height=420, resizable=True, scroll=False, scroll_x=None, scroll_y=None, child_min_width=None, child_min_height=None, fit_content=False) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        spacing: int = 8,
+        stretches: Iterable[int] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        scroll: bool = False,
+        scroll_x: bool | None = None,
+        scroll_y: bool | None = None,
+        child_min_width: int | float | str | None = None,
+        child_min_height: int | float | str | None = None,
+        fit_content: bool = False,
+    ) -> None:
+        super().__init__(
+            widgets,
+            titles=titles,
+            keys=keys,
+            direction="left-to-right",
+            spacing=spacing,
+            stretches=stretches,
+            width=width,
+            height=height,
+            resizable=resizable,
+            scroll=scroll,
+            scroll_x=scroll_x,
+            scroll_y=scroll_y,
+            child_min_width=child_min_width,
+            child_min_height=child_min_height,
+            fit_content=fit_content,
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="widgets" type="ChildInput" value="None">
+      Child widgets or keyed child mapping.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `widgets`.
+    </PyParameter>
+
+    <PyParameter name="spacing" type="int" value="8">
+      Pixel spacing between children.
+    </PyParameter>
+
+    <PyParameter name="stretches" type="Iterable[int] | None" value="None">
+      Lumino stretch factors, one per child when provided.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width. Numeric values use the shared anylumino size rules.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="420">
+      Widget height. Numeric values use the shared anylumino size rules.
+    </PyParameter>
+
+    <PyParameter name="resizable" type="bool" value="True">
+      Whether the panel receives a notebook-friendly resize handle.
+    </PyParameter>
+
+    <PyParameter name="scroll" type="bool" value="False">
+      Enables horizontal scrolling by default.
+    </PyParameter>
+
+    <PyParameter name="scroll_x" type="bool | None" value="None">
+      Explicit horizontal or vertical overflow controls.
+    </PyParameter>
+
+    <PyParameter name="scroll_y" type="bool | None" value="None">
+      Explicit horizontal or vertical overflow controls.
+    </PyParameter>
+
+    <PyParameter name="child_min_width" type="int | float | str | None" value="None">
+      Minimum child sizes used when scrolling is enabled.
+    </PyParameter>
+
+    <PyParameter name="child_min_height" type="int | float | str | None" value="None">
+      Minimum child sizes used when scrolling is enabled.
+    </PyParameter>
+
+    <PyParameter name="fit_content" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

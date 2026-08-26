@@ -1,0 +1,97 @@
+---
+title: "SplitPanel"
+---
+
+Lumino split panel with draggable dividers between children.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="layout_kind" value="t.Unicode('split').tag(sync=True)" />
+
+  <PyAttribute name="orientation" value="t.Enum(ORIENTATIONS, default_value='horizontal').tag(sync=True)" />
+
+  <PyAttribute name="spacing" value="t.Int(6).tag(sync=True)" />
+
+  <PyAttribute name="sizes" value="t.List(t.Float(), default_value=[]).tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, orientation='horizontal', spacing=6, sizes=None, width='100%', height=420, resizable=True, fit_content=False) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        orientation: str = "horizontal",
+        spacing: int = 6,
+        sizes: Iterable[float] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        fit_content: bool = False,
+    ) -> None:
+        self._init_composed(
+            widgets,
+            titles,
+            keys,
+            width,
+            height,
+            resizable,
+            fit_content=fit_content,
+            orientation=orientation,
+            spacing=spacing,
+            sizes=_as_list(sizes),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="widgets" type="ChildInput" value="None">
+      Child widgets or keyed child mapping. Mapping keys become stable child
+      keys and default titles.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `widgets`.
+    </PyParameter>
+
+    <PyParameter name="orientation" type="str" value="'horizontal'">
+      Split direction. Horizontal places panes side by side; vertical stacks
+      panes top to bottom.
+    </PyParameter>
+
+    <PyParameter name="spacing" type="int" value="6">
+      Pixel spacing around Lumino split handles.
+    </PyParameter>
+
+    <PyParameter name="sizes" type="Iterable[float] | None" value="None">
+      Initial relative pane sizes. Values are passed to Lumino as ratios.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="420">
+      Widget height.
+    </PyParameter>
+
+    <PyParameter name="resizable" type="bool" value="True">
+      Whether the whole panel gets a notebook resize handle. Lumino pane
+      dividers remain draggable independently.
+    </PyParameter>
+
+    <PyParameter name="fit_content" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

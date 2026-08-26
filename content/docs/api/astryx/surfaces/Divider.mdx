@@ -1,0 +1,75 @@
+---
+title: "Divider"
+---
+
+Render an Astryx divider.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Divider props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `orientation` ('horizontal' or 'vertical'): Orientation of the divider.
+  * `label` (ReactNode): Optional label centered on the divider.
+  * `variant` ('subtle' or 'strong'): Visual weight of the divider line.
+  * `isFullBleed` (boolean): Extend the divider to container edges with negative margins.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Divider](https://astryx.atmeta.com/components/Divider).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(*, orientation='horizontal', variant='subtle', label=None, full_bleed=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        *,
+        orientation: str = "horizontal",
+        variant: str = "subtle",
+        label: str | None = None,
+        full_bleed: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Divider",
+            variant=variant,
+            props=_named_props(
+                props,
+                orientation=orientation,
+                variant=variant,
+                label=label,
+                isFullBleed=full_bleed,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="orientation" type="str" value="'horizontal'">
+      Astryx component option.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'subtle'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="label" type="str | None" value="None">
+      Optional text centered on the divider.
+    </PyParameter>
+
+    <PyParameter name="full_bleed" type="bool | None" value="None">
+      Whether the divider extends to the container edges.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

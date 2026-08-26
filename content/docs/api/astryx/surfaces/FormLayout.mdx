@@ -1,0 +1,55 @@
+---
+title: "FormLayout"
+---
+
+Arrange Astryx form controls with consistent spacing.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe FormLayout props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `direction` ('vertical' or 'horizontal' or 'horizontal-labels'): Controls field arrangement.
+    Vertical stacks top-to-bottom, horizontal arranges left-to-right with equal flex-grow, and
+    horizontal-labels uses CSS Grid with labels to the left of inputs (collapses to vertical
+    on narrow viewports \<=480px).
+  * `children` (ReactNode): Form fields to arrange. Accepts Astryx inputs (TextInput, Selector,
+    etc.) and Field-wrapped custom controls.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/FormLayout](https://astryx.atmeta.com/components/FormLayout).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, direction='vertical', **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self, children: ChildInput = None, *, direction: str = "vertical", **props: Any
+    ) -> None:
+        super().__init__(
+            "FormLayout", children, props={"direction": direction, **props}
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="direction" type="str" value="'vertical'">
+      Layout direction.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

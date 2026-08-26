@@ -1,0 +1,223 @@
+---
+title: "Widget"
+---
+
+Base anywidget for Astryx-backed components.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="component_family" value="t.Unicode('astryx').tag(sync=True)" />
+
+  <PyAttribute name="component_name" value="t.Unicode('Stack').tag(sync=True)" />
+
+  <PyAttribute name="props" value="t.Dict(default_value={}).tag(sync=True)" />
+
+  <PyAttribute name="color_mode" value="t.Enum(_ASTRYX_THEME_MODES, default_value='light').tag(sync=True)" />
+
+  <PyAttribute name="theme" value="t.Unicode('neutral').tag(sync=True)" />
+
+  <PyAttribute name="brand" value="t.Dict(default_value={}).tag(sync=True)" />
+
+  <PyAttribute name="continuous_update" value="t.Bool(True).tag(sync=True)" />
+
+  <PyAttribute name="search_mode" value="t.Unicode('static').tag(sync=True)" />
+
+  <PyAttribute name="items" type="list[Any]">
+    Option records of the component.
+
+    Components store their records under the Astryx prop they render with,
+    `items` for most components and `options` for the selector family.
+    This accessor reads and writes the right key, so notebooks can update
+    any record-backed component the same way::
+
+    ```
+    selector.items = ["call", "put1"]
+    ```
+  </PyAttribute>
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(component_name='Stack', children=None, *, props=None, text='', label='', value=None, disabled=False, variant='', brand=None, color_mode='light', continuous_update=True, search=None, callbacks=None, action_callbacks=None, open=None, width=None, height=None, **kwargs) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        component_name: str = "Stack",
+        children: ChildInput = None,
+        *,
+        props: Mapping[str, Any] | None = None,
+        text: str = "",
+        label: str = "",
+        value: Any = None,
+        disabled: bool = False,
+        variant: str = "",
+        brand: Mapping[str, Any] | None = None,
+        color_mode: str = "light",
+        continuous_update: bool = True,
+        search: Callable[[str], Iterable[Any]] | None = None,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        open: bool | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        **kwargs: Any,
+    ) -> None:
+        raw_props = dict(props or {})
+        brand = raw_props.pop("brand", brand)
+        color_mode = str(raw_props.pop("color_mode", color_mode))
+        continuous_update = bool(raw_props.pop("continuous_update", continuous_update))
+        callbacks = raw_props.pop("callbacks", callbacks)
+        action_callbacks = raw_props.pop("action_callbacks", action_callbacks)
+        if width is None:
+            width = raw_props.get("width")
+        if height is None:
+            height = raw_props.get("height")
+        if not disabled and "isDisabled" in raw_props:
+            disabled = bool(raw_props["isDisabled"])
+        if open is None and "isOpen" in raw_props:
+            open = bool(raw_props["isOpen"])
+        self._search_callback = search
+        self._propagates_theme = False
+        super().__init__(
+            children,
+            component_kind=component_name,
+            component_name=component_name,
+            props=_clean_props(raw_props),
+            text=text,
+            label=label,
+            value=_clean_value(value),
+            disabled=disabled,
+            variant=variant,
+            brand=_clean_brand(brand),
+            color_mode=_clean_theme_mode(color_mode),
+            continuous_update=continuous_update,
+            search_mode="python" if search is not None else "static",
+            callbacks=callbacks,
+            action_callbacks=action_callbacks,
+            is_open=bool(open),
+            width=width,
+            height=height,
+            **kwargs,
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="component_name" type="str" value="'Stack'">
+      Frontend Astryx component name registered in the anylumino bridge.
+    </PyParameter>
+
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="props" type="Mapping[str, Any] | None" value="None">
+      Additional JSON-safe props for the selected Astryx component.
+      Use this for component options that are not modeled as widget traits.
+      anylumino manages widget composition, value synchronization, callbacks, and brand/theme
+      traits separately.
+      Upstream React-only values such as functions, refs, and React nodes are not serializable
+      from Python.
+      See the Astryx docs for the selected component page, for example [https://astryx.atmeta.com/components/Blockquote](https://astryx.atmeta.com/components/Blockquote).
+    </PyParameter>
+
+    <PyParameter name="text" type="str" value="''">
+      Text content synchronized to the frontend.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible component label.
+    </PyParameter>
+
+    <PyParameter name="value" type="Any" value="None">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component is disabled.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="''">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="brand" type="Mapping[str, Any] | None" value="None">
+      Runtime or built Astryx theme descriptor.
+    </PyParameter>
+
+    <PyParameter name="color_mode" type="str" value="'light'">
+      Astryx `Theme` mode. Use `"light"`, `"dark"`, `"system"` to
+      follow the OS `prefers-color-scheme`, or `"jupyterlab"` to follow
+      the JupyterLab theme.
+    </PyParameter>
+
+    <PyParameter name="continuous_update" type="bool" value="True">
+      Whether Python receives text input, number input, and slider values
+      while the user edits. When `False` the value syncs on blur, on Enter,
+      and at the end of a slider drag.
+    </PyParameter>
+
+    <PyParameter name="search" type="Callable[[str], Iterable[Any]] | None" value="None">
+      Optional Python-backed search callback for `Typeahead`, `Tokenizer`,
+      and `CommandPalette`. It receives the typed query and returns the
+      matching items, and is the only path by which the query reaches Python.
+      Astryx debounces the call by its `debounceMs` prop, 150ms by default;
+      pass `debounceMs=0` for a local source that needs no debouncing.
+      Without a callback the component filters its own items in the browser
+      and nothing is sent per keystroke.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
+      Python activation callbacks.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Python callbacks receiving named action values.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool | None" value="None">
+      Optional controlled open state.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Component host width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Component host height.
+    </PyParameter>
+
+    <PyParameter name="kwargs" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="apply_brand" type="(brand, *, color_mode=None) -> None">
+  Apply a reusable Astryx brand identity to this widget subtree.
+
+  <PySourceCode>
+    ```python
+    def apply_brand(
+        self, brand: Mapping[str, Any] | None, *, color_mode: str | None = None
+    ) -> None:
+        """Apply a reusable Astryx brand identity to this widget subtree."""
+        self.brand = _clean_brand(brand)
+        if color_mode is not None:
+            self.color_mode = _clean_theme_mode(color_mode)
+        self._propagates_theme = True
+        self._adopt_children(self.widgets)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="brand" type="Mapping[str, Any] | None" />
+
+    <PyParameter name="color_mode" type="str | None" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

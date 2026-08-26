@@ -1,0 +1,127 @@
+---
+title: "ClickableCard"
+---
+
+Render an Astryx card that behaves like an action target.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe ClickableCard props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Accessibility label.
+  * `onClick` ((event: MouseEvent) => void): Click handler: fires on card surface only.
+  * `href` (string): Navigation URL.
+  * `target` (string): Link target.
+  * `isDisabled` (boolean): Disables the card.
+  * `children` (ReactNode): Card content.
+  * `padding` (SpacingStep): Inner padding.
+  * `variant` ('default' or 'transparent' or 'muted' or 'blue' or 'cyan' or 'gray' or 'green' or
+    'orange' or 'pink' or 'purple' or 'red' or 'teal' or 'yellow'): Background color variant.
+  * `width` (SizeValue): Card width.
+  * `height` (SizeValue): Card height.
+  * `maxWidth` (SizeValue): Maximum card width.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/ClickableCard](https://astryx.atmeta.com/components/ClickableCard).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, label, variant='default', disabled=False, href=None, target=None, padding=None, width=None, height=None, max_width=None, callbacks=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        label: str,
+        variant: str = "default",
+        disabled: bool = False,
+        href: str | None = None,
+        target: str | None = None,
+        padding: int | float | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        max_width: int | float | str | None = None,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "ClickableCard",
+            children,
+            label=label,
+            variant=variant,
+            disabled=disabled,
+            callbacks=callbacks,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                variant=variant,
+                href=href,
+                target=target,
+                padding=padding,
+                width=width,
+                height=height,
+                maxWidth=max_width,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'default'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the card is disabled.
+    </PyParameter>
+
+    <PyParameter name="href" type="str | None" value="None">
+      Optional navigation target.
+    </PyParameter>
+
+    <PyParameter name="target" type="str | None" value="None">
+      Link target when `href` is supplied.
+    </PyParameter>
+
+    <PyParameter name="padding" type="int | float | None" value="None">
+      Inner padding using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Card width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Card height.
+    </PyParameter>
+
+    <PyParameter name="max_width" type="int | float | str | None" value="None">
+      Maximum card width.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
+      Python callbacks invoked for frontend activations.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

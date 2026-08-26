@@ -1,0 +1,107 @@
+---
+title: "Pagination"
+---
+
+Page through a data set with an Astryx pagination control.
+
+`value` holds the current one-based page. When `page_size_options` is
+given, choosing a new page size arrives through `on_action` rather than
+`value`, so the page number stays the synchronized state.
+
+<Callout title="Notes" type="note">
+  See Astryx component docs: [https://astryx.atmeta.com/components/Pagination](https://astryx.atmeta.com/components/Pagination).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(page=1, *, total_items=None, total_pages=None, page_size=None, page_size_options=None, more=None, sibling_count=None, variant='', size=None, label='', disabled=False, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        page: int = 1,
+        *,
+        total_items: int | None = None,
+        total_pages: int | None = None,
+        page_size: int | None = None,
+        page_size_options: Iterable[int] | None = None,
+        more: bool | None = None,
+        sibling_count: int | None = None,
+        variant: str = "",
+        size: str | None = None,
+        label: str = "",
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Pagination",
+            value=page,
+            label=label,
+            variant=variant,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                totalItems=total_items,
+                totalPages=total_pages,
+                pageSize=page_size,
+                pageSizeOptions=list(page_size_options)
+                if page_size_options is not None
+                else None,
+                hasMore=more,
+                siblingCount=sibling_count,
+                size=size,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="page" type="int" value="1">
+      Current one-based page, synchronized as `value`.
+    </PyParameter>
+
+    <PyParameter name="total_items" type="int | None" value="None">
+      Total row count, used to derive the page count.
+    </PyParameter>
+
+    <PyParameter name="total_pages" type="int | None" value="None">
+      Explicit page count when the total row count is unknown.
+    </PyParameter>
+
+    <PyParameter name="page_size" type="int | None" value="None">
+      Rows per page.
+    </PyParameter>
+
+    <PyParameter name="page_size_options" type="Iterable[int] | None" value="None">
+      Selectable page sizes. Selecting one fires `on_action`.
+    </PyParameter>
+
+    <PyParameter name="more" type="bool | None" value="None">
+      Whether more pages exist, for cursor-style paging.
+    </PyParameter>
+
+    <PyParameter name="sibling_count" type="int | None" value="None">
+      Page buttons shown either side of the current page.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="''">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Control size.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Accessible label for the control.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,114 @@
+---
+title: "SelectableCard"
+---
+
+Render an Astryx card with a selected state.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe SelectableCard props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Accessibility label.
+  * `isSelected` (boolean; required): Controlled selection state.
+  * `onChange` ((isSelected: boolean) => void; required): Called when toggled.
+  * `isDisabled` (boolean): Disables the card.
+  * `children` (ReactNode): Card content.
+  * `padding` (SpacingStep): Inner padding.
+  * `variant` ('default' or 'transparent' or 'muted' or 'blue' or 'cyan' or 'gray' or 'green' or
+    'orange' or 'pink' or 'purple' or 'red' or 'teal' or 'yellow'): Background color variant.
+  * `width` (SizeValue): Card width.
+  * `height` (SizeValue): Card height.
+  * `maxWidth` (SizeValue): Maximum card width.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/SelectableCard](https://astryx.atmeta.com/components/SelectableCard).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, value=False, *, label, variant='default', disabled=False, padding=None, width=None, height=None, max_width=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        value: bool = False,
+        *,
+        label: str,
+        variant: str = "default",
+        disabled: bool = False,
+        padding: int | float | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        max_width: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "SelectableCard",
+            children,
+            label=label,
+            value=value,
+            variant=variant,
+            disabled=disabled,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                variant=variant,
+                padding=padding,
+                width=width,
+                height=height,
+                maxWidth=max_width,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="value" type="bool" value="False">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'default'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the card is disabled.
+    </PyParameter>
+
+    <PyParameter name="padding" type="int | float | None" value="None">
+      Inner padding using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Card width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Card height.
+    </PyParameter>
+
+    <PyParameter name="max_width" type="int | float | str | None" value="None">
+      Maximum card width.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

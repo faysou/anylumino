@@ -1,0 +1,92 @@
+---
+title: "MetadataList"
+---
+
+Render label-value metadata rows.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe MetadataList props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `children` (ReactNode; required): Metadata items (MetadataListItem components).
+  * `columns` ('multi' or 'single' or number): Column layout mode.
+  * `label` (\{ position?: 'start' or 'top', width?: number or string }): Label display
+    configuration. position controls label placement, width sets a custom label column width.
+    Defaults to \{ position: 'top' } for multi-column layouts.
+  * `maxNumOfItems` (number): Maximum items to show before collapsing with a show more/less
+    toggle.
+  * `orientation` ('vertical' or 'horizontal'): Layout orientation. Horizontal mode flows items
+    in a row with flex-wrap.
+  * `title` (ReactNode): Optional title or heading above the list.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization. Must be a stylex.create()
+    value.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/MetadataList](https://astryx.atmeta.com/components/MetadataList).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, columns=None, label=None, max_items=None, orientation=None, title=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Mapping[str, Any]],
+        *,
+        columns: str | int | None = None,
+        label: Mapping[str, Any] | None = None,
+        max_items: int | None = None,
+        orientation: str | None = None,
+        title: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "MetadataList",
+            props=_named_props(
+                props,
+                items=_clean_value(list(items)),
+                columns=columns,
+                label=label,
+                maxNumOfItems=max_items,
+                orientation=orientation,
+                title=title,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Mapping[str, Any]]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="columns" type="str | int | None" value="None">
+      Single, multi, or fixed-count column layout.
+    </PyParameter>
+
+    <PyParameter name="label" type="Mapping[str, Any] | None" value="None">
+      Label position and width configuration.
+    </PyParameter>
+
+    <PyParameter name="max_items" type="int | None" value="None">
+      Maximum visible items before the expansion control.
+    </PyParameter>
+
+    <PyParameter name="orientation" type="str | None" value="None">
+      Vertical or horizontal layout.
+    </PyParameter>
+
+    <PyParameter name="title" type="str | None" value="None">
+      Optional title above the metadata.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

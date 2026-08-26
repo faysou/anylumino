@@ -1,0 +1,106 @@
+---
+title: "Banner"
+---
+
+Render an Astryx banner for prominent status messages.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Banner props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `status` ('info' or 'warning' or 'error' or 'success'; required): Status type controlling
+    icon and color.
+  * `title` (ReactNode; required): Title text or ReactNode displayed in the header.
+  * `description` (ReactNode): Description text rendered below the title in the header.
+  * `icon` (ReactNode): Override the default status icon.
+  * `isDismissable` (boolean): Whether the banner can be dismissed by the user.
+  * `onDismiss` (() => void): Called when the dismiss button is clicked; banner hides itself
+    regardless of whether this is provided.
+  * `endContent` (ReactNode): Action content rendered in the header area, end-aligned. Typically
+    a button or link.
+  * `container` ('card' or 'section'): Container type: card has border-radius; section is
+    full-width with no border-radius for page-level use.
+  * `children` (ReactNode): Content rendered in the card-background area below the colored
+    header.
+  * `defaultIsExpanded` (boolean): Whether the content area (children) starts expanded. Only
+    relevant when children are provided.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Banner](https://astryx.atmeta.com/components/Banner).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(title, *, status='info', description='', dismissable=None, container=None, expanded=None, action_callbacks=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        title: str,
+        *,
+        status: str = "info",
+        description: str = "",
+        dismissable: bool | None = None,
+        container: str | None = None,
+        expanded: bool | None = None,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Banner",
+            label=title,
+            action_callbacks=action_callbacks,
+            props=_named_props(
+                props,
+                title=title,
+                status=status,
+                description=description,
+                isDismissable=dismissable,
+                container=container,
+                defaultIsExpanded=expanded,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="title" type="str">
+      Dialog or empty-state title.
+    </PyParameter>
+
+    <PyParameter name="status" type="str" value="'info'">
+      Validation or status record displayed by Astryx.
+    </PyParameter>
+
+    <PyParameter name="description" type="str" value="''">
+      Supporting description text.
+    </PyParameter>
+
+    <PyParameter name="dismissable" type="bool | None" value="None">
+      Whether the user can dismiss the banner.
+    </PyParameter>
+
+    <PyParameter name="container" type="str | None" value="None">
+      Card or section container presentation.
+    </PyParameter>
+
+    <PyParameter name="expanded" type="bool | None" value="None">
+      Whether child content starts expanded.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Python callbacks receiving the `"dismiss"` action identifier.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,161 @@
+---
+title: "CodeBlock"
+---
+
+Render syntax-highlighted code with Astryx styling.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe CodeBlock props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `code` (string; required): The code string to display.
+  * `language` (string): Language for syntax highlighting. Use "plaintext" to disable.
+  * `title` (string): Filename or label shown in the header bar.
+  * `hasLanguageLabel` (boolean): Show the language name in the header bar. Hidden when language
+    is "plaintext".
+  * `hasLineNumbers` (boolean): Show a line number gutter.
+  * `highlightLines` (number\[]): 1-indexed line numbers to highlight.
+  * `hasCopyButton` (boolean): Show a copy-to-clipboard button.
+  * `onCopy` (() => void): Callback after the code is copied.
+  * `isWrapped` (boolean): Wrap long lines instead of enabling horizontal scroll.
+  * `maxHeight` (number or string): Max height before the block scrolls vertically.
+  * `size` ('sm' or 'md'): Text size variant.
+  * `width` (string): Width of the code block. Any CSS width value. 'fit-content' (default)
+    shrinks to longest line. '100%' fills parent width.
+  * `container` ('card' or 'section'): Container presentation style. 'card' (default): border
+    and radius with the muted syntax background for a standalone card look. 'section': no
+    border or radius and a transparent background so the block blends into the card or panel
+    it's embedded in.
+  * `tokenizer` ((code: string, language: string) => Array\<\{type: string; start: number; end:
+    number}>): Custom tokenizer override for unsupported languages.
+  * `isCollapsible` (boolean): Allow collapsing the code body into just the header bar. Starts
+    expanded; the header becomes clickable to toggle. Only shows the toggle when the code
+    exceeds collapsibleThreshold lines.
+  * `collapsibleThreshold` (number): Minimum number of lines before the collapse toggle appears.
+    Below this threshold the code block renders normally even when isCollapsible is true.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization. Must be a stylex.create()
+    value.
+  * `className` (string): CSS class name for the root element. Prefer xstyle for styling.
+  * `style` (CSSProperties): Inline styles. Prefer xstyle for StyleX-optimized styling.
+  * `data-testid` (string): Test selector for automated testing frameworks.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/CodeBlock](https://astryx.atmeta.com/components/CodeBlock).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(code, *, language='python', title=None, language_label=None, line_numbers=None, highlight_lines=None, copy_button=None, wrapped=None, max_height=None, size=None, width=None, container=None, collapsible=None, collapsible_threshold=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        code: str,
+        *,
+        language: str = "python",
+        title: str | None = None,
+        language_label: bool | None = None,
+        line_numbers: bool | None = None,
+        highlight_lines: Iterable[int] | None = None,
+        copy_button: bool | None = None,
+        wrapped: bool | None = None,
+        max_height: int | float | str | None = None,
+        size: str | None = None,
+        width: str | None = None,
+        container: str | None = None,
+        collapsible: bool | None = None,
+        collapsible_threshold: int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "CodeBlock",
+            width=width,
+            props=_named_props(
+                props,
+                code=code,
+                language=language,
+                title=title,
+                hasLanguageLabel=language_label,
+                hasLineNumbers=line_numbers,
+                highlightLines=list(highlight_lines)
+                if highlight_lines is not None
+                else None,
+                hasCopyButton=copy_button,
+                isWrapped=wrapped,
+                maxHeight=max_height,
+                size=size,
+                width=width,
+                container=container,
+                isCollapsible=collapsible,
+                collapsibleThreshold=collapsible_threshold,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="code" type="str">
+      Astryx component option.
+    </PyParameter>
+
+    <PyParameter name="language" type="str" value="'python'">
+      Code language used for syntax highlighting.
+    </PyParameter>
+
+    <PyParameter name="title" type="str | None" value="None">
+      Header filename or label.
+    </PyParameter>
+
+    <PyParameter name="language_label" type="bool | None" value="None">
+      Whether to show the language in the header.
+    </PyParameter>
+
+    <PyParameter name="line_numbers" type="bool | None" value="None">
+      Whether to show the line-number gutter.
+    </PyParameter>
+
+    <PyParameter name="highlight_lines" type="Iterable[int] | None" value="None">
+      One-indexed lines to highlight.
+    </PyParameter>
+
+    <PyParameter name="copy_button" type="bool | None" value="None">
+      Whether to show the copy control.
+    </PyParameter>
+
+    <PyParameter name="wrapped" type="bool | None" value="None">
+      Whether long lines wrap instead of scrolling.
+    </PyParameter>
+
+    <PyParameter name="max_height" type="int | float | str | None" value="None">
+      Maximum height before vertical scrolling.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Code text size.
+    </PyParameter>
+
+    <PyParameter name="width" type="str | None" value="None">
+      CSS width of the code block.
+    </PyParameter>
+
+    <PyParameter name="container" type="str | None" value="None">
+      Card or section presentation.
+    </PyParameter>
+
+    <PyParameter name="collapsible" type="bool | None" value="None">
+      Whether long code can collapse.
+    </PyParameter>
+
+    <PyParameter name="collapsible_threshold" type="int | None" value="None">
+      Minimum line count for the collapse control.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

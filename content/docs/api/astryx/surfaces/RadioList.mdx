@@ -1,0 +1,115 @@
+---
+title: "RadioList"
+---
+
+Render a single-choice Astryx radio list.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe RadioList props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Label text for the radio group (always rendered for
+    accessibility).
+  * `value` (string; required): The currently selected value.
+  * `onChange` ((value: string) => void; required): Callback fired when the selected value
+    changes.
+  * `children` (ReactNode; required): RadioListItem elements.
+  * `isLabelHidden` (boolean): Whether to visually hide the label.
+  * `description` (string): Description text displayed below the label.
+  * `orientation` ('vertical' or 'horizontal'): Layout direction of the radio items.
+  * `isDisabled` (boolean): Whether all radio items are disabled.
+  * `isRequired` (boolean): Whether the radio group is required.
+  * `isOptional` (boolean): Whether the field is optional (mutually exclusive with isRequired).
+  * `status` (InputStatus): Status indicator (\{ type, message }).
+  * `size` ('sm' or 'md'): Size of the radio controls.
+  * `labelTooltip` (string): Tooltip text for an info icon next to the label.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value: not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/RadioList](https://astryx.atmeta.com/components/RadioList).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value, *, label, orientation=None, disabled=False, size=None, label_hidden=None, description=None, status=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str,
+        *,
+        label: str,
+        orientation: str | None = None,
+        disabled: bool = False,
+        size: str | None = None,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        status: Mapping[str, Any] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "RadioList",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                orientation=orientation,
+                size=size,
+                isLabelHidden=label_hidden,
+                description=description,
+                status=status,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="value" type="str">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="orientation" type="str | None" value="None">
+      Vertical or horizontal item layout.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether all radio items are disabled.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Radio control size.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the group.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,70 @@
+---
+title: "DockPanel"
+---
+
+Lumino dock panel for tabbed or split workspace-style layouts.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="layout_kind" value="t.Unicode('dock').tag(sync=True)" />
+
+  <PyAttribute name="mode" value="t.Enum(DOCK_MODES, default_value='split-right').tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, mode='split-right', width='100%', height=520, resizable=True, fit_content=False) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        mode: str = "split-right",
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 520,
+        resizable: bool = True,
+        fit_content: bool = False,
+    ) -> None:
+        self._init_composed(widgets, titles, keys, width, height, resizable, fit_content=fit_content, mode=mode)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="widgets" type="ChildInput" value="None">
+      Child widgets or keyed child mapping. Mapping keys become stable child
+      keys and default tab titles.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Tab titles associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `widgets`.
+    </PyParameter>
+
+    <PyParameter name="mode" type="str" value="'split-right'">
+      Placement mode used as children are added to the dock layout.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="520">
+      Widget height.
+    </PyParameter>
+
+    <PyParameter name="resizable" type="bool" value="True">
+      Whether the dock panel gets a notebook resize handle.
+    </PyParameter>
+
+    <PyParameter name="fit_content" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

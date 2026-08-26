@@ -1,0 +1,122 @@
+---
+title: "anylumino"
+description: "Lumino layouts for composable anywidgets."
+---
+
+`anylumino` is a small Python package for building notebook interfaces where
+Lumino layout widgets arrange child anywidgets and Astryx components provide
+the application UI.
+
+<div className="hero-grid">
+<div className="hero-copy">
+The package gives notebooks an app-like layout vocabulary: tabs, split panes,
+dock panels, scrollable control stacks, tables, forms, command palettes, and
+keyed child access from Python.
+</div>
+
+![A stylized anylumino dashboard composed from panels, figures, tabs, and controls.](assets/anylumino-mark.svg)
+</div>
+
+<div className="anylumino-demo" aria-label="Animated overview of anylumino layout composition">
+<div className="demo-toolbar"><span></span><span></span><span></span><strong>Toolbar</strong></div>
+<div className="demo-stage">
+<div className="demo-tabs"><span className="active">Figure</span><span>Samples</span><span>Notes</span></div>
+<div className="demo-split">
+<div className="demo-controls"><i></i><i></i><i></i><i></i></div>
+<div className="demo-chart"><svg viewBox="0 0 300 140" aria-hidden="true"><path className="line-a" d="M10 112 C60 62 91 98 132 72 S200 18 292 34"/><path className="line-b" d="M10 96 C68 80 95 38 145 58 S223 126 292 66"/></svg></div>
+</div>
+<div className="demo-dock"><span>Command palette</span><span>Dock panel</span></div>
+</div>
+</div>
+The core idea is direct composition:
+
+```python
+import anylumino as al
+import anylumino.astryx as ax
+
+brand = ax.Brand(
+    "desk",
+    **{
+        "color-accent": ("#0057b8", "#79b8ff"),
+        "color-background-card": ("#ffffff", "#111827"),
+        "radius-container": "8px",
+    },
+)
+
+orders = ax.Table(
+    rows=order_rows,
+    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
+    row_key="order_id",
+    selects="multiple",
+    sortable=True,
+)
+
+controls = ax.Theme(
+    {
+        "symbol": ax.Typeahead(
+            ["AAPL", "MSFT", "NVDA"],
+            value="AAPL",
+            label="Symbol",
+        ),
+        "fields": ax.Tokenizer(
+            ["Bid", "Ask", "Last"],
+            value=["Bid", "Ask"],
+            label="Fields",
+        ),
+        "refresh": ax.Button("Refresh", variant="primary"),
+    },
+    brand=brand,
+    gap=3,
+)
+
+tabs = al.TabPanel({"orders": orders, "chart": trend_figure})
+al.SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
+```
+
+## What it provides
+
+## Layouts
+
+- `TabPanel` for tabbed child widgets.
+- `BoxPanel`, `HBox`, `VBox`, and `ScrollBox` for linear composition.
+- `SplitPanel` for drag-adjustable panes.
+- `DockPanel`, `AccordionPanel`, `StackedPanel`, `GridPanel`, and
+  `ResponsivePanel` for application-like notebook layouts.
+
+## Actions
+
+- `Toolbar` for compact command rows.
+- `MenuBar` for grouped commands.
+- `CommandPalette` for inline notebook-safe searchable commands.
+- `CommandPalette` for Lumino-style searchable actions.
+
+Each action can dispatch to a Python callback.
+
+## Controls
+
+`anylumino` includes Astryx wrappers for buttons, text inputs, selectors,
+tokenizers, segmented controls, tables, status surfaces, popovers, inline
+dialogs, and reusable brand themes.
+
+## Design model
+
+`anylumino` is designed around `LayoutWidget`, the shared base class for layout
+containers. A layout can be declared with a dictionary, and those keys become
+the stable access path from Python:
+
+```python
+tabs = TabPanel({"trend": trend_panel, "samples": samples_table})
+tabs.select_key("samples")
+tabs["trend"].refresh()
+tabs.call_owner("trend", "refresh")
+```
+
+That lets a dashboard own layout, state, and behavior without relying on global
+variables.
+
+## Next steps
+
+- Read the [guide](guide.mdx) for the composition model.
+- Review [Astryx widgets](astryx.mdx) for notebook UI components.
+- Review [controls](controls.mdx) for Astryx form and control patterns.
+- Open the [API reference](api/index.mdx) generated from the package docstrings.

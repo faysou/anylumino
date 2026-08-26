@@ -1,0 +1,95 @@
+---
+title: "PowerSearch"
+---
+
+Build structured filters with the Astryx power search field.
+
+`config` describes the searchable fields and their operators, and `value`
+holds the current filter records, each `{"field": ..., "operator": ...,
+"value": ...}`. Both are plain JSON, matching how :class:`Table` and
+:class:`TreeList` take their data.
+
+<Callout title="Notes" type="note">
+  See Astryx component docs: [https://astryx.atmeta.com/components/PowerSearch](https://astryx.atmeta.com/components/PowerSearch).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(config, filters=(), *, label='', placeholder=None, disabled=False, read_only=None, clear=None, label_hidden=None, menu_width=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        config: Mapping[str, Any],
+        filters: Iterable[Mapping[str, Any]] = (),
+        *,
+        label: str = "",
+        placeholder: str | None = None,
+        disabled: bool = False,
+        read_only: bool | None = None,
+        clear: bool | None = None,
+        label_hidden: bool | None = None,
+        menu_width: int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "PowerSearch",
+            label=label,
+            value=list(filters),
+            disabled=disabled,
+            props=_named_props(
+                props,
+                config=config,
+                placeholder=placeholder,
+                isReadOnly=read_only,
+                hasClear=clear,
+                isLabelHidden=label_hidden,
+                menuWidth=menu_width,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="config" type="Mapping[str, Any]">
+      Search configuration: `{"name": ..., "fields": [...]}`, where each
+      field takes a `key`, a `label`, and an `operators` sequence.
+    </PyParameter>
+
+    <PyParameter name="filters" type="Iterable[Mapping[str, Any]]" value="()">
+      Active filter records, synchronized as `value`.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str | None" value="None">
+      Placeholder text shown when no filter is set.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="read_only" type="bool | None" value="None">
+      Whether existing filters can be edited.
+    </PyParameter>
+
+    <PyParameter name="clear" type="bool | None" value="None">
+      Whether to show a clear control.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="menu_width" type="int | None" value="None">
+      Fixed suggestion menu width in pixels.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

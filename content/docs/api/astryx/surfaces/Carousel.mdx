@@ -1,0 +1,71 @@
+---
+title: "Carousel"
+---
+
+Scroll child widgets horizontally in an Astryx carousel.
+
+<Callout title="Notes" type="note">
+  See Astryx component docs: [https://astryx.atmeta.com/components/Carousel](https://astryx.atmeta.com/components/Carousel).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, gap=1, buttons=None, edge_fade=None, snap=None, padding=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        gap: int | float = 1,
+        buttons: bool | None = None,
+        edge_fade: bool | None = None,
+        snap: bool | None = None,
+        padding: int | float | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Carousel",
+            children,
+            props=_named_props(
+                props,
+                gap=gap,
+                hasButtons=buttons,
+                hasEdgeFade=edge_fade,
+                hasSnap=snap,
+                padding=padding,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="gap" type="int | float" value="1">
+      Astryx spacing step between children.
+    </PyParameter>
+
+    <PyParameter name="buttons" type="bool | None" value="None">
+      Whether to show the previous and next controls.
+    </PyParameter>
+
+    <PyParameter name="edge_fade" type="bool | None" value="None">
+      Whether to fade content at the scroll edges.
+    </PyParameter>
+
+    <PyParameter name="snap" type="bool | None" value="None">
+      Whether scrolling snaps to each child.
+    </PyParameter>
+
+    <PyParameter name="padding" type="int | float | None" value="None">
+      Inner padding using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

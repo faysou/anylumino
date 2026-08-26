@@ -293,6 +293,8 @@ class Carousel(Widget):
     **props : Any
         JSON-safe Carousel props forwarded to Astryx.
 
+    Notes
+    -----
     See Astryx component docs: <https://astryx.atmeta.com/components/Carousel>.
     """
 
@@ -350,6 +352,8 @@ class ContextMenu(Widget):
     **props : Any
         JSON-safe ContextMenu props forwarded to Astryx.
 
+    Notes
+    -----
     See Astryx component docs: <https://astryx.atmeta.com/components/ContextMenu>.
     """
 

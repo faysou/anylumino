@@ -1,0 +1,82 @@
+---
+title: "EmptyState"
+---
+
+Render an Astryx empty-state message.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe EmptyState props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `title` (string; required): Primary message rendered as an \<h3> heading inside the empty
+    state.
+  * `description` (string): Optional secondary text providing additional context below the
+    title.
+  * `icon` (ReactNode): Optional icon or illustration displayed above the title; rendered as
+    decorative (aria-hidden="true").
+  * `actions` (ReactNode): Optional action buttons displayed below the description, laid out
+    horizontally by default and stacked vertically when isCompact is true.
+  * `headingLevel` (1 or 2 or 3 or 4 or 5 or 6): Controls the rendered HTML heading tag (h1-h6)
+    to fit the document outline.
+  * `isCompact` (boolean): Enables the compact variant with reduced spacing for constrained
+    content areas.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/EmptyState](https://astryx.atmeta.com/components/EmptyState).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(title, *, description='', heading_level=None, compact=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        title: str,
+        *,
+        description: str = "",
+        heading_level: int | None = None,
+        compact: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "EmptyState",
+            props=_named_props(
+                props,
+                title=title,
+                description=description,
+                headingLevel=heading_level,
+                isCompact=compact,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="title" type="str">
+      Dialog or empty-state title.
+    </PyParameter>
+
+    <PyParameter name="description" type="str" value="''">
+      Supporting description text.
+    </PyParameter>
+
+    <PyParameter name="heading_level" type="int | None" value="None">
+      Semantic heading level.
+    </PyParameter>
+
+    <PyParameter name="compact" type="bool | None" value="None">
+      Whether to use reduced spacing.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

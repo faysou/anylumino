@@ -1,0 +1,100 @@
+---
+title: "ToggleButtonGroup"
+---
+
+Render a single- or multiple-selection group of toggle buttons.
+
+<Callout title="Astryx Props" type="astryx-props">
+  `children`, `value`, `label`, `type`, `orientation`, `size`, and
+  `isDisabled` are adapted by the named arguments above. `**props` keeps
+  the wrapper forward-compatible with additional JSON-safe Astryx props.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/ToggleButtonGroup](https://astryx.atmeta.com/components/ToggleButtonGroup).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value=None, *, label, selection_mode='single', orientation='horizontal', size=None, disabled=False, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str | Iterable[str] | None = None,
+        *,
+        label: str,
+        selection_mode: str = "single",
+        orientation: str = "horizontal",
+        size: str | None = None,
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        if selection_mode not in {"single", "multiple"}:
+            msg = "selection_mode must be 'single' or 'multiple'"
+            raise ValueError(msg)
+        if selection_mode == "multiple":
+            selected = (
+                []
+                if value is None
+                else [value]
+                if isinstance(value, str)
+                else list(value)
+            )
+        else:
+            if value is not None and not isinstance(value, str):
+                msg = "single-selection value must be a string or None"
+                raise TypeError(msg)
+            selected = value
+
+        super().__init__(
+            "ToggleButtonGroup",
+            label=label,
+            value=selected,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                type=selection_mode,
+                orientation=orientation,
+                size=size,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Button labels, `(label, value)` pairs, or item mappings. Mappings can
+      also set `disabled` and individual button props.
+    </PyParameter>
+
+    <PyParameter name="value" type="str | Iterable[str] | None" value="None">
+      Selected value for single selection, or selected values for multiple selection.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Accessible label for the group.
+    </PyParameter>
+
+    <PyParameter name="selection_mode" type="str" value="'single'">
+      `"single"` for exclusive selection or `"multiple"` for
+      independent selections.
+    </PyParameter>
+
+    <PyParameter name="orientation" type="str" value="'horizontal'">
+      Horizontal or vertical button layout.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Default size inherited by every toggle button.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether all toggle buttons are disabled.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

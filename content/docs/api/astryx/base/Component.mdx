@@ -1,0 +1,66 @@
+---
+title: "Component"
+---
+
+Render a registered Astryx component by name.
+
+## Functions
+
+<PyFunction name="__init__" type="(component_name, children=None, *, props=None, text='', label='', **kwargs) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        component_name: str,
+        children: ChildInput = None,
+        *,
+        props: Mapping[str, Any] | None = None,
+        text: str = "",
+        label: str = "",
+        **kwargs: Any,
+    ) -> None:
+        if component_name not in _ASTRYX_COMPONENT_NAMES:
+            registered = ", ".join(sorted(_ASTRYX_COMPONENT_NAMES))
+            raise ValueError(
+                f"unknown Astryx component {component_name!r}; registered components: {registered}"
+            )
+        super().__init__(
+            component_name,
+            children,
+            props=props,
+            text=text,
+            label=label,
+            **kwargs,
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="component_name" type="str">
+      Frontend Astryx component name registered in the anylumino bridge.
+    </PyParameter>
+
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="props" type="Mapping[str, Any] | None" value="None">
+      Additional JSON-safe props for the selected Astryx component.
+      Unsafe React keys such as `children`, `dangerouslySetInnerHTML`, `ref`, and `key`
+      are filtered by the frontend bridge. Component data props such as `items` are preserved.
+      See the Astryx docs for the selected component page, for example [https://astryx.atmeta.com/components/Blockquote](https://astryx.atmeta.com/components/Blockquote).
+    </PyParameter>
+
+    <PyParameter name="text" type="str" value="''">
+      Text content synchronized to the frontend.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible component label.
+    </PyParameter>
+
+    <PyParameter name="kwargs" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -350,9 +350,12 @@ Build and browse the documentation site:
 make docs-preview
 ```
 
-This opens `http://127.0.0.1:4200/` automatically. The rendered site is static
-under `web/_site`; use `make docs-serve` to rebuild it and serve that static
-output.
+This generates the Python API reference from source and NumPy docstrings, then opens
+`http://127.0.0.1:4200/docs` with the Fumadocs development server. Use `make docs` for
+a production build, `make docs-serve` to run that build locally, and `make docs-check`
+to run API generation, link tests, linting, type checks, and the production build.
+The Griffe-backed `fumadocs-python` generator owns `content/docs/api`; update public
+signatures and docstrings in `src/anylumino` instead of editing generated API pages.
 
 Open `notebooks/astryx_components_smoke.py` for the broad Astryx component
 smoke test. Open `notebooks/astryx_table.py` for focused table selection,

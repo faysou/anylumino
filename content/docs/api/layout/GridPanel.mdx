@@ -1,0 +1,104 @@
+---
+title: "GridPanel"
+---
+
+CSS grid-backed Lumino panel for placing children in grid cells.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="layout_kind" value="t.Unicode('grid').tag(sync=True)" />
+
+  <PyAttribute name="columns" value="t.Unicode('1fr 1fr').tag(sync=True)" />
+
+  <PyAttribute name="rows" value="t.Unicode('auto').tag(sync=True)" />
+
+  <PyAttribute name="gap" value="t.Unicode('8px').tag(sync=True)" />
+
+  <PyAttribute name="areas" value="t.List(t.Dict(), default_value=[]).tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, columns='1fr 1fr', rows='auto', gap=8, areas=None, width='100%', height=420, resizable=True, fit_content=False) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        columns: str = "1fr 1fr",
+        rows: str = "auto",
+        gap: int | float | str | None = 8,
+        areas: Iterable[dict[str, Any]] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        fit_content: bool = False,
+    ) -> None:
+        self._init_composed(
+            widgets,
+            titles,
+            keys,
+            width,
+            height,
+            resizable,
+            fit_content=fit_content,
+            columns=columns,
+            rows=rows,
+            gap=_size_to_css(gap, "8px"),
+            areas=_as_list(areas),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="widgets" type="ChildInput" value="None">
+      Child widgets or keyed child mapping.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `widgets`.
+    </PyParameter>
+
+    <PyParameter name="columns" type="str" value="'1fr 1fr'">
+      CSS `grid-template-columns` value.
+    </PyParameter>
+
+    <PyParameter name="rows" type="str" value="'auto'">
+      CSS `grid-template-rows` value.
+    </PyParameter>
+
+    <PyParameter name="gap" type="int | float | str | None" value="8">
+      CSS grid gap. Numeric values use shared anylumino size rules.
+    </PyParameter>
+
+    <PyParameter name="areas" type="Iterable[dict[str, Any]] | None" value="None">
+      Per-child placement metadata. Each item can describe CSS grid
+      placement such as row, column, or area values understood by the
+      frontend.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="420">
+      Widget height.
+    </PyParameter>
+
+    <PyParameter name="resizable" type="bool" value="True">
+      Whether the grid gets a notebook resize handle.
+    </PyParameter>
+
+    <PyParameter name="fit_content" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

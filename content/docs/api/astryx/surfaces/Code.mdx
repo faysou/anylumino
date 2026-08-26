@@ -1,0 +1,45 @@
+---
+title: "Code"
+---
+
+Render inline code with Astryx styling.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Code props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `children` (ReactNode; required): Code content.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization. Must be a stylex.create()
+    value.
+  * `className` (string): CSS class name for the root element. Prefer xstyle for styling.
+  * `style` (CSSProperties): Inline styles. Prefer xstyle for StyleX-optimized styling.
+  * `data-testid` (string): Test selector for automated testing frameworks.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Code](https://astryx.atmeta.com/components/Code).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(code, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, code: str, **props: Any) -> None:
+        super().__init__("Code", text=code, props=props)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="code" type="str">
+      Astryx component option.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

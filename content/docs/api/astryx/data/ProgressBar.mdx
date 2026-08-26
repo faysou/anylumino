@@ -1,0 +1,106 @@
+---
+title: "ProgressBar"
+---
+
+Render an Astryx progress bar.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe ProgressBar props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): accessible label
+  * `value` (number): Current value (ignored when indeterminate).
+  * `max` (number): Maximum value.
+  * `isLabelHidden` (boolean): Visually hide the label (remains accessible).
+  * `hasValueLabel` (boolean): Show formatted value text (ignored when indeterminate).
+  * `formatValueLabel` ((value: number, max: number) => string): Custom value label formatter;
+    defaults to a percentage string.
+  * `variant` ('accent' or 'success' or 'warning' or 'error' or 'neutral'): Semantic color
+    variant.
+  * `isIndeterminate` (boolean): Animated loading indicator for unknown progress.
+  * `isDisabled` (boolean): Visually disabled state: grays out the fill and text. Use for
+    canceled or inactive operations.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/ProgressBar](https://astryx.atmeta.com/components/ProgressBar).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=0, *, label, variant='accent', max=None, label_hidden=None, value_label=None, indeterminate=None, disabled=False, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: int | float = 0,
+        *,
+        label: str,
+        variant: str = "accent",
+        max: int | float | None = None,
+        label_hidden: bool | None = None,
+        value_label: bool | None = None,
+        indeterminate: bool | None = None,
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "ProgressBar",
+            label=label,
+            value=value,
+            variant=variant,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                max=max,
+                isLabelHidden=label_hidden,
+                hasValueLabel=value_label,
+                isIndeterminate=indeterminate,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="int | float" value="0">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'accent'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="max" type="int | float | None" value="None">
+      Maximum progress value.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="value_label" type="bool | None" value="None">
+      Whether to display the formatted value.
+    </PyParameter>
+
+    <PyParameter name="indeterminate" type="bool | None" value="None">
+      Whether progress is unknown.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether to render the inactive visual state.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

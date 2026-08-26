@@ -1,0 +1,49 @@
+---
+title: "MenuBar"
+---
+
+Lumino-style menu bar with nested menu items and Python callbacks.
+
+## Functions
+
+<PyFunction name="__init__" type="(menus=None, *, callbacks=None, width='100%', height='auto') -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        menus: Iterable[dict[str, Any]] | None = None,
+        *,
+        callbacks: dict[str, ActionCallback] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = "auto",
+    ) -> None:
+        super().__init__(menus, callbacks=callbacks, width=width, height=height, action_kind="menubar")
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="menus" type="Iterable[dict[str, Any]] | None" value="None">
+      Menu definitions. A menu normally has a `label` and an `items`
+      sequence. Item dictionaries should include an `id` and `label` and
+      may include frontend options such as `icon`, `icon_src`,
+      `icon_size`, `disabled`, or `separator`. `icon` uses bundled
+      workflow icon names.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="dict[str, ActionCallback] | None" value="None">
+      Callback map keyed by menu item id. A callback receives the activated
+      item id. The map stays available as the `callbacks` attribute, and
+      `on_click` or `on_action` register callbacks for every activation.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="'auto'">
+      Widget height.
+    </PyParameter>
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

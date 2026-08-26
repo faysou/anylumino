@@ -516,6 +516,8 @@ class Pagination(Widget):
     **props : Any
         JSON-safe Pagination props forwarded to Astryx.
 
+    Notes
+    -----
     See Astryx component docs: <https://astryx.atmeta.com/components/Pagination>.
     """
 

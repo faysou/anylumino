@@ -1,0 +1,81 @@
+---
+title: "Outline"
+---
+
+Render a table-of-contents outline.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Outline props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `items` (OutlineItem\[]; required): Ordered heading items to render as table-of-contents
+    links.
+  * `activeId` (string): Currently active item id. When provided, disables built-in scroll spy
+    state ownership.
+  * `onActiveIdChange` ((id: string) => void): Called when the active item changes from scroll
+    spy or click.
+  * `label` (string; default 'Table of contents'): Accessible label for the nav landmark.
+  * `density` ('default' or 'compact'; default 'default'): Controls item padding density.
+  * `data-testid` (string): Test selector for automated testing.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization.
+  * `className` (string): CSS class names for the nav element.
+  * `style` (CSSProperties): Inline styles for the nav element.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Outline](https://astryx.atmeta.com/components/Outline).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, active_id='', label='Table of contents', density='compact', **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Mapping[str, Any]],
+        *,
+        active_id: str = "",
+        label: str = "Table of contents",
+        density: str = "compact",
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Outline",
+            label=label,
+            value=active_id,
+            props={
+                "items": _clean_value(list(items)),
+                "label": label,
+                "density": density,
+                **props,
+            },
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Mapping[str, Any]]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="active_id" type="str" value="''">
+      Currently active outline item id.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="'Table of contents'">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="density" type="str" value="'compact'">
+      Astryx density or spacing mode.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

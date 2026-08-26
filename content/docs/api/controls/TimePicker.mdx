@@ -1,0 +1,83 @@
+---
+title: "TimePicker"
+---
+
+Browser-native time picker with hour and minute popup controls.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="control_kind" value="'time'" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=None, *, description='', disabled=False, min=None, max=None, step=None, continuous_update=True, width='', **kwargs) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: time | str | None = None,
+        *,
+        description: str = "",
+        disabled: bool = False,
+        min: time | str | None = None,
+        max: time | str | None = None,
+        step: int | str | None = None,
+        continuous_update: bool = True,
+        width: str = "",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            value=value,
+            description=description,
+            disabled=disabled,
+            min=min,
+            max=max,
+            step=step,
+            continuous_update=continuous_update,
+            width=width,
+            **kwargs,
+        )
+        self.control_kind = "time"
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="time | str | None" value="None">
+      Initial value and synchronized Python value.
+    </PyParameter>
+
+    <PyParameter name="description" type="str" value="''">
+      Label shown above the control.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether user interaction is disabled.
+    </PyParameter>
+
+    <PyParameter name="min" type="time | str | None" value="None">
+      Minimum time value.
+    </PyParameter>
+
+    <PyParameter name="max" type="time | str | None" value="None">
+      Maximum time value.
+    </PyParameter>
+
+    <PyParameter name="step" type="int | str | None" value="None">
+      Native input step value.
+    </PyParameter>
+
+    <PyParameter name="continuous_update" type="bool" value="True">
+      Whether Python receives updates while the user edits the input.
+    </PyParameter>
+
+    <PyParameter name="width" type="str" value="''">
+      CSS width for the control.
+    </PyParameter>
+
+    <PyParameter name="kwargs" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

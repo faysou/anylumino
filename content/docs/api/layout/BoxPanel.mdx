@@ -1,0 +1,143 @@
+---
+title: "BoxPanel"
+---
+
+Lumino box layout with configurable direction, spacing, and stretch.
+
+`HBox` and `VBox` are direction-specific convenience subclasses. Set
+`scroll=True` to enable scrolling along the natural box direction, or use
+`scroll_x` and `scroll_y` for explicit overflow behavior.
+
+<Callout title="Notes" type="note">
+  A scrolling panel establishes an overflow boundary. Hosts that cap output
+  height, such as VS Code notebooks, then show a scrollbar inside a scrollbar,
+  and children that position popups within their own subtree are clipped at
+  that boundary. Set `fit_content=True` instead when the panel should grow
+  to its content rather than scroll.
+</Callout>
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="layout_kind" value="t.Unicode('box').tag(sync=True)" />
+
+  <PyAttribute name="direction" value="t.Enum(BOX_DIRECTIONS, default_value='left-to-right').tag(sync=True)" />
+
+  <PyAttribute name="spacing" value="t.Int(8).tag(sync=True)" />
+
+  <PyAttribute name="stretches" value="t.List(t.Int(), default_value=[]).tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, direction='left-to-right', spacing=8, stretches=None, width='100%', height=420, resizable=True, scroll=False, scroll_x=None, scroll_y=None, child_min_width=None, child_min_height=None, fit_content=False) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        direction: str = "left-to-right",
+        spacing: int = 8,
+        stretches: Iterable[int] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        scroll: bool = False,
+        scroll_x: bool | None = None,
+        scroll_y: bool | None = None,
+        child_min_width: int | float | str | None = None,
+        child_min_height: int | float | str | None = None,
+        fit_content: bool = False,
+    ) -> None:
+        horizontal = direction in ("left-to-right", "right-to-left")
+        resolved_scroll_x = bool(scroll_x if scroll_x is not None else scroll and horizontal)
+        resolved_scroll_y = bool(scroll_y if scroll_y is not None else scroll and not horizontal)
+        default_child_min_width = "220px" if resolved_scroll_x else None
+        default_child_min_height = "44px" if resolved_scroll_y else None
+        self._init_composed(
+            widgets,
+            titles,
+            keys,
+            width,
+            height,
+            resizable,
+            resolved_scroll_x,
+            resolved_scroll_y,
+            child_min_width if child_min_width is not None else default_child_min_width,
+            child_min_height if child_min_height is not None else default_child_min_height,
+            fit_content=fit_content,
+            direction=direction,
+            spacing=spacing,
+            stretches=_as_list(stretches),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="widgets" type="ChildInput" value="None">
+      Child anywidget-compatible widgets or owner objects exposing a
+      `widget` attribute. Mapping keys become stable child keys and default
+      titles.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children. Mapping values are looked up
+      by child key.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `widgets`.
+    </PyParameter>
+
+    <PyParameter name="direction" type="str" value="'left-to-right'">
+      Lumino box direction.
+    </PyParameter>
+
+    <PyParameter name="spacing" type="int" value="8">
+      Pixel spacing between children.
+    </PyParameter>
+
+    <PyParameter name="stretches" type="Iterable[int] | None" value="None">
+      Lumino stretch factors, one per child when provided.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width. Numeric values use the shared anylumino size rules.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="420">
+      Widget height. Numeric values use the shared anylumino size rules.
+    </PyParameter>
+
+    <PyParameter name="resizable" type="bool" value="True">
+      Whether the panel receives a notebook-friendly resize handle.
+    </PyParameter>
+
+    <PyParameter name="scroll" type="bool" value="False">
+      Enables scrolling along the natural layout direction.
+    </PyParameter>
+
+    <PyParameter name="scroll_x" type="bool | None" value="None">
+      Explicit horizontal or vertical overflow controls.
+    </PyParameter>
+
+    <PyParameter name="scroll_y" type="bool | None" value="None">
+      Explicit horizontal or vertical overflow controls.
+    </PyParameter>
+
+    <PyParameter name="child_min_width" type="int | float | str | None" value="None">
+      Minimum child sizes used when scrolling is enabled.
+    </PyParameter>
+
+    <PyParameter name="child_min_height" type="int | float | str | None" value="None">
+      Minimum child sizes used when scrolling is enabled.
+    </PyParameter>
+
+    <PyParameter name="fit_content" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

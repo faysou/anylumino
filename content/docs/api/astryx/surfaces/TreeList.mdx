@@ -1,0 +1,72 @@
+---
+title: "TreeList"
+---
+
+Render hierarchical notebook data as an expandable tree.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe TreeList props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `items` (TreeListItemData\[]; required): Recursive tree item data; nested children arrays
+    create hierarchy.
+  * `density` ('compact' or 'balanced' or 'spacious'; default 'balanced'): Spacing density for
+    tree list items.
+  * `header` (ReactNode): Header content rendered above the tree and associated with
+    aria-labelledby.
+  * `data-testid` (string): Test selector for automated testing.
+  * `xstyle` (StyleXStyles): StyleX styles for the root element.
+  * `className` (string): CSS class names for the root element.
+  * `style` (CSSProperties): Inline styles for the root element.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/TreeList](https://astryx.atmeta.com/components/TreeList).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, header='', density='balanced', **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Mapping[str, Any]],
+        *,
+        header: str = "",
+        density: str = "balanced",
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "TreeList",
+            props={
+                "items": _clean_value(list(items)),
+                "header": header or None,
+                "density": density,
+                **props,
+            },
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Mapping[str, Any]]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="header" type="str" value="''">
+      Optional header text or content.
+    </PyParameter>
+
+    <PyParameter name="density" type="str" value="'balanced'">
+      Astryx density or spacing mode.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

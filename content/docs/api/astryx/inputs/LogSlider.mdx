@@ -1,0 +1,93 @@
+---
+title: "LogSlider"
+---
+
+Render an Astryx slider on a logarithmic scale.
+
+Astryx `Slider` steps linearly, so this wrapper drives it in exponent
+space and synchronizes `base ** exponent` as the value. Everything else,
+including `continuous_update`, behaves like :class:`Slider`.
+
+<Callout title="Notes" type="note">
+  See Astryx component docs: [https://astryx.atmeta.com/components/Slider](https://astryx.atmeta.com/components/Slider).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=1, *, label='', base=10, min_exponent=0, max_exponent=4, step=0.1, disabled=False, value_display=None, description=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: int | float = 1,
+        *,
+        label: str = "",
+        base: int | float = 10,
+        min_exponent: int | float = 0,
+        max_exponent: int | float = 4,
+        step: int | float = 0.1,
+        disabled: bool = False,
+        value_display: str | None = None,
+        description: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "LogSlider",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                base=base,
+                minExponent=min_exponent,
+                maxExponent=max_exponent,
+                step=step,
+                valueDisplay=value_display,
+                description=description,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="int | float" value="1">
+      Synchronized component value on the real scale, not the exponent.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="base" type="int | float" value="10">
+      Logarithm base.
+    </PyParameter>
+
+    <PyParameter name="min_exponent" type="int | float" value="0">
+      Smallest exponent the slider can reach.
+    </PyParameter>
+
+    <PyParameter name="max_exponent" type="int | float" value="4">
+      Largest exponent the slider can reach.
+    </PyParameter>
+
+    <PyParameter name="step" type="int | float" value="0.1">
+      Exponent step between slider positions.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="value_display" type="str | None" value="None">
+      Tooltip, text, or hidden value presentation.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the input.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,110 @@
+---
+title: "Thumbnail"
+---
+
+Render an Astryx thumbnail image or placeholder.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Thumbnail props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `src` (string): Image source URL.
+  * `alt` (string): Alt text for the image.
+  * `label` (string): Accessible label (e.g. file name). Shown as tooltip on hover.
+  * `onRemove` ((e: React.MouseEvent) => void): Callback for the overlaid remove button.
+  * `onClick` ((e: React.MouseEvent) => void): Click handler. Adds button semantics and hover
+    shadow.
+  * `isLoading` (boolean): Shows skeleton (no src) or upload overlay (with src).
+  * `isDisabled` (boolean): Whether the thumbnail is disabled.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+  * `className` (string): CSS class name for the root element. Prefer xstyle for styling;
+    className is provided for integration with non-StyleX systems.
+  * `style` (CSSProperties): Inline styles for the root element. Prefer xstyle for styling;
+    inline styles bypass StyleX optimization.
+  * `data-testid` (string): Test selector for automated testing frameworks.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Thumbnail](https://astryx.atmeta.com/components/Thumbnail).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(*, label='', src='', alt='', loading=None, disabled=False, removable=False, clickable=False, action_callbacks=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        *,
+        label: str = "",
+        src: str = "",
+        alt: str = "",
+        loading: bool | None = None,
+        disabled: bool = False,
+        removable: bool = False,
+        clickable: bool = False,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Thumbnail",
+            label=label,
+            disabled=disabled,
+            action_callbacks=action_callbacks,
+            props=_named_props(
+                props,
+                src=src or None,
+                alt=alt or label,
+                label=label,
+                isLoading=loading,
+                isDisabled=disabled,
+                onRemove=removable,
+                clickable=clickable,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="src" type="str" value="''">
+      Image or media source URL.
+    </PyParameter>
+
+    <PyParameter name="alt" type="str" value="''">
+      Accessible alternative text.
+    </PyParameter>
+
+    <PyParameter name="loading" type="bool | None" value="None">
+      Whether to show the loading presentation.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether interaction is disabled.
+    </PyParameter>
+
+    <PyParameter name="removable" type="bool" value="False">
+      Whether to show the remove control.
+    </PyParameter>
+
+    <PyParameter name="clickable" type="bool" value="False">
+      Whether the thumbnail acts as a button.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Python callbacks receiving `"remove"` or `"click"`.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

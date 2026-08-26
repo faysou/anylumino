@@ -1,0 +1,100 @@
+---
+title: "IconButton"
+---
+
+Render an icon-only Astryx button.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe IconButton props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Accessible label. Used as aria-label (not rendered as visible
+    text).
+  * `icon` (ReactNode; required): Icon element rendered inside the button.
+  * `variant` ('primary' or 'secondary' or 'ghost' or 'destructive'): Visual style variant.
+  * `size` ('sm' or 'md' or 'lg'): Size variant.
+  * `isLoading` (boolean): Shows a loading spinner and disables interaction.
+  * `isDisabled` (boolean): Disables the button.
+  * `tooltip` (string): Tooltip text shown on hover.
+  * `onClick` ((e: MouseEvent) => void): Standard click handler.
+  * `clickAction` ((e: MouseEvent) => void or Promise\<void>): Async click handler with automatic
+    loading state.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/IconButton](https://astryx.atmeta.com/components/IconButton).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(label, *, icon='close', variant='secondary', disabled=False, size=None, loading=None, tooltip=None, callbacks=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        label: str,
+        *,
+        icon: str = "close",
+        variant: str = "secondary",
+        disabled: bool = False,
+        size: str | None = None,
+        loading: bool | None = None,
+        tooltip: str | None = None,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "IconButton",
+            label=label,
+            icon=icon,
+            variant=variant,
+            disabled=disabled,
+            callbacks=callbacks,
+            props=_named_props(
+                props, icon=icon, size=size, isLoading=loading, tooltip=tooltip
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="icon" type="str" value="'close'">
+      Astryx icon name.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'secondary'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Button size.
+    </PyParameter>
+
+    <PyParameter name="loading" type="bool | None" value="None">
+      Whether to show the loading state.
+    </PyParameter>
+
+    <PyParameter name="tooltip" type="str | None" value="None">
+      Hover tooltip text.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
+      Python callbacks invoked for frontend activations.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

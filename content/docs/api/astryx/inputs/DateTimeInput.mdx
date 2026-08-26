@@ -1,0 +1,142 @@
+---
+title: "DateTimeInput"
+---
+
+Render an Astryx date-time input.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe DateTimeInput props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Label text.
+  * `isLabelHidden` (boolean): Visually hide the label.
+  * `description` (string): Helper text displayed below the label.
+  * `isOptional` (boolean): Show an "(optional)" indicator next to the label.
+  * `isRequired` (boolean): Mark the field as required.
+  * `isDisabled` (boolean): Disable the input and picker.
+  * `value` (ISODateTimeString): Selected datetime in ISO 8601 format (YYYY-MM-DDTHH:MM or
+    YYYY-MM-DDTHH:MM:SS).
+  * `onChange` ((value: ISODateTimeString or undefined) => void; required): Callback invoked
+    when the selected datetime changes.
+  * `changeAction` ((value: ISODateTimeString or undefined) => void or Promise\<void>): Async
+    action fired after onChange. Drives optimistic UI updates via useTransition.
+  * `isLoading` (boolean): Whether the input is in a loading state. Disables interaction and
+    shows a spinner.
+  * `min` (ISODateTimeString): Minimum selectable datetime. Constrains both date and time
+    selection.
+  * `max` (ISODateTimeString): Maximum selectable datetime. Constrains both date and time
+    selection.
+  * `dateConstraints` (Array\<(date: Date) => boolean>): Array of custom constraint functions
+    that disable specific dates.
+  * `hasSeconds` (boolean): Include seconds in the time portion.
+  * `hourFormat` ('12h' or '24h'): Hour display format. '12h' shows AM/PM; '24h' uses 24-hour
+    notation.
+  * `timeIncrement` (number): Minutes to add or subtract when using arrow keys in the time
+    input.
+  * `hasClear` (boolean): Shows a clear button when a datetime value is set.
+  * `placeholder` (string): Placeholder text shown in the date portion when no date is selected.
+  * `timePlaceholder` (string): Placeholder text shown in the time portion when no time is
+    selected.
+  * `timeLabel` (string): Accessible label for the time portion. Defaults to "\{label} time" so
+    it is tied to the field label and localizable.
+  * `size` ('sm' or 'md' or 'lg'): Size of the input control.
+  * `status` (InputStatus): Status indicator object for error, warning, or success states with a
+    message.
+  * `labelTooltip` (string): Tooltip text displayed via an info icon at the end of the label.
+  * `numberOfMonths` (1 or 2): Number of months displayed simultaneously in the calendar.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/DateTimeInput](https://astryx.atmeta.com/components/DateTimeInput).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=None, *, label='', disabled=False, min=None, max=None, seconds=None, hour_format=None, time_increment=None, clear=None, number_of_months=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: str | None = None,
+        *,
+        label: str = "",
+        disabled: bool = False,
+        min: str | None = None,
+        max: str | None = None,
+        seconds: bool | None = None,
+        hour_format: str | None = None,
+        time_increment: int | None = None,
+        clear: bool | None = None,
+        number_of_months: int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "DateTimeInput",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                min=min,
+                max=max,
+                hasSeconds=seconds,
+                hourFormat=hour_format,
+                timeIncrement=time_increment,
+                hasClear=clear,
+                numberOfMonths=number_of_months,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="str | None" value="None">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the input is disabled.
+    </PyParameter>
+
+    <PyParameter name="min" type="str | None" value="None">
+      Minimum ISO datetime.
+    </PyParameter>
+
+    <PyParameter name="max" type="str | None" value="None">
+      Maximum ISO datetime.
+    </PyParameter>
+
+    <PyParameter name="seconds" type="bool | None" value="None">
+      Whether to include seconds.
+    </PyParameter>
+
+    <PyParameter name="hour_format" type="str | None" value="None">
+      Twelve- or twenty-four-hour display format.
+    </PyParameter>
+
+    <PyParameter name="time_increment" type="int | None" value="None">
+      Arrow-key minute increment.
+    </PyParameter>
+
+    <PyParameter name="clear" type="bool | None" value="None">
+      Whether to show a clear button.
+    </PyParameter>
+
+    <PyParameter name="number_of_months" type="int | None" value="None">
+      Number of calendar months to display.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

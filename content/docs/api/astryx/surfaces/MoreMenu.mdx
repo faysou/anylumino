@@ -1,0 +1,110 @@
+---
+title: "MoreMenu"
+---
+
+Render a compact overflow action menu.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe MoreMenu props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `items` (DropdownMenuOption\[]; required): Menu items: data array of actions, dividers, and
+    sections. Same type as DropdownMenu items prop.
+  * `label` (string): Accessible label for the trigger button (aria-label) and tooltip text.
+  * `variant` (ButtonVariant): Visual style variant of the trigger button.
+  * `size` (ButtonSize): Size of the trigger button.
+  * `icon` (ReactNode): Override the default three-dot icon. Accepts any ReactNode.
+  * `isDisabled` (boolean): Whether the menu trigger is disabled.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/MoreMenu](https://astryx.atmeta.com/components/MoreMenu).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, label='More options', variant='ghost', disabled=False, callbacks=None, action_callbacks=None, size=None, open=False, auto_focus=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        label: str = "More options",
+        variant: str = "ghost",
+        disabled: bool = False,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        size: str | None = None,
+        open: bool = False,
+        auto_focus: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "MoreMenu",
+            label=label,
+            variant=variant,
+            disabled=disabled,
+            callbacks=callbacks,
+            action_callbacks=action_callbacks,
+            open=open,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                label=label,
+                variant=variant,
+                size=size,
+                hasAutoFocus=auto_focus,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="'More options'">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'ghost'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
+      Python callbacks invoked for frontend activations.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Python callbacks receiving the selected menu value.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Trigger button size.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool" value="False">
+      Controlled menu visibility.
+    </PyParameter>
+
+    <PyParameter name="auto_focus" type="bool | None" value="None">
+      Whether the first menu item receives focus on open.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

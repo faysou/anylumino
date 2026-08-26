@@ -1,0 +1,65 @@
+---
+title: "Icon"
+---
+
+Render an Astryx icon by name.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Icon props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `icon` (IconName or ComponentType\<SVGProps>; required): Semantic icon name or SVG component.
+    Valid semantic names: close, chevronDown, chevronLeft, chevronRight, check, success,
+    error, warning, info, calendar, clock, externalLink, menu, moreHorizontal, search,
+    arrowUp, arrowDown, arrowsUpDown, funnel, eyeSlash, viewColumns, copy, checkDouble,
+    wrench, stop, microphone. For any icon not in this list, pass an SVG component directly
+    (e.g. import from lucide-react or @heroicons/react). Note: this prop is called 'icon', not
+    'name'.
+  * `color` ('primary' or 'secondary' or 'tertiary' or 'disabled' or 'accent' or 'success' or
+    'error' or 'warning' or 'inherit'): Color variant mapped to Astryx icon color tokens.
+  * `size` ('xsm' or 'sm' or 'md' or 'lg'): Icon size.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Icon](https://astryx.atmeta.com/components/Icon).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(icon, *, color=None, size=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        icon: str,
+        *,
+        color: str | None = None,
+        size: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Icon",
+            text=icon,
+            icon=icon,
+            props=_named_props(props, icon=icon, color=color, size=size),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="icon" type="str">
+      Astryx icon name.
+    </PyParameter>
+
+    <PyParameter name="color" type="str | None" value="None">
+      Theme icon color.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Icon size.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

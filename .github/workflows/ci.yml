@@ -38,5 +38,8 @@ jobs:
       - name: Install Python dependencies
         run: uv sync --dev
 
+      - name: Check documentation
+        run: make docs-check
+
       - name: Run tests
         run: uv run --no-sync pytest

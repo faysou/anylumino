@@ -1,0 +1,30 @@
+---
+title: "TextWidget"
+---
+
+Small synced value display widget used in examples and tests.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="value" value="t.Unicode('').tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(value='') -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, value: str = "") -> None:
+        super().__init__(value=value)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="str" value="''">
+      Initial value displayed by the widget.
+    </PyParameter>
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,63 @@
+---
+title: "AccordionPanel"
+---
+
+Lumino accordion panel with titled collapsible sections.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="layout_kind" value="t.Unicode('accordion').tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, width='100%', height=420, resizable=True, fit_content=False) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        widgets: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        resizable: bool = True,
+        fit_content: bool = False,
+    ) -> None:
+        self._init_composed(widgets, titles, keys, width, height, resizable, fit_content=fit_content)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="widgets" type="ChildInput" value="None">
+      Child widgets or keyed child mapping. Mapping keys become stable child
+      keys and default section titles.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Section titles associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `widgets`.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="420">
+      Widget height.
+    </PyParameter>
+
+    <PyParameter name="resizable" type="bool" value="True">
+      Whether the accordion gets a notebook resize handle.
+    </PyParameter>
+
+    <PyParameter name="fit_content" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,157 @@
+---
+title: "Link"
+---
+
+Render an Astryx text link.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Link props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `as` (LinkComponentType): Custom component to render instead of an anchor when href is
+    provided.
+  * `label` (string): Accessible label when the visible content is not self-descriptive.
+  * `href` (string): Link destination. When omitted, Astryx renders a button styled as a link.
+  * `hasUnderline` (boolean; default false): Always shows underline; otherwise underline appears
+    on hover.
+  * `isDisabled` (boolean; default false): Disables the link.
+  * `isExternalLink` (boolean; default false): Opens in a new tab, adds an external icon, and
+    sets safe target/rel defaults.
+  * `newTabLabel` (string; default '(opens in new tab)'): Screen-reader text appended to
+    external links.
+  * `target` (string): Where to open the linked document; overridden to \_blank when
+    isExternalLink is true.
+  * `rel` (string): Link relationship; automatically includes noopener noreferrer for external
+    links.
+  * `download` (string or boolean): Requests browser download and optionally supplies a
+    filename.
+  * `referrerPolicy` (HTMLAttributeReferrerPolicy): Referrer policy for the link.
+  * `onClick` (MouseEventHandler): Click handler before navigation, or primary action when href
+    is omitted.
+  * `tooltip` (string): Tooltip text shown on hover.
+  * `isStandalone` (boolean; default false): Applies base font sizing for non-inline links.
+  * `type` (TextType; default 'body'): Semantic Text type forwarded to the internal Text
+    component.
+  * `size` (TextSize): Explicit font size override forwarded to Text.
+  * `weight` (TextWeight): Font weight override forwarded to Text.
+  * `color` (TextColor; default 'accent'): Text color forwarded to Text.
+  * `display` (TextDisplay; default 'inline'): Display type forwarded to Text.
+  * `maxLines` (number; default 0): Maximum lines before truncation.
+  * `children` (ReactNode; required): Link content.
+  * `xstyle` (StyleXStyles): StyleX styles for the root element.
+  * `className` (string): CSS class names for the root element.
+  * `style` (CSSProperties): Inline styles for the root element.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Link](https://astryx.atmeta.com/components/Link).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(label, *, href='', underline=None, disabled=False, external=None, target=None, tooltip=None, standalone=None, text_type=None, size=None, weight=None, color=None, max_lines=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        label: str,
+        *,
+        href: str = "",
+        underline: bool | None = None,
+        disabled: bool = False,
+        external: bool | None = None,
+        target: str | None = None,
+        tooltip: str | None = None,
+        standalone: bool | None = None,
+        text_type: str | None = None,
+        size: str | None = None,
+        weight: str | None = None,
+        color: str | None = None,
+        max_lines: int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Link",
+            text=label,
+            label=label,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                href=href or None,
+                hasUnderline=underline,
+                isDisabled=disabled,
+                isExternalLink=external,
+                target=target,
+                tooltip=tooltip,
+                isStandalone=standalone,
+                type=text_type,
+                size=size,
+                weight=weight,
+                color=color,
+                maxLines=max_lines,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="href" type="str" value="''">
+      Link destination URL.
+    </PyParameter>
+
+    <PyParameter name="underline" type="bool | None" value="None">
+      Whether the underline is always visible.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the link is disabled.
+    </PyParameter>
+
+    <PyParameter name="external" type="bool | None" value="None">
+      Whether to use external-link behavior.
+    </PyParameter>
+
+    <PyParameter name="target" type="str | None" value="None">
+      Browser navigation target.
+    </PyParameter>
+
+    <PyParameter name="tooltip" type="str | None" value="None">
+      Hover tooltip text.
+    </PyParameter>
+
+    <PyParameter name="standalone" type="bool | None" value="None">
+      Whether to apply standalone text sizing.
+    </PyParameter>
+
+    <PyParameter name="text_type" type="str | None" value="None">
+      Semantic text type.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Explicit text-size override.
+    </PyParameter>
+
+    <PyParameter name="weight" type="str | None" value="None">
+      Font-weight override.
+    </PyParameter>
+
+    <PyParameter name="color" type="str | None" value="None">
+      Theme text color.
+    </PyParameter>
+
+    <PyParameter name="max_lines" type="int | None" value="None">
+      Maximum rendered lines before truncation.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

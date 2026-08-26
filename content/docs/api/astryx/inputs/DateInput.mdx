@@ -1,0 +1,126 @@
+---
+title: "DateInput"
+---
+
+Render an Astryx date input.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe DateInput props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Label text.
+  * `isLabelHidden` (boolean): Visually hide the label.
+  * `description` (string): Helper text displayed below the label.
+  * `isOptional` (boolean): Show an "(optional)" indicator next to the label.
+  * `isRequired` (boolean): Mark the field as required.
+  * `isDisabled` (boolean): Disable the input and calendar.
+  * `value` (ISODateString): Selected date in YYYY-MM-DD format.
+  * `onChange` ((value: ISODateString or undefined) => void): Callback invoked when the selected
+    date changes.
+  * `changeAction` ((value: ISODateString or undefined) => void or Promise\<void>): Async action
+    fired after onChange. Drives optimistic UI updates via useTransition.
+  * `isLoading` (boolean): Whether the input is in a loading state. Disables interaction and
+    shows a spinner.
+  * `min` (ISODateString): Minimum selectable date (YYYY-MM-DD).
+  * `max` (ISODateString): Maximum selectable date (YYYY-MM-DD).
+  * `dateConstraints` (Array\<(date: Date) => boolean>): Array of custom constraint functions
+    that disable specific dates.
+  * `placeholder` (string): Placeholder text shown in the text input.
+  * `size` ('sm' or 'md' or 'lg'): Size of the input control.
+  * `status` (InputStatus): Status indicator object for error, warning, or success states with a
+    message.
+  * `labelTooltip` (string): Tooltip text displayed via an info icon at the end of the label.
+  * `hasClear` (boolean): Shows a clear (x) button when a date value is set. Clicking it clears
+    the value and returns focus to the input.
+  * `numberOfMonths` (1 or 2): Number of months displayed simultaneously in the calendar
+    popover.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/DateInput](https://astryx.atmeta.com/components/DateInput).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=None, *, label='', disabled=False, min=None, max=None, placeholder=None, size=None, clear=None, number_of_months=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: str | None = None,
+        *,
+        label: str = "",
+        disabled: bool = False,
+        min: str | None = None,
+        max: str | None = None,
+        placeholder: str | None = None,
+        size: str | None = None,
+        clear: bool | None = None,
+        number_of_months: int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "DateInput",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                min=min,
+                max=max,
+                placeholder=placeholder,
+                size=size,
+                hasClear=clear,
+                numberOfMonths=number_of_months,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="str | None" value="None">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the input is disabled.
+    </PyParameter>
+
+    <PyParameter name="min" type="str | None" value="None">
+      Minimum ISO date.
+    </PyParameter>
+
+    <PyParameter name="max" type="str | None" value="None">
+      Maximum ISO date.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str | None" value="None">
+      Placeholder text.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Input size.
+    </PyParameter>
+
+    <PyParameter name="clear" type="bool | None" value="None">
+      Whether to show a clear button.
+    </PyParameter>
+
+    <PyParameter name="number_of_months" type="int | None" value="None">
+      Number of calendar months to display.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

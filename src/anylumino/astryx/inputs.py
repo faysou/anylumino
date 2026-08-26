@@ -1016,6 +1016,8 @@ class PowerSearch(Widget):
     **props : Any
         JSON-safe PowerSearch props forwarded to Astryx.
 
+    Notes
+    -----
     See Astryx component docs: <https://astryx.atmeta.com/components/PowerSearch>.
     """
 
@@ -1080,6 +1082,8 @@ class LogSlider(Widget):
     **props : Any
         JSON-safe Slider props forwarded to Astryx.
 
+    Notes
+    -----
     See Astryx component docs: <https://astryx.atmeta.com/components/Slider>.
     """
 
@@ -1141,6 +1145,8 @@ class SelectionSlider(Widget):
     **props : Any
         JSON-safe Slider props forwarded to Astryx.
 
+    Notes
+    -----
     See Astryx component docs: <https://astryx.atmeta.com/components/Slider>.
     """
 

@@ -1,0 +1,100 @@
+---
+title: "Card"
+---
+
+Render an Astryx card container.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Card props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `width` (SizeValue): Width of the card (number = pixels, string = used as-is).
+  * `height` (SizeValue): Height of the card (number = pixels, string = used as-is).
+  * `maxWidth` (SizeValue): Maximum width of the card.
+  * `minHeight` (SizeValue): Minimum height of the card.
+  * `children` (ReactNode): Content to render inside the card.
+  * `padding` (0 or 0.5 or 1 or 1.5 or 2 or 3 or 4 or 5 or 6 or 8 or 10): Internal padding using
+    the spacing scale.
+  * `variant` ('default' or 'muted' or 'blue' or 'cyan' or 'gray' or 'green' or 'orange' or
+    'pink' or 'purple' or 'red' or 'teal' or 'yellow'): Background color variant. 'default'
+    uses the standard card background. 'muted' uses the muted background for de-emphasised
+    cards. The non-semantic variants use the corresponding '--color-\<name>-background' token.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Card](https://astryx.atmeta.com/components/Card).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, variant='default', padding=None, width=None, height=None, max_width=None, min_height=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        variant: str = "default",
+        padding: int | float | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        max_width: int | float | str | None = None,
+        min_height: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Card",
+            children,
+            variant=variant,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                variant=variant,
+                padding=padding,
+                width=width,
+                height=height,
+                maxWidth=max_width,
+                minHeight=min_height,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'default'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="padding" type="int | float | None" value="None">
+      Inner padding using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Card width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Card height.
+    </PyParameter>
+
+    <PyParameter name="max_width" type="int | float | str | None" value="None">
+      Maximum card width.
+    </PyParameter>
+
+    <PyParameter name="min_height" type="int | float | str | None" value="None">
+      Minimum card height.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

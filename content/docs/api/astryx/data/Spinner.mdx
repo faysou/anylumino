@@ -1,0 +1,68 @@
+---
+title: "Spinner"
+---
+
+Render an Astryx loading spinner.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Spinner props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `size` ('sm' or 'md' or 'lg'): Spinner size (10px, 14px, 18px).
+  * `shade` ('default' or 'onMedia' or 'subtle' or 'inherit'): Color shade for light or dark
+    backgrounds.
+  * `label` (ReactNode): Visible content below the spinner. String labels auto-set aria-label.
+  * `aria-label` (string): Accessible name for screen readers. Defaults to label (if string) or
+    "Loading".
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Spinner](https://astryx.atmeta.com/components/Spinner).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(*, label='Loading', size=None, shade=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        *,
+        label: str = "Loading",
+        size: str | None = None,
+        shade: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Spinner",
+            label=label,
+            props=_named_props(
+                props, label=label, size=size, shade=shade, **{"aria-label": label}
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="label" type="str" value="'Loading'">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Spinner size.
+    </PyParameter>
+
+    <PyParameter name="shade" type="str | None" value="None">
+      Spinner color treatment for its background.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

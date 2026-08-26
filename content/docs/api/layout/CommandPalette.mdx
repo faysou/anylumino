@@ -1,0 +1,54 @@
+---
+title: "CommandPalette"
+---
+
+Command palette for searchable actions grouped by category.
+
+## Functions
+
+<PyFunction name="__init__" type="(commands=None, *, callbacks=None, width='100%', height=320) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        commands: Iterable[dict[str, Any]] | None = None,
+        *,
+        callbacks: dict[str, ActionCallback] | None = None,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 320,
+    ) -> None:
+        super().__init__(
+            commands,
+            callbacks=callbacks,
+            width=width,
+            height=height,
+            action_kind="command_palette",
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="commands" type="Iterable[dict[str, Any]] | None" value="None">
+      Command definitions. Each command should include an `id` and
+      `label`; optional keys such as `category`, `caption`, `icon`,
+      `icon_src`, `icon_size`, or `disabled` are forwarded to the
+      frontend. `icon` uses bundled workflow icon names.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="dict[str, ActionCallback] | None" value="None">
+      Callback map keyed by command id. A callback receives the activated
+      command id. The map stays available as the `callbacks` attribute, and
+      `on_click` or `on_action` register callbacks for every activation.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Widget width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="320">
+      Widget height.
+    </PyParameter>
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

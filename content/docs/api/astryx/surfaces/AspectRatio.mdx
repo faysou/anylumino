@@ -1,0 +1,49 @@
+---
+title: "AspectRatio"
+---
+
+Constrain child content to a fixed aspect ratio.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe AspectRatio props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `ratio` (number; required): Aspect ratio as width/height (e.g. 16/9, 1).
+  * `children` (ReactNode; required): Content positioned absolutely to fill the container.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/AspectRatio](https://astryx.atmeta.com/components/AspectRatio).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, ratio=16 / 9, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self, children: ChildInput = None, *, ratio: int | float = 16 / 9, **props: Any
+    ) -> None:
+        super().__init__("AspectRatio", children, props={"ratio": ratio, **props})
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="ratio" type="int | float" value="16 / 9">
+      Aspect ratio as a numeric width divided by height value.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,116 @@
+---
+title: "Dialog"
+---
+
+Render Astryx dialog content inline in notebook output.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Dialog props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `isOpen` (boolean; required): Whether the dialog is open.
+  * `onOpenChange` ((isOpen: boolean) => unknown; required): Callback when dialog visibility
+    changes.
+  * `children` (ReactNode; required): Dialog content.
+  * `width` (number or string): Width of the dialog in pixels or any CSS value.
+  * `maxHeight` (number or string): Maximum height of the dialog.
+  * `position` (DialogPosition): Static position for the dialog; centered by default when
+    omitted.
+  * `variant` ('standard' or 'fullscreen'): Dialog variant: fullscreen expands to fill the
+    entire viewport.
+  * `purpose` ('required' or 'form' or 'info'): Controls dismissal behavior: required disables
+    Escape and backdrop click; form disables backdrop click after interaction; info allows
+    both.
+  * `isInline` (boolean): Renders dialog content inline without the \<dialog> element, backdrop,
+    or modal behavior. For documentation previews and showcases only.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Dialog](https://astryx.atmeta.com/components/Dialog).
+</Callout>
+
+<Callout title="Notes" type="note">
+  The wrapper defaults to inline rendering to avoid modal focus-management
+  conflicts inside Jupyter output areas. Set `inline=False` only when the
+  surrounding notebook environment can safely host modal dialogs.
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, open=True, inline=True, width=None, max_height=None, position=None, variant=None, purpose=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        open: bool = True,
+        inline: bool = True,
+        width: int | float | str | None = None,
+        max_height: int | float | str | None = None,
+        position: Mapping[str, Any] | None = None,
+        variant: str | None = None,
+        purpose: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Dialog",
+            children,
+            open=open,
+            width=width,
+            props=_named_props(
+                props,
+                isInline=inline,
+                width=width,
+                maxHeight=max_height,
+                position=position,
+                variant=variant,
+                purpose=purpose,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Dialog body content. Pass a widget, a sequence of widgets, or a mapping
+      of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool" value="True">
+      Controlled open state synchronized through `is_open`.
+    </PyParameter>
+
+    <PyParameter name="inline" type="bool" value="True">
+      Whether dialog content renders inline instead of using native modal
+      behavior.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Dialog width.
+    </PyParameter>
+
+    <PyParameter name="max_height" type="int | float | str | None" value="None">
+      Maximum dialog height.
+    </PyParameter>
+
+    <PyParameter name="position" type="Mapping[str, Any] | None" value="None">
+      Static top, right, bottom, and left position values.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str | None" value="None">
+      Standard or fullscreen dialog presentation.
+    </PyParameter>
+
+    <PyParameter name="purpose" type="str | None" value="None">
+      Required, form, or informational dismissal behavior.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

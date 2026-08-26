@@ -5,19 +5,42 @@
   "scripts": {
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs",
     "build": "node scripts/build-frontend.mjs",
-    "test": "node --test tests/frontend/*.test.mjs"
+    "test": "node --test tests/frontend/*.test.mjs",
+    "docs:convert": "node scripts/generate-api-docs.mjs",
+    "docs:build": "next build",
+    "docs:dev": "next dev",
+    "docs:start": "next start",
+    "docs:lint": "eslint app docs-site scripts/generate-api-docs.mjs tests/docs-href.test.mjs next.config.mjs postcss.config.mjs",
+    "docs:types": "next typegen && tsc --noEmit",
+    "docs:test-links": "node --test tests/docs-href.test.mjs"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.4.3",
     "@astryxdesign/theme-neutral": "^0.4.3",
     "@lumino/commands": "2.3.4",
     "@lumino/widgets": "2.9.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "fumadocs-core": "16.15.1",
+    "fumadocs-mdx": "15.3.1",
+    "fumadocs-python": "1.0.1",
+    "fumadocs-ui": "npm:@fumadocs/base-ui@16.15.1",
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "shiki": "4.4.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/mdx": "2.0.14",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
     "@astryxdesign/cli": "^0.4.3",
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.3.0",
+    "postcss": "8.5.26",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3"
   },
   "allowScripts": {
     "esbuild@0.28.2": true,

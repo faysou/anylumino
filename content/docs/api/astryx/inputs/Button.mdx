@@ -1,0 +1,111 @@
+---
+title: "Button"
+---
+
+Render an Astryx push button.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Button props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Accessible label. Rendered as visible text by default; used as
+    aria-label when isIconOnly is true.
+  * `variant` ('primary' or 'secondary' or 'ghost' or 'destructive'): Visual style variant.
+  * `size` ('sm' or 'md' or 'lg'): Size variant.
+  * `type` ('button' or 'submit' or 'reset'): HTML button type attribute.
+  * `name` (string): HTML name attribute for form submission.
+  * `value` (string or number or readonly string\[]): HTML value attribute for form submission.
+  * `form` (string): Associates the button with a form element by ID.
+  * `isLoading` (boolean): Shows a loading spinner and disables interaction. Announces "Loading"
+    via a live region.
+  * `isInterruptible` (boolean): Keep the button clickable while a clickAction is pending: the
+    spinner and aria-busy still show, but the button is not disabled and the action is not
+    deduped, so a re-click lands and interrupts the in-flight action with a fresh one.
+  * `isDisabled` (boolean): Disables the button. When a tooltip is present, uses aria-disabled
+    instead of native disabled so the button stays focusable.
+  * `icon` (ReactNode): Icon element rendered before the label text.
+  * `isIconOnly` (boolean): When true, renders as a square icon-only button with label as
+    aria-label. Requires icon. Tip: for a dedicated icon-only button component, use IconButton
+    from '@astryxdesign/core/IconButton' instead.
+  * `children` (ReactNode): Optional override for visible text. When provided, displayed instead
+    of label, but label is still required (it provides the accessible name). For most cases,
+    just use label alone: \<Button label="Save" />.
+  * `endContent` (ReactElement\<IconProps> or ReactElement\<BadgeProps>): Trailing icon or badge
+    rendered after the label. Ignored when isIconOnly is true. Color is inherited from the
+    button variant.
+  * `tooltip` (string): Tooltip text shown on hover.
+  * `onClick` ((e: MouseEvent) => void): Standard click handler (passed through from
+    ButtonHTMLAttributes).
+  * `clickAction` ((e: MouseEvent) => void or Promise\<void>): Async click handler. Shows loading
+    state while the returned promise is pending.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Button](https://astryx.atmeta.com/components/Button).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(label, *, variant='secondary', disabled=False, size=None, loading=None, tooltip=None, callbacks=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        label: str,
+        *,
+        variant: str = "secondary",
+        disabled: bool = False,
+        size: str | None = None,
+        loading: bool | None = None,
+        tooltip: str | None = None,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Button",
+            label=label,
+            variant=variant,
+            disabled=disabled,
+            callbacks=callbacks,
+            props=_named_props(props, size=size, isLoading=loading, tooltip=tooltip),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'secondary'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Button size.
+    </PyParameter>
+
+    <PyParameter name="loading" type="bool | None" value="None">
+      Whether to show the loading state.
+    </PyParameter>
+
+    <PyParameter name="tooltip" type="str | None" value="None">
+      Hover tooltip text.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
+      Python callbacks invoked for frontend activations.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

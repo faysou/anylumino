@@ -1,0 +1,76 @@
+---
+title: "Lightbox"
+---
+
+Display one image or video, or a gallery, in an Astryx lightbox.
+
+<Callout title="Astryx Props" type="astryx-props">
+  `media`, `isOpen`, `index`, `hasZoom`, and `hasAutoPlay` are
+  adapted by the named arguments above. `**props` keeps the wrapper
+  forward-compatible with additional JSON-safe Astryx props.
+</Callout>
+
+<Callout title="Notes" type="note">
+  Video media uses Astryx's native player with browser playback controls.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Lightbox](https://astryx.atmeta.com/components/Lightbox).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(media, *, open=False, index=0, zoom=False, auto_play=False, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        media: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+        *,
+        open: bool = False,
+        index: int = 0,
+        zoom: bool = False,
+        auto_play: bool = False,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Lightbox",
+            value=index,
+            open=open,
+            props=_named_props(
+                props,
+                media=_lightbox_media(media),
+                isOpen=open,
+                hasZoom=zoom,
+                hasAutoPlay=auto_play,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="media" type="Mapping[str, Any] | Iterable[Mapping[str, Any]]">
+      One media mapping or a gallery of mappings. Every item requires
+      `src` and accessible `alt` text; `type` may be `"image"` or
+      `"video"`, and `caption` is optional.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool" value="False">
+      Controlled open state synchronized through `is_open`.
+    </PyParameter>
+
+    <PyParameter name="index" type="int" value="0">
+      Controlled gallery index synchronized through `value`.
+    </PyParameter>
+
+    <PyParameter name="zoom" type="bool" value="False">
+      Whether images support double-click zoom and drag-to-pan.
+    </PyParameter>
+
+    <PyParameter name="auto_play" type="bool" value="False">
+      Whether video starts playing when the lightbox opens.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

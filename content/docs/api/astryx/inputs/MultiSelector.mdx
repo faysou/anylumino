@@ -1,0 +1,166 @@
+---
+title: "MultiSelector"
+---
+
+Render an Astryx selector that accepts multiple values.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe MultiSelector props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Label text for the multi-selector, always rendered for
+    accessibility unless hidden visually.
+  * `isLabelHidden` (boolean; default false): Visually hides the label while keeping it
+    available to screen readers.
+  * `description` (string): Helper text displayed between the label and selector.
+  * `isOptional` (boolean; default false): Marks the field as optional; mutually exclusive with
+    isRequired.
+  * `isRequired` (boolean; default false): Marks the field as required; mutually exclusive with
+    isOptional.
+  * `isDisabled` (boolean; default false): Disables the selector.
+  * `options` (option\[]; required): Options displayed in the selector. Astryx accepts strings,
+    option objects, dividers, and sections.
+  * `value` (string\[]; required): Selected option values.
+  * `onChange` ((value: string\[]) => void; required): Called when selected values change.
+  * `changeAction` ((value: string\[]) => void or Promise\<void>): Async action fired after
+    onChange.
+  * `isLoading` (boolean; default false): Shows the selector loading state.
+  * `placeholder` (string; default 'Select...'): Placeholder text when no value is selected.
+  * `size` ('sm' or 'md' or 'lg'; default 'md'): Selector size.
+  * `status` (MultiSelectorStatus): Validation status for warning, error, or success states.
+  * `width` (number or string): Field width. Numbers are pixels; strings are used as CSS values.
+  * `labelTooltip` (string): Tooltip text for an info icon at the end of the label.
+  * `startIcon` (ReactNode or IconType): Icon displayed at the start of the trigger.
+  * `hasClear` (boolean; default false): Shows a clear button when values are selected.
+  * `hasSelectAll` (boolean; default false): Shows a select-all checkbox.
+  * `selectAllLabel` (string; default 'Select all'): Label for the select-all checkbox.
+  * `hasSearch` (boolean; default false): Shows a search input in the dropdown.
+  * `searchPlaceholder` (string; default 'Search...'): Placeholder text for the search input.
+  * `triggerDisplay` ('count' or 'labels' or 'badges'; default 'count'): Controls how selected
+    items are summarized in the trigger.
+  * `maxBadges` (number; default 3): Maximum visible badges before showing a +N summary.
+  * `renderOption` ((option: MultiSelectorOptionData) => ReactNode): Custom render function for
+    selectable options.
+  * `isDefaultOpen` (boolean; default false): Opens the dropdown on mount, useful for previews.
+  * `data-testid` (string): Test selector for automated testing.
+  * `xstyle` (StyleXStyles): StyleX layout customization.
+  * `className` (string): CSS class names for the root element.
+  * `style` (CSSProperties): Inline styles for the root element.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/MultiSelector](https://astryx.atmeta.com/components/MultiSelector).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value=(), *, label='', disabled=False, placeholder=None, size=None, loading=None, clear=None, select_all=None, search=None, trigger_display=None, max_badges=None, description=None, status=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any] | Mapping[str, Any],
+        value: Iterable[str] = (),
+        *,
+        label: str = "",
+        disabled: bool = False,
+        placeholder: str | None = None,
+        size: str | None = None,
+        loading: bool | None = None,
+        clear: bool | None = None,
+        select_all: bool | None = None,
+        search: bool | None = None,
+        trigger_display: str | None = None,
+        max_badges: int | None = None,
+        description: str | None = None,
+        status: Mapping[str, Any] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "MultiSelector",
+            label=label,
+            value=list(value),
+            disabled=disabled,
+            props=_named_props(
+                props,
+                options=_option_records(items),
+                placeholder=placeholder,
+                size=size,
+                isLoading=loading,
+                hasClear=clear,
+                hasSelectAll=select_all,
+                hasSearch=search,
+                triggerDisplay=trigger_display,
+                maxBadges=max_badges,
+                description=description,
+                status=status,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any] | Mapping[str, Any]">
+      Option records. Mappings, pairs, strings, and dictionaries are normalized.
+    </PyParameter>
+
+    <PyParameter name="value" type="Iterable[str]" value="()">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the selector is disabled.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str | None" value="None">
+      Placeholder shown when no option is selected.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Selector size.
+    </PyParameter>
+
+    <PyParameter name="loading" type="bool | None" value="None">
+      Whether to show the loading state.
+    </PyParameter>
+
+    <PyParameter name="clear" type="bool | None" value="None">
+      Whether to show a clear button.
+    </PyParameter>
+
+    <PyParameter name="select_all" type="bool | None" value="None">
+      Whether to show the select-all control.
+    </PyParameter>
+
+    <PyParameter name="search" type="bool | None" value="None">
+      Whether to show option filtering.
+    </PyParameter>
+
+    <PyParameter name="trigger_display" type="str | None" value="None">
+      Count, labels, or badges selection summary.
+    </PyParameter>
+
+    <PyParameter name="max_badges" type="int | None" value="None">
+      Maximum badges shown in the trigger.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the selector.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

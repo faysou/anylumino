@@ -1,0 +1,179 @@
+---
+title: "Tokenizer"
+---
+
+Render a notebook-safe Astryx tokenizer.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Tokenizer props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Accessible label for the input.
+  * `searchSource` (SearchSource\<T>; required): Data source providing search and bootstrap
+    methods for populating the dropdown.
+  * `value` (T\[]; required): Array of currently selected items.
+  * `onChange` ((items: T\[], change: TokenizerChange\<T>) => void; required): Called when
+    selection changes. The change argument includes the affected item and type ('add' or
+    'create' or 'remove' or 'reorder').
+  * `placeholder` (string): Input placeholder text. Only shown when no tokens are selected.
+  * `maxEntries` (number): Maximum number of selections allowed. Input is hidden when the limit
+    is reached.
+  * `hasClear` (boolean): Show a clear-all button for bulk removal of all tokens.
+  * `renderToken` ((item: T, onRemove: () => void) => ReactNode): Custom render function for
+    selected tokens. Default renders Token with label and onRemove.
+  * `renderItem` ((item: T) => ReactNode): Custom render function for dropdown items. Default
+    renders TypeaheadItem.
+  * `isDisabled` (boolean): Disables the input and all token interactions.
+  * `status` (InputStatus): Validation status object with type and message for
+    error/warning/success states.
+  * `isLabelHidden` (boolean): Visually hides the label while keeping it accessible.
+  * `description` (string): Helper text displayed below the label.
+  * `isRequired` (boolean): Marks the field as required.
+  * `isOptional` (boolean): Shows an optional indicator on the label.
+  * `labelTooltip` (string): Tooltip text shown on the label.
+  * `hasEntriesOnFocus` (boolean): Show bootstrap results on focus before typing.
+  * `maxMenuItems` (number): Maximum number of dropdown items to display.
+  * `emptySearchResultsText` (string): Text shown when search returns no results.
+  * `hasAutoFocus` (boolean): Auto-focus the input on mount.
+  * `size` ('sm' or 'md' or 'lg'): Input and token size.
+  * `debounceMs` (number): Debounce delay in ms before triggering search. Set to 0 for
+    synchronous sources.
+  * `hasCreate` (boolean): Allow users to create new tokens from free-text input. When true, a
+    "Create" option appears in the dropdown for typed text that doesn't match existing
+    results. The onChange change type is 'create' for these items.
+  * `onChangeQuery` ((query: string) => void): Callback fired when the search query text
+    changes.
+  * `endContent` (ReactNode): Content to display at the end of the input row. Useful for
+    buttons, result counts, or other controls.
+  * `handleRef` (React.Ref\<TokenizerHandle>): Imperative handle for focus() and blur() control.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value - not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Tokenizer](https://astryx.atmeta.com/components/Tokenizer).
+</Callout>
+
+<Callout title="Notes" type="note">
+  The wrapper stores selected ids in `value` rather than complete item
+  records so notebook state remains compact and JSON-safe.
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value=(), *, label, disabled=False, search=None, placeholder=None, max_entries=None, clear=None, create=None, max_menu_items=None, label_hidden=None, description=None, size=None, debounce_ms=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any] | Mapping[str, Any],
+        value: Iterable[str] = (),
+        *,
+        label: str,
+        disabled: bool = False,
+        search: Callable[[str], Iterable[Any]] | None = None,
+        placeholder: str | None = None,
+        max_entries: int | None = None,
+        clear: bool | None = None,
+        create: bool | None = None,
+        max_menu_items: int | None = None,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        size: str | None = None,
+        debounce_ms: int | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Tokenizer",
+            label=label,
+            value=list(value),
+            disabled=disabled,
+            search=search,
+            props=_named_props(
+                props,
+                items=_search_records(items),
+                label=label,
+                placeholder=placeholder,
+                maxEntries=max_entries,
+                hasClear=clear,
+                hasCreate=create,
+                maxMenuItems=max_menu_items,
+                isLabelHidden=label_hidden,
+                description=description,
+                size=size,
+                debounceMs=debounce_ms,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any] | Mapping[str, Any]">
+      Searchable items. Mappings, pairs, strings, and dictionaries are
+      normalized into `{"id": ..., "label": ...}` records.
+    </PyParameter>
+
+    <PyParameter name="value" type="Iterable[str]" value="()">
+      Selected item ids synchronized back to Python.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Accessible field label.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the input and token interactions should render disabled.
+    </PyParameter>
+
+    <PyParameter name="search" type="Callable[[str], Iterable[Any]] | None" value="None">
+      Optional Python-backed search source. The callback receives the current
+      query string and returns item records, pairs, mappings, or strings that
+      can be normalized into `{"id": ..., "label": ...}` records. When
+      omitted, the frontend uses a static in-browser search source backed by
+      `items`.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str | None" value="None">
+      Input placeholder text.
+    </PyParameter>
+
+    <PyParameter name="max_entries" type="int | None" value="None">
+      Maximum selected tokens.
+    </PyParameter>
+
+    <PyParameter name="clear" type="bool | None" value="None">
+      Whether to show a clear-all button.
+    </PyParameter>
+
+    <PyParameter name="create" type="bool | None" value="None">
+      Whether users can create tokens from free text.
+    </PyParameter>
+
+    <PyParameter name="max_menu_items" type="int | None" value="None">
+      Maximum visible search results.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the input.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Input and token size.
+    </PyParameter>
+
+    <PyParameter name="debounce_ms" type="int | None" value="None">
+      Search debounce duration.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

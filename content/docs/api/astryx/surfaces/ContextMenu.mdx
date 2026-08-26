@@ -1,0 +1,81 @@
+---
+title: "ContextMenu"
+---
+
+Attach a right-click menu to child widgets.
+
+Menu items dispatch to Python the same way :class:`DropdownMenu` items do,
+through `on_action` and `last_action`.
+
+JupyterLab installs its own context menu on notebook outputs, so a right
+click inside Lab opens both menus. Prefer :class:`DropdownMenu` or
+:class:`MoreMenu` for a notebook-facing menu, and reach for this one when
+the output is embedded somewhere Lab does not claim the event.
+
+<Callout title="Notes" type="note">
+  See Astryx component docs: [https://astryx.atmeta.com/components/ContextMenu](https://astryx.atmeta.com/components/ContextMenu).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, children=None, *, size=None, menu_width=None, disabled=False, action_callbacks=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        children: ChildInput = None,
+        *,
+        size: str | None = None,
+        menu_width: int | None = None,
+        disabled: bool = False,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "ContextMenu",
+            children,
+            disabled=disabled,
+            action_callbacks=action_callbacks,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                size=size,
+                menuWidth=menu_width,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Menu item records. Each item takes a `label` and a `value`, and may
+      set `disabled` or `{"type": "divider"}`.
+    </PyParameter>
+
+    <PyParameter name="children" type="ChildInput" value="None">
+      The widgets that respond to a right click.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Menu item size.
+    </PyParameter>
+
+    <PyParameter name="menu_width" type="int | None" value="None">
+      Fixed menu width in pixels.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the menu is suppressed.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Python callbacks receiving the chosen item value.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

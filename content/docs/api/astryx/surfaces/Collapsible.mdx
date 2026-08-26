@@ -1,0 +1,78 @@
+---
+title: "Collapsible"
+---
+
+Render expandable notebook content.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Collapsible props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `trigger` (ReactNode; required): Content shown in the trigger area (always visible).
+  * `children` (ReactNode): Content that collapses and expands.
+  * `defaultIsOpen` (boolean): Default open state (uncontrolled).
+  * `isOpen` (boolean): Controlled open state.
+  * `onOpenChange` ((isOpen: boolean) => void): Callback invoked when the open state changes.
+  * `value` (string): Identifier used for group coordination. Required when placed inside an
+    CollapsibleGroup.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Collapsible](https://astryx.atmeta.com/components/Collapsible).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, trigger, open=True, default_open=None, value='', **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        trigger: str,
+        open: bool = True,
+        default_open: bool | None = None,
+        value: str = "",
+        **props: Any,
+    ) -> None:
+        effective_open = open if default_open is None else default_open
+        super().__init__(
+            "Collapsible",
+            children,
+            label=trigger,
+            open=effective_open,
+            props=_named_props(props, trigger=trigger, value=value or None),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="trigger" type="str">
+      Trigger content used by disclosure or overlay components.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool" value="True">
+      Controlled open state synchronized with Python.
+    </PyParameter>
+
+    <PyParameter name="default_open" type="bool | None" value="None">
+      Backward-compatible alias for `open`.
+    </PyParameter>
+
+    <PyParameter name="value" type="str" value="''">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

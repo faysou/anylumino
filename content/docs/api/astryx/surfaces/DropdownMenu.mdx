@@ -1,0 +1,126 @@
+---
+title: "DropdownMenu"
+---
+
+Render a button-backed Astryx dropdown menu.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe DropdownMenu props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `button` (DropdownMenuButtonProps): Props for the trigger button (Button props except
+    onClick).
+  * `items` (DropdownMenuOption\[]; required): Array of menu entries. Each entry is one of: an
+    action item '\{label, onClick?, icon?, isDisabled?}', a divider '\{type: "divider"}', or a
+    section '\{type: "section", title?, items: \[...action items]}'.
+  * `isMenuOpen` (boolean): Controlled open state for the menu.
+  * `onOpenChange` ((isOpen: boolean) => void): Callback fired when the open state changes.
+  * `menuWidth` (number or string): Custom menu width; defaults to matching the trigger button
+    width.
+  * `onClick` (() => void): Callback fired when the trigger button is clicked.
+  * `hasChevron` (boolean): Whether to show a chevron icon on the trigger button. Set to false
+    for icon-only triggers.
+  * `children` ((item: DropdownMenuItemData) => ReactNode): Custom render function for each item
+    in the list.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/DropdownMenu](https://astryx.atmeta.com/components/DropdownMenu).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, label, variant='secondary', disabled=False, callbacks=None, action_callbacks=None, open=False, menu_width=None, chevron=None, placement=None, auto_focus=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        label: str,
+        variant: str = "secondary",
+        disabled: bool = False,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        open: bool = False,
+        menu_width: int | float | str | None = None,
+        chevron: bool | None = None,
+        placement: str | None = None,
+        auto_focus: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "DropdownMenu",
+            label=label,
+            variant=variant,
+            disabled=disabled,
+            callbacks=callbacks,
+            action_callbacks=action_callbacks,
+            open=open,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                button={"label": label, "variant": variant},
+                menuWidth=menu_width,
+                hasChevron=chevron,
+                placement=placement,
+                hasAutoFocus=auto_focus,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'secondary'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
+      Python callbacks invoked for frontend activations.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Python callbacks receiving the selected menu value.
+    </PyParameter>
+
+    <PyParameter name="open" type="bool" value="False">
+      Controlled menu visibility.
+    </PyParameter>
+
+    <PyParameter name="menu_width" type="int | float | str | None" value="None">
+      Menu width; defaults to the trigger width.
+    </PyParameter>
+
+    <PyParameter name="chevron" type="bool | None" value="None">
+      Whether the trigger shows a chevron.
+    </PyParameter>
+
+    <PyParameter name="placement" type="str | None" value="None">
+      Menu placement relative to the trigger.
+    </PyParameter>
+
+    <PyParameter name="auto_focus" type="bool | None" value="None">
+      Whether the first menu item receives focus on open.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -9,7 +9,6 @@ import anywidget
 import traitlets as t
 
 from .common import ActivationCallbacks
-from .common import document_control as _document_control
 from .common import json_value as _json_value
 from .common import static_asset
 
@@ -48,7 +47,27 @@ class _NativeControlWidget(ActivationCallbacks, anywidget.AnyWidget):
 
 
 class DatePicker(_NativeControlWidget):
-    """Browser-native date picker control."""
+    """Browser-native date picker control.
+
+    Parameters
+    ----------
+    value : date | str | None, default None
+        Initial value and synchronized Python value.
+    description : str, default ''
+        Label shown above the control.
+    disabled : bool, default False
+        Whether user interaction is disabled.
+    min : date | str | None, default None
+        Minimum date value.
+    max : date | str | None, default None
+        Maximum date value.
+    step : int | str | None, default None
+        Native input step value.
+    continuous_update : bool, default True
+        Whether Python receives updates while the user edits the input.
+    width : str, default ''
+        CSS width for the control.
+    """
 
     def __init__(
         self,
@@ -78,7 +97,27 @@ class DatePicker(_NativeControlWidget):
 
 
 class TimePicker(DatePicker):
-    """Browser-native time picker with hour and minute popup controls."""
+    """Browser-native time picker with hour and minute popup controls.
+
+    Parameters
+    ----------
+    value : time | str | None, default None
+        Initial value and synchronized Python value.
+    description : str, default ''
+        Label shown above the control.
+    disabled : bool, default False
+        Whether user interaction is disabled.
+    min : time | str | None, default None
+        Minimum time value.
+    max : time | str | None, default None
+        Maximum time value.
+    step : int | str | None, default None
+        Native input step value.
+    continuous_update : bool, default True
+        Whether Python receives updates while the user edits the input.
+    width : str, default ''
+        CSS width for the control.
+    """
 
     def __init__(
         self,
@@ -108,7 +147,27 @@ class TimePicker(DatePicker):
 
 
 class DatetimePicker(DatePicker):
-    """Browser-native date and time picker control."""
+    """Browser-native date and time picker control.
+
+    Parameters
+    ----------
+    value : datetime | str | None, default None
+        Initial value and synchronized Python value.
+    description : str, default ''
+        Label shown above the control.
+    disabled : bool, default False
+        Whether user interaction is disabled.
+    min : datetime | str | None, default None
+        Minimum date and time value.
+    max : datetime | str | None, default None
+        Maximum date and time value.
+    step : int | str | None, default None
+        Native input step value.
+    continuous_update : bool, default True
+        Whether Python receives updates while the user edits the input.
+    width : str, default ''
+        CSS width for the control.
+    """
 
     def __init__(
         self,
@@ -135,65 +194,6 @@ class DatetimePicker(DatePicker):
             **kwargs,
         )
         self.control_kind = "datetime"
-
-
-_CONTROL_PARAM_DOCS = {
-    "continuous_update": "Whether Python receives updates while the user edits the input.",
-    "description": "Label shown above the control.",
-    "disabled": "Whether user interaction is disabled.",
-    "max": "Maximum date, time, or datetime value.",
-    "min": "Minimum date, time, or datetime value.",
-    "step": "Native input step value.",
-    "value": "Initial value and synced Python value.",
-    "width": "CSS width for the control.",
-}
-
-
-for _cls, _summary, _params in [
-    (
-        DatePicker,
-        "Browser-native date picker control.",
-        [
-            ("value", None),
-            ("description", ""),
-            ("disabled", False),
-            ("min", None),
-            ("max", None),
-            ("step", None),
-            ("continuous_update", True),
-            ("width", ""),
-        ],
-    ),
-    (
-        TimePicker,
-        "Browser-native time picker control.",
-        [
-            ("value", None),
-            ("description", ""),
-            ("disabled", False),
-            ("min", None),
-            ("max", None),
-            ("step", None),
-            ("continuous_update", True),
-            ("width", ""),
-        ],
-    ),
-    (
-        DatetimePicker,
-        "Browser-native datetime picker control.",
-        [
-            ("value", None),
-            ("description", ""),
-            ("disabled", False),
-            ("min", None),
-            ("max", None),
-            ("step", None),
-            ("continuous_update", True),
-            ("width", ""),
-        ],
-    ),
-]:
-    _document_control(_cls, _summary, _params, _CONTROL_PARAM_DOCS)
 
 
 __all__ = ["DatePicker", "DatetimePicker", "TimePicker"]

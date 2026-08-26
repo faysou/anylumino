@@ -1,0 +1,47 @@
+---
+title: "Kbd"
+---
+
+Render keyboard shortcut text with Astryx styling.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Kbd props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `keys` (string; required): Keyboard shortcut string. Use "+" to separate keys. Special keys:
+    mod (Cmd on Mac), ctrl, alt, shift, enter, backspace, escape, tab, up, down, left, right.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+  * `className` (string): CSS class name for the root element. Prefer xstyle for styling;
+    className is provided for integration with non-StyleX systems.
+  * `style` (CSSProperties): Inline styles for the root element. Prefer xstyle for styling;
+    inline styles bypass StyleX optimization.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Kbd](https://astryx.atmeta.com/components/Kbd).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(keys, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, keys: str, **props: Any) -> None:
+        super().__init__("Kbd", props={"keys": keys, **props})
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="keys" type="str">
+      Keyboard shortcut text.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

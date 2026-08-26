@@ -1,7 +1,7 @@
 DOCS_PORT ?= 4200
 DOCS_HOST ?= 127.0.0.1
 OPEN ?= open
-DOCS_URL = http://$(DOCS_HOST):$(DOCS_PORT)/
+DOCS_URL = http://$(DOCS_HOST):$(DOCS_PORT)/docs
 
 .PHONY: install-dev
 install-dev:
@@ -32,14 +32,15 @@ test:
 	uv run pytest
 
 .PHONY: docs-reference
-docs-reference:
-	uv run --no-sync quartodoc build --config web/_quarto.yml
-	uv run --no-sync python scripts/patch_reference_signatures.py
+docs-reference: docs-install
+	@mkdir -p build/docs
+	PYTHONPATH=node_modules/fumadocs-python:src uv run --no-sync python -c 'from fumapy import generate; generate()' anylumino --docstring-style numpy --dir build/docs
+	npm run docs:convert
 
-.PHONY: docs-clean-output
-docs-clean-output:
-	rm -rf web/_site
-	find web -name '*.html' -not -path 'web/_site/*' -delete
+.PHONY: docs-install
+docs-install:
+	uv sync --group dev
+	npm ci
 
 .PHONY: docs-check-port
 docs-check-port:
@@ -50,15 +51,22 @@ docs-check-port:
 	fi
 
 .PHONY: docs
-docs: docs-reference docs-clean-output
-	quarto render web
+docs: docs-reference
+	npm run docs:build
 
 .PHONY: docs-preview
-docs-preview: docs-reference docs-clean-output
+docs-preview: docs-reference
 	(sleep 2; $(OPEN) $(DOCS_URL)) &
-	quarto preview web --no-browser --port $(DOCS_PORT)
+	npm run docs:dev -- --hostname $(DOCS_HOST) --port $(DOCS_PORT)
 
 .PHONY: docs-serve
 docs-serve: docs-check-port docs
 	(sleep 1; $(OPEN) $(DOCS_URL)) &
-	uv run --no-sync python -m http.server $(DOCS_PORT) --bind $(DOCS_HOST) --directory web/_site
+	npm run docs:start -- --hostname $(DOCS_HOST) --port $(DOCS_PORT)
+
+.PHONY: docs-check
+docs-check: docs-reference
+	npm run docs:test-links
+	npm run docs:lint
+	npm run docs:types
+	npm run docs:build

@@ -1,0 +1,65 @@
+---
+title: "Citation"
+---
+
+Render a compact inline citation reference.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Citation props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `source` (CitationSource; required): The citation source object containing title, url, and
+    optional icon.
+  * `number` (number; required): The display index for this citation.
+  * `variant` ('label' or 'number'): Display style: a label chip showing the source title or a
+    compact numbered badge.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Citation](https://astryx.atmeta.com/components/Citation).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(source, *, number=1, variant='number', **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        source: Mapping[str, Any],
+        *,
+        number: int = 1,
+        variant: str = "number",
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Citation",
+            value=number,
+            variant=variant,
+            props={
+                "source": _clean_value(source),
+                "number": number,
+                "variant": variant,
+                **props,
+            },
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="source" type="Mapping[str, Any]">
+      Citation source metadata.
+    </PyParameter>
+
+    <PyParameter name="number" type="int" value="1">
+      Citation number.
+    </PyParameter>
+
+    <PyParameter name="variant" type="str" value="'number'">
+      Astryx visual variant.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

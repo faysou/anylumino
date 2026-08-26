@@ -1,0 +1,122 @@
+---
+title: "Grid"
+---
+
+Arrange child widgets in an Astryx grid.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Grid props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `columns` (number or \{minWidth: number, max?: number, repeat?: 'fill' or 'fit'}): Column
+    configuration. Use a number for fixed columns (e.g. 'columns=\{3}'). Use an object for
+    responsive columns: 'minWidth' sets the minimum column width in px, 'repeat' controls
+    track behavior ('"fill"' preserves empty tracks for consistent widths, '"fit"' collapses
+    empty tracks so items stretch; defaults to '"fill"'), and 'max' caps the maximum number of
+    columns.
+  * `minChildWidth` (number): Deprecated: use 'columns=\{\{minWidth: 280}}' instead. Minimum item
+    width in px; enables responsive auto-fit.
+  * `width` (number or string): Container width.
+  * `height` (number or string): Container height.
+  * `gap` (SpacingStep): Spacing between all items.
+  * `rowGap` (SpacingStep): Row spacing; overrides 'gap' for the row axis.
+  * `columnGap` (SpacingStep): Column spacing; overrides 'gap' for the column axis.
+  * `align` (GridAlignment): Vertical alignment of items.
+  * `justify` (GridAlignment): Horizontal alignment of items.
+  * `children` (ReactNode): Grid content.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value: not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Grid](https://astryx.atmeta.com/components/Grid).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, columns=2, gap=3, row_gap=None, column_gap=None, align=None, justify=None, width=None, height=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        columns: int | str | Mapping[str, Any] = 2,
+        gap: int | float = 3,
+        row_gap: int | float | None = None,
+        column_gap: int | float | None = None,
+        align: str | None = None,
+        justify: str | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Grid",
+            children,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                columns=_grid_columns(columns),
+                gap=gap,
+                rowGap=row_gap,
+                columnGap=column_gap,
+                align=align,
+                justify=justify,
+                width=width,
+                height=height,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="columns" type="int | str | Mapping[str, Any]" value="2">
+      Grid column definition. Pass an int for fixed columns, a
+      `{"minWidth": int, "repeat": "fit" | "fill", "max": int}` mapping for
+      responsive columns, or the equivalent CSS string
+      `"repeat(auto-fit, minmax(280px, 1fr))"`. Other CSS strings raise a
+      `TypeError` because Astryx cannot render them.
+    </PyParameter>
+
+    <PyParameter name="gap" type="int | float" value="3">
+      Astryx spacing step between children.
+    </PyParameter>
+
+    <PyParameter name="row_gap" type="int | float | None" value="None">
+      Row spacing override.
+    </PyParameter>
+
+    <PyParameter name="column_gap" type="int | float | None" value="None">
+      Column spacing override.
+    </PyParameter>
+
+    <PyParameter name="align" type="str | None" value="None">
+      Vertical item alignment.
+    </PyParameter>
+
+    <PyParameter name="justify" type="str | None" value="None">
+      Horizontal item alignment.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Grid width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Grid height.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,128 @@
+---
+title: "Checkbox"
+---
+
+Render an Astryx checkbox input.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe CheckboxInput props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `ref` (React.Ref\<HTMLInputElement>): Ref forwarded to the underlying \<input> element.
+  * `label` (string; required): Label text for the checkbox (always rendered for accessibility).
+  * `isLabelHidden` (boolean): Whether to visually hide the label (still accessible to screen
+    readers).
+  * `description` (string): Description text displayed below the label.
+  * `value` (boolean or 'indeterminate'; required): Whether the checkbox is checked, unchecked,
+    or indeterminate.
+  * `onChange` ((checked: boolean, e: ChangeEvent\<HTMLInputElement>) => void): Callback fired
+    when the checkbox state changes.
+  * `changeAction` ((checked: boolean, e: ChangeEvent\<HTMLInputElement>) => void or
+    Promise\<void>): Async action on change. Fires after onChange if not prevented. Shows
+    loading spinner while pending.
+  * `isLoading` (boolean): Whether the checkbox is in a loading state. Shows spinner and
+    prevents interaction.
+  * `isDisabled` (boolean): Whether the checkbox is disabled.
+  * `isReadOnly` (boolean): Whether the checkbox is read-only. Displays the current state at
+    full opacity but prevents interaction. Unlike 'isDisabled', read-only checkboxes are not
+    visually dimmed.
+  * `isOptional` (boolean): Whether the field is optional. Mutually exclusive with isRequired.
+  * `isRequired` (boolean): Whether the checkbox is required. Mutually exclusive with
+    isOptional.
+  * `size` ('sm' or 'md'): The size of the checkbox. sm for compact layouts, md for default.
+  * `onFocus` ((e: FocusEvent\<HTMLInputElement>) => void): Callback fired when the checkbox
+    receives focus.
+  * `onBlur` ((e: FocusEvent\<HTMLInputElement>) => void): Callback fired when the checkbox loses
+    focus.
+  * `labelIcon` (IconType): Icon to display before the label text. See 'npx astryx docs icons'
+    for valid semantic names.
+  * `status` (\{ type: 'error' or 'warning' or 'success', message: string }): Status indicator.
+    Displays a colored message box below the checkbox and sets aria-invalid for errors.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/CheckboxInput](https://astryx.atmeta.com/components/CheckboxInput).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=False, *, label='', disabled=False, size=None, label_hidden=None, description=None, loading=None, read_only=None, status=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: bool = False,
+        *,
+        label: str = "",
+        disabled: bool = False,
+        size: str | None = None,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        loading: bool | None = None,
+        read_only: bool | None = None,
+        status: Mapping[str, Any] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "CheckboxInput",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                size=size,
+                isLabelHidden=label_hidden,
+                description=description,
+                isLoading=loading,
+                isReadOnly=read_only,
+                status=status,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="bool" value="False">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="''">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Checkbox size.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed below the label.
+    </PyParameter>
+
+    <PyParameter name="loading" type="bool | None" value="None">
+      Whether to show the loading state.
+    </PyParameter>
+
+    <PyParameter name="read_only" type="bool | None" value="None">
+      Whether interaction is disabled without dimming the value.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

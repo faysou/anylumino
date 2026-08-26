@@ -1,0 +1,125 @@
+---
+title: "Token"
+---
+
+Render an Astryx token or chip.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Token props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Text label displayed inside the token.
+  * `size` ('sm' or 'md' or 'lg'): The size of the token.
+  * `color` ('default' or 'red' or 'orange' or 'yellow' or 'green' or 'teal' or 'cyan' or 'blue'
+    or 'purple' or 'pink' or 'gray'): Color variant of the token.
+  * `icon` (ReactNode): Optional icon rendered before the label.
+  * `isDisabled` (boolean): Whether the token is disabled; reduces opacity and blocks
+    interactions.
+  * `onRemove` ((e: React.MouseEvent) => void): Callback fired when the remove button is
+    clicked. When provided, an X button is rendered inside the token.
+  * `onClick` ((e: React.MouseEvent) => void): Click handler. When provided, the token renders
+    as a \<span> container with an invisible \<button> inside for accessibility.
+  * `href` (string): Link URL. When provided, the token renders as an \<a> element.
+  * `description` (string): Accessible description applied via aria-description on the root
+    element.
+  * `endContent` (ReactNode): Content rendered after the label and before the remove button.
+  * `isLabelHidden` (boolean): Visually hides the label using a screen-reader-only clip
+    technique; the label remains accessible.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value, not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Token](https://astryx.atmeta.com/components/Token).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(label, *, color='default', size=None, disabled=False, href=None, description=None, label_hidden=None, removable=False, clickable=False, action_callbacks=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        label: str,
+        *,
+        color: str = "default",
+        size: str | None = None,
+        disabled: bool = False,
+        href: str | None = None,
+        description: str | None = None,
+        label_hidden: bool | None = None,
+        removable: bool = False,
+        clickable: bool = False,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "Token",
+            label=label,
+            disabled=disabled,
+            action_callbacks=action_callbacks,
+            props=_named_props(
+                props,
+                color=color,
+                size=size,
+                isDisabled=disabled,
+                href=href,
+                description=description,
+                isLabelHidden=label_hidden,
+                onRemove=removable,
+                clickable=clickable,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="color" type="str" value="'default'">
+      Astryx component option.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Token size.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the token is disabled.
+    </PyParameter>
+
+    <PyParameter name="href" type="str | None" value="None">
+      Optional link destination.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Accessible description.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the label.
+    </PyParameter>
+
+    <PyParameter name="removable" type="bool" value="False">
+      Whether to show the remove control.
+    </PyParameter>
+
+    <PyParameter name="clickable" type="bool" value="False">
+      Whether the token acts as a button.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Python callbacks receiving `"remove"` or `"click"`.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

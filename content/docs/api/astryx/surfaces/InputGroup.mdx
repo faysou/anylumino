@@ -1,0 +1,123 @@
+---
+title: "InputGroup"
+---
+
+Group an input with prefix and suffix adornments.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe InputGroup props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `children` (ReactNode; required): Input and InputGroupText children.
+  * `label` (string; required): Accessible label for the group.
+  * `isLabelHidden` (boolean): Visually hide the label.
+  * `description` (string): Helper text between label and input group.
+  * `isDisabled` (boolean): Disable the entire group.
+  * `isOptional` (boolean): Show "(optional)" indicator.
+  * `isRequired` (boolean): Mark the field as required.
+  * `size` ('sm' or 'md' or 'lg'): Default size for inputs in the group.
+  * `status` (InputStatus): Status indicator applied to the group border.
+  * `labelTooltip` (string): Tooltip text at the end of the label.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization.
+  * `data-testid` (string): Test selector.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/InputGroup](https://astryx.atmeta.com/components/InputGroup).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, label, prefix='', suffix='', disabled=False, label_hidden=None, description=None, optional=None, required=None, size=None, status=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        label: str,
+        prefix: str = "",
+        suffix: str = "",
+        disabled: bool = False,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        optional: bool | None = None,
+        required: bool | None = None,
+        size: str | None = None,
+        status: Mapping[str, Any] | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "InputGroup",
+            children,
+            label=label,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                label=label,
+                prefix=prefix or None,
+                suffix=suffix or None,
+                isLabelHidden=label_hidden,
+                description=description,
+                isOptional=optional,
+                isRequired=required,
+                size=size,
+                status=status,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="prefix" type="str" value="''">
+      Text rendered before grouped input children.
+    </PyParameter>
+
+    <PyParameter name="suffix" type="str" value="''">
+      Text rendered after grouped input children.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the group.
+    </PyParameter>
+
+    <PyParameter name="optional" type="bool | None" value="None">
+      Whether to mark the group optional.
+    </PyParameter>
+
+    <PyParameter name="required" type="bool | None" value="None">
+      Whether to mark the group required.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Default child input size.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

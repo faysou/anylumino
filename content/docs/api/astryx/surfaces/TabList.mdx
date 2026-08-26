@@ -1,0 +1,93 @@
+---
+title: "TabList"
+---
+
+Render an Astryx tab list.
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe TabList props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `value` (string; required): The currently selected tab value.
+  * `onChange` ((value: string) => void; required): Callback fired when a tab is selected.
+  * `size` ('sm' or 'md' or 'lg'): Size variant applied to all child tabs.
+  * `layout` ('hug' or 'fill'): Layout mode for tab sizing. 'hug': each tab hugs its content
+    width. 'fill': tabs stretch equally to fill the container width.
+  * `hasDivider` (boolean): Whether to show a bottom border divider under the tab list.
+  * `orientation` ('horizontal' or 'vertical'): Orientation of the tab strip, controlling which
+    arrow keys move focus between tabs and the reported aria-orientation. 'horizontal':
+    ArrowLeft/ArrowRight. 'vertical': ArrowUp/ArrowDown. Both axes' arrows are accepted
+    regardless.
+  * `children` (ReactNode; required): Tab and TabMenu items to render inside the nav.
+  * `xstyle` (StyleXStyles): StyleX styles for layout customization (margins, positioning,
+    sizing). Must be a stylex.create() value: not an inline style object like style=\{\{}}.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/TabList](https://astryx.atmeta.com/components/TabList).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value, *, size=None, layout=None, divider=None, orientation=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str,
+        *,
+        size: str | None = None,
+        layout: str | None = None,
+        divider: bool | None = None,
+        orientation: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "TabList",
+            value=value,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                size=size,
+                layout=layout,
+                hasDivider=divider,
+                orientation=orientation,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item records used by generated child components or static search sources.
+    </PyParameter>
+
+    <PyParameter name="value" type="str">
+      Synchronized component value.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Tab size.
+    </PyParameter>
+
+    <PyParameter name="layout" type="str | None" value="None">
+      Hug or fill tab layout.
+    </PyParameter>
+
+    <PyParameter name="divider" type="bool | None" value="None">
+      Whether to show the tab-list divider.
+    </PyParameter>
+
+    <PyParameter name="orientation" type="str | None" value="None">
+      Horizontal or vertical tab orientation.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
