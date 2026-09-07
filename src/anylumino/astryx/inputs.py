@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from ..components import ComponentWidget
+from ..layout import _size_to_css
 from .base import Widget
 from .base import _named_props
 from .base import _option_records
@@ -501,6 +502,10 @@ class TextInput(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_position : {'top', 'left'}, default 'top'
+        Place the label above the control or beside it in a compact row.
+    label_width : int | float | str | None, default None
+        Width of a left-side label. Use the same width to align sibling controls.
     placeholder : str, default ''
         Placeholder text shown when the control is empty.
     disabled : bool, default False
@@ -580,6 +585,8 @@ class TextInput(Widget):
         value: str = "",
         *,
         label: str = "",
+        label_position: str = "top",
+        label_width: int | float | str | None = None,
         placeholder: str = "",
         disabled: bool = False,
         input_type: str | None = None,
@@ -600,8 +607,10 @@ class TextInput(Widget):
             label=label,
             value=value,
             disabled=disabled,
-            props=_named_props(
+            props=_label_props(
                 props,
+                label_position,
+                label_width,
                 placeholder=placeholder,
                 type=input_type,
                 size=size,
@@ -886,6 +895,10 @@ class Slider(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_position : {'top', 'left'}, default 'top'
+        Place the label above the slider or beside it in a compact row.
+    label_width : int | float | str | None, default None
+        Width of a left-side label. Use the same width to align sibling sliders.
     disabled : bool, default False
         Whether the component should render disabled.
     min : int | float | None, default None
@@ -954,6 +967,8 @@ class Slider(Widget):
         value: int | float | tuple[int | float, int | float] | list[int | float] = 0,
         *,
         label: str = "",
+        label_position: str = "top",
+        label_width: int | float | str | None = None,
         disabled: bool = False,
         min: int | float | None = None,
         max: int | float | None = None,
@@ -970,8 +985,10 @@ class Slider(Widget):
             label=label,
             value=value,
             disabled=disabled,
-            props=_named_props(
+            props=_label_props(
                 props,
+                label_position,
+                label_width,
                 min=min,
                 max=max,
                 step=step,
@@ -1065,6 +1082,10 @@ class LogSlider(Widget):
         Synchronized component value on the real scale, not the exponent.
     label : str, default ''
         Visible or accessible label for the component.
+    label_position : {'top', 'left'}, default 'top'
+        Place the label above the slider or beside it in a compact row.
+    label_width : int | float | str | None, default None
+        Width of a left-side label. Use the same width to align sibling sliders.
     base : int | float, default 10
         Logarithm base.
     min_exponent : int | float, default 0
@@ -1092,6 +1113,8 @@ class LogSlider(Widget):
         value: int | float = 1,
         *,
         label: str = "",
+        label_position: str = "top",
+        label_width: int | float | str | None = None,
         base: int | float = 10,
         min_exponent: int | float = 0,
         max_exponent: int | float = 4,
@@ -1106,8 +1129,10 @@ class LogSlider(Widget):
             label=label,
             value=value,
             disabled=disabled,
-            props=_named_props(
+            props=_label_props(
                 props,
+                label_position,
+                label_width,
                 base=base,
                 minExponent=min_exponent,
                 maxExponent=max_exponent,
@@ -1134,6 +1159,10 @@ class SelectionSlider(Widget):
         the first option.
     label : str, default ''
         Visible or accessible label for the component.
+    label_position : {'top', 'left'}, default 'top'
+        Place the label above the slider or beside it in a compact row.
+    label_width : int | float | str | None, default None
+        Width of a left-side label. Use the same width to align sibling sliders.
     marks : bool, default False
         Whether to draw a labelled tick for every option.
     disabled : bool, default False
@@ -1156,6 +1185,8 @@ class SelectionSlider(Widget):
         value: Any = None,
         *,
         label: str = "",
+        label_position: str = "top",
+        label_width: int | float | str | None = None,
         marks: bool = False,
         disabled: bool = False,
         value_display: str | None = None,
@@ -1176,8 +1207,10 @@ class SelectionSlider(Widget):
             label=label,
             value=value,
             disabled=disabled,
-            props=_named_props(
+            props=_label_props(
                 props,
+                label_position,
+                label_width,
                 options=records,
                 marks=marks or None,
                 valueDisplay=value_display,
@@ -1398,6 +1431,10 @@ class Selector(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_position : {'top', 'left'}, default 'top'
+        Place the label above the control or beside it in a compact row.
+    label_width : int | float | str | None, default None
+        Width of a left-side label. Use the same width to align sibling controls.
     disabled : bool, default False
         Whether the selector is disabled.
     placeholder : str | None, default None
@@ -1463,6 +1500,8 @@ class Selector(Widget):
         value: str | None = None,
         *,
         label: str = "",
+        label_position: str = "top",
+        label_width: int | float | str | None = None,
         disabled: bool = False,
         placeholder: str | None = None,
         size: str | None = None,
@@ -1479,8 +1518,10 @@ class Selector(Widget):
             label=label,
             value=value,
             disabled=disabled,
-            props=_named_props(
+            props=_label_props(
                 props,
+                label_position,
+                label_width,
                 options=_option_records(items),
                 placeholder=placeholder,
                 size=size,
@@ -1505,6 +1546,10 @@ class MultiSelector(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_position : {'top', 'left'}, default 'top'
+        Place the label above the control or beside it in a compact row.
+    label_width : int | float | str | None, default None
+        Width of a left-side label. Use the same width to align sibling controls.
     disabled : bool, default False
         Whether the selector is disabled.
     placeholder : str | None, default None
@@ -1588,6 +1633,8 @@ class MultiSelector(Widget):
         value: Iterable[str] = (),
         *,
         label: str = "",
+        label_position: str = "top",
+        label_width: int | float | str | None = None,
         disabled: bool = False,
         placeholder: str | None = None,
         size: str | None = None,
@@ -1606,8 +1653,10 @@ class MultiSelector(Widget):
             label=label,
             value=list(value),
             disabled=disabled,
-            props=_named_props(
+            props=_label_props(
                 props,
+                label_position,
+                label_width,
                 options=_option_records(items),
                 placeholder=placeholder,
                 size=size,
@@ -1621,6 +1670,22 @@ class MultiSelector(Widget):
                 status=status,
             ),
         )
+
+
+def _label_props(
+    props: Mapping[str, Any],
+    label_position: str,
+    label_width: int | float | str | None,
+    **values: Any,
+) -> dict[str, Any]:
+    if label_position not in ("top", "left"):
+        raise ValueError("label_position must be 'top' or 'left'")
+    normalized = _named_props(props, **values)
+    if label_position == "left":
+        normalized["labelPosition"] = label_position
+    if label_width is not None:
+        normalized["labelWidth"] = _size_to_css(label_width, "auto")
+    return normalized
 
 
 class DateInput(Widget):

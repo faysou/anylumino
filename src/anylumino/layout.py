@@ -214,6 +214,7 @@ class _KeyedChildren(ActivationCallbacks):
         """Drop per-child metadata for a child that was removed."""
 
     def _rekey_children(self, previous: list[object], current: list[object]) -> None:
+        selected_key = getattr(self, "selected_key", None)
         previous_keys = {id(view): key for view, key in zip(previous, self.child_keys)}
         titles_by_key = dict(zip(self.child_keys, self._complete_titles()))
         key_list: list[str] = []
@@ -231,6 +232,7 @@ class _KeyedChildren(ActivationCallbacks):
                 self.child_keys = key_list
                 self.titles = [titles_by_key.get(key, "") for key in key_list]
                 self._owners_by_key = owners
+                self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
         self._adopt_children(adopted)
@@ -249,6 +251,14 @@ class _KeyedChildren(ActivationCallbacks):
 
     def _complete_titles(self) -> list[str]:
         return list(self.titles)
+
+    def _restore_selection(self, selected_key: str | None) -> None:
+        if not hasattr(self, "selected_index"):
+            return
+        if selected_key in self.child_keys:
+            self.selected_index = self.child_keys.index(selected_key)
+        else:
+            self.selected_index = max(0, min(self.selected_index, len(self.child_keys) - 1))
 
 
 class LayoutWidget(_KeyedChildren, anywidget.AnyWidget):
@@ -401,6 +411,7 @@ class LayoutWidget(_KeyedChildren, anywidget.AnyWidget):
         key = self.child_keys[index]
         owner = self.get_owner(index)
         view = self.widgets[index]
+        selected_key = self.selected_key
         titles = self._complete_titles()
         self._syncing_children = True
         try:
@@ -410,8 +421,7 @@ class LayoutWidget(_KeyedChildren, anywidget.AnyWidget):
                 self.titles = [*titles[:index], *titles[index + 1 :]]
                 self._owners_by_key.pop(key, None)
                 self._drop_child_metadata(index)
-                if hasattr(self, "selected_index"):
-                    self.selected_index = min(self.selected_index, len(self.widgets) - 1) if self.widgets else 0
+                self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
         if close:
@@ -437,8 +447,7 @@ class LayoutWidget(_KeyedChildren, anywidget.AnyWidget):
                 self.widgets = [self.widgets[position] for position in order]
                 self.child_keys = [self.child_keys[position] for position in order]
                 self.titles = [titles[position] for position in order]
-                if selected_key is not None and hasattr(self, "selected_index"):
-                    self.selected_index = self.child_keys.index(selected_key)
+                self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
 

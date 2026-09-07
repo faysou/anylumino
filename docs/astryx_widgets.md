@@ -222,6 +222,22 @@ Use these for structured navigation and data-heavy notebook views.
 - `TreeList`
 - `Table`
 
+## Input labels
+
+`TextInput`, `Selector`, `MultiSelector`, `Slider`, `LogSlider`, and
+`SelectionSlider` accept `label_position="top"`
+(the default) or `label_position="left"` for compact forms. Both positions retain
+the control's accessible label. Descriptions and validation messages stay with
+the control. The horizontal layout stacks at viewport widths of 480 px or less.
+
+```python
+quantity = ax.Slider(10, label="Quantity", label_position="left", min=0, max=100)
+```
+
+Use the same `label_width` on sibling controls to align their inputs. For example,
+`label_position="left", label_width=80` reserves an 80 px label column. CSS sizes
+such as `"6rem"` also work; omitting the width fits each label to its text.
+
 ## State and callbacks
 
 Input widgets expose a synced `.value` trait:

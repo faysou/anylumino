@@ -15,6 +15,7 @@ from .base import _clean_props
 from .base import _clean_value
 from .base import _named_props
 from .base import _table_columns
+from .base import _table_row_ids
 from .base import _table_rows
 
 
@@ -182,15 +183,16 @@ class Table(Widget):
     ) -> None:
         """Replace table rows from raw row mappings, sequences, or scalar values."""
         row_list = list(rows)
-        if row_key is not None:
-            self._row_key = row_key or "__row_id"
+        next_row_key = self._row_key if row_key is None else row_key or "__row_id"
         column_list = (
             _table_columns(columns, row_list)
             if columns is not None or not self.columns
             else self.columns
         )
+        normalized = _table_rows(row_list, column_list, next_row_key)
+        self._row_key = next_row_key
         self._set_table_props(
-            rows=_table_rows(row_list, column_list, self._row_key),
+            rows=normalized,
             columns=column_list,
             idKey=self._row_key,
         )
@@ -209,20 +211,30 @@ class Table(Widget):
         return str(normalized[self.row_key])
 
     def update_row(self, row_value: Any, values: Any) -> None:
-        """Update cells for an existing row by row id."""
+        """Update cells by row id, preserving selection if the id changes.
+
+        Row ids must remain unique after conversion to strings. An invalid
+        update raises ``ValueError`` without changing rows or selection.
+        """
         target = str(row_value)
         next_rows = []
+        next_id = target
         found = False
         for row in self.rows:
             if str(row.get(self.row_key)) != target:
                 next_rows.append(row)
                 continue
             found = True
-            next_rows.append(self._updated_row(row, values))
+            updated = self._updated_row(row, values)
+            next_id = str(updated[self.row_key])
+            next_rows.append(updated)
         if not found:
             msg = f"table row not found: {target}"
             raise KeyError(msg)
-        self._set_table_props(rows=next_rows)
+        _table_row_ids(next_rows, self.row_key)
+        with self.hold_sync(), self.hold_trait_notifications():
+            self._set_table_props(rows=next_rows)
+            self.selected = [next_id if item == target else item for item in self.selected]
 
     def remove_row(self, row_value: Any) -> None:
         """Remove an existing row by row id."""

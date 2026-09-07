@@ -702,10 +702,12 @@ function componentProps(model, draft, elementId) {
     : ["Typeahead", "Tokenizer", "CommandPalette"].includes(name)
       ? ["items"]
       : name === "SelectionSlider"
-        ? ["options", "marks"]
+        ? ["options", "marks", "labelPosition", "labelWidth"]
         : name === "LogSlider"
-          ? ["base", "minExponent", "maxExponent"]
-          : [];
+          ? ["base", "minExponent", "maxExponent", "labelPosition", "labelWidth"]
+          : ["Slider", "TextInput", "Selector", "MultiSelector"].includes(name)
+            ? ["labelPosition", "labelWidth"]
+            : [];
   const props = modelProps(model, reserved);
   const label = String(model.get("label") || props.label || textFor(model));
   const variant = String(model.get("variant") || props.variant || "");
@@ -1679,6 +1681,12 @@ function AstryxModelView({ model }) {
   const props = componentProps(model, draft, React.useId());
   const Component = componentFor(name, props);
   const children = componentChildren(model);
+  const component = name === "Table"
+    ? React.createElement(AstryxTableView, { model })
+    : React.createElement(Component, props, children);
+  const horizontalLabel = [Slider, TextInput, Selector, MultiSelector].includes(Component)
+    && rawProps(model).labelPosition === "left"
+    && !props.isLabelHidden;
 
   return React.createElement(
     Theme,
@@ -1692,9 +1700,16 @@ function AstryxModelView({ model }) {
           height: cssSize(model.get("height"), ""),
         },
       },
-      name === "Table"
-        ? React.createElement(AstryxTableView, { model })
-        : React.createElement(Component, props, children),
+      horizontalLabel
+        ? React.createElement(FormLayout, {
+          direction: "horizontal-labels",
+          className: "anylumino-InputLabelRow",
+          style: {
+            "--anylumino-input-label-width": cssSize(rawProps(model).labelWidth, "auto"),
+            alignItems: props.description || props.status?.message ? undefined : "center",
+          },
+        }, component)
+        : component,
     ),
   );
 }

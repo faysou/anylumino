@@ -229,6 +229,7 @@ layout that displays those children.
         key = self.child_keys[index]
         owner = self.get_owner(index)
         view = self.widgets[index]
+        selected_key = self.selected_key
         titles = self._complete_titles()
         self._syncing_children = True
         try:
@@ -238,8 +239,7 @@ layout that displays those children.
                 self.titles = [*titles[:index], *titles[index + 1 :]]
                 self._owners_by_key.pop(key, None)
                 self._drop_child_metadata(index)
-                if hasattr(self, "selected_index"):
-                    self.selected_index = min(self.selected_index, len(self.widgets) - 1) if self.widgets else 0
+                self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
         if close:
@@ -281,8 +281,7 @@ layout that displays those children.
                 self.widgets = [self.widgets[position] for position in order]
                 self.child_keys = [self.child_keys[position] for position in order]
                 self.titles = [titles[position] for position in order]
-                if selected_key is not None and hasattr(self, "selected_index"):
-                    self.selected_index = self.child_keys.index(selected_key)
+                self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
     ```

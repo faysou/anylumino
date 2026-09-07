@@ -307,7 +307,18 @@ def _table_rows(
             )
             item[row_key] = str(index)
         normalized.append(item)
+    _table_row_ids(normalized, row_key)
     return normalized
+
+
+def _table_row_ids(rows: Iterable[Mapping[str, Any]], row_key: str) -> set[str]:
+    row_ids: set[str] = set()
+    for row in rows:
+        row_id = str(row[row_key])
+        if row_id in row_ids:
+            raise ValueError(f"table row already exists: {row_id}")
+        row_ids.add(row_id)
+    return row_ids
 
 
 class Widget(ComponentWidget):

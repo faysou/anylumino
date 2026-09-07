@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.14"
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
@@ -35,6 +35,9 @@ jobs:
       - name: Verify committed bundles are current
         run: git diff --exit-code -- src/anylumino/static
 
+      - name: Run frontend tests
+        run: npm test
+
       - name: Install Python dependencies
         run: uv sync --dev
 
@@ -43,3 +46,26 @@ jobs:
 
       - name: Run tests
         run: uv run --no-sync pytest
+
+      - name: Build distributions
+        run: uv build
+
+      - name: Check distribution metadata
+        run: uvx twine check --strict dist/*
+
+      - name: Test installed wheel
+        run: |
+          uv venv /tmp/anylumino-wheel
+          uv pip install --python /tmp/anylumino-wheel/bin/python dist/*.whl
+          cd /tmp
+          /tmp/anylumino-wheel/bin/python - <<'PY'
+          import anylumino as al
+          import anylumino.astryx as ax
+
+          panel = al.TabPanel({"text": ax.Text("Wheel check")})
+          assert panel.child_keys == ["text"]
+          for widget in (panel, panel["text"], al.DatePicker()):
+              state = widget.get_state()
+              assert "export" in state["_esm"]
+              assert "anylumino" in state["_css"]
+          PY

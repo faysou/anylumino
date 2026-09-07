@@ -180,6 +180,52 @@ def test_keyed_mutation_methods_add_rename_and_remove_children() -> None:
     assert panel.selected_index == 0
 
 
+@pytest.mark.parametrize("panel_type", [TabPanel, StackedPanel])
+@pytest.mark.parametrize(
+    "removed_key, selected_key",
+    [("first", "second"), ("second", "third"), ("third", "second")],
+)
+def test_removing_a_child_preserves_selection(
+    panel_type: type[LayoutWidget], removed_key: str, selected_key: str,
+) -> None:
+    children = {key: TextWidget(key) for key in ("first", "second", "third")}
+    panel = panel_type(children)
+    panel.select_key("second")
+
+    removed = panel.remove_widget(removed_key)
+
+    assert removed is children[removed_key]
+    assert panel.selected_key == selected_key
+    assert panel.selected_widget is children[selected_key]
+    assert panel.selected_owner is children[selected_key]
+
+
+@pytest.mark.parametrize("panel_type", [TabPanel, StackedPanel])
+def test_replacing_children_preserves_selection_by_identity(panel_type: type[LayoutWidget]) -> None:
+    children = {key: TextWidget(key) for key in ("first", "second", "third")}
+    panel = panel_type(children)
+    panel.select_key("second")
+
+    panel.widgets = [children["third"], children["first"], children["second"]]
+
+    assert panel.child_keys == ["third", "first", "second"]
+    assert panel.selected_index == 2
+    assert panel.selected_widget is children["second"]
+
+
+@pytest.mark.parametrize("panel_type", [TabPanel, StackedPanel])
+def test_replacing_children_clamps_selection(panel_type: type[LayoutWidget]) -> None:
+    panel = panel_type({"first": TextWidget("First"), "second": TextWidget("Second")})
+    panel.select_key("second")
+    remaining = panel["first"]
+
+    panel.widgets = [remaining]
+
+    assert panel.child_keys == ["first"]
+    assert panel.selected_index == 0
+    assert panel.selected_widget is remaining
+
+
 def test_wrapper_children_keep_owner_and_render_widget_separate() -> None:
     class ChartWrapper:
         def __init__(self) -> None:
@@ -1038,6 +1084,49 @@ def test_astryx_table_accepts_sequence_rows_without_columns() -> None:
     assert table.append_row(("Quarterly", "DOC")) == "2"
 
 
+@pytest.mark.parametrize(
+    "values", [{"id": "C", "qty": 7}, {"cells": {"id": "C", "qty": 7}}, ["C", 7]],
+)
+def test_astryx_table_row_identity_updates_preserve_selection(values) -> None:
+    table = ax.Table(
+        [{"id": "A", "qty": 1}, {"id": "B", "qty": 2}], row_key="id", selected=["B", "A"],
+    )
+
+    table.update_row("A", values)
+
+    assert table.rows == [{"id": "C", "qty": 7}, {"id": "B", "qty": 2}]
+    assert table.selected == ["B", "C"]
+
+
+def test_astryx_table_duplicate_update_is_atomic() -> None:
+    rows = [{"id": "A", "qty": 1}, {"id": "B", "qty": 2}]
+    table = ax.Table(rows, row_key="id", selected=["A"])
+
+    with pytest.raises(ValueError, match="table row already exists: B"):
+        table.update_row("A", {"id": "B", "qty": 7})
+
+    assert table.rows == rows
+    assert table.selected == ["A"]
+
+
+@pytest.mark.parametrize("ids", [("A", "A"), (1, "1")])
+def test_astryx_table_rejects_duplicate_row_ids(ids) -> None:
+    with pytest.raises(ValueError, match=f"table row already exists: {ids[1]}"):
+        ax.Table([{"id": value} for value in ids], row_key="id")
+
+
+def test_astryx_table_duplicate_replacement_is_atomic() -> None:
+    rows = [{"id": "A", "qty": 1}, {"id": "B", "qty": 2}]
+    table = ax.Table(rows, row_key="id", selected=["A"])
+
+    with pytest.raises(ValueError, match="table row already exists: C"):
+        table.set_rows([{"name": "C"}, {"name": "C"}], columns=["name"], row_key="name")
+
+    assert table.rows == rows
+    assert table.row_key == "id"
+    assert table.selected == ["A"]
+
+
 def test_astryx_widget_children_are_keyed_and_composable() -> None:
     button = ax.Button("Run")
     symbol = ax.TextInput(value="AAPL", label="Symbol")
@@ -1348,6 +1437,59 @@ def test_astryx_option_sliders_accept_shared_widget_arguments() -> None:
     assert "continuous_update" not in log.props
     assert selection.disabled is True
     assert selection.continuous_update is True
+
+
+@pytest.mark.parametrize(
+    "widget_type, args, value",
+    [(ax.Slider, (37,), 37), (ax.LogSlider, (100,), 100), (ax.SelectionSlider, (["small", "large"],), "small")],
+)
+@pytest.mark.parametrize("position", ["top", "left"])
+def test_astryx_slider_label_positions(widget_type, args, value, position) -> None:
+    default = widget_type(*args, label="Size", continuous_update=False)
+    widget = widget_type(*args, label="Size", label_position=position, continuous_update=False)
+
+    assert widget.value == value
+    assert widget.label == "Size"
+    assert widget.continuous_update is False
+    assert "labelPosition" not in default.props
+    assert widget.props == {**default.props, **({"labelPosition": "left"} if position == "left" else {})}
+
+
+@pytest.mark.parametrize("widget_type, args", [(ax.Slider, ()), (ax.LogSlider, ()), (ax.SelectionSlider, (["small"],))])
+def test_astryx_sliders_reject_invalid_label_positions(widget_type, args) -> None:
+    with pytest.raises(ValueError, match="label_position must be 'top' or 'left'"):
+        widget_type(*args, label_position="diagonal")
+
+
+@pytest.mark.parametrize("widget_type, args", [(ax.Slider, ()), (ax.LogSlider, ()), (ax.SelectionSlider, (["small"],))])
+@pytest.mark.parametrize("width, expected", [(80, "80px"), ("6rem", "6rem")])
+def test_astryx_slider_label_widths(widget_type, args, width, expected) -> None:
+    widget = widget_type(*args, label="Size", label_position="left", label_width=width)
+
+    assert widget.props["labelPosition"] == "left"
+    assert widget.props["labelWidth"] == expected
+    assert widget.label == "Size"
+
+
+@pytest.mark.parametrize(
+    "widget_type, args, value",
+    [(ax.TextInput, (), "Trade A"), (ax.Selector, (["Call", "Put"],), "Put"),
+     (ax.MultiSelector, (["A", "B"],), ["B"])],
+)
+@pytest.mark.parametrize("position", ["top", "left"])
+def test_astryx_input_label_layout_preserves_values(widget_type, args, value, position) -> None:
+    widget = widget_type(*args, value=value, label="Trade", label_position=position, label_width=80)
+
+    assert widget.value == value
+    assert widget.label == "Trade"
+    assert widget.props["labelWidth"] == "80px"
+    assert widget.props.get("labelPosition", "top") == position
+
+
+@pytest.mark.parametrize("widget_type, args", [(ax.TextInput, ()), (ax.Selector, ([],)), (ax.MultiSelector, ([],))])
+def test_astryx_inputs_reject_invalid_label_positions(widget_type, args) -> None:
+    with pytest.raises(ValueError, match="label_position must be 'top' or 'left'"):
+        widget_type(*args, label_position="diagonal")
 
 
 def test_astryx_pagination_syncs_the_page_and_reports_page_size_as_an_action() -> None:

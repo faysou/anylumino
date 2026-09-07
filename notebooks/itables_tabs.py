@@ -157,7 +157,12 @@ tabs = TabPanel(
 dashboard = SplitPanel(
     {
         "controls": controls,
-        "table": VBox({"toolbar": toolbar, "tabs": tabs}, height=500),
+        "table": VBox(
+            {"toolbar": toolbar, "tabs": tabs},
+            stretches=[0, 1],
+            child_min_height=36,
+            height=500,
+        ),
     },
     sizes=[0.28, 0.72],
     height=540,

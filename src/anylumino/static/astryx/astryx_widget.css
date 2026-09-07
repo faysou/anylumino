@@ -28,6 +28,12 @@
   min-width: 0;
 }
 
+.anylumino-InputLabelRow > .astryx-field > :first-child {
+  width: var(--anylumino-input-label-width, auto);
+  /* Override the ID-level specificity of Astryx's generated padding rule. */
+  padding-top: 0 !important;
+}
+
 .anylumino-DividerHost {
   width: 100%;
   min-height: 1px;

@@ -57,7 +57,7 @@ Render an Astryx selector that accepts multiple values.
 
 ## Functions
 
-<PyFunction name="__init__" type="(items, value=(), *, label='', disabled=False, placeholder=None, size=None, loading=None, clear=None, select_all=None, search=None, trigger_display=None, max_badges=None, description=None, status=None, **props) -> None" kind="constructor">
+<PyFunction name="__init__" type="(items, value=(), *, label='', label_position='top', label_width=None, disabled=False, placeholder=None, size=None, loading=None, clear=None, select_all=None, search=None, trigger_display=None, max_badges=None, description=None, status=None, **props) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -66,6 +66,8 @@ Render an Astryx selector that accepts multiple values.
         value: Iterable[str] = (),
         *,
         label: str = "",
+        label_position: str = "top",
+        label_width: int | float | str | None = None,
         disabled: bool = False,
         placeholder: str | None = None,
         size: str | None = None,
@@ -84,8 +86,10 @@ Render an Astryx selector that accepts multiple values.
             label=label,
             value=list(value),
             disabled=disabled,
-            props=_named_props(
+            props=_label_props(
                 props,
+                label_position,
+                label_width,
                 options=_option_records(items),
                 placeholder=placeholder,
                 size=size,
@@ -113,6 +117,14 @@ Render an Astryx selector that accepts multiple values.
 
     <PyParameter name="label" type="str" value="''">
       Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="label_position" type="str" value="'top'">
+      Place the label above the control or beside it in a compact row.
+    </PyParameter>
+
+    <PyParameter name="label_width" type="int | float | str | None" value="None">
+      Width of a left-side label. Use the same width to align sibling controls.
     </PyParameter>
 
     <PyParameter name="disabled" type="bool" value="False">
