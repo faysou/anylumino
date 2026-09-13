@@ -64,13 +64,46 @@ gallery of screenshots alongside runnable examples.
 
 ## Rehearse publication
 
-Build the wheel and source archive from the release revision, run
-`twine check --strict`, and install the wheel in a clean environment outside the
-checkout. Run an example using that installation to verify that frontend assets
-are present.
+Build the wheel and source archive from the release revision with `uv build`.
+Inspect both artifacts, then install the wheel in a clean environment outside the
+checkout with `uv venv` and `uv pip install`. Run an example using that
+installation to verify that the frontend assets are present.
 
 Publish a prerelease to [TestPyPI](https://packaging.python.org/en/latest/guides/using-testpypi/)
-and verify installation before uploading to PyPI. Configure
-[PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/)
+with `uv publish --publish-url https://test.pypi.org/legacy/`, then create a
+fresh environment and install the published package from TestPyPI with
+`uv pip install --index-url https://test.pypi.org/simple/`. Verify the installed
+version and run an example before publishing to PyPI with `uv publish`.
+Configure [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/)
 for the release workflow. Confirm repository visibility, project links, the
 version, and the license inventory before the public release.
+
+## Local release checklist
+
+Run the following commands from a clean release checkout:
+
+```sh
+npm ci
+npm run build
+uv sync --group dev
+uv run --no-sync pytest
+make docs-check
+uv build
+uv publish --dry-run --trusted-publishing never dist/*
+```
+
+Create the clean wheel environment outside the checkout and run the installed
+package smoke check before publishing:
+
+```sh
+uv venv /tmp/anylumino-wheel
+uv pip install --python /tmp/anylumino-wheel/bin/python dist/*.whl
+```
+
+The package supports Python 3.10 and later, as declared in
+`pyproject.toml`.
+The current CI support lane is Python 3.14 on Ubuntu, so add older-version CI
+lanes before making a tested support guarantee for each interpreter version.
+Browser validation currently covers Chromium-based JupyterLab; Safari, Firefox,
+VS Code notebooks, and static exports require separate checks before claiming
+support.

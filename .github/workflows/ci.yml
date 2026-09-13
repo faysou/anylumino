@@ -50,8 +50,8 @@ jobs:
       - name: Build distributions
         run: uv build
 
-      - name: Check distribution metadata
-        run: uvx twine check --strict dist/*
+      - name: Validate distributions for publication
+        run: uv publish --dry-run --trusted-publishing never dist/*
 
       - name: Test installed wheel
         run: |
