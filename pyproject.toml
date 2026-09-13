@@ -37,6 +37,9 @@ dev = [
 [tool.uv]
 package = true
 
+[tool.uv.sources]
+anywidget = { path = "../anywidget", editable = true }
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/anylumino"]
 

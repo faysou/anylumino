@@ -53,7 +53,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anywidget", specifier = ">=0.11.0" },
+    { name = "anywidget", editable = "../anywidget" },
     { name = "traitlets", specifier = ">=5.15.1" },
 ]
 
@@ -72,16 +72,32 @@ dev = [
 
 [[package]]
 name = "anywidget"
-version = "0.11.0"
-source = { registry = "https://pypi.org/simple" }
+source = { editable = "../anywidget" }
 dependencies = [
     { name = "ipywidgets" },
     { name = "psygnal" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/79/31/0491d707c674b34267f55d96d6a7148e55e7b6718a271686232cf295fbe2/anywidget-0.11.0.tar.gz", hash = "sha256:6695fbef9449cf8c27f421b96c5837aa37f909ec1f60cfa33add333e1b70b169", size = 426999, upload-time = "2026-04-27T23:42:09.576Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8e/c2/8fec8e8e2eb920cc2280f569144080cd58622a2eda83bfa4c0c354a63264/anywidget-0.11.0-py3-none-any.whl", hash = "sha256:c574d9acc6503ad27b37a9acea48f957a8ba7c9c9876cfcb37898931c098ce9d", size = 317341, upload-time = "2026-04-27T23:42:08.356Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "ipywidgets", specifier = ">=7.6.0" },
+    { name = "psygnal", specifier = ">=0.8.1" },
+    { name = "typing-extensions", specifier = ">=4.2.0" },
+    { name = "watchfiles", marker = "extra == 'dev'", specifier = ">=1.1.0" },
+]
+provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "comm", specifier = ">=0.1.4" },
+    { name = "jupyterlab", specifier = ">=4.2.4" },
+    { name = "msgspec", specifier = ">=0.20.0" },
+    { name = "pydantic", specifier = ">=2.5.3" },
+    { name = "pytest", specifier = ">=7.4.4" },
+    { name = "ruff", specifier = ">=0.15.9" },
+    { name = "ty", specifier = ">=0.0.29" },
+    { name = "watchfiles", specifier = ">=0.23.0" },
 ]
 
 [[package]]

@@ -4,6 +4,8 @@ from collections.abc import Callable, Mapping
 from typing import Any, Iterable
 
 import anywidget
+from anywidget import get_model_id
+from anywidget import is_widget
 import traitlets as t
 
 from .common import ActivationCallbacks
@@ -21,8 +23,8 @@ TitleInput = Iterable[str] | Mapping[str, str] | None
 
 
 def _widget_ref(value: object) -> object:
-    model_id = getattr(value, "model_id", None)
-    if isinstance(model_id, str):
+    model_id = get_model_id(value)
+    if model_id is not None:
         return f"anywidget:{model_id}"
     return value
 
@@ -72,18 +74,18 @@ def _validate_keys(key_list: list[str]) -> None:
 
 
 def _view_for_child(child: object) -> object:
-    if isinstance(getattr(child, "model_id", None), str):
+    if is_widget(child):
         return child
     view = getattr(child, "widget", None)
-    if isinstance(getattr(view, "model_id", None), str):
+    if is_widget(view):
         return view
     return child
 
 
 def _is_child(value: object) -> bool:
-    if isinstance(getattr(value, "model_id", None), str):
+    if is_widget(value):
         return True
-    return isinstance(getattr(getattr(value, "widget", None), "model_id", None), str)
+    return is_widget(getattr(value, "widget", None))
 
 
 def _as_child_list(children: ChildInput) -> list[Any]:
