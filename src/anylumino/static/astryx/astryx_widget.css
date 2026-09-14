@@ -24,6 +24,18 @@
   min-width: 180px;
 }
 
+/*
+ * The slider value bubble animates in from below its resting spot, so for its
+ * first frames it overlaps the top of the thumb and takes the pointer from it,
+ * and a press restarts that animation. Show it instantly and let the pointer
+ * pass through so hovering or grabbing the top of the thumb does not blink.
+ * Astryx pins its rules at ID-level specificity, hence the overrides.
+ */
+.anylumino-AstryxWidgetHost .astryx-slider .astryx-tooltip {
+  animation: none !important;
+  pointer-events: none !important;
+}
+
 .anylumino-AstryxChild {
   min-width: 0;
 }
