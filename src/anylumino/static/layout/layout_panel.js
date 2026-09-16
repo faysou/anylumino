@@ -28,7 +28,7 @@ function slotIsVisible(slot) {
   if (!slot || slot.isHidden) {
     return false;
   }
-  return document.body.contains(slot.node);
+  return slot.node.isConnected;
 }
 
 function notifySlotVisible(slot) {

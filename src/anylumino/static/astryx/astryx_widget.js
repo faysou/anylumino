@@ -366,8 +366,8 @@ function themeCSS(brand, theme) {
     .join("\n\n");
 }
 
-function useThemeCSS(themeName, css) {
-  React.useInsertionEffect(() => claimThemeCSS(themeName, css), [themeName, css]);
+function useThemeCSS(themeName, css, styleRoot) {
+  React.useInsertionEffect(() => claimThemeCSS(themeName, css, styleRoot), [themeName, css, styleRoot]);
 }
 
 function useDocumentThemeGuard() {
@@ -1669,13 +1669,13 @@ function AstryxTableView({ model }) {
   });
 }
 
-function AstryxModelView({ model }) {
+function AstryxModelView({ model, styleRoot }) {
   const name = String(model.get("component_name") || model.get("component_kind") || "Stack");
   const mode = useColorMode(String(model.get("color_mode") || "light"));
   const brandKey = JSON.stringify(model.get("brand") ?? {});
   const theme = React.useMemo(() => brandTheme(model.get("brand") ?? {}), [brandKey]);
   const css = React.useMemo(() => themeCSS(model.get("brand") ?? {}, theme), [brandKey, theme]);
-  useThemeCSS(theme.name, css);
+  useThemeCSS(theme.name, css, styleRoot);
   useDocumentThemeGuard();
   const draft = useDraft();
   const props = componentProps(model, draft, React.useId());
@@ -1761,6 +1761,7 @@ export default {
     // distinct prefix per root the anchor names collide and a popover positions
     // against another widget's trigger.
     const reactRoot = createRoot(el, { identifierPrefix: `al${nextReactRootId()}-` });
+    const styleRoot = el.getRootNode();
     let childController = new AbortController();
     let childKey = childSignature(model);
     let scheduled = false;
@@ -1774,7 +1775,7 @@ export default {
         childKey = nextChildKey;
       }
       flushSync(() => {
-        reactRoot.render(React.createElement(AstryxModelView, { model }));
+        reactRoot.render(React.createElement(AstryxModelView, { model, styleRoot }));
       });
       void renderChildren(model, host, el, combineSignals(signal, childController.signal), childrenChanged);
     };

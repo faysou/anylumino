@@ -107,6 +107,33 @@ test("claimThemeCSS keeps distinct stylesheets apart and ignores empty CSS", () 
 });
 
 
+test("claimThemeCSS appends to a shadow root instead of the document head", () => {
+  const documentRef = new FakeDocument();
+  const shadowRoot = new FakeElement("#shadow-root");
+  shadowRoot.ownerDocument = documentRef;
+  shadowRoot.querySelectorAll = (selector) => {
+    const match = /^style\[([^=]+)="([^"]+)"\]$/.exec(selector);
+    return shadowRoot.children.filter((child) => child.getAttribute(match[1]) === match[2]);
+  };
+  const css = ":root { --color-accent: #0057b8; }";
+
+  const releaseFirst = claimThemeCSS("desk", css, shadowRoot);
+  const releaseSecond = claimThemeCSS("desk", css, shadowRoot);
+
+  assert.equal(documentRef.head.children.length, 0);
+  assert.equal(shadowRoot.children.length, 1);
+  const style = shadowRoot.children[0];
+  assert.equal(style.textContent, css);
+  assert.equal(style.getAttribute("data-anylumino-astryx-theme"), "desk");
+  assert.equal(style.getAttribute("data-anylumino-astryx-theme-count"), "2");
+
+  releaseFirst();
+  releaseSecond();
+
+  assert.equal(shadowRoot.children.length, 0);
+});
+
+
 test("claimDocumentTheme restores the host page mode once the last widget releases", () => {
   const documentRef = new FakeDocument();
   documentRef.documentElement.setAttribute("data-theme", "light");

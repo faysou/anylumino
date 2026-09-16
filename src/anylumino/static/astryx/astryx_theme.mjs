@@ -64,16 +64,20 @@ export function hashString(value) {
  * Inject theme CSS once per distinct stylesheet and keep a reference count, so
  * a widget unmounting never strips tokens from the widgets that remain. Astryx
  * dedupes by theme name and drops the shared tag with the first unmount.
+ *
+ * `styleRoot` is the document or the shadow root that contains the widget. A
+ * style tag in `document.head` does not reach into a shadow root, which is
+ * where hosts such as marimo mount every anywidget.
  */
-export function claimThemeCSS(themeName, css, documentRef = globalThis.document) {
+export function claimThemeCSS(themeName, css, styleRoot = globalThis.document) {
   const text = typeof css === "string" ? css.trim() : "";
-  if (!text || !documentRef) {
+  if (!text || !styleRoot) {
     return () => {};
   }
 
   const styleKey = `${themeName}-${hashString(text)}`;
   const selector = `style[data-anylumino-astryx-theme-id="${styleKey}"]`;
-  const matches = [...documentRef.querySelectorAll(selector)];
+  const matches = [...styleRoot.querySelectorAll(selector)];
   let element = matches[0];
   for (const duplicate of matches.slice(1)) {
     duplicate.remove();
@@ -82,12 +86,12 @@ export function claimThemeCSS(themeName, css, documentRef = globalThis.document)
   if (element) {
     element.setAttribute("data-anylumino-astryx-theme-count", String(themeCSSCount(element) + 1));
   } else {
-    element = documentRef.createElement("style");
+    element = (styleRoot.ownerDocument ?? styleRoot).createElement("style");
     element.setAttribute("data-anylumino-astryx-theme", themeName);
     element.setAttribute("data-anylumino-astryx-theme-id", styleKey);
     element.setAttribute("data-anylumino-astryx-theme-count", "1");
     element.textContent = text;
-    documentRef.head.appendChild(element);
+    (styleRoot.head ?? styleRoot).appendChild(element);
   }
 
   let released = false;
