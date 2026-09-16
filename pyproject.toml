@@ -37,9 +37,6 @@ dev = [
 [tool.uv]
 package = true
 
-[tool.uv.sources]
-anywidget = { git = "https://github.com/faysou/anywidget", rev = "3ee25f87edb68cee12cd2b766d7b6d5eda0446b8" }
-
 [tool.hatch.build.targets.wheel]
 packages = ["src/anylumino"]
 
