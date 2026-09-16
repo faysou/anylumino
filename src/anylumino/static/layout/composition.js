@@ -308,12 +308,20 @@ export function installResizeHandle(model, root, onResize, signal, options = {})
 
 export function notifyLuminoWidgetVisible(widget, options = {}) {
   widget.update();
+  notifyNodeVisible(widget.node, options);
+}
+
+/**
+ * Tell size-sensitive content under `node`, such as Plotly plots and embedded
+ * documents, that it is visible again after being hidden or resized.
+ */
+export function notifyNodeVisible(node, options = {}) {
   const notify = () => {
     if (options.dispatchWindowResize) {
       dispatchResize(window);
     }
     const plotly = window.Plotly;
-    for (const plot of widget.node.querySelectorAll(".js-plotly-plot")) {
+    for (const plot of node.querySelectorAll(".js-plotly-plot")) {
       try {
         if (typeof plotly?.Plots?.resize === "function") {
           plotly.Plots.resize(plot);
@@ -324,7 +332,7 @@ export function notifyLuminoWidgetVisible(widget, options = {}) {
         dispatchResize(plot);
       }
     }
-    for (const iframe of widget.node.querySelectorAll("iframe")) {
+    for (const iframe of node.querySelectorAll("iframe")) {
       if (iframe.contentWindow) {
         resizeEmbeddedDocument(iframe.contentWindow);
       }

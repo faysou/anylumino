@@ -112,3 +112,40 @@ export function logValue(exponent, base) {
   return base ** Number(exponent);
 }
 
+
+/**
+ * Relative pane sizes of a split panel as fractions that sum to one. Panes
+ * without a size share what the sized panes leave, or the whole panel when
+ * none is sized.
+ */
+export function paneFractions(sizes, count) {
+  if (count <= 0) {
+    return [];
+  }
+  const given = (Array.isArray(sizes) ? sizes : []).slice(0, count).map((size) => Math.max(0, Number(size) || 0));
+  const missing = count - given.length;
+  const total = given.reduce((sum, size) => sum + size, 0);
+  if (total <= 0) {
+    return Array.from({ length: count }, () => 1 / count);
+  }
+  const share = missing > 0 ? total / given.length : 0;
+  const fractions = [...given, ...Array.from({ length: missing }, () => share)];
+  const sum = fractions.reduce((acc, fraction) => acc + fraction, 0);
+  return fractions.map((fraction) => fraction / sum);
+}
+
+/**
+ * Fractions after the pane at `index` is dragged to `fraction`. Only the last
+ * pane absorbs the change, so the other panes keep their sizes.
+ */
+export function fractionsWithPane(fractions, index, fraction) {
+  const next = [...fractions];
+  const last = next.length - 1;
+  if (index < 0 || index >= last) {
+    return next;
+  }
+  const others = next.reduce((sum, value, position) => (position === index || position === last ? sum : sum + value), 0);
+  next[index] = Math.min(Math.max(Number(fraction) || 0, 0), Math.max(0, 1 - others));
+  next[last] = Math.max(0, 1 - others - next[index]);
+  return next.map((value) => Math.round(value * 1e4) / 1e4);
+}

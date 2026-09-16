@@ -42,6 +42,12 @@ from .inputs import TextArea
 from .inputs import TextInput
 from .inputs import TimeInput
 from .inputs import ToggleButton
+from .layout import AccordionPanel
+from .layout import ResponsivePanel
+from .layout import ScrollBox
+from .layout import SplitPanel
+from .layout import StackedPanel
+from .layout import TabPanel
 from .surfaces import AlertDialog
 from .surfaces import AspectRatio
 from .surfaces import AvatarGroup
@@ -90,6 +96,7 @@ from .surfaces import Typeahead
 
 
 __all__ = [
+    "AccordionPanel",
     "AlertDialog",
     "AspectRatio",
     "Avatar",
@@ -115,12 +122,12 @@ __all__ = [
     "Collapsible",
     "CommandPalette",
     "Component",
+    "ContextMenu",
     "DateInput",
     "DateRangeInput",
     "DateTimeInput",
     "Dialog",
     "Divider",
-    "ContextMenu",
     "DropdownMenu",
     "EmptyState",
     "Field",
@@ -134,22 +141,24 @@ __all__ = [
     "IconButton",
     "InputGroup",
     "Kbd",
+    "Lightbox",
     "Link",
     "List",
-    "Lightbox",
+    "LogSlider",
     "Markdown",
     "MetadataList",
     "MoreMenu",
-    "LogSlider",
     "MultiSelector",
     "NumberInput",
     "Outline",
     "Overlay",
-    "Popover",
     "Pagination",
+    "Popover",
     "PowerSearch",
     "ProgressBar",
     "RadioList",
+    "ResponsivePanel",
+    "ScrollBox",
     "Section",
     "SegmentedControl",
     "SelectableCard",
@@ -158,10 +167,13 @@ __all__ = [
     "Skeleton",
     "Slider",
     "Spinner",
+    "SplitPanel",
     "Stack",
+    "StackedPanel",
     "StatusDot",
     "Switch",
     "TabList",
+    "TabPanel",
     "Table",
     "Text",
     "TextArea",

@@ -90,15 +90,80 @@ al.SplitPanel(
 
 ## Component groups
 
+The groups below follow how a notebook UI is put together: composition first,
+then content, inputs, actions, feedback, overlays, and data. Every class lives
+in the `anylumino.astryx` namespace; the module column says where its API
+reference page is.
+
+| Group                   | API module           |
+| ----------------------- | -------------------- |
+| Foundation and theme    | `base`               |
+| Layout panels           | `layout`             |
+| Layout containers       | `surfaces`           |
+| Typography and content  | `inputs`, `data`     |
+| Forms and direct inputs | `inputs`, `surfaces` |
+| Selection and search    | `inputs`, `surfaces` |
+| Actions and menus       | `inputs`, `surfaces` |
+| Feedback and status     | `data`               |
+| Overlays and previews   | `surfaces`           |
+| Navigation and data     | `surfaces`, `data`   |
+
 ### Foundation and theme
 
-Use these when creating reusable wrappers, applying shared styling, or reaching
-for a component that does not yet have a dedicated Python class.
+Use these to define a shared brand, apply a theme to a subtree, or wrap an
+Astryx component that has no dedicated Python class yet.
 
 - `Widget`
 - `Component`
 - `Brand`
+- `BuiltTheme`
 - `Theme`
+
+### Layout panels
+
+Use these for the structure of a notebook UI: tabs, one-at-a-time panels,
+collapsible sections, scrolling regions, resizable panes, and layouts that
+reflow with the available width. They mirror the Lumino layout widgets with
+the same keyed child API, so `select_key`, `add_widget`, and `remove_widget`
+work the same way, while rendering with Astryx styling.
+
+- `TabPanel`
+- `StackedPanel`
+- `AccordionPanel`
+- `ScrollBox`
+- `SplitPanel`
+- `ResponsivePanel`
+
+```python
+tabs = ax.TabPanel({"orders": orders, "fills": fills}, size="sm")
+tabs.select_key("fills")
+
+workspace = ax.SplitPanel(
+    {"controls": controls, "chart": figure},
+    sizes=[0.3, 0.7],
+    height=480,
+)
+```
+
+`TabPanel` and `StackedPanel` mount a child the first time it is shown and keep
+it mounted, hidden, afterwards, so a Plotly figure keeps its state across tab
+switches. `SplitPanel` syncs drags back to its `sizes` trait as fractions.
+
+### Layout containers
+
+Use these to arrange content inside a panel or a notebook output.
+
+- `Stack`
+- `Grid`
+- `Center`
+- `Section`
+- `Card`
+- `ClickableCard`
+- `SelectableCard`
+- `AspectRatio`
+- `Divider`
+- `Collapsible`
+- `Carousel`
 
 ### Typography and content
 
@@ -120,21 +185,6 @@ small semantic content.
 - `AvatarGroup`
 - `Icon`
 
-### Layout containers
-
-Use these to arrange Astryx content inside a notebook output before placing the
-result in a Lumino layout.
-
-- `Stack`
-- `Grid`
-- `Center`
-- `Section`
-- `Card`
-- `ClickableCard`
-- `AspectRatio`
-- `Divider`
-- `Collapsible`
-
 ### Forms and direct inputs
 
 Use these for direct value entry and form composition.
@@ -147,9 +197,12 @@ Use these for direct value entry and form composition.
 - `TextArea`
 - `NumberInput`
 - `Slider`
+- `LogSlider`
+- `SelectionSlider`
 - `Checkbox`
 - `Switch`
 - `ToggleButton`
+- `ToggleButtonGroup`
 - `DateInput`
 - `DateRangeInput`
 - `DateTimeInput`
@@ -159,8 +212,7 @@ Use these for direct value entry and form composition.
 
 ### Selection and search
 
-Use these when users choose from predefined options or searchable static
-sources.
+Use these when users choose from predefined options or searchable sources.
 
 - `Selector`
 - `MultiSelector`
@@ -169,6 +221,7 @@ sources.
 - `CheckboxList`
 - `Typeahead`
 - `Tokenizer`
+- `PowerSearch`
 
 ### Actions and menus
 
@@ -179,6 +232,7 @@ Use these for command surfaces and button-like interactions.
 - `ButtonGroup`
 - `Toolbar`
 - `DropdownMenu`
+- `ContextMenu`
 - `MoreMenu`
 - `CommandPalette`
 
@@ -203,6 +257,8 @@ inline rendering so they stay inside the output area.
 - `Tooltip`
 - `HoverCard`
 - `Popover`
+- `Overlay`
+- `Lightbox`
 - `Dialog`
 - `AlertDialog`
 
@@ -216,6 +272,7 @@ Use these for structured navigation and data-heavy notebook views.
 - `MetadataList`
 - `Outline`
 - `TreeList`
+- `Pagination`
 - `Table`
 
 ## Forms and values

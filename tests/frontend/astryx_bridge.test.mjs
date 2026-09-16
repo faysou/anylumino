@@ -3,9 +3,11 @@ import test from "node:test";
 
 import {
   childSignature,
+  fractionsWithPane,
   logExponent,
   logValue,
   modelProps,
+  paneFractions,
   registeredComponent,
   resolveColorMode,
   sendModelAction,
@@ -139,4 +141,25 @@ test("logExponent and logValue round-trip a logarithmic slider position", () => 
   assert.equal(logExponent("nonsense", 10, -2, 4), -2);
   assert.equal(logExponent(1e9, 10, 0, 4), 4);
   assert.equal(logExponent(1e-9, 10, 0, 4), 0);
+});
+
+
+test("paneFractions normalizes split sizes and fills unsized panes", () => {
+  assert.deepEqual(paneFractions([0.3, 0.7], 2), [0.3, 0.7]);
+  assert.deepEqual(paneFractions([3, 1], 2), [0.75, 0.25]);
+  assert.deepEqual(paneFractions([], 4), [0.25, 0.25, 0.25, 0.25]);
+  assert.deepEqual(paneFractions(undefined, 2), [0.5, 0.5]);
+  assert.deepEqual(paneFractions([0.5], 3), [1 / 3, 1 / 3, 1 / 3]);
+  assert.deepEqual(paneFractions([0.2, 0.2, 0.9], 2), [0.5, 0.5]);
+  assert.deepEqual(paneFractions([-1, "2"], 2), [0, 1]);
+  assert.deepEqual(paneFractions([0.5, 0.5], 0), []);
+});
+
+
+test("fractionsWithPane moves size between a dragged pane and the last pane", () => {
+  assert.deepEqual(fractionsWithPane([0.25, 0.25, 0.5], 0, 0.4), [0.4, 0.25, 0.35]);
+  assert.deepEqual(fractionsWithPane([0.25, 0.25, 0.5], 1, 0.9), [0.25, 0.75, 0]);
+  assert.deepEqual(fractionsWithPane([0.5, 0.5], 0, -0.2), [0, 1]);
+  assert.deepEqual(fractionsWithPane([0.5, 0.5], 1, 0.1), [0.5, 0.5]);
+  assert.deepEqual(fractionsWithPane([0.5, 0.5], 5, 0.1), [0.5, 0.5]);
 });

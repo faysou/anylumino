@@ -1,0 +1,135 @@
+---
+title: "AccordionPanel"
+---
+
+Astryx collapsible group with one titled section per child.
+
+The open sections live in `value`: a child key when `multiple` is
+`False` and a list of child keys otherwise.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="value" value="self._open_value(open, multiple)" />
+
+  <PyAttribute name="open_keys" type="list[str]">
+    Keys of the open sections.
+  </PyAttribute>
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, open=None, multiple=False, dividers=True, width=None, height=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        open: str | int | Iterable[str | int] | None = None,
+        multiple: bool = False,
+        dividers: bool = True,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "AccordionPanel",
+            children,
+            titles=titles,
+            keys=keys,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                type="multiple" if multiple else "single",
+                hasDividers=dividers,
+            ),
+        )
+        self.value = self._open_value(open, multiple)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widgets or keyed child mapping.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Section titles associated with children. Defaults to the child keys.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `children`.
+    </PyParameter>
+
+    <PyParameter name="open" type="str | int | Iterable[str | int] | None" value="None">
+      Initially open section keys or indexes. Defaults to the first child
+      when `multiple` is `False` and to no section otherwise.
+    </PyParameter>
+
+    <PyParameter name="multiple" type="bool" value="False">
+      Whether several sections can be open at once.
+    </PyParameter>
+
+    <PyParameter name="dividers" type="bool" value="True">
+      Whether to draw hairline dividers between sections.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Panel width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Panel height.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="open_key" type="(key_or_index) -> None">
+  Open the section for `key_or_index`.
+
+  <PySourceCode>
+    ```python
+    def open_key(self, key_or_index: str | int) -> None:
+        """Open the section for ``key_or_index``."""
+        key = self.get_key(self.get_index(key_or_index) if isinstance(key_or_index, str) else key_or_index)
+        if self.props.get("type") == "multiple":
+            self.value = [*[open for open in self.open_keys if open != key], key]
+        else:
+            self.value = key
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="key_or_index" type="str | int" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="close_key" type="(key_or_index) -> None">
+  Close the section for `key_or_index`.
+
+  <PySourceCode>
+    ```python
+    def close_key(self, key_or_index: str | int) -> None:
+        """Close the section for ``key_or_index``."""
+        key = self.get_key(self.get_index(key_or_index) if isinstance(key_or_index, str) else key_or_index)
+        remaining = [open for open in self.open_keys if open != key]
+        self.value = remaining if self.props.get("type") == "multiple" else (remaining[0] if remaining else "")
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="key_or_index" type="str | int" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

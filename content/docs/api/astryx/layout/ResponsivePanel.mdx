@@ -1,0 +1,89 @@
+---
+title: "ResponsivePanel"
+---
+
+Astryx stack that switches direction when its width crosses a breakpoint.
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, breakpoint=760, wide_direction='horizontal', narrow_direction='vertical', gap=2, width=None, height=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        breakpoint: int = 760,
+        wide_direction: str = "horizontal",
+        narrow_direction: str = "vertical",
+        gap: int | float = 2,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        for name, direction in (("wide_direction", wide_direction), ("narrow_direction", narrow_direction)):
+            if direction not in STACK_DIRECTIONS:
+                msg = f"{name} must be one of {STACK_DIRECTIONS}, got {direction!r}"
+                raise ValueError(msg)
+        super().__init__(
+            "ResponsivePanel",
+            children,
+            titles=titles,
+            keys=keys,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                breakpoint=breakpoint,
+                wideDirection=wide_direction,
+                narrowDirection=narrow_direction,
+                gap=gap,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widgets or keyed child mapping.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `children`.
+    </PyParameter>
+
+    <PyParameter name="breakpoint" type="int" value="760">
+      Width in CSS pixels where the layout switches direction.
+    </PyParameter>
+
+    <PyParameter name="wide_direction" type="str" value="'horizontal'">
+      Stack direction at or above the breakpoint.
+    </PyParameter>
+
+    <PyParameter name="narrow_direction" type="str" value="'vertical'">
+      Stack direction below the breakpoint.
+    </PyParameter>
+
+    <PyParameter name="gap" type="int | float" value="2">
+      Astryx spacing step between children.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Panel width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Panel height.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

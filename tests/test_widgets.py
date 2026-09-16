@@ -1594,3 +1594,122 @@ def test_inputs_map_select_on_focus_to_the_frontend_prop() -> None:
 
     opted_out = ax.NumberInput(10, label="Qty", select_on_focus=False)
     assert opted_out.props["selectOnFocus"] is False
+
+
+def test_astryx_layout_panels_live_in_the_layout_module() -> None:
+    assert ax.TabPanel.__module__ == "anylumino.astryx.layout"
+    assert ax.SplitPanel.__module__ == "anylumino.astryx.layout"
+    assert [panel.component_name for panel in (
+        ax.TabPanel(),
+        ax.StackedPanel(),
+        ax.AccordionPanel(),
+        ax.ScrollBox(),
+        ax.SplitPanel(),
+        ax.ResponsivePanel(),
+    )] == ["TabPanel", "StackedPanel", "AccordionPanel", "ScrollBox", "SplitPanel", "ResponsivePanel"]
+
+
+def test_astryx_tab_panel_keys_titles_and_selection_match_the_lumino_api() -> None:
+    orders = ax.Text("Orders")
+    fills = ax.Text("Fills")
+    logs = ax.Text("Logs")
+    tabs = ax.TabPanel({"orders": orders, "fills": fills}, titles={"fills": "Fills today"}, size="sm", divider=False)
+
+    assert tabs.child_keys == ["orders", "fills"]
+    assert tabs.titles == ["orders", "Fills today"]
+    assert tabs.props == {"size": "sm", "hasDivider": False, "gap": 2}
+    assert tabs.selected_index == 0
+    assert tabs.selected_key == "orders"
+
+    tabs.select_key("fills")
+    assert tabs.selected_index == 1
+    assert tabs.selected_widget is fills
+
+    tabs.add_tab(logs, "Log lines", key="logs", select=True)
+    assert tabs.child_keys == ["orders", "fills", "logs"]
+    assert tabs.titles == ["orders", "Fills today", "Log lines"]
+    assert tabs.selected_key == "logs"
+
+    tabs.remove_widget("fills")
+    assert tabs.child_keys == ["orders", "logs"]
+    assert tabs.selected_key == "logs"
+
+
+def test_astryx_stacked_panel_selection_can_change() -> None:
+    stacked = ax.StackedPanel([ax.Text("A"), ax.Text("B")], keys=["a", "b"], selected_index=1)
+
+    assert stacked.selected_key == "b"
+    stacked.select(0)
+    assert stacked.selected_key == "a"
+    stacked.select_key("b")
+    assert stacked.selected_index == 1
+
+
+def test_astryx_accordion_panel_tracks_open_sections_in_value() -> None:
+    single = ax.AccordionPanel({"first": ax.Text("1"), "second": ax.Text("2")})
+    assert single.props == {"type": "single", "hasDividers": True}
+    assert single.value == "first"
+    assert single.open_keys == ["first"]
+
+    single.open_key("second")
+    assert single.value == "second"
+    single.close_key("second")
+    assert single.value == ""
+    assert single.open_keys == []
+
+    multiple = ax.AccordionPanel(
+        {"first": ax.Text("1"), "second": ax.Text("2"), "third": ax.Text("3")},
+        open=["third", 0],
+        multiple=True,
+        dividers=False,
+    )
+    assert multiple.props == {"type": "multiple", "hasDividers": False}
+    assert multiple.value == ["third", "first"]
+
+    multiple.open_key("second")
+    assert multiple.value == ["third", "first", "second"]
+    multiple.close_key(0)
+    assert multiple.value == ["third", "second"]
+
+    with pytest.raises(ValueError, match="single section"):
+        ax.AccordionPanel({"first": ax.Text("1"), "second": ax.Text("2")}, open=["first", "second"])
+
+
+def test_astryx_scroll_box_forwards_viewport_options() -> None:
+    scroll = ax.ScrollBox([ax.Text("Line")], axis="both", label="Log lines", height=240, max_width=600, padding=2)
+
+    assert scroll.label == "Log lines"
+    assert scroll.height == "240px"
+    assert scroll.props == {"axis": "both", "gap": 2, "padding": 2, "height": 240, "maxWidth": 600}
+    with pytest.raises(ValueError, match="axis must be one of"):
+        ax.ScrollBox([ax.Text("Line")], axis="diagonal")
+
+
+def test_astryx_split_panel_tracks_orientation_and_sizes() -> None:
+    left = ax.Text("Left")
+    right = ax.Text("Right")
+    split = ax.SplitPanel({"left": left, "right": right}, orientation="vertical", sizes=[0.3, 0.7], min_size=120)
+
+    assert split.props == {"orientation": "vertical", "minSize": 120}
+    assert split.sizes == [0.3, 0.7]
+    assert split.width == "100%"
+    assert split.height == "420px"
+
+    split.remove_widget("left")
+    assert split.sizes == [0.7]
+    assert split.child_keys == ["right"]
+    with pytest.raises(ValueError, match="orientation must be one of"):
+        ax.SplitPanel([left], orientation="diagonal")
+
+
+def test_astryx_responsive_panel_forwards_breakpoint_and_directions() -> None:
+    panel = ax.ResponsivePanel([ax.Text("A"), ax.Text("B")], breakpoint=500, wide_direction="vertical", narrow_direction="horizontal", gap=4)
+
+    assert panel.props == {
+        "breakpoint": 500,
+        "wideDirection": "vertical",
+        "narrowDirection": "horizontal",
+        "gap": 4,
+    }
+    with pytest.raises(ValueError, match="narrow_direction must be one of"):
+        ax.ResponsivePanel([ax.Text("A")], narrow_direction="diagonal")

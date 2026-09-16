@@ -148,15 +148,19 @@ def _normalize_children(
     return widget_list, owner_list, key_list, title_list
 
 
-class _KeyedChildren(ActivationCallbacks):
+class KeyedChildren(ActivationCallbacks):
     """Keyed access to the children of a composed anylumino widget.
 
-    Children are stored as a synced ``widgets`` list of rendered views plus a
-    parallel ``child_keys`` list. ``get_widget`` returns the view that renders
-    in the browser and ``get_owner`` returns the object that was passed in, so
+    Lumino layout widgets and Astryx widgets share this base. Children are
+    stored as a synced ``widgets`` list of rendered views plus a parallel
+    ``child_keys`` list. ``get_widget`` returns the view that renders in the
+    browser and ``get_owner`` returns the object that was passed in, so
     wrapper objects exposing a ``widget`` attribute keep their own API.
-    Subscripting returns the owner.
+    Subscripting returns the owner. Widgets with a ``selected_index`` trait
+    also gain ``selected_key`` and ``select_key``.
     """
+
+    _title_prefix = "Widget"
 
     widgets: list[Any]
     child_keys: list[str]
@@ -251,9 +255,6 @@ class _KeyedChildren(ActivationCallbacks):
             index += 1
         return f"widget-{index}"
 
-    def _complete_titles(self) -> list[str]:
-        return list(self.titles)
-
     def _restore_selection(self, selected_key: str | None) -> None:
         if not hasattr(self, "selected_index"):
             return
@@ -261,72 +262,6 @@ class _KeyedChildren(ActivationCallbacks):
             self.selected_index = self.child_keys.index(selected_key)
         else:
             self.selected_index = max(0, min(self.selected_index, len(self.child_keys) - 1))
-
-
-class LayoutWidget(_KeyedChildren, anywidget.AnyWidget):
-    """Base class for keyed anywidget composition layouts.
-
-    ``LayoutWidget`` stores child widgets in a keyed map while syncing the
-    frontend-ready widget views to the browser. Subclasses choose the Lumino
-    layout that displays those children.
-    """
-
-    _title_prefix = "Widget"
-
-    widgets = t.List(anywidget.WidgetTrait(), default_value=[]).tag(
-        sync=True,
-        to_json=_widget_list_to_json,
-        from_json=_widget_list_from_json,
-    )
-    child_keys = t.List(t.Unicode(), default_value=[]).tag(sync=True)
-    titles = t.List(t.Unicode(), default_value=[]).tag(sync=True)
-    width = t.Unicode("100%").tag(sync=True)
-    height = t.Unicode("420px").tag(sync=True)
-    resizable = t.Bool(True).tag(sync=True)
-    scroll_x = t.Bool(False).tag(sync=True)
-    scroll_y = t.Bool(False).tag(sync=True)
-    child_min_width = t.Unicode("0px").tag(sync=True)
-    child_min_height = t.Unicode("0px").tag(sync=True)
-    fit_content = t.Bool(False).tag(sync=True)
-
-    def _init_composed(
-        self,
-        widgets: ChildInput,
-        titles: TitleInput,
-        keys: Iterable[str] | None,
-        width: int | float | str | None,
-        height: int | float | str | None,
-        resizable: bool,
-        scroll_x: bool = False,
-        scroll_y: bool = False,
-        child_min_width: int | float | str | None = None,
-        child_min_height: int | float | str | None = None,
-        fit_content: bool = False,
-        **kwargs: Any,
-    ) -> None:
-        widget_list, owner_list, key_list, title_list = _normalize_children(widgets, titles, keys)
-        self._owners_by_key = dict(zip(key_list, owner_list, strict=True))
-        self._init_callbacks()
-        self._syncing_children = True
-        try:
-            super().__init__(
-                widgets=widget_list,
-                child_keys=key_list,
-                titles=title_list,
-                width=_size_to_css(width, "100%"),
-                height=_size_to_css(height, "420px"),
-                resizable=resizable,
-                scroll_x=scroll_x,
-                scroll_y=scroll_y,
-                child_min_width=_size_to_css(child_min_width, "0px"),
-                child_min_height=_size_to_css(child_min_height, "0px"),
-                fit_content=fit_content,
-                **kwargs,
-            )
-        finally:
-            self._syncing_children = False
-        self.observe(self._observe_widgets, names="widgets")
-        self.on_msg(self._handle_frontend_message)
 
     @property
     def selected_key(self) -> str | None:
@@ -459,17 +394,6 @@ class LayoutWidget(_KeyedChildren, anywidget.AnyWidget):
         titles[index] = title
         self.titles = titles
 
-    def _handle_frontend_message(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
-        if content.get("type") != "move":
-            return
-        from_index = content.get("from")
-        to_index = content.get("to")
-        if not isinstance(from_index, int) or not isinstance(to_index, int):
-            return
-        if not 0 <= from_index < len(self.child_keys):
-            return
-        self.move_widget(from_index, to_index)
-
     def _next_key(self, key: str | None = None) -> str:
         if key is not None:
             child_key = _key_to_string(key)
@@ -490,6 +414,80 @@ class LayoutWidget(_KeyedChildren, anywidget.AnyWidget):
             else:
                 complete.append(key)
         return complete
+
+class LayoutWidget(KeyedChildren, anywidget.AnyWidget):
+    """Base class for keyed anywidget composition layouts.
+
+    ``LayoutWidget`` stores child widgets in a keyed map while syncing the
+    frontend-ready widget views to the browser. Subclasses choose the Lumino
+    layout that displays those children.
+    """
+
+    widgets = t.List(anywidget.WidgetTrait(), default_value=[]).tag(
+        sync=True,
+        to_json=_widget_list_to_json,
+        from_json=_widget_list_from_json,
+    )
+    child_keys = t.List(t.Unicode(), default_value=[]).tag(sync=True)
+    titles = t.List(t.Unicode(), default_value=[]).tag(sync=True)
+    width = t.Unicode("100%").tag(sync=True)
+    height = t.Unicode("420px").tag(sync=True)
+    resizable = t.Bool(True).tag(sync=True)
+    scroll_x = t.Bool(False).tag(sync=True)
+    scroll_y = t.Bool(False).tag(sync=True)
+    child_min_width = t.Unicode("0px").tag(sync=True)
+    child_min_height = t.Unicode("0px").tag(sync=True)
+    fit_content = t.Bool(False).tag(sync=True)
+
+    def _init_composed(
+        self,
+        widgets: ChildInput,
+        titles: TitleInput,
+        keys: Iterable[str] | None,
+        width: int | float | str | None,
+        height: int | float | str | None,
+        resizable: bool,
+        scroll_x: bool = False,
+        scroll_y: bool = False,
+        child_min_width: int | float | str | None = None,
+        child_min_height: int | float | str | None = None,
+        fit_content: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        widget_list, owner_list, key_list, title_list = _normalize_children(widgets, titles, keys)
+        self._owners_by_key = dict(zip(key_list, owner_list, strict=True))
+        self._init_callbacks()
+        self._syncing_children = True
+        try:
+            super().__init__(
+                widgets=widget_list,
+                child_keys=key_list,
+                titles=title_list,
+                width=_size_to_css(width, "100%"),
+                height=_size_to_css(height, "420px"),
+                resizable=resizable,
+                scroll_x=scroll_x,
+                scroll_y=scroll_y,
+                child_min_width=_size_to_css(child_min_width, "0px"),
+                child_min_height=_size_to_css(child_min_height, "0px"),
+                fit_content=fit_content,
+                **kwargs,
+            )
+        finally:
+            self._syncing_children = False
+        self.observe(self._observe_widgets, names="widgets")
+        self.on_msg(self._handle_frontend_message)
+
+    def _handle_frontend_message(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
+        if content.get("type") != "move":
+            return
+        from_index = content.get("from")
+        to_index = content.get("to")
+        if not isinstance(from_index, int) or not isinstance(to_index, int):
+            return
+        if not 0 <= from_index < len(self.child_keys):
+            return
+        self.move_widget(from_index, to_index)
 
 
 _ComposedWidget = LayoutWidget

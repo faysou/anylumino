@@ -4,9 +4,13 @@ import { convert, write } from 'fumadocs-python';
 const inputPath = new URL('../build/docs/anylumino.json', import.meta.url);
 const outputPath = new URL('../content/docs/api/', import.meta.url);
 const api = JSON.parse(await readFile(inputPath, 'utf8'));
+// Astryx submodules in reading order: the shared base, then composition, then
+// the component families.
+const ASTRYX_MODULE_ORDER = ['base', 'layout', 'surfaces', 'inputs', 'data'];
 
 delete api.modules.common;
 filterModule(api);
+orderAstryxModules(api.modules.astryx);
 
 await rm(outputPath, { recursive: true, force: true });
 await write(
@@ -27,6 +31,16 @@ await writeFile(
     2,
   )}\n`,
 );
+
+function orderAstryxModules(astryx) {
+  const order = (name) => {
+    const index = ASTRYX_MODULE_ORDER.indexOf(name);
+    return index === -1 ? ASTRYX_MODULE_ORDER.length : index;
+  };
+  astryx.modules = Object.fromEntries(
+    Object.entries(astryx.modules).sort(([left], [right]) => order(left) - order(right)),
+  );
+}
 
 function filterModule(module) {
   module.modules = Object.fromEntries(

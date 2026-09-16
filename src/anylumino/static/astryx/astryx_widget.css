@@ -40,6 +40,40 @@
   min-width: 0;
 }
 
+.anylumino-AstryxChild[hidden] {
+  display: none;
+}
+
+.anylumino-PanelContent {
+  min-width: 0;
+}
+
+.anylumino-SplitPanel {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.anylumino-SplitPanel-horizontal {
+  flex-direction: row;
+}
+
+.anylumino-SplitPanel-vertical {
+  flex-direction: column;
+}
+
+.anylumino-SplitPane {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.anylumino-SplitPane-fill {
+  flex: 1 1 0;
+}
+
 .anylumino-InputLabelRow > .astryx-field > :first-child {
   width: var(--anylumino-input-label-width, auto);
   /* Override the ID-level specificity of Astryx's generated padding rule. */

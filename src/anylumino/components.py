@@ -9,7 +9,7 @@ import traitlets as t
 
 from .layout import ChildInput
 from .layout import TitleInput
-from .layout import _KeyedChildren
+from .layout import KeyedChildren
 from .layout import _normalize_children
 from .layout import _size_to_css
 from .layout import _widget_list_from_json
@@ -19,7 +19,7 @@ from .layout import _widget_list_to_json
 ActionCallback = Callable[["ComponentWidget", Any], None]
 
 
-class ComponentWidget(_KeyedChildren, anywidget.AnyWidget):
+class ComponentWidget(KeyedChildren, anywidget.AnyWidget):
     """Base class for composable component-library anywidgets.
 
     Component families inherit this class to share child composition, keyed

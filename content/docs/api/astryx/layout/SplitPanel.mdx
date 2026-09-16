@@ -1,0 +1,89 @@
+---
+title: "SplitPanel"
+---
+
+Astryx panes separated by draggable resize handles.
+
+`sizes` holds the relative pane sizes as fractions of the panel. Drags
+sync the fractions back to Python, and assigning `sizes` resizes the
+panes.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="sizes" value="t.List(t.Float(), default_value=[]).tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, orientation='horizontal', sizes=None, min_size=80, width='100%', height=420, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        orientation: str = "horizontal",
+        sizes: Iterable[float] | None = None,
+        min_size: int = 80,
+        width: int | float | str | None = "100%",
+        height: int | float | str | None = 420,
+        **props: Any,
+    ) -> None:
+        if orientation not in SPLIT_ORIENTATIONS:
+            msg = f"orientation must be one of {SPLIT_ORIENTATIONS}, got {orientation!r}"
+            raise ValueError(msg)
+        super().__init__(
+            "SplitPanel",
+            children,
+            titles=titles,
+            keys=keys,
+            sizes=list(sizes or []),
+            width=width,
+            height=height,
+            props=_named_props(props, orientation=orientation, minSize=min_size),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widgets or keyed child mapping.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `children`.
+    </PyParameter>
+
+    <PyParameter name="orientation" type="str" value="'horizontal'">
+      Split direction. Horizontal places panes side by side; vertical stacks
+      them.
+    </PyParameter>
+
+    <PyParameter name="sizes" type="Iterable[float] | None" value="None">
+      Relative pane sizes. Equal sizes are used when omitted.
+    </PyParameter>
+
+    <PyParameter name="min_size" type="int" value="80">
+      Minimum pane size in pixels.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="'100%'">
+      Panel width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="420">
+      Panel height.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

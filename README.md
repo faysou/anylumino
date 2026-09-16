@@ -91,6 +91,9 @@ al.SplitPanel(
 - Layout widgets: public `LayoutWidget` base plus `TabPanel`, `BoxPanel`,
   `HBox`, `VBox`, `ScrollBox`, `SplitPanel`, `DockPanel`, `AccordionPanel`,
   `StackedPanel`, `GridPanel`, and `ResponsivePanel`.
+- Astryx layout panels with the same keyed child API and Astryx styling:
+  `TabPanel`, `StackedPanel`, `AccordionPanel`, `ScrollBox`, `SplitPanel`,
+  and `ResponsivePanel` in `anylumino.astryx`.
 - Astryx component wrappers for notebook UI: buttons, text, headings, badges,
   cards, stacks, grids, forms, fields, tabs, segmented controls, selectors,
   checkboxes, radio lists, sliders, date/time inputs, banners, status dots,
@@ -358,8 +361,9 @@ The Griffe-backed `fumadocs-python` generator owns `content/docs/api`; update pu
 signatures and docstrings in `src/anylumino` instead of editing generated API pages.
 
 Open `notebooks/astryx_components_smoke.py` for the broad Astryx component
-smoke test. Open `notebooks/astryx_table.py` for focused table selection,
-sorting, and row-helper examples. Open `notebooks/plotly_tabs.py` and
+smoke test. Open `notebooks/astryx_layout_panels.py` for the Astryx layout
+panels driven from Python. Open `notebooks/astryx_table.py` for focused table
+selection, sorting, and row-helper examples. Open `notebooks/plotly_tabs.py` and
 `notebooks/plotly_dashboard.py` for Lumino layout patterns with Plotly figures.
 Open `notebooks/itables_tabs.py` to see an `itables.widget.ITable` inside a tab
 with controls that append rows to a pandas DataFrame and refresh the displayed

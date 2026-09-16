@@ -1,0 +1,92 @@
+---
+title: "StackedPanel"
+---
+
+Astryx panel that shows one selected child at a time.
+
+A child mounts the first time it is selected and stays mounted, hidden,
+afterwards, so switching back keeps its state.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="selected_index" value="t.Int(0).tag(sync=True)" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, selected_index=0, width=None, height=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        selected_index: int = 0,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "StackedPanel",
+            children,
+            titles=titles,
+            keys=keys,
+            selected_index=selected_index,
+            width=width,
+            height=height,
+            props=_named_props(props),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widgets or keyed child mapping.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `children`.
+    </PyParameter>
+
+    <PyParameter name="selected_index" type="int" value="0">
+      Initially visible child index.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Panel width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Panel height.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="select" type="(index) -> None">
+  Show the child at `index`.
+
+  <PySourceCode>
+    ```python
+    def select(self, index: int) -> None:
+        """Show the child at ``index``."""
+        self.selected_index = index
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="index" type="int" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

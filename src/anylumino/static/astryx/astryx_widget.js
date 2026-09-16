@@ -24,7 +24,7 @@ import { ClickableCard } from "@astryxdesign/core/ClickableCard";
 import { Citation } from "@astryxdesign/core/Citation";
 import { Code } from "@astryxdesign/core/Code";
 import { CodeBlock } from "@astryxdesign/core/CodeBlock";
-import { Collapsible } from "@astryxdesign/core/Collapsible";
+import { Collapsible, CollapsibleGroup } from "@astryxdesign/core/Collapsible";
 import { CommandPalette } from "@astryxdesign/core/CommandPalette";
 import { ContextMenu } from "@astryxdesign/core/ContextMenu";
 import { DateInput } from "@astryxdesign/core/DateInput";
@@ -60,6 +60,8 @@ import { Popover } from "@astryxdesign/core/Popover";
 import { PowerSearch } from "@astryxdesign/core/PowerSearch";
 import { ProgressBar } from "@astryxdesign/core/ProgressBar";
 import { RadioList, RadioListItem } from "@astryxdesign/core/RadioList";
+import { ResizeHandle, useResizable } from "@astryxdesign/core/Resizable";
+import { ScrollableArea } from "@astryxdesign/core/ScrollableArea";
 import { Section } from "@astryxdesign/core/Section";
 import { SegmentedControl, SegmentedControlItem } from "@astryxdesign/core/SegmentedControl";
 import { SelectableCard } from "@astryxdesign/core/SelectableCard";
@@ -97,15 +99,18 @@ import {
   clampIndex,
   combineSignals,
   cssSize,
+  notifyNodeVisible,
   removeModelListener,
   renderWidgetRef,
 } from "../layout/composition.js";
 import {
   childSignature,
+  fractionsWithPane,
   logExponent,
   logValue,
   modelProps,
   observeJupyterLabTheme,
+  paneFractions,
   registeredComponent,
   resolveColorMode,
   sendModelAction,
@@ -613,12 +618,13 @@ function slotChildren(model) {
   return refs.map((_ref, index) => slotChild(model, keys[index] ?? "", index));
 }
 
-function slotChild(model, key, index) {
+function slotChild(model, key, index, hidden = false) {
   return React.createElement("div", {
     className: "anylumino-AstryxChild",
     "data-anylumino-key": key ?? "",
     "data-anylumino-index": String(index),
     key: `${key ?? "widget"}-${index}`,
+    hidden: hidden || undefined,
   });
 }
 
@@ -1669,7 +1675,265 @@ function AstryxTableView({ model }) {
   });
 }
 
-function AstryxModelView({ model, styleRoot }) {
+function panelChildren(model) {
+  const count = (model.get("widgets") ?? []).length;
+  const keys = model.get("child_keys") ?? [];
+  const titles = model.get("titles") ?? [];
+  return {
+    count,
+    keys: Array.from({ length: count }, (_, index) => String(keys[index] ?? "")),
+    titles: Array.from({ length: count }, (_, index) => String(titles[index] || keys[index] || `Item ${index + 1}`)),
+  };
+}
+
+function setSelectedIndex(model, index) {
+  model.set("selected_index", index);
+  model.save_changes();
+}
+
+function axisSize(node, horizontal) {
+  if (!node) {
+    return 0;
+  }
+  return horizontal ? node.clientWidth : node.clientHeight;
+}
+
+function useMeasuredSize(ref, horizontal) {
+  const [size, setSize] = React.useState(0);
+  React.useLayoutEffect(() => {
+    const node = ref.current;
+    if (!node) {
+      return undefined;
+    }
+    const update = () => setSize(axisSize(node, horizontal));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [ref, horizontal]);
+  return size;
+}
+
+/**
+ * Tab and stacked panels show one child at a time. A child mounts the first
+ * time it is selected and then stays mounted but hidden, so switching back
+ * keeps its state instead of rendering it again.
+ */
+function AstryxSelectedPanelView({ model }) {
+  const name = String(model.get("component_name"));
+  const props = modelProps(model);
+  const { count, keys, titles } = panelChildren(model);
+  const selected = clampIndex(Number(model.get("selected_index") ?? 0), count);
+  const visited = React.useRef(new Set());
+  visited.current.add(selected);
+  const contentRef = React.useRef(null);
+  React.useEffect(() => {
+    const slot = contentRef.current && ownSlots(model, contentRef.current).get(String(selected));
+    if (slot) {
+      notifyNodeVisible(slot);
+    }
+  }, [model, selected]);
+
+  const slots = [];
+  for (let index = 0; index < count; index += 1) {
+    if (visited.current.has(index)) {
+      slots.push(slotChild(model, keys[index], index, index !== selected));
+    }
+  }
+  const content = React.createElement("div", { ref: contentRef, className: "anylumino-PanelContent" }, slots);
+  if (name !== "TabPanel") {
+    return content;
+  }
+  const tabs = React.createElement(
+    TabList,
+    {
+      value: keys[selected] ?? "",
+      onChange: (nextValue) => setSelectedIndex(model, Math.max(0, keys.indexOf(String(nextValue)))),
+      size: props.size,
+      layout: props.layout,
+      hasDivider: props.hasDivider,
+    },
+    keys.map((key, index) => React.createElement(Tab, { key: `${key}-${index}`, value: key, label: titles[index] })),
+  );
+  return React.createElement(VStack, { gap: props.gap ?? 2 }, tabs, content);
+}
+
+function AstryxAccordionView({ model }) {
+  const props = modelProps(model);
+  const { keys, titles } = panelChildren(model);
+  const isMultiple = props.type === "multiple";
+  const value = model.get("value");
+  const openKeys = isMultiple
+    ? asArray(value).map(String)
+    : (value == null || value === "" ? [] : [String(value)]);
+  const contentRef = React.useRef(null);
+  const openSignature = openKeys.join(" ");
+  React.useEffect(() => {
+    if (!contentRef.current) {
+      return;
+    }
+    const slots = ownSlots(model, contentRef.current);
+    for (const key of openKeys) {
+      const slot = slots.get(String(keys.indexOf(key)));
+      if (slot) {
+        notifyNodeVisible(slot);
+      }
+    }
+  }, [model, openSignature]);
+
+  const sections = keys.map((key, index) => React.createElement(
+    Collapsible,
+    { key: `${key}-${index}`, value: key, trigger: titles[index] },
+    slotChild(model, key, index),
+  ));
+  return React.createElement(
+    "div",
+    { ref: contentRef, className: "anylumino-PanelContent" },
+    React.createElement(
+      CollapsibleGroup,
+      {
+        type: isMultiple ? "multiple" : "single",
+        value: isMultiple ? openKeys : (openKeys[0] ?? ""),
+        onChange: (next) => setModelValue(model, isMultiple ? asArray(next).map(String) : (next == null ? "" : String(next))),
+        hasDividers: props.hasDividers ?? true,
+        density: props.density,
+      },
+      sections,
+    ),
+  );
+}
+
+function AstryxScrollBoxView({ model }) {
+  const props = modelProps(model);
+  return React.createElement(
+    ScrollableArea,
+    {
+      axis: props.axis ?? "block",
+      label: String(model.get("label") || props.label || "Scrollable content"),
+      role: props.role,
+      overscroll: props.overscroll,
+      width: props.width ?? cssSize(model.get("width"), undefined),
+      height: props.height ?? cssSize(model.get("height"), undefined),
+      maxWidth: props.maxWidth,
+      minHeight: props.minHeight,
+      padding: props.padding,
+      paddingInline: props.paddingInline,
+      paddingBlock: props.paddingBlock,
+    },
+    React.createElement(VStack, { gap: props.gap ?? 2 }, keyedSlotChildren(model)),
+  );
+}
+
+/**
+ * Every pane but the last owns a resizable region and the handle after it; the
+ * last pane fills what is left. Pane sizes come from `sizes` as fractions of
+ * the measured panel, and a drag writes the fractions back.
+ */
+function AstryxSplitPanelView({ model, mountChildren }) {
+  const props = modelProps(model);
+  const horizontal = props.orientation !== "vertical";
+  const { count, keys } = panelChildren(model);
+  const fractions = paneFractions(model.get("sizes"), count);
+  const containerRef = React.useRef(null);
+  const basis = useMeasuredSize(containerRef, horizontal);
+  React.useEffect(() => {
+    if (basis > 0) {
+      mountChildren();
+    }
+  }, [basis, count, mountChildren]);
+
+  const onPaneSize = (index, size) => {
+    const current = axisSize(containerRef.current, horizontal);
+    if (current <= 0) {
+      return;
+    }
+    model.set("sizes", fractionsWithPane(paneFractions(model.get("sizes"), count), index, size / current));
+    model.save_changes();
+  };
+  const handleProps = {
+    hasDivider: props.hasDivider ?? true,
+    isAlwaysVisible: props.isAlwaysVisible,
+    label: props.label,
+  };
+
+  const panes = [];
+  if (basis > 0) {
+    for (let index = 0; index < count; index += 1) {
+      const slot = slotChild(model, keys[index], index);
+      const key = `${keys[index]}-${index}`;
+      if (index === count - 1) {
+        panes.push(React.createElement("div", { key, className: "anylumino-SplitPane anylumino-SplitPane-fill" }, slot));
+      } else {
+        panes.push(React.createElement(AstryxSplitPane, {
+          key,
+          index,
+          fraction: fractions[index],
+          basis,
+          horizontal,
+          minSize: props.minSize,
+          handleProps,
+          onPaneSize,
+        }, slot));
+      }
+    }
+  }
+  return React.createElement(
+    "div",
+    { ref: containerRef, className: `anylumino-SplitPanel anylumino-SplitPanel-${horizontal ? "horizontal" : "vertical"}` },
+    panes,
+  );
+}
+
+function AstryxSplitPane({ index, fraction, basis, horizontal, minSize, handleProps, onPaneSize, children }) {
+  const direction = horizontal ? "horizontal" : "vertical";
+  const target = Math.round(fraction * basis);
+  const region = useResizable({
+    direction,
+    defaultSize: target,
+    minSize: minSize ?? 80,
+    onSizeChange: (size) => onPaneSize(index, size),
+  });
+  React.useEffect(() => {
+    if (Math.abs(target - region.size) > 1) {
+      region.resize(target);
+    }
+  }, [target]);
+  return React.createElement(
+    React.Fragment,
+    null,
+    React.createElement("div", { className: "anylumino-SplitPane", style: { flex: `0 0 ${region.size}px` } }, children),
+    React.createElement(ResizeHandle, { direction, resizable: region.props, ...handleProps }),
+  );
+}
+
+function AstryxResponsivePanelView({ model }) {
+  const props = modelProps(model);
+  const containerRef = React.useRef(null);
+  const width = useMeasuredSize(containerRef, true);
+  const wide = width >= Number(props.breakpoint ?? 760);
+  const direction = wide ? (props.wideDirection ?? "horizontal") : (props.narrowDirection ?? "vertical");
+  React.useEffect(() => {
+    if (containerRef.current) {
+      notifyNodeVisible(containerRef.current);
+    }
+  }, [direction]);
+  return React.createElement(
+    "div",
+    { ref: containerRef, className: "anylumino-PanelContent anylumino-ResponsivePanel" },
+    React.createElement(Stack, { direction, gap: props.gap ?? 2, width: "100%" }, keyedSlotChildren(model)),
+  );
+}
+
+const PANEL_VIEWS = {
+  AccordionPanel: AstryxAccordionView,
+  ResponsivePanel: AstryxResponsivePanelView,
+  ScrollBox: AstryxScrollBoxView,
+  SplitPanel: AstryxSplitPanelView,
+  StackedPanel: AstryxSelectedPanelView,
+  TabPanel: AstryxSelectedPanelView,
+};
+
+function AstryxModelView({ model, styleRoot, mountChildren }) {
   const name = String(model.get("component_name") || model.get("component_kind") || "Stack");
   const mode = useColorMode(String(model.get("color_mode") || "light"));
   const brandKey = JSON.stringify(model.get("brand") ?? {});
@@ -1679,12 +1943,16 @@ function AstryxModelView({ model, styleRoot }) {
   useDocumentThemeGuard();
   const draft = useDraft();
   const props = componentProps(model, draft, React.useId());
-  const Component = componentFor(name, props);
-  const children = componentChildren(model);
-  const component = name === "Table"
-    ? React.createElement(AstryxTableView, { model })
-    : React.createElement(Component, props, children);
-  const horizontalLabel = [Slider, TextInput, Selector, MultiSelector].includes(Component)
+  const PanelView = PANEL_VIEWS[name];
+  const Component = PanelView ? null : componentFor(name, props);
+  const children = PanelView ? undefined : componentChildren(model);
+  const component = PanelView
+    ? React.createElement(PanelView, { model, mountChildren })
+    : name === "Table"
+      ? React.createElement(AstryxTableView, { model })
+      : React.createElement(Component, props, children);
+  const horizontalLabel = Component !== null
+    && [Slider, TextInput, Selector, MultiSelector].includes(Component)
     && rawProps(model).labelPosition === "left"
     && !props.isLabelHidden;
 
@@ -1736,11 +2004,18 @@ async function renderChildren(model, host, rootElement, childSignal, reset) {
       // React reuses a slot element whose key survived, so the previous child
       // has to be cleared out before a different one renders into it.
       slot.replaceChildren();
-    } else if (slot.dataset.anyluminoRendered === "true") {
+    } else if (slot.dataset.anyluminoRendered === "true" || slot.dataset.anyluminoRendering === "true") {
       continue;
     }
-    await renderWidgetRef(model, host, ref, slot, childSignal);
-    slot.dataset.anyluminoRendered = "true";
+    // A panel view can request a mount while a model change already runs one,
+    // so a slot is claimed before its child renders.
+    slot.dataset.anyluminoRendering = "true";
+    try {
+      await renderWidgetRef(model, host, ref, slot, childSignal);
+      slot.dataset.anyluminoRendered = "true";
+    } finally {
+      delete slot.dataset.anyluminoRendering;
+    }
   }
 }
 
@@ -1766,6 +2041,12 @@ export default {
     let childKey = childSignature(model);
     let scheduled = false;
 
+    // Panel views create slots from their own state, such as a measured pane
+    // size, and ask for the children to be mounted once those slots exist.
+    const mountChildren = () => {
+      void renderChildren(model, host, el, combineSignals(signal, childController.signal), false);
+    };
+
     const renderCurrent = () => {
       const nextChildKey = childSignature(model);
       const childrenChanged = nextChildKey !== childKey;
@@ -1775,7 +2056,7 @@ export default {
         childKey = nextChildKey;
       }
       flushSync(() => {
-        reactRoot.render(React.createElement(AstryxModelView, { model, styleRoot }));
+        reactRoot.render(React.createElement(AstryxModelView, { model, styleRoot, mountChildren }));
       });
       void renderChildren(model, host, el, combineSignals(signal, childController.signal), childrenChanged);
     };
@@ -1800,6 +2081,9 @@ export default {
       "component_kind",
       "widgets",
       "child_keys",
+      "titles",
+      "selected_index",
+      "sizes",
       "text",
       "label",
       "value",

@@ -1,0 +1,102 @@
+---
+title: "ScrollBox"
+---
+
+Astryx scrollable area holding a vertical stack of children.
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, axis='block', label='Scrollable content', gap=2, padding=None, width=None, height=320, max_width=None, min_height=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        titles: TitleInput = None,
+        keys: Iterable[str] | None = None,
+        axis: str = "block",
+        label: str = "Scrollable content",
+        gap: int | float = 2,
+        padding: int | float | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = 320,
+        max_width: int | float | str | None = None,
+        min_height: int | float | str | None = None,
+        **props: Any,
+    ) -> None:
+        if axis not in SCROLL_AXES:
+            msg = f"axis must be one of {SCROLL_AXES}, got {axis!r}"
+            raise ValueError(msg)
+        super().__init__(
+            "ScrollBox",
+            children,
+            titles=titles,
+            keys=keys,
+            label=label,
+            width=width,
+            height=height,
+            props=_named_props(
+                props,
+                axis=axis,
+                gap=gap,
+                padding=padding,
+                width=width,
+                height=height,
+                maxWidth=max_width,
+                minHeight=min_height,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widgets or keyed child mapping.
+    </PyParameter>
+
+    <PyParameter name="titles" type="TitleInput" value="None">
+      Optional labels associated with children.
+    </PyParameter>
+
+    <PyParameter name="keys" type="Iterable[str] | None" value="None">
+      Stable child keys for iterable `children`.
+    </PyParameter>
+
+    <PyParameter name="axis" type="str" value="'block'">
+      Scroll axis, `"block"`, `"inline"`, or `"both"`.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="'Scrollable content'">
+      Accessible name of the scroll viewport.
+    </PyParameter>
+
+    <PyParameter name="gap" type="int | float" value="2">
+      Astryx spacing step between children.
+    </PyParameter>
+
+    <PyParameter name="padding" type="int | float | None" value="None">
+      Content padding using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Viewport width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="320">
+      Viewport height.
+    </PyParameter>
+
+    <PyParameter name="max_width" type="int | float | str | None" value="None">
+      Maximum viewport width.
+    </PyParameter>
+
+    <PyParameter name="min_height" type="int | float | str | None" value="None">
+      Minimum viewport height.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
