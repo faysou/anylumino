@@ -53,7 +53,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anywidget", editable = "../anywidget" },
+    { name = "anywidget", git = "https://github.com/faysou/anywidget?rev=3ee25f87edb68cee12cd2b766d7b6d5eda0446b8" },
     { name = "traitlets", specifier = ">=5.15.1" },
 ]
 
@@ -72,32 +72,12 @@ dev = [
 
 [[package]]
 name = "anywidget"
-source = { editable = "../anywidget" }
+version = "0.11.0"
+source = { git = "https://github.com/faysou/anywidget?rev=3ee25f87edb68cee12cd2b766d7b6d5eda0446b8#3ee25f87edb68cee12cd2b766d7b6d5eda0446b8" }
 dependencies = [
     { name = "ipywidgets" },
     { name = "psygnal" },
     { name = "typing-extensions" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "ipywidgets", specifier = ">=7.6.0" },
-    { name = "psygnal", specifier = ">=0.8.1" },
-    { name = "typing-extensions", specifier = ">=4.2.0" },
-    { name = "watchfiles", marker = "extra == 'dev'", specifier = ">=1.1.0" },
-]
-provides-extras = ["dev"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "comm", specifier = ">=0.1.4" },
-    { name = "jupyterlab", specifier = ">=4.2.4" },
-    { name = "msgspec", specifier = ">=0.20.0" },
-    { name = "pydantic", specifier = ">=2.5.3" },
-    { name = "pytest", specifier = ">=7.4.4" },
-    { name = "ruff", specifier = ">=0.15.9" },
-    { name = "ty", specifier = ">=0.0.29" },
-    { name = "watchfiles", specifier = ">=0.23.0" },
 ]
 
 [[package]]

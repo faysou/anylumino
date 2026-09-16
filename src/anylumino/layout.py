@@ -4,8 +4,17 @@ from collections.abc import Callable, Mapping
 from typing import Any, Iterable
 
 import anywidget
-from anywidget import get_model_id
-from anywidget import is_widget
+
+try:
+    from anywidget import get_model_id
+    from anywidget import is_widget
+except ImportError:
+    # Released anywidget has the composition helpers as private names until
+    # https://github.com/manzt/anywidget/pull/1024 lands.
+    from anywidget._descriptor import _try_get_model_id as get_model_id
+
+    def is_widget(obj: object) -> bool:
+        return get_model_id(obj) is not None
 import traitlets as t
 
 from .common import ActivationCallbacks
