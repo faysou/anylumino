@@ -46,6 +46,15 @@
   padding-top: 0 !important;
 }
 
+/*
+ * A text input keeps its intrinsic width as the min-content of the field
+ * column, so a fixed-width row overflows its host instead of sharing the
+ * label row width with sibling controls such as a Selector.
+ */
+.anylumino-InputLabelRow > .astryx-field > :last-child {
+  min-width: 0;
+}
+
 .anylumino-DividerHost {
   width: 100%;
   min-height: 1px;
