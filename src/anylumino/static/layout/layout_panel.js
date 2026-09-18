@@ -142,6 +142,11 @@ function createPanel(model, root, slots, onSplitSizesChanged) {
       if (typeof panel.relativeSizes === "function") {
         onSplitSizesChanged?.(panel.relativeSizes().map(Number));
       }
+      // Children that are Lumino roots of their own, such as a nested tab panel, only
+      // re-layout on a window resize, and embedded documents need the resize relayed
+      slots.forEach((slot, index) =>
+        notifyLuminoWidgetVisible(slot, { dispatchWindowResize: index === 0 }),
+      );
     };
     panel.handleMoved.connect(syncSizes);
     panel.disposed.connect(() => panel.handleMoved.disconnect(syncSizes));
