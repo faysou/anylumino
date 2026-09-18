@@ -8,6 +8,7 @@ import {
   modelListeners,
   reusableSlots,
   titleFor,
+  whenConnected,
 } from "../../src/anylumino/static/layout/composition.js";
 
 
@@ -129,4 +130,34 @@ test("measuredContentHeight measures through zero-box wrappers", async () => {
 
   const empty = fakeElement(0, [fakeElement(0, [])]);
   assert.equal(measuredContentHeight(empty, { includeSelf: false }), 0);
+});
+
+
+test("whenConnected resolves once the node joins the document or the signal aborts", async () => {
+  const frames = [];
+  const previous = { raf: globalThis.requestAnimationFrame, caf: globalThis.cancelAnimationFrame };
+  globalThis.requestAnimationFrame = (callback) => frames.push(callback);
+  globalThis.cancelAnimationFrame = () => {};
+  try {
+    assert.equal(await whenConnected({ isConnected: true }), true);
+
+    const node = { isConnected: false };
+    const pending = whenConnected(node);
+    assert.equal(frames.length, 1);
+    frames.shift()();
+    assert.equal(frames.length, 1);
+    node.isConnected = true;
+    frames.shift()();
+    assert.equal(await pending, true);
+    assert.equal(frames.length, 0);
+
+    const controller = new AbortController();
+    const aborted = whenConnected({ isConnected: false }, controller.signal);
+    controller.abort();
+    assert.equal(await aborted, false);
+    assert.equal(await whenConnected({ isConnected: false }, controller.signal), false);
+  } finally {
+    globalThis.requestAnimationFrame = previous.raf;
+    globalThis.cancelAnimationFrame = previous.caf;
+  }
 });

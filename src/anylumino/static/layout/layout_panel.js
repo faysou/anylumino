@@ -22,6 +22,7 @@ import {
   renderChildError,
   renderWidgetRef,
   reusableSlots,
+  whenConnected,
 } from "./composition.js";
 
 function slotIsVisible(slot) {
@@ -434,6 +435,9 @@ export default {
 
       syncScroll(root, viewport, slots, model);
       panel = createPanel(model, root, slots, saveSplitSizes);
+      if (!(await whenConnected(viewport, signal))) {
+        return;
+      }
       Widget.attach(panel, viewport);
       root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
       syncStackedIndex();

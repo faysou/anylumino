@@ -14,6 +14,7 @@ import {
   renderChildError,
   renderWidgetRef,
   reusableSlots,
+  whenConnected,
 } from "./composition.js";
 
 function createSlot(index, ref, titles, keys, parentSignal) {
@@ -67,6 +68,9 @@ export default {
     const panel = new TabPanel({ tabPlacement: model.get("tab_placement") || "top" });
     panel.addClass("anylumino-TabPanel");
     panel.tabsMovable = Boolean(model.get("tabs_movable"));
+    if (!(await whenConnected(root, signal))) {
+      return;
+    }
     Widget.attach(panel, root);
 
     let selectionFromFrontend = false;
@@ -233,7 +237,6 @@ export default {
         if (existing === undefined) {
           return createSlot(index, ref, titles, keys, signal);
         }
-        existing.parent = null;
         labelSlot(existing, index, titles, keys, "Tab");
         return existing;
       });
@@ -243,11 +246,11 @@ export default {
         disposeLuminoWidget(slot);
       }
 
+      // Insert by index so a kept tab stays in the DOM: detaching a slot reloads any iframe
+      // inside it and resets embedded state such as a chart.
       try {
         syncingFromModel = true;
-        for (const slot of nextSlots) {
-          panel.addWidget(slot);
-        }
+        nextSlots.forEach((slot, index) => panel.insertWidget(index, slot));
       } finally {
         syncingFromModel = false;
       }

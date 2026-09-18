@@ -169,6 +169,34 @@ export function combineSignals(parentSignal, localSignal) {
   return controller.signal;
 }
 
+// anywidget renders as soon as a widget module is ready, which can happen before the notebook
+// attaches the output node, and Lumino refuses to attach a widget to a detached host.
+export function whenConnected(node, signal) {
+  if (node.isConnected) {
+    return Promise.resolve(true);
+  }
+  if (signal?.aborted) {
+    return Promise.resolve(false);
+  }
+  return new Promise((resolve) => {
+    let frame = 0;
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      resolve(false);
+    };
+    const check = () => {
+      if (node.isConnected) {
+        signal?.removeEventListener("abort", stop);
+        resolve(true);
+        return;
+      }
+      frame = requestAnimationFrame(check);
+    };
+    signal?.addEventListener("abort", stop, { once: true });
+    frame = requestAnimationFrame(check);
+  });
+}
+
 export function dispatchResize(target) {
   try {
     target.dispatchEvent(new Event("resize"));

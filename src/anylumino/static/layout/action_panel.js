@@ -6,7 +6,7 @@ import {
   Widget,
 } from "@lumino/widgets";
 import { CommandRegistry } from "@lumino/commands";
-import { cssSize, modelListeners } from "./composition.js";
+import { cssSize, modelListeners, whenConnected } from "./composition.js";
 
 const ICON_PATHS = {
   AddContent: ["M12 5v14", "M5 12h14"],
@@ -301,7 +301,7 @@ export default {
       root.replaceChildren();
     };
 
-    const renderPanel = () => {
+    const renderPanel = async () => {
       clearPanel();
       const kind = model.get("action_kind");
       if (kind === "menubar") {
@@ -310,6 +310,10 @@ export default {
         panel = createCommandPalette(model, activate);
       } else {
         panel = createToolbar(model, activate);
+      }
+      const created = panel;
+      if (!(await whenConnected(root, signal)) || panel !== created) {
+        return;
       }
       Widget.attach(panel, root);
       iconObserver = decorateCommandIcons(model.get("actions") ?? []);
