@@ -239,13 +239,22 @@ mirror = ax.Text("AAPL")
 traitlets.link((symbol, "value"), (mirror, "text"))
 ```
 
-Button-like widgets use callbacks because a click is an event, not a persistent
-value. Every anylumino widget family registers activations the same way:
-`on_click(callback)` runs for each activation and receives the widget, while
-`on_action(callback)` runs only for activations that carry a value and receives
-the widget and that value. Pass `remove=True` to unregister the same callable.
-The `callbacks` and `action_callbacks` constructor arguments register the same
-two lists.
+Every anylumino widget registers activations the same way: `on_click(callback)`
+runs for each activation and receives the widget, while `on_action(callback)`
+runs only for activations that carry a value and receives the widget and that
+value. Pass `remove=True` to unregister the same callable. The `callbacks` and
+`action_callbacks` constructor arguments register the same two lists.
+
+What counts as an activation depends on the widget kind:
+
+- Event widgets such as buttons, cards, menus, toolbars, and command palettes
+  activate on a click, because a click is not a persistent value.
+- Value widgets such as checkboxes, switches, inputs, sliders, and the native
+  date and time controls activate on every `value` change. `on_action` receives
+  the new value. They also fire when Python assigns `value`, so use `observe`
+  when a handler needs the old value or must ignore programmatic updates.
+- Tables and tab panels keep selection, sort, and tab state in synced traits.
+  Observe those traits, or use `on_selection` and `on_sort` on tables.
 
 ```python
 status = ax.Text("Ready")
@@ -254,6 +263,9 @@ button = ax.Button(
     variant="primary",
     callbacks=[lambda _button: setattr(status, "text", "Submitted")],
 )
+
+live = ax.Checkbox(False, label="Live")
+live.on_action(lambda _checkbox, checked: setattr(status, "text", f"Live: {checked}"))
 
 menu = ax.DropdownMenu(
     [{"label": "Export", "value": "export"}],

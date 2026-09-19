@@ -102,6 +102,7 @@ Base anywidget for Astryx-backed components.
             height=height,
             **kwargs,
         )
+        self.observe(self._notify_value_change, names="value")
     ```
   </PySourceCode>
 
@@ -171,11 +172,12 @@ Base anywidget for Astryx-backed components.
     </PyParameter>
 
     <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
-      Python activation callbacks.
+      Python activation callbacks. They run on clicks for event components
+      and on every `value` change for value components.
     </PyParameter>
 
     <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
-      Python callbacks receiving named action values.
+      Python callbacks receiving named action values or the new `value`.
     </PyParameter>
 
     <PyParameter name="open" type="bool | None" value="None">

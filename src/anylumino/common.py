@@ -23,8 +23,11 @@ class ActivationCallbacks:
     as a chosen menu item or a changed control value. Both accept
     ``remove=True`` to unregister the same callable.
 
-    Use ``traitlets.link`` or ``observe`` to keep sibling widgets in sync;
-    callbacks are for reacting to activations, not for mirroring state.
+    Event widgets such as buttons and menus notify from a frontend message.
+    Value widgets notify from a ``value`` trait change through
+    ``_notify_value_change``, so the callbacks also run when Python assigns
+    ``value``. Use ``traitlets.link`` or ``observe`` to keep sibling widgets in
+    sync; callbacks are for reacting to activations, not for mirroring state.
     """
 
     def _init_callbacks(self) -> None:
@@ -62,6 +65,10 @@ class ActivationCallbacks:
     def _notify_click(self) -> None:
         for callback in list(self._click_callbacks):
             callback(self)
+
+    def _notify_value_change(self, change: dict[str, Any]) -> None:
+        self._notify_action(change["new"])
+        self._notify_click()
 
 
 class LazyStaticAsset:

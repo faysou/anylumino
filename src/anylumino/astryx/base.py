@@ -367,9 +367,10 @@ class Widget(ComponentWidget):
         Without a callback the component filters its own items in the browser
         and nothing is sent per keystroke.
     callbacks : Iterable[Callable[[ComponentWidget], None]] | None, default None
-        Python activation callbacks.
+        Python activation callbacks. They run on clicks for event components
+        and on every ``value`` change for value components.
     action_callbacks : Iterable[Callable[[ComponentWidget, Any], None]] | None, default None
-        Python callbacks receiving named action values.
+        Python callbacks receiving named action values or the new ``value``.
     open : bool | None, default None
         Optional controlled open state.
     width : int | float | str | None, default None
@@ -450,6 +451,7 @@ class Widget(ComponentWidget):
             height=height,
             **kwargs,
         )
+        self.observe(self._notify_value_change, names="value")
 
     @property
     def items(self) -> list[Any]:

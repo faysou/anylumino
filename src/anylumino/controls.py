@@ -41,10 +41,6 @@ class _NativeControlWidget(ActivationCallbacks, anywidget.AnyWidget):
         self.observe(self._notify_value_change, names="value")
         self._register_callbacks(callbacks)
 
-    def _notify_value_change(self, change: dict[str, Any]) -> None:
-        self._notify_action(change["new"])
-        self._notify_click()
-
 
 class DatePicker(_NativeControlWidget):
     """Browser-native date picker control.

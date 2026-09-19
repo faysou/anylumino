@@ -309,7 +309,9 @@ quantity.value
 symbol.observe(lambda change: print(change["new"]), names="value")
 ```
 
-Button-style widgets use callbacks because a click is an event:
+Every widget also accepts `callbacks` and `action_callbacks`, or registers them
+later with `on_click` and `on_action`. Button-style widgets run them on a click
+because a click is an event, not a value:
 
 ```python
 status = ax.Text("Ready")
@@ -318,6 +320,15 @@ submit = ax.Button(
     variant="primary",
     callbacks=[lambda _button: setattr(status, "value", "Submitted")],
 )
+```
+
+Value widgets such as `Checkbox`, `Switch`, `TextInput`, and `Slider` run them
+on every `value` change, including changes assigned from Python. `on_action`
+receives `(widget, new_value)`:
+
+```python
+live = ax.Checkbox(False, label="Live")
+live.on_action(lambda _checkbox, checked: setattr(status, "value", f"Live: {checked}"))
 ```
 
 Menus and grouped actions also accept `action_callbacks`. Each callback

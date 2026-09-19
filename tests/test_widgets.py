@@ -1275,8 +1275,9 @@ def test_activation_callbacks_share_one_registration_idiom() -> None:
     menu = ax.DropdownMenu([{"label": "Export", "value": "export"}], label="Actions")
     picker = DatePicker("2026-07-09")
     button = ax.Button("Run")
+    checkbox = ax.Checkbox(False, label="Enabled")
 
-    for widget in (toolbar, menu, picker, button):
+    for widget in (toolbar, menu, picker, button, checkbox):
         widget.on_click(lambda source: clicks.append(source))
         widget.on_action(lambda source, value: actions.append((source, value)))
 
@@ -1284,9 +1285,39 @@ def test_activation_callbacks_share_one_registration_idiom() -> None:
     menu._handle_frontend_message(menu, {"type": "click", "value": "export"}, None)
     picker.value = "2026-07-10"
     button._handle_frontend_message(button, {"type": "click"}, None)
+    checkbox.value = True
 
-    assert clicks == [toolbar, menu, picker, button]
-    assert actions == [(toolbar, "reset"), (menu, "export"), (picker, "2026-07-10")]
+    assert clicks == [toolbar, menu, picker, button, checkbox]
+    assert actions == [
+        (toolbar, "reset"),
+        (menu, "export"),
+        (picker, "2026-07-10"),
+        (checkbox, True),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("widget", "next_value"),
+    [
+        (ax.Checkbox(False, label="Enabled"), True),
+        (ax.Switch(False, label="Live"), True),
+        (ax.TextInput(value="AAPL", label="Symbol"), "MSFT"),
+        (ax.NumberInput(10, label="Qty"), 25),
+    ],
+)
+def test_astryx_value_widgets_run_constructor_callbacks_on_value_change(
+    widget: ax.Widget, next_value: object
+) -> None:
+    clicks: list[object] = []
+    actions: list[tuple[object, object]] = []
+    widget.on_click(lambda source: clicks.append(source))
+    widget.on_action(lambda source, value: actions.append((source, value)))
+
+    assert clicks == []
+    widget.value = next_value
+
+    assert clicks == [widget]
+    assert actions == [(widget, next_value)]
 
 
 def test_activation_callbacks_can_be_unregistered() -> None:
