@@ -14,6 +14,8 @@ tables, and outputs. A composed widget can own its layout, state, callbacks,
 and domain methods while still being an anywidget that can be nested into
 another layout.
 
+Documentation: <https://faysou.github.io/anylumino/docs/>
+
 ## Quick start
 
 ```python
