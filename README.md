@@ -1,7 +1,9 @@
 # anylumino
 
-`anylumino` is a small proof-of-concept library for creating anywidget widgets
-that use Lumino for layout and Astryx for notebook UI components.
+`anylumino` is a Python library for building composable notebook widgets with
+anywidget. It provides Lumino layout panels, menus, and toolbars, a family of
+Astryx UI components for inputs, tables, and surfaces, and browser-native date
+and time controls, all exposed as anywidgets that nest into one another.
 
 It targets the anywidget 0.11 AFM composition API: Python passes child
 anywidgets as synced widget references, and the frontend resolves each child
