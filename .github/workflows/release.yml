@@ -1,0 +1,123 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      index:
+        description: Index to publish to
+        type: choice
+        options: [pypi, testpypi]
+        default: testpypi
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Build frontend bundles
+        run: |
+          npm ci
+          npm run build
+
+      - name: Verify committed bundles are current
+        run: git diff --exit-code -- src/anylumino/static
+
+      - name: Verify the tag matches the project version
+        if: github.ref_type == 'tag'
+        run: |
+          version="$(uv version --short)"
+          if [ "v$version" != "${{ github.ref_name }}" ]; then
+            echo "Tag ${{ github.ref_name }} does not match project version $version"
+            exit 1
+          fi
+
+      - name: Build distributions
+        run: uv build
+
+      - name: Validate distributions for publication
+        run: uv publish --dry-run --trusted-publishing never dist/*
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: distributions
+          path: dist
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Trusted Publishing exchanges this job's OIDC token for a short-lived
+    # upload token, so the workflow needs no stored PyPI credentials.
+    environment: ${{ github.event.inputs.index || 'pypi' }}
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: distributions
+          path: dist
+
+      - name: Publish to PyPI
+        if: github.event.inputs.index != 'testpypi'
+        run: uv publish dist/*
+
+      - name: Publish to TestPyPI
+        if: github.event.inputs.index == 'testpypi'
+        run: uv publish --publish-url https://test.pypi.org/legacy/ dist/*
+
+  attach:
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: distributions
+          path: dist
+
+      - name: Attach distributions to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* --verify-tag --generate-notes --title "anylumino ${TAG#v}"
+          fi

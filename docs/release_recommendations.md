@@ -75,14 +75,20 @@ Inspect both artifacts, then install the wheel in a clean environment outside th
 checkout with `uv venv` and `uv pip install`. Run an example using that
 installation to verify that the frontend assets are present.
 
-Publish a prerelease to [TestPyPI](https://packaging.python.org/en/latest/guides/using-testpypi/)
-with `uv publish --publish-url https://test.pypi.org/legacy/`, then create a
-fresh environment and install the published package from TestPyPI with
-`uv pip install --index-url https://test.pypi.org/simple/`. Verify the installed
-version and run an example before publishing to PyPI with `uv publish`.
-Configure [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/)
-for the release workflow. Confirm repository visibility, project links, the
-version, and the license inventory before the public release.
+The Release workflow publishes through
+[PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/), so the
+repository stores no upload token. It runs on a `v*` tag and on manual dispatch,
+builds the distributions, checks that the tag matches the project version,
+attaches the artifacts to the GitHub release, and uploads to PyPI. A manual run
+can target TestPyPI instead.
+
+Both indexes need a pending publisher before the first upload, registered
+against owner `faysou`, repository `anylumino`, workflow `release.yml`, and
+environment `pypi` or `testpypi`. Rehearse on TestPyPI first, then install the
+published package into a fresh environment with
+`uv pip install --index-url https://test.pypi.org/simple/`, verify the version,
+and run an example. Confirm repository visibility, project links, the version,
+and the license inventory before the public release.
 
 ## Local release checklist
 

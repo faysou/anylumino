@@ -19,3 +19,8 @@ changes. CI verifies both files.
 Keep pull requests focused. Add or update a runnable notebook when a change
 introduces a user-facing widget pattern, and update the relevant documentation
 when public behavior changes.
+
+Releases run from a `v*` tag. Bump the version in `pyproject.toml`, tag the
+release commit, and push the tag; the Release workflow builds the
+distributions, attaches them to the GitHub release, and publishes to PyPI
+through Trusted Publishing.
