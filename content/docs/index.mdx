@@ -1,5 +1,5 @@
 ---
-title: "anylumino"
+title: "Overview"
 description: "Lumino layouts for composable anywidgets."
 ---
 
@@ -73,9 +73,21 @@ tabs = al.TabPanel({"orders": orders, "chart": trend_figure})
 al.SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 ```
 
+![Overview example rendered in JupyterLab](assets/examples/index-overview.png)
+
+The benefit is not only visual layout. An anywidget layout library gives a
+notebook the same composition model used in application UI code: build larger
+reusable widgets from smaller widgets, keep children addressable by key, attach
+callbacks to controls, and place behavior on the composed object itself.
+
+For example, a `FigurePanel` can combine a toolbar and a figure, expose methods
+such as `refresh()` or `set_data()`, and still be nested inside a `TabPanel` or
+`SplitPanel` like any other widget. That keeps state and behavior close to the
+UI component instead of spreading them across notebook-global variables.
+
 ## What it provides
 
-## Layouts
+### Layouts
 
 - `TabPanel` for tabbed child widgets.
 - `BoxPanel`, `HBox`, `VBox`, and `ScrollBox` for linear composition.
@@ -83,16 +95,16 @@ al.SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 - `DockPanel`, `AccordionPanel`, `StackedPanel`, `GridPanel`, and
   `ResponsivePanel` for application-like notebook layouts.
 
-## Actions
+### Actions
 
 - `Toolbar` for compact command rows.
 - `MenuBar` for grouped commands.
-- `CommandPalette` for inline notebook-safe searchable commands.
-- `CommandPalette` for Lumino-style searchable actions.
+- `CommandPalette` for Lumino-style searchable actions, with an inline
+  notebook-safe Astryx variant in `anylumino.astryx`.
 
 Each action can dispatch to a Python callback.
 
-## Controls
+### Controls
 
 `anylumino` includes Astryx wrappers for buttons, text inputs, selectors,
 tokenizers, segmented controls, tables, status surfaces, popovers, inline
@@ -116,7 +128,9 @@ variables.
 
 ## Next steps
 
-- Read the [guide](guide.mdx) for the composition model.
-- Review [Astryx widgets](astryx.mdx) for notebook UI components.
-- Review [controls](controls.mdx) for Astryx form and control patterns.
+- Read the [composition guide](guide.mdx) for child mapping, mutation, resizing,
+  and callbacks.
+- Review [Astryx controls](astryx.mdx) for notebook UI components, forms,
+  tables, and themes.
+- Explore the [examples](examples.mdx) for notebook dashboard patterns.
 - Open the [API reference](api/index.mdx) generated from the package docstrings.

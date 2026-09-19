@@ -17,6 +17,8 @@ TabPanel(
 )
 ```
 
+![Minimal tabs example rendered in JupyterLab](assets/examples/examples-minimal-tabs.png)
+
 ## Add a tab after display
 
 ```python
@@ -26,21 +28,32 @@ tabs
 tabs.add("recent", figure_b, title="Recent", select=True)
 ```
 
-## Astryx order dashboard skeleton
+![Add a tab after display example rendered in JupyterLab](assets/examples/examples-add-a-tab-after-display.png)
+
+## Order blotter with callbacks
+
+The Fill button marks the checked rows as filled and reports the count, so the
+table, the status line, and the filters stay in sync from one callback:
 
 ```python
 import anylumino as al
 import anylumino.astryx as ax
 
-status = ax.Text("Ready")
+status = ax.Text("Select orders, then press Fill")
 
 orders = ax.Table(
     rows=order_rows,
     columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
     row_key="order_id",
+    selected=["O-1", "O-3"],
     selects="multiple",
     sortable=True,
 )
+
+def fill_selected(_button):
+    for order_id in orders.selected:
+        orders.update_row(order_id, {"status": "FILLED"})
+    status.text = f"Filled {len(orders.selected)} orders"
 
 filters = ax.Theme(
     {
@@ -56,35 +69,26 @@ filters = ax.Theme(
         ),
         "commands": ax.CommandPalette(
             [
-                {
-                    "id": "refresh",
-                    "label": "Refresh",
-                    "auxiliaryData": {"group": "Data"},
-                },
-                {
-                    "id": "export",
-                    "label": "Export CSV",
-                    "auxiliaryData": {"group": "Files"},
-                },
+                {"id": "fill", "label": "Fill selected", "auxiliaryData": {"group": "Orders"}},
+                {"id": "export", "label": "Export CSV", "auxiliaryData": {"group": "Files"}},
             ],
-            value="refresh",
-            width=420,
+            value="fill",
+            width=320,
         ),
-        "refresh": ax.Button(
-            "Refresh",
-            variant="primary",
-            callbacks=[lambda _button: setattr(status, "text", "Refreshed")],
-        ),
+        "fill": ax.Button("Fill", variant="primary", callbacks=[fill_selected]),
     },
     gap=3,
 )
 
 tabs = al.TabPanel({"orders": orders, "chart": trend_figure})
 al.SplitPanel(
-    {"filters": filters, "workspace": tabs, "status": status},
-    sizes=[0.25, 0.65, 0.10],
+    {"filters": filters, "workspace": al.VBox({"tabs": tabs, "status": status}, stretches=[1, 0])},
+    sizes=[0.3, 0.7],
+    height=520,
 )
 ```
+
+![Order blotter with callbacks example rendered in JupyterLab](assets/examples/examples-order-blotter-with-callbacks.png)
 
 ## Lumino action skeleton
 
@@ -110,10 +114,16 @@ toolbar = al.Toolbar(actions, callbacks=callbacks)
 menu = al.MenuBar([{"label": "Figure", "items": actions}], callbacks=callbacks)
 
 tabs = al.TabPanel({"figure-1": figure_panel})
-al.SplitPanel(
-    {"controls": al.VBox({"menu": menu, "toolbar": toolbar}), "workspace": tabs},
+al.GridPanel(
+    {"menu": menu, "toolbar": toolbar, "workspace": tabs},
+    columns="1fr",
+    rows="34px 44px minmax(0, 1fr)",
+    gap=0,
+    height=560,
 )
 ```
+
+![Lumino action skeleton example rendered in JupyterLab](assets/examples/examples-lumino-action-skeleton.png)
 
 Lumino action widgets still use bundled workflow icon names such as
 `AddContent` and `RotateRight`. Astryx widgets use their own component props and
@@ -126,6 +136,9 @@ require CDN access for Lumino, Astryx, or bundled workflow icons.
 
 The repository includes Jupytext notebooks for smoke testing:
 
+- `notebooks/docs_examples.py` collects every example on these documentation
+  pages in page order; `scripts/docs_examples.py` regenerates it and the
+  screenshots come from `scripts/capture-docs-screenshots.mjs`.
 - `notebooks/plotly_tabs.py` tests tabs and dynamic child addition with Plotly
   figures.
 - `notebooks/plotly_dashboard.py` exercises all layout and action widgets with

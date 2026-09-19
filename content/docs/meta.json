@@ -2,10 +2,8 @@
   "title": "AnyLumino",
   "pages": [
     "index",
-    "guide-overview",
     "guide",
     "astryx",
-    "controls",
     "examples",
     "api"
   ]

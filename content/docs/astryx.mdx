@@ -1,10 +1,11 @@
 ---
-title: "Astryx widgets"
+title: "Astryx controls"
 ---
 
-Astryx widgets are the component family for notebook UIs in `anylumino`. They
-provide JupyterLab-friendly controls, tables, surfaces, and theme support while
-keeping Python state synchronized through anywidget traits.
+Astryx controls are the component family for notebook UIs in `anylumino`: the
+interactive building blocks for forms, filters, command panels, tables, status
+surfaces, and themes. They synchronize Python state through normal traitlets
+and compose inside Lumino layouts or other Astryx containers.
 
 Useful appearance and behavior options are keyword-only constructor arguments
 with Python snake-case names. Unmodeled JSON-safe upstream options remain
@@ -15,45 +16,173 @@ upstream component reference.
 
 ## Notebook dashboard
 
+A position monitor built only from Astryx controls. The button callback edits
+table rows and moves the progress bar from Python:
+
 ```python
 import anylumino as al
 import anylumino.astryx as ax
 
-brand = ax.Brand(
-    "desk",
-    **{
-        "color-accent": ("#0057b8", "#79b8ff"),
-        "color-background-card": ("#ffffff", "#111827"),
-        "color-text-primary": ("#111827", "#f9fafb"),
-        "radius-container": "8px",
-    },
-)
-
-status = ax.Text("Ready")
-
-orders = ax.Table(
-    rows=[
-        {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
-        {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
-    ],
-    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
-    row_key="order_id",
-    selects="multiple",
+positions = ax.Table(
+    rows=position_rows,
+    columns={"symbol": "Symbol", "qty": "Qty", "price": "Price", "pnl": "PnL"},
+    row_key="symbol",
+    selects="single",
     sortable=True,
     width="100%",
 )
+exposure = ax.ProgressBar(62, label="Gross exposure", variant="accent", value_label=True)
 
-workspace = ax.Theme(
+def mark_to_market(_button):
+    for row in positions.rows:
+        positions.update_row(row["symbol"], {"pnl": round(row["pnl"] * 1.1, 2)})
+    exposure.value = min(exposure.value + 8, 100)
+
+ax.Theme(
     {
         "header": ax.Stack(
             {
-                "title": ax.Heading("Orders", level=3),
-                "badge": ax.Badge("Live", variant="success"),
+                "title": ax.Heading("Positions", level=3),
+                "status": ax.StatusDot("Connected", variant="success", pulsing=True),
+                "badge": ax.Badge("Paper", variant="info"),
             },
             direction="horizontal",
             align="center",
             gap=2,
         ),
+        "summary": ax.MetadataList(
+            [
+                {"label": "Account", "value": "SIM-001"},
+                {"label": "Venue", "value": "XNAS"},
+                {"label": "Updated", "value": "14:30"},
+            ],
+            columns="multi",
+        ),
+        "exposure": exposure,
+        "actions": ax.Stack(
+            {
+                "mark": ax.Button("Mark to market", variant="primary", callbacks=[mark_to_market]),
+                "flatten": ax.Button("Flatten", variant="ghost"),
+            },
+            direction="horizontal",
+            gap=2,
+        ),
+        "positions": positions,
+    },
+    gap=3,
+)
+```
+
+![Notebook dashboard example rendered in JupyterLab](assets/examples/astryx-notebook-dashboard.png)
+
+## Component groups
+
+The groups below follow how a notebook UI is put together: composition first,
+then content, inputs, actions, feedback, overlays, and data. Every class lives
+in the `anylumino.astryx` namespace; the module in parentheses is where its API
+reference page is.
+
+| Group                                          | Use for                                                                                                                                       | Components                                                                                                                                                                                                                                                                            |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Foundation and theme (`base`)                  | Define a shared brand, theme a subtree, or wrap an Astryx component that has no Python class yet                                              | `Widget`, `Component`, `Brand`, `BuiltTheme`, `Theme`                                                                                                                                                                                                                                 |
+| Layout panels (`layout`)                       | Structure a notebook UI with the keyed Lumino child API: tabs, one-at-a-time panels, collapsible sections, scrolling, resizable panes, reflow | `TabPanel`, `StackedPanel`, `AccordionPanel`, `ScrollBox`, `SplitPanel`, `ResponsivePanel`                                                                                                                                                                                            |
+| Layout containers (`surfaces`)                 | Arrange content inside a panel or a notebook output                                                                                           | `Stack`, `Grid`, `Center`, `Section`, `Card`, `ClickableCard`, `SelectableCard`, `AspectRatio`, `Divider`, `Collapsible`, `Carousel`                                                                                                                                                  |
+| Typography and content (`inputs`, `data`)      | Headings, body copy, rendered Markdown, code, links, avatars, and small semantic content                                                      | `Text`, `Heading`, `Markdown`, `Code`, `CodeBlock`, `Blockquote`, `Kbd`, `Link`, `Citation`, `Timestamp`, `Thumbnail`, `Avatar`, `AvatarGroup`, `Icon`                                                                                                                                |
+| Forms and direct inputs (`inputs`, `surfaces`) | Direct value entry and form composition                                                                                                       | `FormLayout`, `Field`, `FieldStatus`, `InputGroup`, `TextInput`, `TextArea`, `NumberInput`, `Slider`, `LogSlider`, `SelectionSlider`, `Checkbox`, `Switch`, `ToggleButton`, `ToggleButtonGroup`, `DateInput`, `DateRangeInput`, `DateTimeInput`, `TimeInput`, `Calendar`, `FileInput` |
+| Selection and search (`inputs`, `surfaces`)    | Choose from predefined options or searchable sources                                                                                          | `Selector`, `MultiSelector`, `SegmentedControl`, `RadioList`, `CheckboxList`, `Typeahead`, `Tokenizer`, `PowerSearch`                                                                                                                                                                 |
+| Actions and menus (`inputs`, `surfaces`)       | Command surfaces and button-like interactions                                                                                                 | `Button`, `IconButton`, `ButtonGroup`, `Toolbar`, `DropdownMenu`, `ContextMenu`, `MoreMenu`, `CommandPalette`                                                                                                                                                                         |
+| Feedback and status (`data`)                   | Show state, progress, loading placeholders, or empty results                                                                                  | `Badge`, `StatusDot`, `ProgressBar`, `Spinner`, `Skeleton`, `Token`, `Banner`, `EmptyState`                                                                                                                                                                                           |
+| Overlays and previews (`surfaces`)             | Notebook-safe contextual surfaces; dialogs render inline by default so they stay in the output area                                           | `Tooltip`, `HoverCard`, `Popover`, `Overlay`, `Lightbox`, `Dialog`, `AlertDialog`                                                                                                                                                                                                     |
+| Navigation and data (`surfaces`, `data`)       | Structured navigation and data-heavy notebook views                                                                                           | `Breadcrumbs`, `TabList`, `List`, `MetadataList`, `Outline`, `TreeList`, `Pagination`, `Table`                                                                                                                                                                                        |
+
+### Layout panels
+
+The layout panels mirror the Lumino layout widgets with the same keyed child
+API, so `select_key`, `add_widget`, and `remove_widget` work the same way while
+rendering with Astryx styling:
+
+```python
+tabs = ax.TabPanel({"orders": orders, "fills": fills, "chart": figure}, size="sm")
+tabs.select_key("fills")
+
+workspace = ax.SplitPanel(
+    {"controls": controls, "workspace": tabs},
+    sizes=[0.3, 0.7],
+    height=480,
+)
+```
+
+![Layout panels example rendered in JupyterLab](assets/examples/astryx-layout-panels.png)
+
+`TabPanel` and `StackedPanel` mount a child the first time it is shown and keep
+it mounted, hidden, afterwards, so a Plotly figure keeps its state across tab
+switches. `SplitPanel` syncs drags back to its `sizes` trait as fractions.
+
+## Form controls
+
+Input widgets expose a synced `.value` trait. `FormLayout` stacks them with
+consistent label spacing:
+
+```python
+import anylumino as al
+import anylumino.astryx as ax
+
+order_form = ax.FormLayout(
+    {
+        "symbol": ax.TextInput(value="AAPL", label="Symbol"),
+        "quantity": ax.NumberInput(value=100, label="Quantity", min=1),
+        "limit": ax.Slider(184.5, label="Limit price", min=150, max=220, step=0.5, value_display="text"),
+        "side": ax.SegmentedControl(
+            ["Buy", "Sell"],
+            value="Buy",
+            label="Side",
+        ),
+        "routing": ax.Selector(
+            ["Smart", "Primary", "Dark"],
+            value="Smart",
+            label="Routing",
+        ),
+        "urgent": ax.Checkbox(value=False, label="Urgent"),
+    }
+)
+```
+
+![Form controls example rendered in JupyterLab](assets/examples/astryx-form-controls.png)
+
+Use `.value` to read synchronized state:
+
+```python
+order_form["symbol"].value
+order_form["quantity"].value
+```
+
+Use `observe(..., names="value")` when another widget should react to edits.
+Assigning the trait from Python fires the same observer as typing in the
+notebook:
+
+```python
+status = ax.Text("Waiting for a symbol")
+symbol = ax.TextInput(value="AAPL", label="Symbol")
+
+def on_symbol_change(change):
+    status.text = f"Symbol: {change['new']}"
+
+symbol.observe(on_symbol_change, names="value")
+symbol.value = "MSFT"
+
+ax.Stack({"symbol": symbol, "status": status}, gap=2)
+```
+
+![Form controls example rendered in JupyterLab](assets/examples/astryx-form-controls-3.png)
+
+## Selection controls
+
+Astryx selection widgets cover small option sets, searchable option sets, and
+multi-value tokenized filters.
+
+```python
+filters = ax.Stack(
+    {
         "symbol": ax.Typeahead(
             ["AAPL", "MSFT", "NVDA"],
             value="AAPL",
@@ -65,291 +194,130 @@ workspace = ax.Theme(
             label="Fields",
         ),
         "density": ax.SegmentedControl(
-            ["Compact", "Standard"],
+            ["Compact", "Standard", "Expanded"],
             value="Standard",
             label="Density",
         ),
-        "refresh": ax.Button(
-            "Refresh",
-            variant="primary",
-            callbacks=[lambda _button: setattr(status, "text", "Refreshed")],
+        "metric": ax.Selector(
+            ["Latency", "Volume", "Fills"],
+            value="Latency",
+            label="Metric",
         ),
-        "orders": orders,
     },
-    brand=brand,
     gap=3,
 )
-
-al.SplitPanel(
-    {"workspace": workspace, "status": status},
-    orientation="vertical",
-    sizes=[0.85, 0.15],
-    height=560,
-)
 ```
 
-## Component groups
+![Selection controls example rendered in JupyterLab](assets/examples/astryx-selection-controls.png)
 
-The groups below follow how a notebook UI is put together: composition first,
-then content, inputs, actions, feedback, overlays, and data. Every class lives
-in the `anylumino.astryx` namespace; the module column says where its API
-reference page is.
+`Typeahead`, `Tokenizer`, and `CommandPalette` currently use
+static search sources. Query text and open-state changes are sent as widget
+messages; selected item ids are synchronized through `.value`.
 
-| Group                   | API module           |
-| ----------------------- | -------------------- |
-| Foundation and theme    | `base`               |
-| Layout panels           | `layout`             |
-| Layout containers       | `surfaces`           |
-| Typography and content  | `inputs`, `data`     |
-| Forms and direct inputs | `inputs`, `surfaces` |
-| Selection and search    | `inputs`, `surfaces` |
-| Actions and menus       | `inputs`, `surfaces` |
-| Feedback and status     | `data`               |
-| Overlays and previews   | `surfaces`           |
-| Navigation and data     | `surfaces`, `data`   |
+## Buttons and actions
 
-### Foundation and theme
-
-Use these to define a shared brand, apply a theme to a subtree, or wrap an
-Astryx component that has no dedicated Python class yet.
-
-- `Widget`
-- `Component`
-- `Brand`
-- `BuiltTheme`
-- `Theme`
-
-### Layout panels
-
-Use these for the structure of a notebook UI: tabs, one-at-a-time panels,
-collapsible sections, scrolling regions, resizable panes, and layouts that
-reflow with the available width. They mirror the Lumino layout widgets with
-the same keyed child API, so `select_key`, `add_widget`, and `remove_widget`
-work the same way, while rendering with Astryx styling.
-
-- `TabPanel`
-- `StackedPanel`
-- `AccordionPanel`
-- `ScrollBox`
-- `SplitPanel`
-- `ResponsivePanel`
-
-```python
-tabs = ax.TabPanel({"orders": orders, "fills": fills}, size="sm")
-tabs.select_key("fills")
-
-workspace = ax.SplitPanel(
-    {"controls": controls, "chart": figure},
-    sizes=[0.3, 0.7],
-    height=480,
-)
-```
-
-`TabPanel` and `StackedPanel` mount a child the first time it is shown and keep
-it mounted, hidden, afterwards, so a Plotly figure keeps its state across tab
-switches. `SplitPanel` syncs drags back to its `sizes` trait as fractions.
-
-### Layout containers
-
-Use these to arrange content inside a panel or a notebook output.
-
-- `Stack`
-- `Grid`
-- `Center`
-- `Section`
-- `Card`
-- `ClickableCard`
-- `SelectableCard`
-- `AspectRatio`
-- `Divider`
-- `Collapsible`
-- `Carousel`
-
-### Typography and content
-
-Use these for headings, body copy, rendered Markdown, code, links, avatars, and
-small semantic content.
-
-- `Text`
-- `Heading`
-- `Markdown`
-- `Code`
-- `CodeBlock`
-- `Blockquote`
-- `Kbd`
-- `Link`
-- `Citation`
-- `Timestamp`
-- `Thumbnail`
-- `Avatar`
-- `AvatarGroup`
-- `Icon`
-
-### Forms and direct inputs
-
-Use these for direct value entry and form composition.
-
-- `FormLayout`
-- `Field`
-- `FieldStatus`
-- `InputGroup`
-- `TextInput`
-- `TextArea`
-- `NumberInput`
-- `Slider`
-- `LogSlider`
-- `SelectionSlider`
-- `Checkbox`
-- `Switch`
-- `ToggleButton`
-- `ToggleButtonGroup`
-- `DateInput`
-- `DateRangeInput`
-- `DateTimeInput`
-- `TimeInput`
-- `Calendar`
-- `FileInput`
-
-### Selection and search
-
-Use these when users choose from predefined options or searchable sources.
-
-- `Selector`
-- `MultiSelector`
-- `SegmentedControl`
-- `RadioList`
-- `CheckboxList`
-- `Typeahead`
-- `Tokenizer`
-- `PowerSearch`
-
-### Actions and menus
-
-Use these for command surfaces and button-like interactions.
-
-- `Button`
-- `IconButton`
-- `ButtonGroup`
-- `Toolbar`
-- `DropdownMenu`
-- `ContextMenu`
-- `MoreMenu`
-- `CommandPalette`
-
-### Feedback and status
-
-Use these to show state, progress, loading placeholders, or empty results.
-
-- `Badge`
-- `StatusDot`
-- `ProgressBar`
-- `Spinner`
-- `Skeleton`
-- `Token`
-- `Banner`
-- `EmptyState`
-
-### Overlays and previews
-
-Use these for notebook-safe contextual surfaces. Dialog wrappers default to
-inline rendering so they stay inside the output area.
-
-- `Tooltip`
-- `HoverCard`
-- `Popover`
-- `Overlay`
-- `Lightbox`
-- `Dialog`
-- `AlertDialog`
-
-### Navigation and data
-
-Use these for structured navigation and data-heavy notebook views.
-
-- `Breadcrumbs`
-- `TabList`
-- `List`
-- `MetadataList`
-- `Outline`
-- `TreeList`
-- `Pagination`
-- `Table`
-
-## Forms and values
-
-Input widgets expose a synced `.value` trait:
-
-```python
-symbol = ax.TextInput(value="AAPL", label="Symbol")
-quantity = ax.NumberInput(value=100, label="Quantity", min=1)
-side = ax.SegmentedControl(["Buy", "Sell"], value="Buy", label="Side")
-
-symbol.value
-quantity.value
-side.value
-
-symbol.observe(lambda change: print(change["new"]), names="value")
-```
-
-Button-style widgets use callbacks because a click is an event:
+Button-like widgets use callbacks because a click is an event, not a persistent
+value.
 
 ```python
 status = ax.Text("Ready")
+
 submit = ax.Button(
     "Submit",
     variant="primary",
     callbacks=[lambda _button: setattr(status, "text", "Submitted")],
 )
+
+actions = ax.CommandPalette(
+    [
+        {"id": "refresh", "label": "Refresh", "auxiliaryData": {"group": "Data"}},
+        {"id": "export", "label": "Export CSV", "auxiliaryData": {"group": "Files"}},
+    ],
+    value="refresh",
+    width=420,
+)
+
+ax.Stack({"status": status, "submit": submit, "actions": actions}, gap=3)
 ```
+
+![Buttons and actions example rendered in JupyterLab](assets/examples/astryx-buttons-and-actions.png)
 
 ## Tables
 
-`Table` renders structured row data with optional checkbox selection and
-sorting:
+`Table` is the data-grid control for notebook data views, with optional
+checkbox selection and sorting. Rows can be edited in place after display:
 
 ```python
 orders = ax.Table(
     rows=[
-        {"order_id": "O-1", "symbol": "AAPL", "qty": 10},
-        {"order_id": "O-2", "symbol": "MSFT", "qty": 5},
+        {"order_id": "O-1", "symbol": "AAPL", "qty": 10, "status": "NEW"},
+        {"order_id": "O-2", "symbol": "MSFT", "qty": 5, "status": "PARTIAL"},
     ],
-    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty"},
+    columns={"order_id": "Order", "symbol": "Symbol", "qty": "Qty", "status": "Status"},
     row_key="order_id",
     selects="multiple",
     sortable=True,
 )
 
-orders.append_row({"order_id": "O-3", "symbol": "NVDA", "qty": 1})
-orders.update_row("O-2", {"qty": 7})
+orders.append_row({"order_id": "O-3", "symbol": "NVDA", "qty": 1, "status": "NEW"})
+orders.update_row("O-2", {"qty": 7, "status": "FILLED"})
 orders.remove_row("O-1")
-orders.set_rows(next_order_snapshot)
 ```
 
-Use `selects=""` for no checkbox column, `selects="single"` for one selected
-row, or `selects="multiple"` for checkbox multi-selection.
+![Tables example rendered in JupyterLab](assets/examples/astryx-tables.png)
+
+Leave `selects=""` for no checkbox column, use `selects="single"` for one
+selected row, or use `selects="multiple"` for checkbox multi-selection.
+`set_rows(rows)` replaces the whole table with a new snapshot.
 
 ## Theme identity
 
-Use `Brand` and `Theme` to apply small shared design-token
-overrides:
+Use `Brand` and `Theme` to apply small shared design-token overrides to
+related controls. Each token takes a `(light, dark)` pair, and `mode` picks
+`"light"`, `"dark"`, or `"system"`:
 
 ```python
 brand = ax.Brand(
     "desk",
     **{
         "color-accent": ("#0057b8", "#79b8ff"),
-        "color-background-card": ("#ffffff", "#111827"),
-        "radius-container": "8px",
+        "color-background-card": ("#f4f7fb", "#111827"),
+        "radius-container": "12px",
     },
 )
 
 panel = ax.Theme(
-    {"button": ax.Button("Run"), "status": ax.Badge("Ready")},
+    {
+        "card": ax.Card(
+            {
+                "content": ax.Stack(
+                    {
+                        "header": ax.Stack(
+                            {
+                                "title": ax.Heading("Desk", level=3),
+                                "badge": ax.Badge("Live", variant="success"),
+                            },
+                            direction="horizontal",
+                            align="center",
+                            gap=2,
+                        ),
+                        "symbol": ax.Typeahead(["AAPL", "MSFT", "NVDA"], value="AAPL", label="Symbol"),
+                        "coverage": ax.ProgressBar(72, label="Coverage", variant="accent", value_label=True),
+                        "run": ax.Button("Run", variant="primary"),
+                    },
+                    gap=3,
+                ),
+            },
+            padding=4,
+        ),
+    },
     brand=brand,
-    mode="system",
-    gap=2,
+    mode="light",
+    gap=3,
 )
 ```
+
+![Theme identity example rendered in JupyterLab](assets/examples/astryx-theme-identity.png)
 
 `Theme` propagates the brand to nested Astryx children because each
 anywidget child is mounted in its own frontend root.
@@ -384,7 +352,7 @@ instance while developing locally.
 ## Notebook-safe overlays
 
 Dialog-style components default to inline rendering so they stay inside the
-Jupyter output area:
+Jupyter output area. `Popover` anchors to a trigger widget:
 
 ```python
 preview = ax.Dialog(
@@ -398,7 +366,17 @@ confirm = ax.AlertDialog(
     "This inline preview uses the alert dialog surface.",
     action_label="Confirm",
 )
+
+details = ax.Popover(
+    ax.Text("Last run finished at 14:30 with 6 fills."),
+    ax.Button("Run details"),
+    label="Run details",
+)
+
+ax.Stack({"preview": preview, "confirm": confirm, "details": details}, gap=3)
 ```
+
+![Notebook-safe overlays example rendered in JupyterLab](assets/examples/astryx-notebook-safe-overlays.png)
 
 Use non-inline dialogs only after validating the surrounding notebook
 environment.

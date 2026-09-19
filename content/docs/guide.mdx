@@ -32,12 +32,38 @@ from anylumino import astryx as ax
 
 tabs = TabPanel(
     {
-        "status": ax.Text("Ready"),
-        "logs": ax.Text("No events yet"),
+        "status": ax.Stack(
+            {
+                "connection": ax.Stack(
+                    {
+                        "dot": ax.StatusDot("Connected", variant="success", pulsing=True),
+                        "text": ax.Text("Streaming ESM24 quotes"),
+                    },
+                    direction="horizontal",
+                    align="center",
+                    gap=2,
+                ),
+                "fills": ax.ProgressBar(3, label="Fills", max=10, value_label=True),
+                "summary": ax.Text("1 working order, 3 fills", text_type="supporting", color="secondary"),
+            },
+            gap=3,
+        ),
+        "logs": ax.List(
+            [
+                {"label": "Session started", "description": "13:30:00"},
+                {"label": "Subscribed ESM24", "description": "13:30:02"},
+                {"label": "First fill", "description": "13:31:14"},
+            ],
+            dividers=True,
+            density="compact",
+        ),
     },
     titles={"status": "Status", "logs": "Logs"},
+    height=220,
 )
 ```
+
+![Child widgets example rendered in JupyterLab](assets/examples/guide-child-widgets.png)
 
 If `titles` is omitted for a mapping, the child keys are used as the titles.
 
@@ -66,7 +92,6 @@ another layout.
 import anylumino as al
 import anylumino.astryx as ax
 
-
 class FigurePanel(al.VBox):
     def __init__(self, figure):
         self.figure = figure
@@ -83,14 +108,18 @@ class FigurePanel(al.VBox):
             align="center",
             gap=2,
         )
-        super().__init__({"toolbar": toolbar, "figure": figure}, height=520)
+        super().__init__(
+            {"toolbar": toolbar, "figure": figure},
+            stretches=[0, 1],
+            child_min_height=56,
+            height=520,
+        )
 
     def refresh(self):
         update_figure(self.figure)
 
     def set_data(self, data):
         self.figure.data = data
-
 
 tabs = al.TabPanel({"trend": FigurePanel(figure)})
 tabs["trend"].refresh()
@@ -108,7 +137,6 @@ class FigureWrapper:
 
     def refresh(self):
         update_figure(self.figure)
-
 
 tabs = TabPanel({"trend": FigureWrapper(figure)})
 
@@ -144,6 +172,8 @@ wide = HBox(children, scroll=True, child_min_width=180, spacing=12, height=160)
 vertical = ScrollBox(children, height=420)
 ```
 
+![Scroll behavior example rendered in JupyterLab](assets/examples/guide-scroll-behavior.png)
+
 For explicit overflow control:
 
 ```python
@@ -153,8 +183,11 @@ HBox(
     scroll_y=False,
     spacing=12,
     child_min_width=220,
+    height=160,
 )
 ```
+
+![Scroll behavior example rendered in JupyterLab](assets/examples/guide-scroll-behavior-2.png)
 
 `spacing` controls the gap between children. `child_min_width` and
 `child_min_height` reserve enough room for each child, and `scroll=True` lets a
@@ -172,6 +205,8 @@ SplitPanel({"left": controls, "right": chart}, sizes=[0.3, 0.7])
 SplitPanel({"left": controls, "right": chart}, resizable=False)
 ```
 
+![Resizing example rendered in JupyterLab](assets/examples/guide-resizing.png)
+
 `SplitPanel` uses Lumino split handles between child panes. The layout host
 resize handle controls the overall notebook footprint. When panes are adjusted
 with Lumino split handles, the current relative pane sizes are synced back to
@@ -184,6 +219,7 @@ the action id.
 
 ```python
 import anylumino as al
+import anylumino.astryx as ax
 
 toolbar = ax.Stack(
     {
@@ -192,15 +228,24 @@ toolbar = ax.Stack(
             variant="primary",
             callbacks=[lambda _button: figure_panel.refresh()],
         ),
-        "note": ax.Button(
-            "Note",
-            callbacks=[lambda _button: figure_panel.add_note(text="Event")],
+        "clear": ax.Button(
+            "Clear",
+            callbacks=[lambda _button: figure_panel.set_data([])],
         ),
     },
     direction="horizontal",
     gap=2,
 )
+
+al.SplitPanel(
+    {"toolbar": toolbar, "panel": figure_panel},
+    orientation="vertical",
+    sizes=[0.1, 0.9],
+    height=600,
+)
 ```
+
+![Actions and callbacks example rendered in JupyterLab](assets/examples/guide-actions-and-callbacks.png)
 
 For compact application chrome, the Lumino-style `Toolbar`, `MenuBar`, and
 `CommandPalette` remain available and dispatch action ids to Python callbacks.
