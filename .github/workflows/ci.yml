@@ -35,6 +35,12 @@ jobs:
       - name: Verify committed bundles are current
         run: git diff --exit-code -- src/anylumino/static
 
+      - name: Regenerate bundled dependency licenses
+        run: npm run licenses
+
+      - name: Verify the license inventory is current
+        run: git diff --exit-code -- THIRD_PARTY_LICENSES.md
+
       - name: Run frontend tests
         run: npm test
 

@@ -337,6 +337,10 @@ deduplication, and JupyterLab testing workflow for theme changes.
 Frontend assets are bundled into the Python package. Runtime notebooks do not
 need CDN access for Lumino, Astryx, or the bundled workflow icons.
 
+Saving a notebook with widget state stores those assets once per widget model,
+which makes such files large. Rerun the examples with a kernel instead, or
+execute them with `--ExecutePreprocessor.store_widget_state=False`.
+
 ## Development
 
 ```sh
@@ -368,3 +372,10 @@ selection, sorting, and row-helper examples. Open `notebooks/plotly_tabs.py` and
 Open `notebooks/itables_tabs.py` to see an `itables.widget.ITable` inside a tab
 with controls that append rows to a pandas DataFrame and refresh the displayed
 table.
+
+## License
+
+`anylumino` is MIT licensed and requires Python 3.14 or later. The frontend
+bundles compile Lumino, Astryx, StyleX, and React into the wheel;
+`THIRD_PARTY_LICENSES.md` lists those packages with their notices, and
+`npm run licenses` regenerates it from the bundle inputs.

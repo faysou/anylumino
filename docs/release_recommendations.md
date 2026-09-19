@@ -1,28 +1,34 @@
 # Release Recommendations
 
 Prepare the first public release as an alpha. The package builds and the examples
-run in JupyterLab, but license packaging, saved widget-state size, and supported
-environments need explicit decisions before publication.
+run in JupyterLab. License packaging, the copyright holder, and the supported
+Python version are settled; saved widget-state size and browser coverage remain
+open.
 
-## Complete license packaging
+## License packaging
 
-The wheel includes bundled frontend dependencies. Its license directory contains
-the project's MIT license, while some bundled comments refer to upstream license
-files that are absent from the distribution.
+`THIRD_PARTY_LICENSES.md` inventories every package that the frontend build
+compiles into `src/anylumino/static`, with the upstream notice text for each one.
+`npm run licenses` regenerates it from the esbuild inputs, so documentation-site
+dependencies stay out of the runtime inventory, and CI fails when the committed
+file falls behind. Packages that publish no license file, currently Lumino,
+Astryx, and StyleX, take their notice from `licenses/`; the generator fails on a
+new package that has neither.
 
-Inventory the dependencies included by the frontend build and package their
-required license texts and notices. Generate the inventory from the actual bundle
-inputs so documentation-site dependencies do not get mixed into the runtime
-inventory. Confirm that `Nautilus` is the intended copyright holder in `LICENSE`
-and author name in `pyproject.toml`.
+`pyproject.toml` ships both `LICENSE` and `THIRD_PARTY_LICENSES.md` through
+`license-files`, so the wheel carries the notices it needs. The copyright holder
+and author are Faysal Aberkane.
 
 ## Reduce saved widget-state size
 
-The September 2026 notebook checks produced a 124.9 MB component smoke notebook
-and a 74.6 MB theme notebook when widget state was saved. The component notebook
-contained 112 copies of the same approximately 919 KB JavaScript bundle and
-152 KB stylesheet. This makes notebook sharing and reopening costly even though
-the compressed wheel is small.
+Each anywidget model carries its own `_esm` and `_css` state, so a saved notebook
+repeats the bundle once per widget instance. Converting the Jupytext examples to
+`.ipynb` and executing them with widget state saved produced a 124.9 MB component
+smoke notebook and a 74.6 MB theme notebook, the former holding 112 copies of the
+same approximately 919 KB JavaScript bundle and 152 KB stylesheet. Those files
+were local conversions and are not in the repository, which tracks only the
+Jupytext `.py` sources, but any user who saves a notebook with widget state hits
+the same cost.
 
 Investigate sharing frontend assets between widget models while preserving
 offline operation. Check notebook size, reopening behavior, and interactive
@@ -36,9 +42,9 @@ Keep the Jupytext source examples free of saved outputs.
 
 ## Define supported environments
 
-CI targets Python 3.14, while package metadata permits Python 3.10 and later.
-Decide whether the older versions remain a support promise. Either verify that
-promise separately or deliberately raise the minimum Python version.
+`pyproject.toml` requires Python 3.14 and later, which matches the single CI
+lane. Adding an older interpreter back means adding its CI lane in the same
+change.
 
 Document the supported notebook hosts and browsers. The visual checks cover
 JupyterLab in Chromium on macOS; they do not establish compatibility with Safari,
@@ -100,10 +106,8 @@ uv venv /tmp/anylumino-wheel
 uv pip install --python /tmp/anylumino-wheel/bin/python dist/*.whl
 ```
 
-The package supports Python 3.10 and later, as declared in
-`pyproject.toml`.
-The current CI support lane is Python 3.14 on Ubuntu, so add older-version CI
-lanes before making a tested support guarantee for each interpreter version.
+The package requires Python 3.14 and later, as declared in `pyproject.toml`, and
+CI tests that single lane on Ubuntu.
 Browser validation currently covers Chromium-based JupyterLab; Safari, Firefox,
 VS Code notebooks, and static exports require separate checks before claiming
 support.

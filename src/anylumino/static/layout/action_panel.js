@@ -316,6 +316,9 @@ export default {
         return;
       }
       Widget.attach(panel, root);
+      // Lumino drops update requests posted while a widget is hidden, so a
+      // palette built before attach renders no results until its first input.
+      panel.update();
       iconObserver = decorateCommandIcons(model.get("actions") ?? []);
     };
 

@@ -4,18 +4,11 @@ from collections.abc import Callable, Mapping
 from typing import Any, Iterable
 
 import anywidget
-
-try:
-    from anywidget import get_model_id
-    from anywidget import is_widget
-except ImportError:
-    # Released anywidget has the composition helpers as private names until
-    # https://github.com/manzt/anywidget/pull/1024 lands.
-    from anywidget._descriptor import _try_get_model_id as get_model_id
-
-    def is_widget(obj: object) -> bool:
-        return get_model_id(obj) is not None
 import traitlets as t
+
+# anywidget keeps the model id lookup private until
+# https://github.com/manzt/anywidget/pull/1024 lands.
+from anywidget._descriptor import _try_get_model_id as get_model_id
 
 from .common import ActivationCallbacks
 from .common import static_asset
@@ -29,6 +22,10 @@ ACTION_KINDS = ("toolbar", "menubar", "command_palette")
 ActionCallback = Callable[[str], None]
 ChildInput = Iterable[object] | Mapping[str, object] | None
 TitleInput = Iterable[str] | Mapping[str, str] | None
+
+
+def _is_widget(value: object) -> bool:
+    return get_model_id(value) is not None
 
 
 def _widget_ref(value: object) -> object:
@@ -83,18 +80,18 @@ def _validate_keys(key_list: list[str]) -> None:
 
 
 def _view_for_child(child: object) -> object:
-    if is_widget(child):
+    if _is_widget(child):
         return child
     view = getattr(child, "widget", None)
-    if is_widget(view):
+    if _is_widget(view):
         return view
     return child
 
 
 def _is_child(value: object) -> bool:
-    if is_widget(value):
+    if _is_widget(value):
         return True
-    return is_widget(getattr(value, "widget", None))
+    return _is_widget(getattr(value, "widget", None))
 
 
 def _as_child_list(children: ChildInput) -> list[Any]:
