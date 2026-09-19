@@ -11,11 +11,17 @@ export const metadata: Metadata = {
   description: 'Documentation for composing notebook interfaces with AnyLumino.',
 };
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
-        <RootProvider>{children}</RootProvider>
+        <RootProvider
+          search={{ options: { type: 'static', api: `${basePath}/static.json` } }}
+        >
+          {children}
+        </RootProvider>
       </body>
     </html>
   );

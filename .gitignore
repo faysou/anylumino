@@ -2,6 +2,7 @@
 .uv-cache/
 node_modules/
 .next/
+out/
 *.tsbuildinfo
 .pytest_cache/
 .ipynb_checkpoints/

@@ -10,7 +10,6 @@
     "docs:convert": "node scripts/generate-api-docs.mjs",
     "docs:build": "next build",
     "docs:dev": "next dev",
-    "docs:start": "next start",
     "docs:lint": "eslint app docs-site scripts/generate-api-docs.mjs tests/docs-href.test.mjs next.config.mjs postcss.config.mjs",
     "docs:types": "next typegen && tsc --noEmit",
     "docs:test-links": "node --test tests/docs-href.test.mjs"

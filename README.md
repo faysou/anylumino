@@ -359,10 +359,14 @@ make docs-preview
 
 This generates the Python API reference from source and NumPy docstrings, then opens
 `http://127.0.0.1:4200/docs` with the Fumadocs development server. Use `make docs` for
-a production build, `make docs-serve` to run that build locally, and `make docs-check`
-to run API generation, link tests, linting, type checks, and the production build.
-The Griffe-backed `fumadocs-python` generator owns `content/docs/api`; update public
-signatures and docstrings in `src/anylumino` instead of editing generated API pages.
+a static export into `out/`, `make docs-serve` to serve that export locally, and
+`make docs-check` to run API generation, link tests, linting, type checks, and the
+production build. The Griffe-backed `fumadocs-python` generator owns
+`content/docs/api`; update public signatures and docstrings in `src/anylumino`
+instead of editing generated API pages.
+
+The Docs workflow publishes the same export to GitHub Pages at
+<https://faysou.github.io/anylumino/docs/> on every push to `main`.
 
 Open `notebooks/astryx_components_smoke.py` for the broad Astryx component
 smoke test. Open `notebooks/astryx_layout_panels.py` for the Astryx layout

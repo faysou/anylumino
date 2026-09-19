@@ -62,7 +62,7 @@ docs-preview: docs-reference
 .PHONY: docs-serve
 docs-serve: docs-check-port docs
 	(sleep 1; $(OPEN) $(DOCS_URL)) &
-	npm run docs:start -- --hostname $(DOCS_HOST) --port $(DOCS_PORT)
+	uv run --no-sync python -m http.server $(DOCS_PORT) --bind $(DOCS_HOST) --directory out
 
 .PHONY: docs-check
 docs-check: docs-reference
