@@ -239,3 +239,10 @@
   `--effort` and to Codex as config overrides on every turn, saved with the session and shown in
   the header. Verify with pytest and a live Codex turn that builds one chart and one card per
   product.
+- [x] 14.5 Show line numbers in the three code tabs. Verify with pytest, in JupyterLab, and with
+  retaken documentation screenshots.
+- [x] 14.6 Export the OpenUI program as a comment with a fingerprint of the `UI` class, and add an
+  `Import` button and dialog that read an exported file back. Apply unchanged files, edited
+  callbacks, and edited programs directly, and send files with an edited `UI` class or that do not
+  apply to the agent to reconcile, then report whether the reconciled `UI` class matches the file.
+  Verify with pytest, in JupyterLab, and with a live turn that reconciles an edited `UI` class.

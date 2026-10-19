@@ -22,8 +22,8 @@ and `Callbacks`. The chat side SHALL show the agent, the session name, and the t
 
 ### Requirement: Read-only code tabs
 
-The `OpenUI`, `UI code`, and `Callbacks` tabs SHALL show their text with syntax highlighting,
-and SHALL NOT accept edits. Only chat turns SHALL change them.
+The `OpenUI`, `UI code`, and `Callbacks` tabs SHALL show their text with syntax highlighting
+and line numbers, and SHALL NOT accept edits. Only chat turns SHALL change them.
 
 #### Scenario: Code tab cannot be edited
 
@@ -136,7 +136,8 @@ Passing an agent that differs from the saved one SHALL raise `ValueError`.
 The workbench header SHALL have an `Export` button, disabled until a UI is built. It SHALL open a
 dialog that browses the kernel's folders, starting in the kernel's current directory, and asks for
 a name. Exporting SHALL write one module `<name>.py` in the chosen folder, replacing an existing
-file: the shown UI code first, then the shown callbacks, with the callbacks' leading imports moved
+file: the shown OpenUI program as a comment with a fingerprint of the `UI` class, then the shown UI
+code, then the shown callbacks, with the callbacks' leading imports moved
 up to the UI code's imports. It SHALL post a chat message with the path and a `load` call that
 uses it.
 
@@ -146,6 +147,26 @@ uses it.
   `sales`, and confirms
 - **THEN** `exports/sales.py` holds the `UI code` tab followed by the `Callbacks` tab, and the chat
   shows `load("exports/sales.py", sales=sales)`
+
+### Requirement: Importing an exported file
+
+The workbench header SHALL have an `Import` button that opens a dialog listing the kernel's folders
+and `.py` files. Importing a file SHALL read its OpenUI program comment, `UI` class, and callbacks,
+and apply the program and callbacks as a turn would. When the file does not apply, or its `UI`
+class changed since the export and differs from the generated code, the workbench SHALL send the
+file to the agent in a turn that asks for a program and callbacks that reproduce it. After that
+turn applies, the workbench SHALL post whether the generated `UI` class matches the file's. A file without
+the program comment or the `UI` class SHALL be rejected with a system message.
+
+#### Scenario: Callbacks edited outside the workbench
+
+- **WHEN** an exported file's App class is edited in an editor and the file is imported
+- **THEN** the tabs show the edited callbacks and no agent turn runs
+
+#### Scenario: UI class edited outside the workbench
+
+- **WHEN** an exported file's `UI` class is edited and the file is imported
+- **THEN** a turn sends the file to the agent, and its reply applies like any other turn
 
 ### Requirement: Loading an exported file
 

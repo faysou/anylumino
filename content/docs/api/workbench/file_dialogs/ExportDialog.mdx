@@ -1,0 +1,78 @@
+---
+title: "ExportDialog"
+---
+
+Pick a folder and a name, then call `on_export(folder, name)`.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="on_export" value="on_export" />
+
+  <PyAttribute name="name" value="ax.TextInput('ui', label='Name')" />
+
+  <PyAttribute name="files" value="ax.Text('', text_type='supporting')" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(on_export) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, on_export: Callable[[Path, str], None]) -> None:
+        self.on_export = on_export
+        self.name = ax.TextInput("ui", label="Name")
+        self.files = ax.Text("", text_type="supporting")
+        super().__init__("Export UI", [self.name, self.files], "Export")
+        self.name.observe(lambda _change: self.browsed(), names="value")
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="on_export" type="Callable[[Path, str], None]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="open_with" type="(name) -> None">
+  Show the dialog with `name` filled in, in the last browsed folder or the current directory.
+
+  <PySourceCode>
+    ```python
+    def open_with(self, name: str) -> None:
+        """Show the dialog with ``name`` filled in, in the last browsed folder or the current directory."""
+        self.name.value = name
+        self.open_in_last_folder()
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="name" type="str" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="browsed" type="() -> None">
+  <PySourceCode>
+    ```python
+    def browsed(self) -> None:
+        self.files.text = f"Writes {file_name(self.name.value or 'ui')} here, replacing an existing file."
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="finish" type="() -> None">
+  <PySourceCode>
+    ```python
+    def finish(self) -> None:
+        self.hide()
+        self.on_export(self.folder, self.name.value or "ui")
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

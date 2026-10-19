@@ -67,15 +67,17 @@ def test_fresh_workbench_layout(tmp_path):
         ["UI", "OpenUI", "UI code", "Callbacks"],
         0,
     )
-    agent, session, dot, caption, export, dialog = header.widgets
+    agent, session, dot, caption, export, import_, dialog, import_dialog = header.widgets
     assert (agent.label, session.label, dot.label, caption.text) == ("codex", "unsaved", "Ready", "Ready")
     assert (export.label, export.disabled) == ("Export", True)
     assert (dialog is workbench.export_dialog, dialog.is_open) == (True, False)
+    assert (import_.label, import_.disabled, import_dialog is workbench.import_dialog) == ("Import", False, True)
     assert workbench.suppress_shortcuts is True
     (empty,) = workbench.ui_host.widgets
     assert isinstance(empty, ax.EmptyState)
     assert code(workbench) == {"openui": "", "ui_code": "", "callbacks": ""}
     assert all(isinstance(view, ax.CodeBlock) for view in workbench.code_views.values())
+    assert [view.props["hasLineNumbers"] for view in workbench.code_views.values()] == [True, True, True]
 
 
 def test_successful_turn_updates_all_tabs(agent_reply, tmp_path, sales):

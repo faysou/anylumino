@@ -1,0 +1,166 @@
+---
+title: "FolderDialog"
+---
+
+Browse the kernel's folders, with `fields` under the folder list and a confirm button.
+
+The dialog browses the kernel's file system, not the browser's, because
+the kernel writes and reads the files. With `suffix`, files with that
+suffix are listed after the folders, and clicking one calls `pick`.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="suffix" value="suffix" />
+
+  <PyAttribute name="folder" type="Path | None" value="None" />
+
+  <PyAttribute name="path" value="ax.Text('', text_type='supporting')" />
+
+  <PyAttribute name="folders" value="ax.Stack([], direction='vertical', gap=0, height=220, scrollable=True)" />
+
+  <PyAttribute name="confirm" value="ax.Button(confirm, variant='primary', callbacks=[lambda _button: self.finish()])" />
+
+  <PyAttribute name="props" value="{**self.props, 'width': 480}" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(title, fields, confirm, suffix='') -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, title: str, fields: Sequence[ax.Widget], confirm: str, suffix: str = "") -> None:
+        self.suffix = suffix
+        self.folder: Path | None = None
+        self.path = ax.Text("", text_type="supporting")
+        self.folders = ax.Stack([], direction="vertical", gap=0, height=220, scrollable=True)
+        up = ax.Button("Up", variant="ghost", size="sm", callbacks=[lambda _button: self.browse(self.folder.parent)])
+        cancel = ax.Button("Cancel", callbacks=[lambda _button: self.hide()])
+        self.confirm = ax.Button(confirm, variant="primary", callbacks=[lambda _button: self.finish()])
+        super().__init__(
+            ax.Stack(
+                [
+                    ax.Heading(title),
+                    ax.Stack([self.path, up], direction="horizontal", justify="between", align="center"),
+                    self.folders,
+                    *fields,
+                    ax.Stack([cancel, self.confirm], direction="horizontal", justify="end"),
+                ],
+                direction="vertical",
+                gap=3,
+                padding=4,
+            ),
+            open=False,
+            inline=False,
+        )
+        # Set as a prop only: the width argument also sizes the widget host, which then
+        # takes header space while the dialog is closed
+        self.props = {**self.props, "width": 480}
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="title" type="str" />
+
+    <PyParameter name="fields" type="Sequence[ax.Widget]" />
+
+    <PyParameter name="confirm" type="str" />
+
+    <PyParameter name="suffix" type="str" value="''" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="open_in_last_folder" type="() -> None">
+  Show the dialog in the last browsed folder, or the current directory at the first open.
+
+  <PySourceCode>
+    ```python
+    def open_in_last_folder(self) -> None:
+        """Show the dialog in the last browsed folder, or the current directory at the first open."""
+        self.browse(self.folder or Path.cwd())
+        self.show()
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="browse" type="(folder) -> None">
+  <PySourceCode>
+    ```python
+    def browse(self, folder: Path) -> None:
+        self.folder = folder.resolve()
+        self.path.text = str(self.folder)
+        try:
+            entries = sorted(
+                (entry for entry in self.folder.iterdir() if not entry.name.startswith(".")), key=lambda entry: entry.name
+            )
+        except OSError:
+            entries = []
+
+        folders = [
+            ax.Button(f"{entry.name}/", variant="ghost", size="sm", callbacks=[lambda _button, entry=entry: self.browse(entry)])
+            for entry in entries
+            if entry.is_dir()
+        ]
+        files = [
+            ax.Button(entry.name, variant="ghost", size="sm", callbacks=[lambda _button, entry=entry: self.pick(entry)])
+            for entry in entries
+            if self.suffix and entry.is_file() and entry.suffix == self.suffix
+        ]
+        self.folders.widgets = [*folders, *files]
+        self.browsed()
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="folder" type="Path" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="browsed" type="() -> None">
+  Update the fields after the folder changes.
+
+  <PySourceCode>
+    ```python
+    def browsed(self) -> None:
+        """Update the fields after the folder changes."""
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="pick" type="(path) -> None">
+  Handle a click on a listed file.
+
+  <PySourceCode>
+    ```python
+    def pick(self, path: Path) -> None:
+        """Handle a click on a listed file."""
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="path" type="Path" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="finish" type="() -> None">
+  Handle the confirm button.
+
+  <PySourceCode>
+    ```python
+    def finish(self) -> None:
+        """Handle the confirm button."""
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

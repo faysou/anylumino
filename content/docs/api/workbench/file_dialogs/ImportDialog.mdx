@@ -1,0 +1,77 @@
+---
+title: "ImportDialog"
+---
+
+Pick an exported `.py` file, then call `on_import(path)`.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="on_import" value="on_import" />
+
+  <PyAttribute name="chosen" type="Path | None" value="None" />
+
+  <PyAttribute name="files" value="ax.Text('', text_type='supporting')" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(on_import) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, on_import: Callable[[Path], None]) -> None:
+        self.on_import = on_import
+        self.chosen: Path | None = None
+        self.files = ax.Text("", text_type="supporting")
+        super().__init__("Import UI", [self.files], "Import", suffix=".py")
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="on_import" type="Callable[[Path], None]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="browsed" type="() -> None">
+  <PySourceCode>
+    ```python
+    def browsed(self) -> None:
+        self.chosen = None
+        self.files.text = "Pick an exported file."
+        self.confirm.disabled = True
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="pick" type="(path) -> None">
+  <PySourceCode>
+    ```python
+    def pick(self, path: Path) -> None:
+        self.chosen = path
+        self.files.text = f"Imports {path.name} into the workbench, replacing the current UI."
+        self.confirm.disabled = False
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="path" type="Path" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="finish" type="() -> None">
+  <PySourceCode>
+    ```python
+    def finish(self) -> None:
+        self.hide()
+        self.on_import(self.chosen)
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

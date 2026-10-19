@@ -74,7 +74,7 @@ Workbench(agent="codex", session="sales", namespace={"sales": sales}, effort="lo
 | `UI code`   | The Python module that builds the `UI` tab. The tab runs this code. |
 | `Callbacks` | The Python handlers from the agent's latest `python` block.         |
 
-The code tabs are read only. Only chat turns change them.
+The code tabs are read only and show line numbers. Only chat turns change them.
 
 ![OpenUI tab with the program the agent wrote](assets/workbench/workbench-openui.png)
 
@@ -224,8 +224,8 @@ a failed turn leave all four tabs unchanged.
 | `agents.py`           | Builds the CLI arguments, parses the Claude and Codex event streams, and stops a turn.                                                        |
 | `session.py`          | Saves and loads sessions with an atomic write, and validates session names.                                                                   |
 | `app.py`              | The `App` base class: namespace attributes, `setup`, handler calls with error routing, and `ask_agent`.                                       |
-| `export.py`           | Runs the callbacks and the UI code for both the workbench and `load`, and writes the exported file.                                           |
-| `export_dialog.py`    | The export dialog, which browses the kernel's folders rather than the browser's, since the kernel reads the files back.                       |
+| `export.py`           | Runs the callbacks and the UI code for both the workbench and `load`, writes the exported file, and reads it back for import.                 |
+| `file_dialogs.py`     | The export and import dialogs, which browse the kernel's folders rather than the browser's, since the kernel writes and reads the files.     |
 | `workbench.py`        | Assembles the panels and runs the turn.                                                                                                       |
 
 The frontend parts are `ax.Chat` in `static/astryx/astryx_widget.js` and the
@@ -282,7 +282,7 @@ OpenUI bundle; `npm run build` bundles it.
 - **Browser:** `notebooks/openui_workbench_fake_agent.py` drives a full turn in
   JupyterLab without spending tokens.
 
-## Export and load
+## Export, load, and import
 
 **Export** in the workbench header writes the current UI to one Python file,
 so the same UI runs without the workbench or the agent. It is available once a
@@ -294,8 +294,9 @@ UI is built.
    The name defaults to the session name, with `-` replaced by `_` so the file
    can be imported as a module.
    The workbench writes `sales.py`, replacing an existing file, and posts the
-   `load` call for it in the chat. The file holds the `UI code` tab and then the
-   `Callbacks` tab, with the imports of both at the top.
+   `load` call for it in the chat. The file holds the `OpenUI` tab as a comment
+   after the docstring, then the `UI code` tab and the `Callbacks` tab, with the
+   imports of both at the top.
 3. Run that call in a notebook cell:
 
 ```python
@@ -324,6 +325,36 @@ ui = UI(app)
 The app works without a UI, for example to call a handler in a test. The `UI`
 is a widget, so it composes like any other: put it in a `TabPanel`, a
 `SplitPanel`, or a stack next to other widgets.
+
+### Import an edited file
+
+**Import** in the header reads an exported file back into the workbench, so you
+can change it in an editor and then continue in the chat. The dialog browses
+the kernel's folders and lists their `.py` files. Pick one and select
+**Import**. The workbench reads three parts from the file: the OpenUI program
+in the comment block between the `` # ```openui-lang `` and `` # ``` `` lines,
+the `UI` class, and the rest as the callbacks.
+
+| File change                                | Result                                                             |
+| ------------------------------------------ | ------------------------------------------------------------------ |
+| None, or only the callbacks                | The tabs fill from the file, with no agent turn.                   |
+| The OpenUI comment                         | The tabs fill from the new program, with no agent turn.            |
+| The `UI` class                             | The tabs fill, then a turn asks the agent to reconcile.            |
+| Anything that stops the file from applying | The tabs keep their contents, and a turn asks the agent to fix it. |
+
+The comment's first line records a fingerprint of the exported `UI` class, so
+the workbench can tell an edited `UI` class from an edited program. When both
+changed, the `UI` class counts as edited. The agent never edits the `UI` class
+directly: it is always generated from the program. A reconcile turn sends the agent the whole file and asks for a program
+that generates the edited `UI` class and callbacks that keep the `App` class.
+The chat shows a one-line request, and the reply applies like any other turn.
+A valid reply can still miss part of a hand edit, so after it applies, the chat
+reports whether the generated `UI` class matches the file. On a mismatch, the
+`UI code` tab shows what applied, and you can ask the agent to close the gap.
+An edit that OpenUI cannot express, such as Python logic in `UI.__init__`,
+always reports a mismatch.
+A file without the program comment or the `UI` class is rejected with a chat
+message, since it was not exported from a workbench.
 
 ## Limits
 

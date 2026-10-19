@@ -1,0 +1,36 @@
+---
+title: "ExportedFile"
+---
+
+The parts of an exported file: the OpenUI program, the `UI` class source, and the callbacks.
+
+`ui_edited` is whether the `UI` class changed since the export, from the
+fingerprint the export wrote; a file without one counts as edited.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="program" type="str" />
+
+  <PyAttribute name="ui_class" type="str" />
+
+  <PyAttribute name="callbacks" type="str" />
+
+  <PyAttribute name="ui_edited" type="bool" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(program, ui_class, callbacks, ui_edited) -> None" kind="constructor">
+  <div>
+    <PyParameter name="program" type="str" />
+
+    <PyParameter name="ui_class" type="str" />
+
+    <PyParameter name="callbacks" type="str" />
+
+    <PyParameter name="ui_edited" type="bool" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -36,9 +36,13 @@ Build notebook UIs by chatting with a local coding agent.
 
   <PyAttribute name="export_button" value="ax.Button('Export', size='sm', disabled=True, callbacks=[lambda _button: self.export_dialog.open_with((self.state.name or 'ui').replace('-', '_'))])" />
 
+  <PyAttribute name="import_dialog" value="ImportDialog(self.import_file)" />
+
+  <PyAttribute name="import_button" value="ax.Button('Import', size='sm', callbacks=[lambda _button: self.import_dialog.open_in_last_folder()])" />
+
   <PyAttribute name="ui_host" value="al.ScrollBox([self.empty_ui()], height='100%')" />
 
-  <PyAttribute name="code_views" value="{'openui': ax.CodeBlock('', language='text', width='100%'), 'ui_code': ax.CodeBlock('', language='python', width='100%'), 'callbacks': ax.CodeBlock('', language='python', width='100%')}" />
+  <PyAttribute name="code_views" value="{'openui': ax.CodeBlock('', language='text', line_numbers=True, width='100%'), 'ui_code': ax.CodeBlock('', language='python', line_numbers=True, width='100%'), 'callbacks': ax.CodeBlock('', language='python', line_numbers=True, width='100%')}" />
 
   <PyAttribute name="tabs" value="al.TabPanel({'ui': self.ui_host, **{key: al.ScrollBox([view], height='100%') for key, view in self.code_views.items()}}, titles=TABS, height='100%')" />
 
@@ -97,6 +101,10 @@ Build notebook UIs by chatting with a local coding agent.
             # Session names may hold `-`, which an importable module name cannot
             callbacks=[lambda _button: self.export_dialog.open_with((self.state.name or "ui").replace("-", "_"))],
         )
+        self.import_dialog = ImportDialog(self.import_file)
+        self.import_button = ax.Button(
+            "Import", size="sm", callbacks=[lambda _button: self.import_dialog.open_in_last_folder()]
+        )
         header = ax.Stack(
             [
                 ax.Badge(" ".join(filter(None, [self.state.agent, self.state.model, self.state.effort])), variant="info"),
@@ -104,7 +112,9 @@ Build notebook UIs by chatting with a local coding agent.
                 self.status,
                 self.status_text,
                 self.export_button,
+                self.import_button,
                 self.export_dialog,
+                self.import_dialog,
             ],
             direction="horizontal",
             gap=2,
@@ -114,9 +124,9 @@ Build notebook UIs by chatting with a local coding agent.
         )
         self.ui_host = al.ScrollBox([self.empty_ui()], height="100%")
         self.code_views = {
-            "openui": ax.CodeBlock("", language="text", width="100%"),
-            "ui_code": ax.CodeBlock("", language="python", width="100%"),
-            "callbacks": ax.CodeBlock("", language="python", width="100%"),
+            "openui": ax.CodeBlock("", language="text", line_numbers=True, width="100%"),
+            "ui_code": ax.CodeBlock("", language="python", line_numbers=True, width="100%"),
+            "callbacks": ax.CodeBlock("", language="python", line_numbers=True, width="100%"),
         }
         self.tabs = al.TabPanel(
             {"ui": self.ui_host, **{key: al.ScrollBox([view], height="100%") for key, view in self.code_views.items()}},
@@ -219,6 +229,42 @@ Build notebook UIs by chatting with a local coding agent.
   <PyFunctionReturn type="None" />
 </PyFunction>
 
+<PyFunction name="import_file" type="(path) -> None">
+  Fill the tabs from an exported file, and ask the agent to reconcile it when it was edited.
+
+  The program and callbacks of the file apply as a turn's would. When they
+  do not apply, or the file's `UI` class differs from the code the
+  program generates, a turn sends the file to the agent to update the
+  program and callbacks.
+
+  <PySourceCode>
+    ```python
+    def import_file(self, path: Path) -> None:
+        """Fill the tabs from an exported file, and ask the agent to reconcile it when it was edited.
+
+        The program and callbacks of the file apply as a turn's would. When they
+        do not apply, or the file's ``UI`` class differs from the code the
+        program generates, a turn sends the file to the agent to update the
+        program and callbacks.
+        """
+        if self.running:
+            self.add_message("system", "A turn is already running; wait for it or stop it.")
+
+            return
+
+        self.set_running(True)
+        self.runner.stopped = False
+        self.schedule(self.run_import(path))
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="path" type="Path" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
 <PyFunction name="ask_agent" type="(message, context=None) -> None">
   Send `message` to the agent as if the user had typed it.
 
@@ -263,14 +309,119 @@ Build notebook UIs by chatting with a local coding agent.
   <PyFunctionReturn type="None" />
 </PyFunction>
 
-<PyFunction name="run_turn" type="(text, context=None) -> None">
+<PyFunction name="run_import" type="(path) -> None">
+  <PySourceCode>
+    ````python
+    async def run_import(self, path: Path) -> None:
+        shown = shown_path(path)
+        try:
+            source = path.read_text()
+            reason = await self.apply_import(source)
+        except (OSError, ExportedFileError) as error:
+            self.add_message("system", f"Import of `{shown}` failed: {error}")
+            self.set_running(False)
+
+            return
+
+        if not reason:
+            self.last_error = ""
+            self.add_message("system", f"Imported `{shown}`.")
+            self.set_running(False)
+            self.save()
+
+            return
+
+        details = (
+            f"The file `{shown}` was exported from this workbench and changed outside it, and {reason}. "
+            "Reply with the openui-lang program and the python callbacks that reproduce this file: "
+            "the program must generate its UI class, and the callbacks must keep its App class.\n\n"
+            f"```text\n{source}\n```"
+        )
+        await self.run_turn(f"Reconcile the imported file `{shown}`: {reason}.", details=details)
+        self.report_reconcile(shown, source)
+    ````
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="path" type="Path" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="report_reconcile" type="(shown, source) -> None">
   <PySourceCode>
     ```python
-    async def run_turn(self, text: str, context: Any = None) -> None:
+    def report_reconcile(self, shown: str, source: str) -> None:
+        if self.last_error or self.runner.stopped:
+            return
+
+        try:
+            target = class_source(source, "UI")
+        except SyntaxError:
+            return
+
+        if ui_fingerprint(class_source(self.ui_code, "UI")) == ui_fingerprint(target):
+            self.add_message("system", f"Reconciled `{shown}`: the generated UI class matches the file.")
+        else:
+            self.add_message(
+                "system",
+                f"The generated UI class still differs from `{shown}`. The UI code tab shows what applied; "
+                "ask the agent in the chat to close the gap.",
+            )
+
+        self.save()
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="shown" type="str" />
+
+    <PyParameter name="source" type="str" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="apply_import" type="(source) -> str">
+  Apply an exported file's program and callbacks; return why the agent must reconcile it, or `""`.
+
+  <PySourceCode>
+    ```python
+    async def apply_import(self, source: str) -> str:
+        """Apply an exported file's program and callbacks; return why the agent must reconcile it, or ``""``."""
+        try:
+            exported = read_module(source)
+        except SyntaxError as error:
+            return f"it is not valid Python: {error.msg} (line {error.lineno})"
+
+        try:
+            await self.apply(exported.program, exported.callbacks)
+        except Exception as error:
+            return f"it does not apply: {error}"
+
+        if exported.ui_edited and ui_fingerprint(class_source(self.ui_code, "UI")) != ui_fingerprint(exported.ui_class):
+            return "its UI class was edited, so it differs from the code its program generates"
+
+        return ""
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="source" type="str" />
+  </div>
+
+  <PyFunctionReturn type="str" />
+</PyFunction>
+
+<PyFunction name="run_turn" type="(text, context=None, details='') -> None">
+  <PySourceCode>
+    ```python
+    async def run_turn(self, text: str, context: Any = None, details: str = "") -> None:
         try:
             self.add_message("user", text, "sent")
             index = self.add_message("assistant", "", "sending")
-            await self.stream_reply(index, text, context)
+            await self.stream_reply(index, text, context, details)
         finally:
             self.state.agent_session_id = self.runner.session_id
             self.set_running(False)
@@ -282,15 +433,17 @@ Build notebook UIs by chatting with a local coding agent.
     <PyParameter name="text" type="str" />
 
     <PyParameter name="context" type="Any" value="None" />
+
+    <PyParameter name="details" type="str" value="''" />
   </div>
 
   <PyFunctionReturn type="None" />
 </PyFunction>
 
-<PyFunction name="stream_reply" type="(index, text, context) -> None">
+<PyFunction name="stream_reply" type="(index, text, context, details='') -> None">
   <PySourceCode>
     ```python
-    async def stream_reply(self, index: int, text: str, context: Any) -> None:
+    async def stream_reply(self, index: int, text: str, context: Any, details: str = "") -> None:
         reply = ""
         tools: list[dict[str, Any]] = []
         failure = ""
@@ -304,7 +457,7 @@ Build notebook UIs by chatting with a local coding agent.
             self.update_reply(index, reply, tools, "sending")
 
         try:
-            async for event in self.runner.turn(self.turn_prompt(text, context), await system_prompt(self.namespace)):
+            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace)):
                 if isinstance(event, Text):
                     reply += event.text
                 elif isinstance(event, ToolStarted):
@@ -342,6 +495,8 @@ Build notebook UIs by chatting with a local coding agent.
     <PyParameter name="text" type="str" />
 
     <PyParameter name="context" type="Any" />
+
+    <PyParameter name="details" type="str" value="''" />
   </div>
 
   <PyFunctionReturn type="None" />
@@ -521,7 +676,7 @@ Build notebook UIs by chatting with a local coding agent.
     def export(self, folder: Path, name: str) -> None:
         """Write the UI code and callbacks into one file in ``folder`` and post the ``load`` call for it."""
         try:
-            path = shown_path(write_module(folder, name, self.ui_code, self.state.callbacks))
+            path = shown_path(write_module(folder, name, self.ui_code, self.state.callbacks, self.state.program))
         except OSError as error:
             self.add_message("system", f"Export failed: {error}")
 
@@ -546,11 +701,11 @@ Build notebook UIs by chatting with a local coding agent.
   <PyFunctionReturn type="None" />
 </PyFunction>
 
-<PyFunction name="turn_prompt" type="(text, context) -> str">
+<PyFunction name="turn_prompt" type="(text, context, details='') -> str">
   <PySourceCode>
     ````python
-    def turn_prompt(self, text: str, context: Any) -> str:
-        parts = [text]
+    def turn_prompt(self, text: str, context: Any, details: str = "") -> str:
+        parts = [text, *([details] if details else [])]
         if context is not None:
             parts.append(f"Context from the UI: {json.dumps(context, default=str)}")
 
@@ -571,6 +726,8 @@ Build notebook UIs by chatting with a local coding agent.
     <PyParameter name="text" type="str" />
 
     <PyParameter name="context" type="Any" />
+
+    <PyParameter name="details" type="str" value="''" />
   </div>
 
   <PyFunctionReturn type="str" />

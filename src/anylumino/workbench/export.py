@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import inspect
 import os
+import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -18,10 +21,33 @@ from .catalog import go
 MODULE = "anylumino_workbench"
 # Globals of the generated UI code, which an export shares with the callbacks
 UI_GLOBALS = {"UI": None, "al": anylumino, "ax": ax, "go": go}
+# The comment lines that hold the OpenUI program in an exported file; the start line also holds
+# the fingerprint of the exported UI class, which tells an edited UI class from an edited program
+PROGRAM_START = "# ```openui-lang"
+PROGRAM_END = "# ```"
+FINGERPRINT = "ui-sha256="
 
 
 class CallbacksError(ValueError):
     """The callbacks do not define exactly one usable ``App`` subclass."""
+
+
+class ExportedFileError(ValueError):
+    """A file does not have the parts of a workbench export."""
+
+
+@dataclass(frozen=True)
+class ExportedFile:
+    """The parts of an exported file: the OpenUI program, the ``UI`` class source, and the callbacks.
+
+    ``ui_edited`` is whether the ``UI`` class changed since the export, from the
+    fingerprint the export wrote; a file without one counts as edited.
+    """
+
+    program: str
+    ui_class: str
+    callbacks: str
+    ui_edited: bool
 
 
 def app_class(source: str) -> type[App]:
@@ -90,13 +116,15 @@ def file_name(name: str) -> str:
     return f"{name}.py"
 
 
-def module_source(ui_code: str, callbacks: str) -> str:
+def module_source(ui_code: str, callbacks: str, program: str = "") -> str:
     """Join ``ui_code`` and then ``callbacks`` into one module, with the callbacks' imports moved up.
 
-    ``__future__`` imports go first, after the UI code's docstring, since Python
-    rejects them anywhere else.
+    ``program``, when given, goes after the UI code's docstring as a comment
+    block that `read_module` reads back. ``__future__`` imports go first after
+    that, since Python rejects them anywhere else.
     """
     ui = split_head(ui_code)
+    fingerprint = ui_fingerprint(class_source(ui_code, "UI"))
     callbacks_parts = {key: text.lstrip("\n") for key, text in split_head(callbacks).items()}
     # Both parts may import the same module, such as Plotly for a Plot statement
     shared = set(ui["imports"].splitlines(keepends=True))
@@ -107,6 +135,7 @@ def module_source(ui_code: str, callbacks: str) -> str:
     return "".join(
         [
             ui["docstring"],
+            program_comment(program, fingerprint),
             ui["future"],
             callbacks_parts["future"],
             ui["imports"],
@@ -117,6 +146,29 @@ def module_source(ui_code: str, callbacks: str) -> str:
             callbacks_parts["body"],
         ]
     )
+
+
+def program_comment(program: str, fingerprint: str) -> str:
+    if not program:
+        return ""
+
+    lines = [f"# {line}".rstrip() for line in program.splitlines()]
+
+    return "\n" + "\n".join([f"{PROGRAM_START} {FINGERPRINT}{fingerprint}", *lines, PROGRAM_END]) + "\n"
+
+
+def ui_fingerprint(ui_class: str) -> str:
+    """Return a short hash of a ``UI`` class's code.
+
+    The hash covers the syntax tree with keyword arguments sorted, so layout,
+    comments, and keyword order do not count as changes.
+    """
+    tree = ast.parse(ui_class)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            node.keywords.sort(key=lambda keyword: keyword.arg or "")
+
+    return hashlib.sha256(ast.dump(tree).encode()).hexdigest()[:16]
 
 
 def split_head(source: str) -> dict[str, str]:
@@ -144,12 +196,80 @@ def split_head(source: str) -> dict[str, str]:
     return parts
 
 
-def write_module(folder: str | Path, name: str, ui_code: str, callbacks: str) -> Path:
-    """Write ``ui_code`` and ``callbacks`` as one module into ``folder``, replacing an existing file."""
+def write_module(folder: str | Path, name: str, ui_code: str, callbacks: str, program: str = "") -> Path:
+    """Write ``ui_code`` and ``callbacks`` as one module into ``folder``, replacing an existing file.
+
+    ``program`` is written as a comment, so that the file can be imported back.
+    """
     path = Path(folder) / file_name(name)
-    path.write_text(module_source(ui_code, callbacks))
+    path.write_text(module_source(ui_code, callbacks, program))
 
     return path
+
+
+def read_module(source: str) -> ExportedFile:
+    """Split an exported file into its OpenUI program, ``UI`` class, and callbacks.
+
+    The callbacks are the file without its docstring, the program comment, the
+    ``UI`` class, and the imports only the ``UI`` class uses.
+
+    Raises
+    ------
+    SyntaxError
+        If ``source`` is not valid Python.
+    ExportedFileError
+        If the program comment or the ``UI`` class is missing.
+    """
+    lines = source.splitlines(keepends=True)
+    stripped = [line.rstrip() for line in lines]
+    try:
+        start = next(index for index, line in enumerate(stripped) if line.split(" ui-")[0] == PROGRAM_START)
+        end = stripped.index(PROGRAM_END, start + 1)
+    except (StopIteration, ValueError):
+        raise ExportedFileError(f"the file has no OpenUI program between {PROGRAM_START!r} and {PROGRAM_END!r} lines") from None
+
+    program = "\n".join(line.removeprefix("#").removeprefix(" ") for line in stripped[start + 1 : end])
+    tree = ast.parse(source)
+    ui = next((node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == "UI"), None)
+    if ui is None:
+        raise ExportedFileError("the file has no UI class")
+
+    removed = set(range(start, end + 1)) | set(range(ui.lineno - 1, ui.end_lineno or ui.lineno))
+    first = tree.body[0]
+    if isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant) and isinstance(first.value.value, str):
+        removed |= set(range(first.lineno - 1, first.end_lineno or first.lineno))
+
+    kept = [node for node in tree.body if node is not ui and not isinstance(node, (ast.Import, ast.ImportFrom))]
+    used = {node.id for statement in kept for node in ast.walk(statement) if isinstance(node, ast.Name)}
+    for node in tree.body:
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            names = {(alias.asname or alias.name).split(".")[0] for alias in node.names}
+            if names <= set(UI_GLOBALS) and not names & used:
+                removed |= set(range(node.lineno - 1, node.end_lineno or node.lineno))
+
+    callbacks = "".join(line for index, line in enumerate(lines) if index not in removed)
+
+    ui_class = class_source(source, "UI")
+    recorded = stripped[start].partition(FINGERPRINT)[2]
+
+    return ExportedFile(
+        program,
+        ui_class,
+        re.sub(r"\n{3,}", "\n\n\n", callbacks).strip("\n") + "\n",
+        recorded != ui_fingerprint(ui_class),
+    )
+
+
+def class_source(source: str, name: str) -> str:
+    """Return the source of the module-level class ``name`` in ``source``, or an empty string."""
+    tree = ast.parse(source)
+    node = next((node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == name), None)
+    if node is None:
+        return ""
+
+    lines = source.splitlines(keepends=True)
+
+    return "".join(lines[node.lineno - 1 : node.end_lineno]).rstrip() + "\n"
 
 
 def load(path: str | Path, **namespace: Any) -> Any:
