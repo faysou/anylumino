@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- GitHub releases now carry the version's changelog entry as their notes,
+  instead of only a link to the compare view. The Release workflow stops
+  before publishing when the changelog has no entry for the tagged version.
+
 ## 0.2.0
 
 This release adds the workbench: build notebook UIs by chatting with a local
