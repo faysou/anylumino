@@ -28,7 +28,9 @@ Keep pull requests focused. Add or update a runnable notebook when a change
 introduces a user-facing widget pattern, and update the relevant documentation
 when public behavior changes.
 
-Releases run from a `v*` tag. Bump the version in `pyproject.toml`, tag the
-release commit, and push the tag; the Release workflow builds the
-distributions, attaches them to the GitHub release, and publishes to PyPI
-through Trusted Publishing.
+Releases run from a `v*` tag. Bump the version in `pyproject.toml`, add a
+`## <version>` section to `CHANGELOG.md`, tag the release commit, and push the
+tag. The Release workflow builds the distributions, publishes them to PyPI
+through Trusted Publishing, and attaches them to the GitHub release, whose
+notes come from that changelog section through `scripts/release_notes.py`. The
+workflow fails before publishing when the section is missing.
