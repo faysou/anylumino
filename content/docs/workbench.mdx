@@ -7,6 +7,8 @@ coding agent. The chat sits on the left. The right side has four tabs: the live
 UI, the [OpenUI Lang](https://github.com/thesysdev/openui) program the agent
 wrote, the Python generated from that program, and the agent's callbacks.
 
+![Workbench after one turn: the chat on the left and the generated sales explorer in the UI tab](assets/workbench/workbench-ui.png)
+
 ## Requirements
 
 - `node` on `PATH`. The workbench parses OpenUI programs with the bundled
@@ -47,6 +49,10 @@ the program, the callbacks, or both.
 
 The code tabs are read only. Only chat turns change them.
 
+![OpenUI tab with the program the agent wrote](assets/workbench/workbench-openui.png)
+
+![UI code tab with the Python module generated from the program](assets/workbench/workbench-ui-code.png)
+
 A turn is applied in full or not at all. The workbench merges and parses the
 program, compiles the callbacks, generates the UI code, and builds the widgets.
 If any step fails, all four tabs keep their previous content, and the chat shows
@@ -77,6 +83,8 @@ def on_total(event, widgets):
 - `Widget("name")` in the program mounts the widget stored under `name` in the
   `namespace`, such as a Plotly `FigureWidget`.
 - An exception in a handler shows in the chat. The other widgets keep working.
+
+![Callbacks tab with setup and the event handlers](assets/workbench/workbench-callbacks.png)
 
 <Callout type="warn" title="Warning">
   The workbench runs agent-written Python in your kernel: the callbacks and the
