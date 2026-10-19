@@ -16,6 +16,9 @@ tables, and outputs. A composed widget can own its layout, state, callbacks,
 and domain methods while still being an anywidget that can be nested into
 another layout.
 
+It also ships a workbench that builds these UIs by chatting with a local coding
+agent, Claude Code or Codex, and exports the result as plain Python.
+
 Documentation: <https://faysou.github.io/anylumino/docs/>
 
 ## Quick start
@@ -119,6 +122,34 @@ Children remain addressable by key, callbacks can interact with sibling
 widgets, and larger components such as `OrderDashboard`, `FigurePanel`, or
 `SampleReview` can be reused across notebooks without relying on global
 variables.
+
+## Workbench
+
+`anylumino.workbench.Workbench` builds a notebook UI from a chat with a local
+`claude` (Claude Code) or `codex` (Codex CLI). Pass the data the UI should use,
+then describe the UI:
+
+```python
+import pandas as pd
+from anylumino.workbench import Workbench
+
+sales = pd.DataFrame(
+    {"region": ["EMEA", "APAC", "AMER"], "revenue": [1.5, 2.0, 3.2]}
+)
+
+Workbench(agent="claude", session="sales", namespace={"sales": sales})
+```
+
+The agent writes an OpenUI program and an `App` class with the callbacks. The
+workbench shows the live UI next to the program, the Python generated from it,
+and the callbacks. The agent sees the names, types, and data frame columns of
+the namespace, not its rows, and its turns run read-only. Charts use Plotly.
+
+**Export** writes the UI to one Python file, which
+`anylumino.workbench.load("exports/sales.py", sales=sales)` shows in any
+notebook without the agent. **Import** reads an edited file back into the
+workbench. The workbench needs `node` on `PATH` and a signed-in agent CLI. See
+the [workbench guide](https://faysou.github.io/anylumino/docs/workbench/).
 
 ## Layout composition
 
