@@ -361,8 +361,11 @@ message, since it was not exported from a workbench.
 - The agent can use the components in the workbench catalog only: layout
   panels, cards, text, inputs, badges, tables, code blocks, Plotly figures, and
   mounted namespace widgets.
-- Options that take Python callables, such as a button's `callbacks`, are not
-  available. Option values must be literals.
+- Option values must be literals, so constructor keywords that take Python
+  functions, such as a button's `callbacks`, are not options. Components still
+  run Python: a button's action slot takes `@Callback("handler")`, which calls
+  that method of the `App` on click, as described in
+  [Callbacks](#callbacks).
 - OpenUI `$state` variables, `Query`, `Mutation`, `@Each`, and `@OpenUrl`
   are not supported, and a reply that uses them is not applied. The `App` class
   holds the state and reads the data instead. For content whose size depends on
