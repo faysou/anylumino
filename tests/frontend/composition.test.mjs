@@ -5,7 +5,9 @@ import {
   clampIndex,
   coalesce,
   cssSize,
+  installShortcutSuppression,
   modelListeners,
+  observeResize,
   reusableSlots,
   titleFor,
   whenConnected,
@@ -111,12 +113,12 @@ test("reusableSlots hands back one slot per ref and reports the rest", () => {
   assert.deepEqual(reusable.rest(), [second]);
 });
 
-function fakeElement(height, children = []) {
+function fakeElement(height, children = [], top = 0) {
   return {
     scrollHeight: height,
     offsetHeight: height,
     children,
-    getBoundingClientRect: () => ({ top: 0, bottom: height, height }),
+    getBoundingClientRect: () => ({ top, bottom: top + height, width: height ? 300 : 0, height }),
   };
 }
 
@@ -130,6 +132,10 @@ test("measuredContentHeight measures through zero-box wrappers", async () => {
 
   const empty = fakeElement(0, [fakeElement(0, [])]);
   assert.equal(measuredContentHeight(empty, { includeSelf: false }), 0);
+
+  // Scrolled above the viewport, the wrapper's all-zero rect sits below the node's top.
+  const scrolled = fakeElement(143, [fakeElement(0, [fakeElement(306, [], -65)])], -65);
+  assert.equal(measuredContentHeight(scrolled, { includeSelf: false }), 306);
 });
 
 
@@ -159,5 +165,84 @@ test("whenConnected resolves once the node joins the document or the signal abor
   } finally {
     globalThis.requestAnimationFrame = previous.raf;
     globalThis.cancelAnimationFrame = previous.caf;
+  }
+});
+
+
+function fakeNode() {
+  const attributes = new Set();
+  const listeners = new Map();
+  return {
+    attributes,
+    listeners,
+    hasAttribute: (name) => attributes.has(name),
+    setAttribute: (name) => attributes.add(name),
+    removeAttribute: (name) => attributes.delete(name),
+    toggleAttribute: (name, force) => (force ? attributes.add(name) : attributes.delete(name)),
+    addEventListener: (type, callback) => listeners.set(type, callback),
+  };
+}
+
+
+test("installShortcutSuppression marks the root and the focused node while enabled", () => {
+  const ATTRIBUTE = "data-lm-suppress-shortcuts";
+  const root = fakeNode();
+  const focused = fakeNode();
+  const marked = fakeNode();
+  marked.setAttribute(ATTRIBUTE);
+  const values = { suppress_shortcuts: true };
+  const model = { get: (name) => values[name] };
+
+  const sync = installShortcutSuppression(model, root, new AbortController().signal);
+  const rootMarked = root.hasAttribute(ATTRIBUTE);
+  root.listeners.get("focusin")({ target: focused });
+  const focusedMarked = focused.hasAttribute(ATTRIBUTE);
+  root.listeners.get("focusout")({ target: focused });
+  root.listeners.get("focusin")({ target: marked });
+  root.listeners.get("focusout")({ target: marked });
+  values.suppress_shortcuts = false;
+  sync();
+  root.listeners.get("focusin")({ target: focused });
+
+  assert.equal(rootMarked, true);
+  assert.equal(focusedMarked, true);
+  assert.equal(focused.hasAttribute(ATTRIBUTE), false);
+  assert.equal(marked.hasAttribute(ATTRIBUTE), true);
+  assert.equal(root.hasAttribute(ATTRIBUTE), false);
+});
+
+
+test("observeResize calls back on each resize until the signal aborts", () => {
+  const previous = globalThis.ResizeObserver;
+  const observers = [];
+  globalThis.ResizeObserver = class {
+    constructor(callback) {
+      this.callback = callback;
+      this.observed = [];
+      this.disconnected = false;
+      observers.push(this);
+    }
+    observe(element) {
+      this.observed.push(element);
+    }
+    disconnect() {
+      this.disconnected = true;
+    }
+  };
+  try {
+    const controller = new AbortController();
+    const element = { id: "root" };
+    let calls = 0;
+    observeResize(element, () => (calls += 1), controller.signal);
+    observers[0].callback([]);
+    observers[0].callback([]);
+    controller.abort();
+
+    assert.equal(observers.length, 1);
+    assert.deepEqual(observers[0].observed, [element]);
+    assert.equal(calls, 2);
+    assert.equal(observers[0].disconnected, true);
+  } finally {
+    globalThis.ResizeObserver = previous;
   }
 });

@@ -7,10 +7,12 @@ import {
   disposeLuminoWidget,
   fitContentEnabled,
   installResizeHandle,
+  installShortcutSuppression,
   labelSlot,
   measuredContentHeight,
   modelListeners,
   notifyLuminoWidgetVisible,
+  observeResize,
   renderChildError,
   renderWidgetRef,
   reusableSlots,
@@ -60,6 +62,7 @@ export default {
 
     const root = document.createElement("div");
     root.className = "anylumino-TabPanelHost";
+    const syncShortcuts = installShortcutSuppression(model, root, signal);
     root.style.width = cssSize(model.get("width"), "100%");
     root.style.height = cssSize(model.get("height"), "420px");
     root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
@@ -92,10 +95,10 @@ export default {
         return;
       }
 
-      const tabBar = root.querySelector(".lm-TabBar");
-      const tabBarHeight = tabBar?.getBoundingClientRect().height ?? 0;
+      // Everything around the current child: the tab bar and the panel borders and padding.
+      const chrome = parseFloat(getComputedStyle(root).height) - currentWidget.node.getBoundingClientRect().height;
       const childHeight = measuredContentHeight(currentWidget.node, { includeSelf: false });
-      const nextHeight = Math.max(180, Math.ceil(tabBarHeight + childHeight));
+      const nextHeight = Math.max(180, Math.ceil(chrome + childHeight));
       if (!Number.isFinite(nextHeight) || Math.abs(nextHeight - lastFitHeight) < 2) {
         return;
       }
@@ -106,11 +109,52 @@ export default {
       notifyCurrentWidgetVisible();
     };
 
+    let fitPending = false;
     const scheduleFitContent = () => {
-      if (!fitContentEnabled(model)) {
+      if (!fitContentEnabled(model) || fitPending) {
         return;
       }
-      requestAnimationFrame(() => requestAnimationFrame(fitContentNow));
+      fitPending = true;
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          fitPending = false;
+          fitContentNow();
+        }),
+      );
+    };
+
+    // A callback can resize a child's content after it renders, so the fit follows the
+    // current child's content boxes a few levels deep: an outer box that fills the slot
+    // does not shrink with its content. display:contents mount roots have no box. Removed
+    // nodes, such as a closing popup, change the measured height without resizing a box.
+    const contentObserver = new ResizeObserver(scheduleFitContent);
+    const mutationObserver = new MutationObserver(scheduleFitContent);
+    signal.addEventListener(
+      "abort",
+      () => {
+        contentObserver.disconnect();
+        mutationObserver.disconnect();
+      },
+      { once: true },
+    );
+    const observeCurrentContent = () => {
+      contentObserver.disconnect();
+      mutationObserver.disconnect();
+      const visit = (parent, depth) => {
+        for (const child of parent.children) {
+          const contents = getComputedStyle(child).display === "contents";
+          if (!contents) {
+            contentObserver.observe(child);
+          }
+          if (contents || depth > 1) {
+            visit(child, contents ? depth : depth - 1);
+          }
+        }
+      };
+      if (fitContentEnabled(model) && panel.currentWidget) {
+        visit(panel.currentWidget.node, 4);
+        mutationObserver.observe(panel.currentWidget.node, { childList: true, subtree: true });
+      }
     };
 
     const notifyCurrentWidgetVisible = () => {
@@ -126,9 +170,7 @@ export default {
     const syncSize = () => {
       root.style.width = cssSize(model.get("width"), "100%");
       root.style.height = cssSize(model.get("height"), "420px");
-      if (!fitContentEnabled(model)) {
-        lastFitHeight = 0;
-      }
+      lastFitHeight = 0;
       root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
       notifyCurrentWidgetVisible();
     };
@@ -188,6 +230,7 @@ export default {
         await renderWidgetRef(model, host, ref, slot.node, slot.anyluminoSignal);
         slot.node.dataset.anyluminoRendered = "true";
         notifyCurrentWidgetVisible();
+        observeCurrentContent();
         scheduleFitContent();
       } catch (error) {
         // Show the failure in the tab that owns it instead of leaving it blank.
@@ -263,6 +306,7 @@ export default {
     const onCurrentChanged = (_sender, args) => {
       const nextIndex = args.currentIndex;
       notifyCurrentWidgetVisible();
+      observeCurrentContent();
       void renderCurrentChild();
       if (syncingFromModel) {
         return;
@@ -294,16 +338,23 @@ export default {
 
     panel.currentChanged.connect(onCurrentChanged);
     panel.tabBar.tabMoved.connect(onTabMoved);
-    window.addEventListener("resize", updatePanel, { signal });
+    observeResize(root, updatePanel, signal);
 
     const unbind = modelListeners(model, [
       ["widgets", rerender],
+      ["suppress_shortcuts", syncShortcuts],
       ["child_keys", rerender],
       ["titles", syncTitles],
       ["selected_index", syncSelectedIndex],
       ["tab_placement", syncPlacement],
       ["tabs_movable", syncMovable],
-      ["fit_content", syncSize],
+      [
+        "fit_content",
+        () => {
+          syncSize();
+          observeCurrentContent();
+        },
+      ],
       ["width", syncSize],
       ["height", syncSize],
     ]);
@@ -318,7 +369,7 @@ export default {
         panel.currentChanged.disconnect(onCurrentChanged);
         panel.tabBar.tabMoved.disconnect(onTabMoved);
         unbind();
-        panel.dispose();
+        disposeLuminoWidget(panel);
         root.remove();
       },
       { once: true },

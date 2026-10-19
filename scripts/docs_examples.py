@@ -18,6 +18,7 @@ import ast
 import re
 import sys
 from dataclasses import dataclass
+from importlib.metadata import version
 from pathlib import Path
 
 DOCS_DIR = Path("content/docs")
@@ -35,6 +36,7 @@ NOTEBOOK_HEADER = '''# ---
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
+#       jupytext_version: {jupytext_version}
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -278,7 +280,8 @@ def rendered_name(code: str) -> str:
 
 
 def write_notebook(examples: list[Example]) -> None:
-    cells = [NOTEBOOK_HEADER]
+    # Jupytext writes its own version when it saves the notebook, so the generated header matches it
+    cells = [NOTEBOOK_HEADER.replace("{jupytext_version}", version("jupytext"))]
     for example in examples:
         marker = f"# docs-example({example.slug})" if example.screenshot else ""
         cells.append(

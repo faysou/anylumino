@@ -1,0 +1,102 @@
+---
+title: "catalog"
+---
+
+The anylumino components an OpenUI program may use, and the OpenUI library spec built from them.
+
+<PyAttributes>
+  <PyAttribute name="ROOT" value="'VBox'" />
+
+  <PyAttribute name="CALLBACK" value="'Callback'" />
+
+  <PyAttribute name="COMPONENTS" type="tuple[Component, ...]" value="tuple(_with_options(component) for component in _COMPONENTS)" />
+
+  <PyAttribute name="CATALOG" type="dict[str, Component]" value="{component.name: component for component in COMPONENTS}" />
+</PyAttributes>
+
+<Tabs items={["Class","Functions"]}>
+  <Tab value="Class">
+    <Cards>
+      <Card title="Prop" href="/docs/api/workbench/catalog/Prop" />
+
+      <Card title="Component" href="/docs/api/workbench/catalog/Component" />
+    </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="library_spec" type="() -> dict[str, Any]">
+      Return the OpenUI LibrarySpec for the catalog, with the `Callback` custom action.
+
+      <PySourceCode>
+        ```python
+        def library_spec() -> dict[str, Any]:
+            """Return the OpenUI LibrarySpec for the catalog, with the `Callback` custom action."""
+            defs: dict[str, Any] = {component.name: _component_schema(component) for component in COMPONENTS}
+            defs["Component"] = {"anyOf": [{"$ref": f"#/$defs/{component.name}"} for component in COMPONENTS]}
+            defs["ActionExpression"] = {
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "properties": {"type": {"type": "string", "const": "continue_conversation"}, "context": {}},
+                        "required": ["type"],
+                    },
+                    {"type": "object", "properties": {"type": _STRING, "params": {"type": "object"}}, "required": ["type"]},
+                ]
+            }
+            defs[CALLBACK] = {
+                "type": "object",
+                "properties": {"type": {"type": "string", "const": CALLBACK}, "params": _CALLBACK_PARAMS},
+                "required": ["type", "params"],
+            }
+            return {
+                "id": "anylumino",
+                "version": "1.0.0",
+                "root": ROOT,
+                "schema": {
+                    "properties": {component.name: {"$ref": f"#/$defs/{component.name}"} for component in COMPONENTS},
+                    "$defs": defs,
+                    "actions": {CALLBACK: {"description": _CALLBACK_DESCRIPTION, "params": _CALLBACK_PARAMS}},
+                },
+                "components": {
+                    component.name: {"signature": _signature(component), "description": component.description}
+                    for component in COMPONENTS
+                },
+                "actions": {
+                    CALLBACK: {"signature": f"{CALLBACK}(handler: string, context?: any)", "description": _CALLBACK_DESCRIPTION}
+                },
+            }
+        ```
+      </PySourceCode>
+
+      <PyFunctionReturn type="dict[str, typing.Any]" />
+    </PyFunction>
+
+    <PyFunction name="type_name" type="(schema) -> str">
+      Return the TypeScript-style type OpenUI signatures use for `schema`.
+
+      <PySourceCode>
+        ```python
+        def type_name(schema: dict[str, Any]) -> str:
+            """Return the TypeScript-style type OpenUI signatures use for ``schema``."""
+            if schema.get("$ref") == "#/$defs/Component":
+                return "Component"
+            if schema.get("$ref") == "#/$defs/ActionExpression":
+                return "ActionExpression"
+            if "enum" in schema:
+                return " | ".join(f'"{value}"' for value in schema["enum"])
+            if "anyOf" in schema:
+                return " | ".join(type_name(option) for option in schema["anyOf"])
+            if schema.get("type") == "array":
+                return f"{type_name(schema['items'])}[]" if "items" in schema else "any[]"
+            return schema.get("type", "any")
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="schema" type="dict[str, Any]" />
+      </div>
+
+      <PyFunctionReturn type="str" />
+    </PyFunction>
+  </Tab>
+</Tabs>

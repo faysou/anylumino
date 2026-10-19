@@ -1,0 +1,50 @@
+---
+title: "Component"
+---
+
+A catalog component: the OpenUI name, the anylumino class it builds, and its props.
+
+`fixed` are constructor keywords generated code always passes, such as
+the `direction` of the Astryx stack behind `VBox` and `HBox`.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="name" type="str" />
+
+  <PyAttribute name="module" type="str" />
+
+  <PyAttribute name="cls" type="str" />
+
+  <PyAttribute name="description" type="str" />
+
+  <PyAttribute name="props" type="tuple[Prop, ...]" />
+
+  <PyAttribute name="fixed" type="tuple[tuple[str, Any], ...]" value="()" />
+
+  <PyAttribute name="factory" type="str" />
+
+  <PyAttribute name="options" type="dict[str, Any]">
+    Return the option schemas by keyword, or an empty dict for a component without options.
+  </PyAttribute>
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(name, module, cls, description, props, fixed=()) -> None" kind="constructor">
+  <div>
+    <PyParameter name="name" type="str" />
+
+    <PyParameter name="module" type="str" />
+
+    <PyParameter name="cls" type="str" />
+
+    <PyParameter name="description" type="str" />
+
+    <PyParameter name="props" type="tuple[Prop, ...]" />
+
+    <PyParameter name="fixed" type="tuple[tuple[str, Any], ...]" value="()" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

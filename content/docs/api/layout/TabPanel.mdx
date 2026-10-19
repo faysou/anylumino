@@ -97,7 +97,10 @@ stable child identifiers and default tab titles. Use `select_key` or
       Whether the panel receives a notebook-friendly resize handle.
     </PyParameter>
 
-    <PyParameter name="fit_content" type="bool" value="False" />
+    <PyParameter name="fit_content" type="bool" value="False">
+      Whether the panel height follows the tab bar and the selected tab's
+      content, with a 180 pixel minimum, instead of `height`.
+    </PyParameter>
   </div>
 
   <PyFunctionReturn type="None" />

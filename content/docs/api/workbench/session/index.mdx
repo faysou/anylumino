@@ -1,0 +1,91 @@
+---
+title: "session"
+---
+
+Named workbench sessions saved as JSON under `~/.anylumino/sessions/`.
+
+<Tabs items={["Class","Functions"]}>
+  <Tab value="Class">
+    <Cards>
+      <Card title="SessionState" href="/docs/api/workbench/session/SessionState" />
+    </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="sessions_dir" type="() -> Path">
+      <PySourceCode>
+        ```python
+        def sessions_dir() -> Path:
+            return Path.home() / ".anylumino" / "sessions"
+        ```
+      </PySourceCode>
+
+      <PyFunctionReturn type="pathlib.Path" />
+    </PyFunction>
+
+    <PyFunction name="session_path" type="(name) -> Path">
+      Return the file of session `name`; names are limited to letters, digits, `_`, and `-`.
+
+      <PySourceCode>
+        ```python
+        def session_path(name: str) -> Path:
+            """Return the file of session ``name``; names are limited to letters, digits, `_`, and `-`."""
+            if not _NAME.fullmatch(name):
+                raise ValueError(f"Invalid session name {name!r}: use letters, digits, '_', and '-'.")
+            return sessions_dir() / f"{name}.json"
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="name" type="str" />
+      </div>
+
+      <PyFunctionReturn type="pathlib.Path" />
+    </PyFunction>
+
+    <PyFunction name="save" type="(state) -> Path">
+      Write `state` atomically, stamping `updated_at`, and return the file path.
+
+      <PySourceCode>
+        ```python
+        def save(state: SessionState) -> Path:
+            """Write ``state`` atomically, stamping ``updated_at``, and return the file path."""
+            path = session_path(state.name)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            state.updated_at = datetime.now(UTC).isoformat(timespec="seconds")
+            temporary = path.with_suffix(".json.tmp")
+            temporary.write_text(json.dumps(asdict(state), indent=2) + "\n")
+            os.replace(temporary, path)
+            return path
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="state" type="SessionState" />
+      </div>
+
+      <PyFunctionReturn type="pathlib.Path" />
+    </PyFunction>
+
+    <PyFunction name="load" type="(name) -> SessionState | None">
+      Return the saved session `name`, or `None` when there is none.
+
+      <PySourceCode>
+        ```python
+        def load(name: str) -> SessionState | None:
+            """Return the saved session ``name``, or `None` when there is none."""
+            path = session_path(name)
+            if not path.exists():
+                return None
+            return SessionState(**json.loads(path.read_text()))
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="name" type="str" />
+      </div>
+
+      <PyFunctionReturn type="anylumino.workbench.session.SessionState | None" />
+    </PyFunction>
+  </Tab>
+</Tabs>

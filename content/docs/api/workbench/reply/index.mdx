@@ -1,0 +1,56 @@
+---
+title: "reply"
+---
+
+Split an agent reply into chat prose, an OpenUI program, and Python callbacks.
+
+<Tabs items={["Class","Functions"]}>
+  <Tab value="Class">
+    <Cards>
+      <Card title="ReplyError" href="/docs/api/workbench/reply/ReplyError" />
+
+      <Card title="Reply" href="/docs/api/workbench/reply/Reply" />
+    </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="split_reply" type="(text) -> Reply">
+      Return the prose and the optional `openui` and `python` blocks of `text`.
+
+      <PySourceCode>
+        ```python
+        def split_reply(text: str) -> Reply:
+            """Return the prose and the optional `openui` and `python` blocks of ``text``."""
+            program: list[str] = []
+            callbacks: list[str] = []
+
+            def take(match: re.Match[str]) -> str:
+                label, body = match.group(1).lower(), match.group(2)
+                if label in _PROGRAM_LABELS:
+                    program.append(body)
+                elif label == "python":
+                    callbacks.append(body)
+                else:
+                    return match.group(0)
+                return "\n"
+
+            prose = _FENCE.sub(take, text)
+            for blocks, label in ((program, "openui"), (callbacks, "python")):
+                if len(blocks) > 1:
+                    raise ReplyError(f"The reply has {len(blocks)} `{label}` blocks; send at most one.")
+            return Reply(
+                re.sub(r"\n{3,}", "\n\n", prose).strip(),
+                program[0].rstrip("\n") if program else None,
+                callbacks[0] if callbacks else None,
+            )
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="text" type="str" />
+      </div>
+
+      <PyFunctionReturn type="anylumino.workbench.reply.Reply" />
+    </PyFunction>
+  </Tab>
+</Tabs>

@@ -1,0 +1,177 @@
+# Tasks
+
+## 1. anywidget render-after-attach fix (local clone)
+
+- [x] 1.1 In `../anywidget`, create `fix/render-after-attach` from `origin/main`. Make
+  `WidgetBinding.createView` in `packages/anywidget/src/binding.ts` wait for the target before it
+  calls `render`: render at once if `target.el.isConnected`, otherwise await `target.displayed`,
+  otherwise poll `isConnected` on `requestAnimationFrame` until the combined signal aborts. Verify
+  with new tests in the clone's suite that cover the detached-then-attached, already-attached, and
+  aborted-while-waiting cases.
+- [x] 1.2 Apply the same wait to `host.getWidget(ref).render({el})` in
+  `packages/anywidget/src/host.ts`. Verify with a test where a parent renders a child into a
+  detached slot.
+- [x] 1.3 Add `make install-dev-anywidget-local` to the anylumino `Makefile`. It builds the clone's
+  frontend, runs `uv pip install -e ../anywidget`, and prints that later commands need
+  `--no-sync`. Document it in `CONTRIBUTING.md`. Verify that
+  `uv run --no-sync python -c "import anywidget; print(anywidget.__file__)"` points into
+  `../anywidget`, and that `git diff pyproject.toml uv.lock` is empty.
+- [x] 1.4 Reproduce issue #1025 in JupyterLab (`uv run --no-sync jupyter lab` from anylumino)
+  with ego-lite: the Lumino `Widget.attach` widget from the issue, displayed 3 s after
+  construction. Verify that it renders `attached` with the clone installed, and fails with PyPI
+  anywidget 0.11.0.
+
+## 2. Astryx Chat widget
+
+- [x] 2.1 Add `Chat` to `src/anylumino/astryx/` and export it from `anylumino.astryx`, with these
+  traits: `messages` (`role`, `content`, `status`, `tool_calls`), `is_streaming`, `placeholder`,
+  and `disabled`. Add `on_submit` and `on_stop`, which handle the `submit` and `stop` messages.
+  Add `submit` and `stop` to the message-contract test in `tests/test_widgets.py`. Verify with
+  pytest tests that drive `_handle_frontend_message` and assert the exact callback arguments,
+  including that a disabled chat ignores submit.
+- [x] 2.2 Add the `Chat` case to `src/anylumino/static/astryx/astryx_widget.js`. It assembles
+  `ChatLayout`, `ChatMessageList`, `ChatMessage` with `ChatMessageBubble` and Markdown,
+  `ChatSystemMessage`, `ChatToolCalls`, and `ChatComposer` with stop while streaming. Put the pure
+  message-to-props mapping in `astryx_bridge.mjs`. Verify with a `node --test` case for that
+  mapping, and with `npm run build`.
+- [x] 2.3 Add a `notebooks/astryx_chat.py` percent-format notebook with an echo bot that streams
+  its reply. Verify with ego-lite in `uv run --no-sync jupyter lab`: messages render in order,
+  streaming grows one bubble, stop appears and fires, and tool-call rows change status.
+- [x] 2.4 Document `Chat` in the API reference and in the docs examples page. Verify that
+  `make docs-check` passes.
+
+## 3. OpenUI tool bundle
+
+- [x] 3.1 Add `@openuidev/lang-core` and `zod` at exact versions to `package.json`, with the
+  lang-core postinstall denied in `allowScripts`. Verify that `npm ci` runs no install script for
+  them.
+- [x] 3.2 Add `scripts/openui_tool.mjs` with the `parse`, `merge`, and `prompt` commands, which
+  read JSON on stdin and write JSON on stdout. Add a `platform: "node"` entry in
+  `scripts/bundle-entries.mjs` that outputs
+  `src/anylumino/static/openui/openui_tool.bundle.mjs`. Verify that `npm run build` produces it
+  and that the wheel includes it.
+- [x] 3.3 Copy a few OpenUI 1.0 conformance fixtures (grammar, actions custom, editing, errors)
+  with their MIT notice into `tests/frontend/fixtures/openui/`, and add `node --test` cases that
+  run the bundle on them. Verify that each `expected.json` tree and merged program matches.
+
+## 4. Catalog and system prompt
+
+- [x] 4.1 Add `src/anylumino/workbench/catalog.py` with the components listed in the
+  `openui-codegen` spec and the `Callback` action, and a function that emits the OpenUI
+  LibrarySpec JSON. Verify with a test that asserts the exact component list and prop order, and
+  with a test that builds every entry's anylumino class from sample props.
+- [x] 4.2 Add `src/anylumino/workbench/openui.py`, which runs the bundle with
+  `asyncio.create_subprocess_exec("node", ...)`, and raises an error naming `node` when it is
+  missing. Verify with pytest: one parse of the catalog library, one merge, one prompt, and the
+  missing-`node` error with an empty `PATH`.
+- [x] 4.3 Generate the system prompt with inline mode and edit mode on, and bindings and tools
+  off. Add the callback contract and the namespace summary, and cache the prompt by catalog hash.
+  Verify with tests that the prompt contains every component and `@Callback`, does not contain
+  `Query(`, `Mutation(`, or `$`-variables, and stays below a measured size bound.
+
+## 5. Code generation and callbacks
+
+- [x] 5.1 Add `src/anylumino/workbench/codegen.py`, which turns a parsed tree into the `build`
+  module described in `design.md`. Verify with an exact-source snapshot test for a program that
+  uses each catalog component kind, and with a determinism test.
+- [x] 5.2 Generate callback wiring for `@Callback` and `@ToAssistant`, using the event the catalog
+  assigns to each action slot. Verify with tests that exec the generated module and fire a button
+  click and an input change through `_handle_frontend_message`, and assert the exact `event` dicts
+  and `ask_agent` calls.
+- [x] 5.3 Add named generation errors for a dynamic prop, an unknown handler, a missing namespace
+  widget, and unsupported features (`$state`, `Query`). Verify with one parametrized test that
+  asserts each error message.
+
+## 6. CLI agent bridge
+
+- [x] 6.1 Add reply splitting into prose, an optional `openui` fence, and an optional `python`
+  fence, and reject duplicate fences. Verify with a parametrized pytest covering both fences, only
+  `openui`, only `python`, neither, and duplicates.
+- [x] 6.2 Add the Claude runner. Settle the `--permission-mode` open question from `design.md`
+  by checking against 2.1.302, record the answer in `design.md`, and add the runner with first
+  and resume arguments, stream parsing, and the read-only tool list. Capture a real stream once
+  into `tests/fixtures/agents/claude/`. Verify with a fake `claude` on `PATH` that replays it, and
+  assert the argv, the text deltas, the tool calls, and the session ID.
+- [x] 6.3 Add the Codex runner. Settle the codex system-prompt open question from `design.md`,
+  record the answer there, and add the runner with `exec` and `exec resume` arguments, the
+  read-only sandbox, and JSONL parsing. Capture a real stream once into
+  `tests/fixtures/agents/codex/`. Verify with a fake `codex` that replays it, and assert the argv,
+  the text, the items, and the thread ID.
+- [x] 6.4 Add the one-turn-at-a-time guard, stop (SIGTERM to the process group, then SIGKILL after
+  a grace period), and the missing-executable error. Verify with tests that use a fake CLI that
+  sleeps: a second submit starts nothing, stop exits within the grace period, and the error names
+  the executable.
+
+## 7. Session store
+
+- [x] 7.1 Add `src/anylumino/workbench/session.py`, which saves and loads
+  `~/.anylumino/sessions/<name>.json` with an atomic write, validates names, and holds the fields
+  listed in the `openui-workbench` spec. Verify with tests under a temporary `HOME`: an exact
+  round-trip of every field, and rejection of `../x`.
+
+## 8. Workbench assembly
+
+- [x] 8.1 Add `src/anylumino/workbench/workbench.py` with `Workbench(agent="claude", session=None,
+  namespace=None, cwd=None)`. Build the split, the header, the chat, and the four keyed tabs with
+  read-only `CodeBlock`s and the empty `UI` state. Export it from `anylumino.workbench`. Verify
+  with a pytest that asserts the tab keys and titles, the selected `ui` tab, and the header text.
+- [x] 8.2 Wire submit -> bridge turn -> streamed chat updates -> atomic apply -> tab updates, with
+  stop, `ask_agent`, and callback errors shown as system messages. Verify with pytest using the
+  fake CLIs: a successful turn updates all four tabs, a callbacks syntax error leaves all four
+  unchanged with an error naming the line, and a raising handler is reported while other handlers
+  still run.
+- [x] 8.3 Wire session save after each turn and restore when the workbench is created, including a
+  restore where the UI cannot be built. Verify with pytest: two turns, a new `Workbench` with the
+  same session gives equal tab contents and messages, and the next turn uses resume arguments.
+- [x] 8.4 Add a `notebooks/openui_workbench.py` example with a `sales` data frame in the
+  namespace, and a docs page covering setup (`node`, `claude` or `codex`), the four tabs, the
+  callback contract, sessions, and the trust model for executed code. Verify that `make docs-check`
+  passes and that the notebook runs with `uv run --no-sync`.
+
+## 9. Integration checks
+
+- [x] 9.1 With the clone installed (1.3), start `uv run --no-sync jupyter lab` from anylumino and
+  drive `notebooks/openui_workbench.py` with ego-lite. Check that the layout renders, the tabs
+  switch, typing in the code tabs does nothing, and a fake-agent turn updates all four tabs.
+  Capture screenshots under `build/review/`.
+- [x] 9.2 Run one live turn with `claude` and one with `codex` in that notebook, and only when the
+  user asks, since they spend tokens. Check that each builds a UI whose button runs its callback
+  against `sales`, and that restarting the kernel and restoring the session resumes the agent.
+  Ran on 2026-10-19 through the `Workbench` API with the notebook's `sales` namespace, not in a
+  browser: both agents passed.
+- [x] 9.3 Run `make test`, and check that CI-equivalent `uv sync --group dev && uv run pytest`
+  passes with PyPI anywidget, without the clone.
+
+## 10. Component options
+
+- [x] 10.1 Derive an `options` object prop for each catalog component from its wrapper's keywords,
+  pass the options as keywords in generated code, and reject unknown options. Verify with pytest:
+  the Table option types, the parser type check, and the codegen snapshot with `sortable`.
+- [x] 10.2 Generate the `openui-components` skill into the package plugin directory with
+  `make workbench-skill`, and point the system prompt to it. Verify with pytest that the files
+  match the catalog and that the prompt does not list the options.
+- [x] 10.3 Load the plugin in `claude` with `--plugin-dir` and allow the read-only tools with
+  `--allowedTools`. Verify with one live turn per CLI that the agent reads `Table.md` and the
+  reply builds a sortable table.
+- [x] 10.4 Keep the user's MCP servers out of turns: `--strict-mcp-config` for `claude`, and one
+  `enabled=false` override per server from `codex mcp list --json` for `codex`. Verify with pytest,
+  and with the `claude` init event, which lists only `Read`, `Grep`, `Glob`, and `Skill`.
+- [x] 10.5 Derive enum values for string options from the wrapper's numpydoc value sets, then from
+  the Astryx prop literals of the prop each keyword is passed to, read from the wrapper source.
+  List the Table `selects` and `sort_direction` values and the Stack `align` and `justify` values
+  as numpydoc sets. Verify with pytest that the parser rejects `density: "tight"` and that renamed
+  props, `; default` suffixes, and wrapped entries yield their values.
+- [x] 10.6 Add the `setup(widgets)` callback, teach it with `set_rows` and `items` in the system
+  prompt, and reserve `python` fences for callbacks. A live turn before this asked the user to
+  paste the data frame rows and sent two `python` blocks. Verify with pytest and with the live
+  9.2 turns.
+- [x] 10.7 Show the status as a visible caption next to the header's `StatusDot`, whose label
+  Astryx gives only to screen readers, in an Astryx stack so the items keep their natural widths.
+  Dispose the action panel through `disposeLuminoWidget`. Verify with pytest that the caption
+  reads `Running` during a turn.
+- [x] 10.8 Fix the browser findings: layout and tab panels refit on a container resize through a
+  `ResizeObserver`, not only on a window resize; the workbench sets the new `suppress_shortcuts`
+  layout trait so keys in a code tab do not act as notebook shortcuts; the user message, not
+  the finished reply, carries the `sent` status; and a `fit_content` tab panel follows content
+  changes and measures through box-less mount roots wherever the panel is scrolled. Verify with pytest, `node --test`, and an ego lite
+  recheck in JupyterLab.

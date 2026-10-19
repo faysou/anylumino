@@ -58,9 +58,15 @@ export function measuredContentHeight(node, options = {}) {
   const measureChildren = (parent) => {
     for (const child of parent.children) {
       const childRect = child.getBoundingClientRect();
-      const childHeight = Math.max(child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
       // A display:contents wrapper, such as an anywidget mount root, has no
-      // box of its own; measure through it so its content still counts.
+      // box of its own; measure through it so its content still counts. Its
+      // all-zero rect would otherwise measure as -nodeRect.top, which is
+      // positive while the node is scrolled above the viewport.
+      if (childRect.width === 0 && childRect.height === 0 && child.children.length > 0) {
+        measureChildren(child);
+        continue;
+      }
+      const childHeight = Math.max(child.scrollHeight, child.offsetHeight, childRect.bottom - nodeRect.top);
       if (childHeight <= 0 && child.children.length > 0) {
         measureChildren(child);
         continue;
@@ -171,6 +177,7 @@ export function combineSignals(parentSignal, localSignal) {
 
 // anywidget renders as soon as a widget module is ready, which can happen before the notebook
 // attaches the output node, and Lumino refuses to attach a widget to a detached host.
+// Remove once an anywidget release includes manzt/anywidget#1029.
 export function whenConnected(node, signal) {
   if (node.isConnected) {
     return Promise.resolve(true);
@@ -216,6 +223,47 @@ export function resizeEmbeddedDocument(contentWindow) {
       handler.reSize();
     }
   }
+}
+
+const SUPPRESS_SHORTCUTS = "data-lm-suppress-shortcuts";
+
+// Lumino's command registry skips key bindings for events from inside this attribute,
+// but it tests a binding's selector on each node before the attribute on the next one.
+// JupyterLab's command-mode selectors match the focused node itself, so the attribute
+// also goes on whichever node inside the root holds focus.
+export function installShortcutSuppression(model, root, signal) {
+  const tagged = new WeakSet();
+  const sync = () => root.toggleAttribute(SUPPRESS_SHORTCUTS, Boolean(model.get("suppress_shortcuts")));
+  root.addEventListener(
+    "focusin",
+    (event) => {
+      const target = event.target;
+      if (model.get("suppress_shortcuts") && target !== root && !target.hasAttribute(SUPPRESS_SHORTCUTS)) {
+        target.setAttribute(SUPPRESS_SHORTCUTS, "");
+        tagged.add(target);
+      }
+    },
+    { signal },
+  );
+  root.addEventListener(
+    "focusout",
+    (event) => {
+      if (tagged.delete(event.target)) {
+        event.target.removeAttribute(SUPPRESS_SHORTCUTS);
+      }
+    },
+    { signal },
+  );
+  sync();
+  return sync;
+}
+
+// Lumino only refits on its own resize messages, so a host that changes the
+// panel's width without a window resize, such as a collapsing sidebar, needs this.
+export function observeResize(element, callback, signal) {
+  const observer = new ResizeObserver(() => callback());
+  observer.observe(element);
+  signal.addEventListener("abort", () => observer.disconnect(), { once: true });
 }
 
 export function disposeLuminoWidget(widget) {

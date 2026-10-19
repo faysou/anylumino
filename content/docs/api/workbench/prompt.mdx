@@ -1,0 +1,85 @@
+---
+title: "prompt"
+---
+
+The workbench system prompt: the OpenUI prompt for the catalog plus the callback contract.
+
+<PyAttributes>
+  <PyAttribute name="PREAMBLE" value="'You build notebook UIs for the user. Answer in prose, and when the UI or its behavior should change, add fenced code as described below. The UI is written in openui-lang.'" />
+
+  <PyAttribute name="OPTIONS" type="dict[str, Any]" value="{'preamble': PREAMBLE, 'inlineMode': True, 'editMode': True, 'toolCalls': False, 'bindings': False}" />
+
+  <PyAttribute name="SETUP" value="'setup'" />
+
+  <PyAttribute name="CALLBACKS" value="f'## Python callbacks\n\nInteractive components run Python through `@Callback(handler, context?)`. Put every handler in one\nfenced block labeled `python`, next to the openui-lang block. Use the `python` label for that block\nonly; label any other code you show, such as a snippet for the user, `text`.\n\n```python\ndef {SETUP}(widgets):\n    widgets[&#x22;table&#x22;].set_rows(sales.to_dict(&#x22;records&#x22;))\n    widgets[&#x22;region&#x22;].items = [&#x22;All&#x22;, *sorted(sales[&#x22;region&#x22;].unique())]\n\n\ndef on_run(event, widgets):\n    region = widgets[&#x22;region&#x22;].value or &#x22;All&#x22;\n    widgets[&#x22;summary&#x22;].text = f&#x22;Region: {{region}}&#x22;\n```\n\n- A handler takes `event` and `widgets`. `event` is a dict with `source` (the statement name of the\n  component that fired), `value` (the new value for `on_change`, `None` for a button), and\n  `context` (the second `@Callback` argument).\n- `widgets` maps every statement name to its live widget. Inputs expose `.value`; Heading, Text,\n  and Markdown expose `.text`; Button and Badge expose `.label`; Selector exposes `.items`; Table\n  has `.set_rows(records)`.\n- An optional `{SETUP}(widgets)` function runs once each time the UI is built. Fill tables and\n  selectors from namespace data there instead of copying the data into the program: you see only\n  the shape and columns of data frames, not their rows.\n- `ask_agent(message, context=None)` sends a new chat message to you from a handler.\n- Every handler named in `@Callback` must be defined. The python block always holds the complete\n  set of handlers: omit the block when no handler changes, and when one changes, send them all.\n- Handlers run in the notebook kernel with the namespace listed below as globals.\n'" />
+
+  <PyAttribute name="COMPONENT_OPTIONS" value="f'## Component options\n\nComponents whose signature ends with `options?` take an object of extra keyword options as their\nlast argument, for example `Table(rows, [&#x22;region&#x22;], {{sortable: true}})`. Before you use the options\nof a component, look them up in the `{skill.NAME}` skill, or read `{skill.SKILL}/components/<Name>.md`.\nAn unknown option stops the reply from being applied.\n'" />
+</PyAttributes>
+
+<Tabs items={["Functions"]}>
+  <Tab value="Functions">
+    <PyFunction name="system_prompt" type="(namespace) -> str">
+      Return the full system prompt, with `namespace` described for the agent.
+
+      <PySourceCode>
+        ```python
+        async def system_prompt(namespace: Mapping[str, Any]) -> str:
+            """Return the full system prompt, with ``namespace`` described for the agent."""
+            return "\n\n".join([await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)])
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="namespace" type="Mapping[str, Any]" />
+      </div>
+
+      <PyFunctionReturn type="str" />
+    </PyFunction>
+
+    <PyFunction name="base_prompt" type="() -> str">
+      Return the OpenUI prompt for the catalog, generated once per catalog version.
+
+      <PySourceCode>
+        ```python
+        async def base_prompt() -> str:
+            """Return the OpenUI prompt for the catalog, generated once per catalog version."""
+            key = hashlib.sha256(json.dumps([library_spec(), OPTIONS], sort_keys=True).encode()).hexdigest()
+            if key not in _cache:
+                _cache[key] = await openui.prompt(OPTIONS)
+            return _cache[key]
+        ```
+      </PySourceCode>
+
+      <PyFunctionReturn type="str" />
+    </PyFunction>
+
+    <PyFunction name="namespace_summary" type="(namespace) -> str">
+      Describe each namespace entry by name and type, with shape and columns for data frames.
+
+      <PySourceCode>
+        ```python
+        def namespace_summary(namespace: Mapping[str, Any]) -> str:
+            """Describe each namespace entry by name and type, with shape and columns for data frames."""
+            if not namespace:
+                return "## Namespace\n\nThe namespace is empty."
+            lines = ["## Namespace", "", "Callbacks can read these names; `Widget(name)` mounts the widgets among them:", ""]
+            for name, value in namespace.items():
+                kind = f"{type(value).__module__}.{type(value).__qualname__}"
+                detail = ""
+                shape = getattr(value, "shape", None)
+                columns = getattr(value, "columns", None)
+                if shape is not None and columns is not None:
+                    detail = f", shape {tuple(shape)}, columns {[str(column) for column in columns]}"
+                lines.append(f"- `{name}`: `{kind}`{detail}")
+            return "\n".join(lines)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="namespace" type="Mapping[str, Any]" />
+      </div>
+
+      <PyFunctionReturn type="str" />
+    </PyFunction>
+  </Tab>
+</Tabs>

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  chatMessages,
   childSignature,
   fractionsWithPane,
   logExponent,
@@ -162,4 +163,40 @@ test("fractionsWithPane moves size between a dragged pane and the last pane", ()
   assert.deepEqual(fractionsWithPane([0.5, 0.5], 0, -0.2), [0, 1]);
   assert.deepEqual(fractionsWithPane([0.5, 0.5], 1, 0.1), [0.5, 0.5]);
   assert.deepEqual(fractionsWithPane([0.5, 0.5], 5, 0.1), [0.5, 0.5]);
+});
+
+
+test("chatMessages maps roles, statuses, and tool calls to positional render records", () => {
+  const records = chatMessages([
+    { role: "user", content: "Add a slider", status: "sent" },
+    {
+      role: "assistant",
+      content: "**Done**",
+      status: "stopped",
+      tool_calls: [
+        { name: "Read", target: "sales.csv", status: "running" },
+        { name: "Edit", status: "unknown" },
+      ],
+    },
+    { role: "system", content: "Session resumed", status: "unknown" },
+    { role: "tool", content: 7 },
+  ]);
+
+  assert.deepEqual(records, [
+    { key: "0", role: "user", content: "Add a slider", status: "sent", isStopped: false, toolCalls: [] },
+    {
+      key: "1",
+      role: "assistant",
+      content: "**Done**",
+      status: undefined,
+      isStopped: true,
+      toolCalls: [
+        { key: "1-0", name: "Read", target: "sales.csv", status: "running" },
+        { key: "1-1", name: "Edit", status: "pending" },
+      ],
+    },
+    { key: "2", role: "system", content: "Session resumed", status: undefined, isStopped: false, toolCalls: [] },
+    { key: "3", role: "assistant", content: "7", status: undefined, isStopped: false, toolCalls: [] },
+  ]);
+  assert.deepEqual(chatMessages(undefined), []);
 });

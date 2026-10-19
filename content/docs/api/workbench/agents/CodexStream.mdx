@@ -1,0 +1,60 @@
+---
+title: "CodexStream"
+---
+
+Turn `codex exec --json` lines into events.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="wrote" value="False" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="() -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self) -> None:
+        self.wrote = False
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="feed" type="(line) -> list[Event]">
+  <PySourceCode>
+    ```python
+    def feed(self, line: str) -> list[Event]:
+        data = json.loads(line)
+        kind = data.get("type")
+        if kind == "thread.started":
+            return [Session(data["thread_id"])]
+        if kind in ("turn.failed", "error"):
+            error = data.get("error") or {}
+            return [Failed(str(error.get("message") or data.get("message") or kind))]
+        item = data.get("item") or {}
+        item_type = item.get("type")
+        if item_type == "agent_message" and kind == "item.completed":
+            text = item["text"]
+            events: list[Event] = [Text("\n\n")] if self.wrote else []
+            self.wrote = True
+            return [*events, Text(text)]
+        if item_type in (None, "agent_message", "reasoning"):
+            return []
+        if kind == "item.started":
+            return [ToolStarted(item["id"], item_type, _target(item))]
+        if kind == "item.completed":
+            failed = item.get("status") == "failed" or item.get("exit_code") not in (None, 0)
+            return [ToolFinished(item["id"], failed)]
+        return []
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="line" type="str" />
+  </div>
+
+  <PyFunctionReturn type="list[anylumino.workbench.agents.Event]" />
+</PyFunction>

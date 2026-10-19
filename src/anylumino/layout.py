@@ -427,6 +427,10 @@ class LayoutWidget(KeyedChildren, anywidget.AnyWidget):
     ``LayoutWidget`` stores child widgets in a keyed map while syncing the
     frontend-ready widget views to the browser. Subclasses choose the Lumino
     layout that displays those children.
+
+    Set ``suppress_shortcuts`` to ``True`` to keep key presses inside the
+    layout from triggering JupyterLab shortcuts, such as notebook command-mode
+    keys, while focus is on content that is not a text field.
     """
 
     widgets = t.List(anywidget.WidgetTrait(), default_value=[]).tag(
@@ -444,6 +448,7 @@ class LayoutWidget(KeyedChildren, anywidget.AnyWidget):
     child_min_width = t.Unicode("0px").tag(sync=True)
     child_min_height = t.Unicode("0px").tag(sync=True)
     fit_content = t.Bool(False).tag(sync=True)
+    suppress_shortcuts = t.Bool(False).tag(sync=True)
 
     def _init_composed(
         self,
@@ -534,6 +539,9 @@ class TabPanel(LayoutWidget):
         percentages, and strings are passed through as CSS sizes.
     resizable : bool, default True
         Whether the panel receives a notebook-friendly resize handle.
+    fit_content : bool, default False
+        Whether the panel height follows the tab bar and the selected tab's
+        content, with a 180 pixel minimum, instead of ``height``.
     """
 
     _esm = static_asset("layout/tab_panel.bundle.js")
@@ -908,6 +916,9 @@ class SplitPanel(LayoutWidget):
     resizable : bool, default True
         Whether the whole panel gets a notebook resize handle. Lumino pane
         dividers remain draggable independently.
+    fit_content : bool, default False
+        Whether the panel height follows its panes' content instead of
+        ``height``.
     """
 
     _esm = static_asset("layout/layout_panel.bundle.js")

@@ -58,9 +58,10 @@ async function readNotices(name, directory) {
 
 async function bundledPackages() {
   const directories = new Set();
-  for (const [entryPoint] of entries) {
+  for (const [entryPoint, , options] of entries) {
     const result = await build({
       ...shared,
+      ...options,
       entryPoints: [entryPoint],
       outdir: dirname(entryPoint),
       write: false,

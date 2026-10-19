@@ -1,0 +1,49 @@
+---
+title: "SessionState"
+---
+
+What a workbench needs to restore a session. The UI code is derived, so it is not stored.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="name" type="str" />
+
+  <PyAttribute name="agent" type="str" />
+
+  <PyAttribute name="cwd" type="str" />
+
+  <PyAttribute name="agent_session_id" type="str | None" value="None" />
+
+  <PyAttribute name="messages" type="list[dict[str, Any]]" value="field(default_factory=list)" />
+
+  <PyAttribute name="program" type="str" value="''" />
+
+  <PyAttribute name="callbacks" type="str" value="''" />
+
+  <PyAttribute name="updated_at" type="str" value="''" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(name, agent, cwd, agent_session_id=None, messages=list(), program='', callbacks='', updated_at='') -> None" kind="constructor">
+  <div>
+    <PyParameter name="name" type="str" />
+
+    <PyParameter name="agent" type="str" />
+
+    <PyParameter name="cwd" type="str" />
+
+    <PyParameter name="agent_session_id" type="str | None" value="None" />
+
+    <PyParameter name="messages" type="list[dict[str, Any]]" value="list()" />
+
+    <PyParameter name="program" type="str" value="''" />
+
+    <PyParameter name="callbacks" type="str" value="''" />
+
+    <PyParameter name="updated_at" type="str" value="''" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

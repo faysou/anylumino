@@ -18,6 +18,16 @@ import { Calendar } from "@astryxdesign/core/Calendar";
 import { Card } from "@astryxdesign/core/Card";
 import { Carousel } from "@astryxdesign/core/Carousel";
 import { Center } from "@astryxdesign/core/Center";
+import {
+  ChatComposer,
+  ChatLayout,
+  ChatMessage,
+  ChatMessageBubble,
+  ChatMessageList,
+  ChatMessageMetadata,
+  ChatSystemMessage,
+  ChatToolCalls,
+} from "@astryxdesign/core/Chat";
 import { CheckboxInput } from "@astryxdesign/core/CheckboxInput";
 import { CheckboxList, CheckboxListItem } from "@astryxdesign/core/CheckboxList";
 import { ClickableCard } from "@astryxdesign/core/ClickableCard";
@@ -104,6 +114,7 @@ import {
   renderWidgetRef,
 } from "../layout/composition.js";
 import {
+  chatMessages,
   childSignature,
   fractionsWithPane,
   logExponent,
@@ -135,6 +146,7 @@ const COMPONENTS = {
   Card,
   Carousel,
   Center,
+  Chat: ChatLayout,
   CheckboxInput,
   CheckboxList,
   Citation,
@@ -1675,6 +1687,46 @@ function AstryxTableView({ model }) {
   });
 }
 
+function AstryxChatView({ model }) {
+  const props = modelProps(model);
+  const isStreaming = Boolean(model.get("is_streaming"));
+  const messages = chatMessages(model.get("messages"));
+  const lastIndex = messages.length - 1;
+  const rows = messages.map((message, index) => {
+    if (message.role === "system") {
+      return React.createElement(ChatSystemMessage, { key: message.key }, message.content);
+    }
+    const metadata = message.status || message.isStopped
+      ? React.createElement(ChatMessageMetadata, {
+        status: message.status,
+        footer: message.isStopped ? "Stopped" : undefined,
+      })
+      : undefined;
+    return React.createElement(
+      ChatMessage,
+      { key: message.key, sender: message.role },
+      React.createElement(
+        ChatMessageBubble,
+        { metadata },
+        React.createElement(Markdown, { isStreaming: isStreaming && index === lastIndex }, message.content),
+      ),
+      message.toolCalls.length > 0 ? React.createElement(ChatToolCalls, { calls: message.toolCalls }) : null,
+    );
+  });
+  const composer = React.createElement(ChatComposer, {
+    placeholder: String(model.get("placeholder") || "") || undefined,
+    isDisabled: Boolean(model.get("disabled")),
+    isStopShown: isStreaming,
+    onSubmit: (value) => model.send({ type: "submit", value }),
+    onStop: () => model.send({ type: "stop" }),
+  });
+  return React.createElement(
+    ChatLayout,
+    { ...props, composer, style: { height: "100%", ...props.style } },
+    React.createElement(ChatMessageList, { isStreaming }, rows),
+  );
+}
+
 function panelChildren(model) {
   const count = (model.get("widgets") ?? []).length;
   const keys = model.get("child_keys") ?? [];
@@ -1950,7 +2002,9 @@ function AstryxModelView({ model, styleRoot, mountChildren }) {
     ? React.createElement(PanelView, { model, mountChildren })
     : name === "Table"
       ? React.createElement(AstryxTableView, { model })
-      : React.createElement(Component, props, children);
+      : name === "Chat"
+        ? React.createElement(AstryxChatView, { model })
+        : React.createElement(Component, props, children);
   const horizontalLabel = Component !== null
     && [Slider, TextInput, Selector, MultiSelector].includes(Component)
     && rawProps(model).labelPosition === "left"
@@ -2104,6 +2158,9 @@ export default {
       "brand",
       "continuous_update",
       "search_mode",
+      "messages",
+      "is_streaming",
+      "placeholder",
     ];
 
     watched.forEach((name) => model.on(`change:${name}`, scheduleRender));

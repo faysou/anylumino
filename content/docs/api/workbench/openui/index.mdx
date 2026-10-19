@@ -1,0 +1,107 @@
+---
+title: "openui"
+---
+
+Parse, merge, and describe OpenUI Lang programs with the bundled `@openuidev/lang-core` tool.
+
+<PyAttributes>
+  <PyAttribute name="TOOL" value="Path(__file__).resolve().parent.parent / 'static' / 'openui' / 'openui_tool.bundle.mjs'" />
+</PyAttributes>
+
+<Tabs items={["Class","Functions"]}>
+  <Tab value="Class">
+    <Cards>
+      <Card title="OpenUIError" href="/docs/api/workbench/openui/OpenUIError" />
+    </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="parse" type="(program) -> dict[str, Any]">
+      Return the evaluated tree, errors, and statement names of `program`.
+
+      <PySourceCode>
+        ```python
+        async def parse(program: str) -> dict[str, Any]:
+            """Return the evaluated tree, errors, and statement names of ``program``."""
+            return await run_tool({"command": "parse", "program": program, "library": library_spec()})
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="program" type="str" />
+      </div>
+
+      <PyFunctionReturn type="dict[str, typing.Any]" />
+    </PyFunction>
+
+    <PyFunction name="merge" type="(current, patch) -> str">
+      Merge `patch` into `current` by statement name, as OpenUI edit mode does.
+
+      <PySourceCode>
+        ```python
+        async def merge(current: str, patch: str) -> str:
+            """Merge ``patch`` into ``current`` by statement name, as OpenUI edit mode does."""
+            return (await run_tool({"command": "merge", "current": current, "patch": patch}))["program"]
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="current" type="str" />
+
+        <PyParameter name="patch" type="str" />
+      </div>
+
+      <PyFunctionReturn type="str" />
+    </PyFunction>
+
+    <PyFunction name="prompt" type="(options) -> str">
+      Return the OpenUI system prompt for the catalog with the given prompt options.
+
+      <PySourceCode>
+        ```python
+        async def prompt(options: dict[str, Any]) -> str:
+            """Return the OpenUI system prompt for the catalog with the given prompt options."""
+            return (await run_tool({"command": "prompt", "library": library_spec(), "options": options}))["prompt"]
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="options" type="dict[str, Any]" />
+      </div>
+
+      <PyFunctionReturn type="str" />
+    </PyFunction>
+
+    <PyFunction name="run_tool" type="(request) -> dict[str, Any]">
+      Send one request to the bundled tool and return its JSON response.
+
+      <PySourceCode>
+        ```python
+        async def run_tool(request: dict[str, Any]) -> dict[str, Any]:
+            """Send one request to the bundled tool and return its JSON response."""
+            node = shutil.which("node")
+            if node is None:
+                raise OpenUIError("The workbench needs `node` on PATH to parse OpenUI programs.")
+            process = await asyncio.create_subprocess_exec(
+                node,
+                str(TOOL),
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env={**os.environ, "OPENUI_TELEMETRY_DISABLED": "1"},
+            )
+            stdout, stderr = await process.communicate(json.dumps(request).encode())
+            if process.returncode != 0:
+                raise OpenUIError(f"OpenUI tool failed ({process.returncode}): {stderr.decode().strip()}")
+            return json.loads(stdout)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="request" type="dict[str, Any]" />
+      </div>
+
+      <PyFunctionReturn type="dict[str, typing.Any]" />
+    </PyFunction>
+  </Tab>
+</Tabs>

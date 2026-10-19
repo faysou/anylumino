@@ -6,9 +6,23 @@ DOCS_URL = http://$(DOCS_HOST):$(DOCS_PORT)/docs
 .PHONY: install-dev
 install-dev:
 	uv sync --group dev
+	# JupyterLab runs CommonJS scripts from site-packages; without this file Node
+	# applies the repo's "type": "module" to them and they fail at startup.
+	printf '{"type": "commonjs"}\n' > .venv/package.json
 	npm ci
 	npm run build
 	uv run --no-sync jupytext-config set-default-viewer
+
+ANYWIDGET_LOCAL ?= ../anywidget
+
+.PHONY: install-dev-anywidget-local
+install-dev-anywidget-local:
+	pnpm --dir $(ANYWIDGET_LOCAL) install --frozen-lockfile
+	pnpm --dir $(ANYWIDGET_LOCAL) build
+	pnpm --dir $(ANYWIDGET_LOCAL) --filter anywidget build
+	uv pip install --reinstall-package anywidget -e $(ANYWIDGET_LOCAL)
+	@echo "anywidget now comes from $(ANYWIDGET_LOCAL). Use 'uv run --no-sync' for later commands;"
+	@echo "a plain 'uv run' or 'uv sync' restores PyPI anywidget from uv.lock."
 
 .PHONY: update-dependencies
 update-dependencies:
@@ -25,6 +39,10 @@ update-dependencies:
 .PHONY: frontend
 frontend:
 	npm run build
+
+.PHONY: workbench-skill
+workbench-skill:
+	uv run --no-sync python -c "from anylumino.workbench import skill; skill.write()"
 
 .PHONY: test
 test:

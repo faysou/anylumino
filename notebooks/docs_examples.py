@@ -104,7 +104,7 @@ def make_figure(title="Trend", phase=0.0):
 # %% [markdown]
 # ## index.mdx: Overview
 #
-# Lines 33 to 74 of `content/docs/index.mdx`.
+# Lines 34 to 75 of `content/docs/index.mdx`.
 
 # %%
 # docs-example(index-overview)
@@ -155,7 +155,7 @@ al.SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 # %% [markdown]
 # ## index.mdx: Design model
 #
-# Lines 119 to 124 of `content/docs/index.mdx`.
+# Lines 120 to 125 of `content/docs/index.mdx`.
 
 # %%
 trend_panel = al.VBox({"figure": make_figure("Trend panel")}, height=360)
@@ -813,9 +813,62 @@ al.SplitPanel(
 )
 
 # %% [markdown]
+# ## examples.mdx: Chat with a streamed reply
+#
+# Lines 100 to 145 of `content/docs/examples.mdx`.
+
+# %%
+# docs-example(examples-chat-with-a-streamed-reply)
+
+import asyncio
+
+import anylumino.astryx as ax
+
+chat = ax.Chat(
+    [
+        {"role": "system", "content": "Session started"},
+        {"role": "user", "content": "Load the sales data", "status": "sent"},
+        {
+            "role": "assistant",
+            "content": "Loaded **1,204 rows** from `sales.csv`.",
+            "tool_calls": [{"name": "Read", "target": "sales.csv", "status": "complete"}],
+        },
+    ],
+    placeholder="Ask about the data",
+)
+reply_task = None
+
+async def reply(text):
+    answer = ""
+    for word in f"You asked: {text}".split():
+        answer = f"{answer} {word}".strip()
+        chat.messages = [*chat.messages[:-1], {"role": "assistant", "content": answer}]
+        await asyncio.sleep(0.2)
+    chat.is_streaming = False
+
+def submit(chat, text):
+    global reply_task
+    chat.messages = [
+        *chat.messages,
+        {"role": "user", "content": text, "status": "sent"},
+        {"role": "assistant", "content": ""},
+    ]
+    chat.is_streaming = True
+    reply_task = asyncio.get_running_loop().create_task(reply(text))
+
+def stop(chat):
+    reply_task.cancel()
+    chat.messages = [*chat.messages[:-1], {**chat.messages[-1], "status": "stopped"}]
+    chat.is_streaming = False
+
+chat.on_submit(submit)
+chat.on_stop(stop)
+chat
+
+# %% [markdown]
 # ## examples.mdx: Lumino action skeleton
 #
-# Lines 95 to 124 of `content/docs/examples.mdx`.
+# Lines 154 to 183 of `content/docs/examples.mdx`.
 
 # %%
 # docs-example(examples-lumino-action-skeleton)

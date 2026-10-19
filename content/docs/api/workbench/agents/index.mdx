@@ -1,0 +1,181 @@
+---
+title: "agents"
+---
+
+Run one chat turn with the local `claude` or `codex` CLI and stream what it does.
+
+<PyAttributes>
+  <PyAttribute name="AGENTS" value="('claude', 'codex')" />
+
+  <PyAttribute name="CLAUDE_TOOLS" value="'Read,Grep,Glob,Skill'" />
+
+  <PyAttribute name="STOP_GRACE" value="3.0" />
+
+  <PyAttribute name="Event" value="Session | Text | ToolStarted | ToolFinished | Failed" />
+</PyAttributes>
+
+<Tabs items={["Class","Functions"]}>
+  <Tab value="Class">
+    <Cards>
+      <Card title="AgentError" href="/docs/api/workbench/agents/AgentError" />
+
+      <Card title="Session" href="/docs/api/workbench/agents/Session" />
+
+      <Card title="Text" href="/docs/api/workbench/agents/Text" />
+
+      <Card title="ToolStarted" href="/docs/api/workbench/agents/ToolStarted" />
+
+      <Card title="ToolFinished" href="/docs/api/workbench/agents/ToolFinished" />
+
+      <Card title="Failed" href="/docs/api/workbench/agents/Failed" />
+
+      <Card title="ClaudeStream" href="/docs/api/workbench/agents/ClaudeStream" />
+
+      <Card title="CodexStream" href="/docs/api/workbench/agents/CodexStream" />
+
+      <Card title="AgentRunner" href="/docs/api/workbench/agents/AgentRunner" />
+    </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="claude_argv" type="(session_id, resume, name, system_prompt) -> list[str]">
+      <PySourceCode>
+        ```python
+        def claude_argv(session_id: str, resume: bool, name: str, system_prompt: str) -> list[str]:
+            session = ["--resume", session_id] if resume else ["--session-id", session_id, "-n", name]
+            return [
+                "claude",
+                "-p",
+                "--output-format",
+                "stream-json",
+                "--verbose",
+                "--include-partial-messages",
+                *session,
+                "--append-system-prompt",
+                system_prompt,
+                "--strict-mcp-config",
+                "--plugin-dir",
+                str(skill.PLUGIN),
+                "--tools",
+                CLAUDE_TOOLS,
+                "--allowedTools",
+                CLAUDE_TOOLS,
+                "--permission-mode",
+                "dontAsk",
+            ]
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="session_id" type="str" />
+
+        <PyParameter name="resume" type="bool" />
+
+        <PyParameter name="name" type="str" />
+
+        <PyParameter name="system_prompt" type="str" />
+      </div>
+
+      <PyFunctionReturn type="list[str]" />
+    </PyFunction>
+
+    <PyFunction name="codex_argv" type="(session_id, cwd, system_prompt, mcp_overrides) -> list[str]">
+      <PySourceCode>
+        ```python
+        def codex_argv(session_id: str | None, cwd: Path, system_prompt: str, mcp_overrides: list[str]) -> list[str]:
+            disabled = [part for override in mcp_overrides for part in ("-c", override)]
+            if session_id:
+                return [
+                    "codex",
+                    "exec",
+                    "resume",
+                    session_id,
+                    "--json",
+                    "--skip-git-repo-check",
+                    "-c",
+                    'sandbox_mode="read-only"',
+                    *disabled,
+                    "-",
+                ]
+            return [
+                "codex",
+                "exec",
+                "--json",
+                "-s",
+                "read-only",
+                "--skip-git-repo-check",
+                "-C",
+                str(cwd),
+                "-c",
+                f"developer_instructions={json.dumps(system_prompt)}",
+                *disabled,
+                "-",
+            ]
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="session_id" type="str | None" />
+
+        <PyParameter name="cwd" type="Path" />
+
+        <PyParameter name="system_prompt" type="str" />
+
+        <PyParameter name="mcp_overrides" type="list[str]" />
+      </div>
+
+      <PyFunctionReturn type="list[str]" />
+    </PyFunction>
+
+    <PyFunction name="codex_mcp_overrides" type="(cwd) -> list[str]">
+      Return config overrides that turn off every MCP server `codex` would start.
+
+      The read-only sandbox does not cover MCP tools. Plugin servers have no entry in
+      `config.toml`, so `enabled=false` alone leaves them without a transport;
+      each override replaces the transport with a placeholder that never starts.
+
+      <PySourceCode>
+        ```python
+        async def codex_mcp_overrides(cwd: Path) -> list[str]:
+            """Return config overrides that turn off every MCP server `codex` would start.
+
+            The read-only sandbox does not cover MCP tools. Plugin servers have no entry in
+            ``config.toml``, so ``enabled=false`` alone leaves them without a transport;
+            each override replaces the transport with a placeholder that never starts.
+            """
+            process = await asyncio.create_subprocess_exec(
+                shutil.which("codex") or "codex",
+                "mcp",
+                "list",
+                "--json",
+                cwd=cwd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            output, errors = await process.communicate()
+            try:
+                servers = json.loads(output)
+            except json.JSONDecodeError:
+                message = errors.decode().strip()[-2000:]
+                raise AgentError(f"`codex mcp list --json` failed, so its MCP servers cannot be turned off: {message}") from None
+            overrides = []
+            for server in servers:
+                name = server["name"]
+                if not server.get("enabled"):
+                    continue
+                transport = _PLACEHOLDER_TRANSPORTS.get(server.get("transport", {}).get("type"))
+                if transport is None or not re.fullmatch(r"[A-Za-z0-9_-]+", name):
+                    raise AgentError(f"The codex MCP server {name!r} cannot be turned off.")
+                overrides.append(f"mcp_servers.{name}={{{transport},enabled=false}}")
+            return overrides
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="cwd" type="Path" />
+      </div>
+
+      <PyFunctionReturn type="list[str]" />
+    </PyFunction>
+  </Tab>
+</Tabs>

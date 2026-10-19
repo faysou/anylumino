@@ -15,10 +15,12 @@ import {
   disposeLuminoWidget,
   fitContentEnabled,
   installResizeHandle,
+  installShortcutSuppression,
   labelSlot,
   measuredContentHeight,
   modelListeners,
   notifyLuminoWidgetVisible,
+  observeResize,
   renderChildError,
   renderWidgetRef,
   reusableSlots,
@@ -219,6 +221,7 @@ export default {
 
     const root = document.createElement("div");
     root.className = `anylumino-LayoutHost anylumino-${model.get("layout_kind")}Host`;
+    const syncShortcuts = installShortcutSuppression(model, root, signal);
     root.style.width = cssSize(model.get("width"), "100%");
     root.style.height = cssSize(model.get("height"), "420px");
     el.replaceChildren(root);
@@ -458,10 +461,11 @@ export default {
     });
 
     root.addEventListener("click", () => setTimeout(() => void renderVisibleChildren(), 0), { signal });
-    window.addEventListener("resize", syncSize, { signal });
+    observeResize(root, syncSize, signal);
 
     const unbind = modelListeners(model, [
       ["widgets", rerender],
+      ["suppress_shortcuts", syncShortcuts],
       ["child_keys", rerender],
       ["layout_kind", rerender],
       ["direction", rerender],

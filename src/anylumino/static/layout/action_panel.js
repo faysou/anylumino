@@ -6,7 +6,7 @@ import {
   Widget,
 } from "@lumino/widgets";
 import { CommandRegistry } from "@lumino/commands";
-import { cssSize, modelListeners, whenConnected } from "./composition.js";
+import { cssSize, disposeLuminoWidget, modelListeners, whenConnected } from "./composition.js";
 
 const ICON_PATHS = {
   AddContent: ["M12 5v14", "M5 12h14"],
@@ -292,9 +292,7 @@ export default {
     };
 
     const clearPanel = () => {
-      if (panel) {
-        panel.dispose();
-      }
+      disposeLuminoWidget(panel);
       iconObserver?.disconnect();
       iconObserver = null;
       panel = null;

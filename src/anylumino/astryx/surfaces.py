@@ -84,9 +84,9 @@ class Stack(Widget):
         Layout direction.
     gap : int | float, default 2
         Astryx spacing step between children.
-    align : str | None, default None
+    align : {'start', 'center', 'end', 'stretch'}, optional
         Cross-axis alignment.
-    justify : str | None, default None
+    justify : {'start', 'center', 'end', 'between', 'around', 'evenly'}, optional
         Main-axis alignment.
     width : int | float | str | None, default None
         Container width.

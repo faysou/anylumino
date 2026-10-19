@@ -1405,6 +1405,8 @@ def test_every_frontend_message_type_has_a_python_handler() -> None:
         "search",  # astryx Widget._handle_frontend_message
         "selection",  # astryx Table
         "sort",  # astryx Table
+        "stop",  # astryx Chat
+        "submit",  # astryx Chat
     }
     static_dir = Path(static_asset("astryx/astryx_widget.js")).parent.parent
     sources = [
@@ -1422,6 +1424,79 @@ def test_every_frontend_message_type_has_a_python_handler() -> None:
 
     assert sent, "no frontend message types found"
     assert sent <= handled, f"unhandled frontend message types: {sorted(sent - handled)}"
+
+
+def test_astryx_chat_syncs_messages_and_turn_state() -> None:
+    messages = [
+        {"role": "user", "content": "Add a slider", "status": "sent"},
+        {
+            "role": "assistant",
+            "content": "Reading **sales.csv**",
+            "tool_calls": [{"name": "Read", "target": "sales.csv", "status": "running"}],
+        },
+        {"role": "system", "content": "Session resumed"},
+    ]
+
+    chat = ax.Chat(messages, is_streaming=True, placeholder="Ask", disabled=True, width=360)
+
+    assert "Chat" in ax.__all__
+    assert chat.get_state(
+        key=[
+            "component_name",
+            "messages",
+            "is_streaming",
+            "placeholder",
+            "disabled",
+            "width",
+            "height",
+            "props",
+        ]
+    ) == {
+        "component_name": "Chat",
+        "messages": messages,
+        "is_streaming": True,
+        "placeholder": "Ask",
+        "disabled": True,
+        "width": "360px",
+        "height": "480px",
+        "props": {},
+    }
+
+
+def test_astryx_chat_submit_and_stop_reach_registered_callbacks() -> None:
+    chat = ax.Chat()
+    submitted: list[tuple[object, str]] = []
+    other: list[str] = []
+    stopped: list[object] = []
+
+    def record_other(_chat: object, text: str) -> None:
+        other.append(text)
+
+    chat.on_submit(lambda widget, text: submitted.append((widget, text)))
+    chat.on_submit(record_other)
+    chat.on_stop(stopped.append)
+    chat._handle_frontend_message(chat, {"type": "submit", "value": "Add a slider"}, None)
+    chat.on_submit(record_other, remove=True)
+    chat._handle_frontend_message(chat, {"type": "submit", "value": "Make it red"}, None)
+    chat._handle_frontend_message(chat, {"type": "stop"}, None)
+
+    assert submitted == [(chat, "Add a slider"), (chat, "Make it red")]
+    assert other == ["Add a slider"]
+    assert stopped == [chat]
+
+
+def test_astryx_disabled_chat_ignores_submit_but_not_stop() -> None:
+    chat = ax.Chat(disabled=True)
+    submitted: list[str] = []
+    stopped: list[object] = []
+    chat.on_submit(lambda _chat, text: submitted.append(text))
+    chat.on_stop(stopped.append)
+
+    chat._handle_frontend_message(chat, {"type": "submit", "value": "Add a slider"}, None)
+    chat._handle_frontend_message(chat, {"type": "stop"}, None)
+
+    assert submitted == []
+    assert stopped == [chat]
 
 
 def test_astryx_log_slider_drives_the_slider_in_exponent_space() -> None:

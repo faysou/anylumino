@@ -1,0 +1,49 @@
+---
+title: "Prop"
+---
+
+One positional prop of a catalog component.
+
+`kind` is `value` for a constructor keyword, `children` for a slot of
+components, `action` for an OpenUI action, or `options` for the object
+of extra constructor keywords that ends every widget component. `argument` is the
+constructor keyword when it differs from the prop name. `event` is the
+widget event an action binds to: `click` or `change`.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="name" type="str" />
+
+  <PyAttribute name="schema" type="dict[str, Any]" />
+
+  <PyAttribute name="required" type="bool" value="False" />
+
+  <PyAttribute name="kind" type="str" value="'value'" />
+
+  <PyAttribute name="argument" type="str" value="''" />
+
+  <PyAttribute name="event" type="str" value="''" />
+
+  <PyAttribute name="keyword" type="str" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(name, schema, required=False, kind='value', argument='', event='') -> None" kind="constructor">
+  <div>
+    <PyParameter name="name" type="str" />
+
+    <PyParameter name="schema" type="dict[str, Any]" />
+
+    <PyParameter name="required" type="bool" value="False" />
+
+    <PyParameter name="kind" type="str" value="'value'" />
+
+    <PyParameter name="argument" type="str" value="''" />
+
+    <PyParameter name="event" type="str" value="''" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

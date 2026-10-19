@@ -1,0 +1,4 @@
+{"type": "thread.started", "thread_id": "01a14ffe-6124-72d0-9368-530f48c6095d"}
+{"type": "turn.started"}
+{"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "text": "Contained \u201chello.\u201d PINEAPPLE"}}
+{"type": "turn.completed", "usage": {"input_tokens": 77036, "cached_input_tokens": 64256, "cache_write_input_tokens": 0, "output_tokens": 162, "reasoning_output_tokens": 91}}

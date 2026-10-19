@@ -149,3 +149,33 @@ export function fractionsWithPane(fractions, index, fraction) {
   next[last] = Math.max(0, 1 - others - next[index]);
   return next.map((value) => Math.round(value * 1e4) / 1e4);
 }
+
+
+const CHAT_ROLES = new Set(["user", "assistant", "system"]);
+const CHAT_MESSAGE_STATUSES = new Set(["sending", "sent", "error"]);
+const CHAT_TOOL_CALL_STATUSES = new Set(["pending", "running", "complete", "error"]);
+
+/**
+ * Render records for the `messages` of a chat. Keys follow list position, so
+ * appending a message or growing the last one keeps the existing rows mounted.
+ * `stopped` is not an Astryx delivery status, so it is reported on its own.
+ */
+export function chatMessages(messages) {
+  return (Array.isArray(messages) ? messages : []).map((message, index) => {
+    const status = message?.status;
+    const calls = Array.isArray(message?.tool_calls) ? message.tool_calls : [];
+    return {
+      key: String(index),
+      role: CHAT_ROLES.has(message?.role) ? message.role : "assistant",
+      content: String(message?.content ?? ""),
+      status: CHAT_MESSAGE_STATUSES.has(status) ? status : undefined,
+      isStopped: status === "stopped",
+      toolCalls: calls.map((call, callIndex) => ({
+        key: `${index}-${callIndex}`,
+        name: String(call?.name ?? ""),
+        ...(call?.target == null || call.target === "" ? {} : { target: String(call.target) }),
+        status: CHAT_TOOL_CALL_STATUSES.has(call?.status) ? call.status : "pending",
+      })),
+    };
+  });
+}

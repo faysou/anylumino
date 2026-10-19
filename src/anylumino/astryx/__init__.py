@@ -3,6 +3,7 @@ from .base import BuiltTheme
 from .base import Component
 from .base import Theme
 from .base import Widget
+from .chat import Chat
 from .data import Avatar
 from .data import Banner
 from .data import Blockquote
@@ -113,6 +114,7 @@ __all__ = [
     "Card",
     "Carousel",
     "Center",
+    "Chat",
     "Checkbox",
     "CheckboxList",
     "Citation",

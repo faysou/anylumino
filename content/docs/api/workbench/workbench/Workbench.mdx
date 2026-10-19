@@ -1,0 +1,534 @@
+---
+title: "Workbench"
+---
+
+Build notebook UIs by chatting with a local coding agent.
+
+<Callout title="Notes" type="note">
+  The workbench runs agent-written Python in this kernel: the callbacks and
+  the generated UI code. Both are shown in the code tabs.
+</Callout>
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="state" value="saved or store.SessionState(name=session or '', agent=agent, cwd=str(Path(cwd or os.getcwd()).resolve()))" />
+
+  <PyAttribute name="namespace" value="dict(namespace or {})" />
+
+  <PyAttribute name="runner" value="AgentRunner(self.state.agent, Path(self.state.cwd), self.state.name or 'anylumino', self.state.agent_session_id)" />
+
+  <PyAttribute name="ui_code" value="''" />
+
+  <PyAttribute name="last_error" value="''" />
+
+  <PyAttribute name="tasks" type="set[asyncio.Task[Any]]" value="set()" />
+
+  <PyAttribute name="chat" value="ax.Chat(self.state.messages, placeholder='Describe the UI to build', height='100%')" />
+
+  <PyAttribute name="status" value="ax.StatusDot('Ready', variant='neutral')" />
+
+  <PyAttribute name="status_text" value="ax.Text('Ready', text_type='supporting')" />
+
+  <PyAttribute name="ui_host" value="al.ScrollBox([self.empty_ui()], height='100%')" />
+
+  <PyAttribute name="code_views" value="{'openui': ax.CodeBlock('', language='text', width='100%'), 'ui_code': ax.CodeBlock('', language='python', width='100%'), 'callbacks': ax.CodeBlock('', language='python', width='100%')}" />
+
+  <PyAttribute name="tabs" value="al.TabPanel({'ui': self.ui_host, **{key: al.ScrollBox([view], height='100%') for key, view in self.code_views.items()}}, titles=TABS, height='100%')" />
+
+  <PyAttribute name="suppress_shortcuts" value="True" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(agent='claude', session=None, namespace=None, cwd=None, *, height=640) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        agent: str = "claude",
+        session: str | None = None,
+        namespace: Mapping[str, Any] | None = None,
+        cwd: str | Path | None = None,
+        *,
+        height: int | float | str | None = 640,
+    ) -> None:
+        saved = store.load(session) if session else None
+        self.state = saved or store.SessionState(
+            name=session or "", agent=agent, cwd=str(Path(cwd or os.getcwd()).resolve())
+        )
+        self.namespace = dict(namespace or {})
+        self.runner = AgentRunner(
+            self.state.agent, Path(self.state.cwd), self.state.name or "anylumino", self.state.agent_session_id
+        )
+        self.ui_code = ""
+        self.last_error = ""
+        self.tasks: set[asyncio.Task[Any]] = set()
+
+        self.chat = ax.Chat(self.state.messages, placeholder="Describe the UI to build", height="100%")
+        self.status = ax.StatusDot("Ready", variant="neutral")
+        # Astryx shows a status dot's label only to screen readers, so a caption repeats it
+        self.status_text = ax.Text("Ready", text_type="supporting")
+        header = ax.Stack(
+            [ax.Badge(self.state.agent, variant="info"), ax.Badge(self.state.name or "unsaved"), self.status, self.status_text],
+            direction="horizontal",
+            gap=2,
+            align="center",
+            height=HEADER_HEIGHT,
+            padding=2,
+        )
+        self.ui_host = al.ScrollBox([self.empty_ui()], height="100%")
+        self.code_views = {
+            "openui": ax.CodeBlock("", language="text", width="100%"),
+            "ui_code": ax.CodeBlock("", language="python", width="100%"),
+            "callbacks": ax.CodeBlock("", language="python", width="100%"),
+        }
+        self.tabs = al.TabPanel(
+            {"ui": self.ui_host, **{key: al.ScrollBox([view], height="100%") for key, view in self.code_views.items()}},
+            titles=TABS,
+            height="100%",
+        )
+        super().__init__(
+            [al.VBox([header, self.chat], stretches=[0, 1], child_min_height=HEADER_HEIGHT, height="100%"), self.tabs],
+            sizes=[0.35, 0.65],
+            height=height,
+        )
+        # Without this, keys pressed in a read-only code tab act as notebook command-mode shortcuts
+        self.suppress_shortcuts = True
+        self.chat.on_submit(lambda _chat, text: self.submit(text))
+        self.chat.on_stop(lambda _chat: self.schedule(self.runner.stop()))
+        if saved is not None:
+            self.schedule(self.restore())
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="agent" type="str" value="'claude'">
+      The CLI to run each turn with: `"claude"` or `"codex"`.
+    </PyParameter>
+
+    <PyParameter name="session" type="str | None" value="None">
+      Session name. A named session is saved after every turn under
+      `~/.anylumino/sessions/<session>.json` and restored when a workbench
+      is created with the same name, including the agent's own session.
+    </PyParameter>
+
+    <PyParameter name="namespace" type="Mapping[str, Any] | None" value="None">
+      Names the callbacks can read, such as data frames. Widgets in it can be
+      mounted with `Widget(name)`. The agent sees each name and type.
+    </PyParameter>
+
+    <PyParameter name="cwd" type="str | Path | None" value="None">
+      Directory the agent runs in. Defaults to the current directory, or the
+      directory stored with a restored session.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="640">
+      CSS height of the workbench.
+    </PyParameter>
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="empty_ui" type="() -> ax.EmptyState">
+  <PySourceCode>
+    ```python
+    @staticmethod
+    def empty_ui() -> ax.EmptyState:
+        return ax.EmptyState("No UI yet", description="Ask the agent for one in the chat.")
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="anylumino.astryx.anylumino.astryx.EmptyState" />
+</PyFunction>
+
+<PyFunction name="submit" type="(text, context=None) -> None">
+  Start a turn with `text`; refused with a system message while a turn runs.
+
+  <PySourceCode>
+    ```python
+    def submit(self, text: str, context: Any = None) -> None:
+        """Start a turn with ``text``; refused with a system message while a turn runs."""
+        if self.runner.running:
+            self.add_message("system", "A turn is already running; wait for it or stop it.")
+            return
+        self.schedule(self.run_turn(text, context))
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="text" type="str" />
+
+    <PyParameter name="context" type="Any" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="ask_agent" type="(message, context=None) -> None">
+  Send `message` to the agent as if the user had typed it.
+
+  <PySourceCode>
+    ```python
+    def ask_agent(self, message: str, context: Any = None) -> None:
+        """Send ``message`` to the agent as if the user had typed it."""
+        self.submit(message, context)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="message" type="str" />
+
+    <PyParameter name="context" type="Any" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="schedule" type="(coroutine) -> None">
+  <PySourceCode>
+    ```python
+    def schedule(self, coroutine: Coroutine[Any, Any, Any]) -> None:
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coroutine)
+            return
+        task = loop.create_task(coroutine)
+        self.tasks.add(task)
+        task.add_done_callback(self.tasks.discard)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="coroutine" type="Coroutine[Any, Any, Any]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="run_turn" type="(text, context=None) -> None">
+  <PySourceCode>
+    ```python
+    async def run_turn(self, text: str, context: Any = None) -> None:
+        self.add_message("user", text, "sent")
+        self.add_message("assistant", "", status="sending")
+        self.set_running(True)
+        reply = ""
+        tools: list[dict[str, Any]] = []
+        failure = ""
+        # At most one chat update per interval, and the last one always lands.
+        loop = asyncio.get_running_loop()
+        flush: asyncio.TimerHandle | None = None
+
+        def flush_reply() -> None:
+            nonlocal flush
+            flush = None
+            self.update_reply(reply, tools, "sending")
+
+        try:
+            async for event in self.runner.turn(self.turn_prompt(text, context), await system_prompt(self.namespace)):
+                if isinstance(event, Text):
+                    reply += event.text
+                elif isinstance(event, ToolStarted):
+                    tools.append({"id": event.id, "name": event.name, "target": event.target, "status": "running"})
+                elif isinstance(event, ToolFinished):
+                    for tool in tools:
+                        if tool["id"] == event.id:
+                            tool["status"] = "error" if event.error else "complete"
+                elif isinstance(event, Failed):
+                    failure = event.message
+                if flush is None:
+                    flush = loop.call_later(STREAM_INTERVAL, flush_reply)
+        except (AgentError, openui.OpenUIError) as error:
+            failure = str(error)
+        if flush is not None:
+            flush.cancel()
+        try:
+            if self.runner.stopped:
+                self.update_reply(reply, tools, "stopped")
+            elif failure:
+                self.update_reply(reply, tools, "error")
+                self.add_message("system", f"The agent failed: {failure}")
+            else:
+                await self.finish_reply(reply, tools)
+        finally:
+            self.state.agent_session_id = self.runner.session_id
+            self.set_running(False)
+            self.save()
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="text" type="str" />
+
+    <PyParameter name="context" type="Any" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="finish_reply" type="(reply, tools) -> None">
+  <PySourceCode>
+    ```python
+    async def finish_reply(self, reply: str, tools: list[dict[str, Any]]) -> None:
+        try:
+            parts = split_reply(reply)
+        except ReplyError as error:
+            self.update_reply(reply, tools)
+            self.report_apply_error(str(error))
+            return
+        self.update_reply(parts.prose, tools)
+        if parts.program is None and parts.callbacks is None:
+            return
+        callbacks = self.state.callbacks if parts.callbacks is None else parts.callbacks
+        try:
+            program = await openui.merge(self.state.program, parts.program) if parts.program else self.state.program
+            await self.apply(program, callbacks)
+        except (ApplyError, openui.OpenUIError) as error:
+            self.report_apply_error(str(error))
+        else:
+            self.last_error = ""
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="reply" type="str" />
+
+    <PyParameter name="tools" type="list[dict[str, Any]]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="report_apply_error" type="(message) -> None">
+  <PySourceCode>
+    ```python
+    def report_apply_error(self, message: str) -> None:
+        self.last_error = message
+        self.add_message("system", f"The reply was not applied; the UI is unchanged. {message}")
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="message" type="str" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="apply" type="(program, callbacks) -> None">
+  Build the UI from `program` and `callbacks`, then update all tabs at once.
+
+  <PySourceCode>
+    ```python
+    async def apply(self, program: str, callbacks: str) -> None:
+        """Build the UI from ``program`` and ``callbacks``, then update all tabs at once."""
+        result = await openui.parse(program)
+        if result["errors"] or result["incomplete"]:
+            details = "; ".join(f"{error.get('statementId', '?')}: {error['message']}" for error in result["errors"])
+            raise ApplyError(f"OpenUI errors: {details or 'the program is incomplete'}")
+        handlers = self.compile_callbacks(callbacks)
+        try:
+            source = codegen.generate(result, handlers, self.namespace)
+        except codegen.GenerationError as error:
+            raise ApplyError(f"UI code: {error}") from error
+        module: dict[str, Any] = {"__name__": "anylumino_workbench_ui"}
+        try:
+            exec(compile(source, "ui.py", "exec"), module)
+            root, widgets = module["build"](handlers, self.namespace, self.ask_agent)
+        except Exception as error:
+            raise ApplyError(f"Building the UI raised {type(error).__name__}: {error}") from error
+        if SETUP in handlers:
+            handlers[SETUP](widgets)
+        self.state.program = program
+        self.state.callbacks = callbacks
+        self.ui_code = source
+        self.ui_host.widgets = [root]
+        for key, text in (("openui", program), ("ui_code", source), ("callbacks", callbacks)):
+            view = self.code_views[key]
+            view.props = {**view.props, "code": text}
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="program" type="str" />
+
+    <PyParameter name="callbacks" type="str" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="compile_callbacks" type="(callbacks) -> dict[str, Callable[..., None]]">
+  <PySourceCode>
+    ```python
+    def compile_callbacks(self, callbacks: str) -> dict[str, Callable[..., None]]:
+        scope: dict[str, Any] = {**self.namespace, "ask_agent": self.ask_agent, "__name__": "anylumino_workbench_callbacks"}
+        try:
+            exec(compile(callbacks, "callbacks.py", "exec"), scope)
+        except SyntaxError as error:
+            raise ApplyError(f"Callbacks failed to compile: {error.msg} (line {error.lineno})") from error
+        except Exception as error:
+            raise ApplyError(f"Callbacks raised {type(error).__name__}: {error}") from error
+        return {
+            name: self.guarded(name, value)
+            for name, value in scope.items()
+            if callable(value) and getattr(value, "__module__", None) == "anylumino_workbench_callbacks"
+        }
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="callbacks" type="str" />
+  </div>
+
+  <PyFunctionReturn type="dict[str, collections.abc.Callable[..., None]]" />
+</PyFunction>
+
+<PyFunction name="guarded" type="(name, handler) -> Callable[..., None]">
+  <PySourceCode>
+    ```python
+    def guarded(self, name: str, handler: Callable[..., None]) -> Callable[..., None]:
+        def run(*args: Any) -> None:
+            try:
+                handler(*args)
+            except Exception as error:
+                self.add_message("system", f"Callback `{name}` raised {type(error).__name__}: {error}")
+
+        return run
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="name" type="str" />
+
+    <PyParameter name="handler" type="Callable[..., None]" />
+  </div>
+
+  <PyFunctionReturn type="collections.abc.Callable[..., None]" />
+</PyFunction>
+
+<PyFunction name="restore" type="() -> None">
+  <PySourceCode>
+    ```python
+    async def restore(self) -> None:
+        if not self.state.program:
+            return
+        try:
+            await self.apply(self.state.program, self.state.callbacks)
+        except (ApplyError, openui.OpenUIError) as error:
+            self.ui_host.widgets = [ax.EmptyState("The saved UI could not be built", description=str(error))]
+            for key, text in (("openui", self.state.program), ("callbacks", self.state.callbacks)):
+                view = self.code_views[key]
+                view.props = {**view.props, "code": text}
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="turn_prompt" type="(text, context) -> str">
+  <PySourceCode>
+    ````python
+    def turn_prompt(self, text: str, context: Any) -> str:
+        parts = [text]
+        if context is not None:
+            parts.append(f"Context from the UI: {json.dumps(context, default=str)}")
+        if self.last_error:
+            parts.append(f"Your previous reply was not applied: {self.last_error}")
+        if self.state.program:
+            parts.append(f"Current program:\n```openui-lang\n{self.state.program}\n```")
+        if self.state.callbacks:
+            parts.append(f"Current callbacks:\n```python\n{self.state.callbacks}```")
+        return "\n\n".join(parts)
+    ````
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="text" type="str" />
+
+    <PyParameter name="context" type="Any" />
+  </div>
+
+  <PyFunctionReturn type="str" />
+</PyFunction>
+
+<PyFunction name="add_message" type="(role, content, status=None) -> None">
+  <PySourceCode>
+    ```python
+    def add_message(self, role: str, content: str, status: str | None = None) -> None:
+        message: dict[str, Any] = {"role": role, "content": content}
+        if status:
+            message["status"] = status
+        self.chat.messages = [*self.chat.messages, message]
+        self.state.messages = self.chat.messages
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="role" type="str" />
+
+    <PyParameter name="content" type="str" />
+
+    <PyParameter name="status" type="str | None" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="update_reply" type="(content, tools, status=None) -> None">
+  <PySourceCode>
+    ```python
+    def update_reply(self, content: str, tools: list[dict[str, Any]], status: str | None = None) -> None:
+        message: dict[str, Any] = {"role": "assistant", "content": content}
+        if status:
+            message["status"] = status
+        if tools:
+            message["tool_calls"] = [{key: tool[key] for key in ("name", "target", "status")} for tool in tools]
+        self.chat.messages = [*self.chat.messages[:-1], message]
+        self.state.messages = self.chat.messages
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="content" type="str" />
+
+    <PyParameter name="tools" type="list[dict[str, Any]]" />
+
+    <PyParameter name="status" type="str | None" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="set_running" type="(running) -> None">
+  <PySourceCode>
+    ```python
+    def set_running(self, running: bool) -> None:
+        self.chat.is_streaming = running
+        self.status.label = self.status_text.text = "Running" if running else "Ready"
+        self.status.variant = "accent" if running else "neutral"
+        self.status.props = {**self.status.props, "isPulsing": running}
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="running" type="bool" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="save" type="() -> None">
+  <PySourceCode>
+    ```python
+    def save(self) -> None:
+        if self.state.name:
+            store.save(self.state)
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

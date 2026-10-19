@@ -32,14 +32,14 @@ class Table(Widget):
         Row id field. Use ``None`` to generate notebook-local row ids.
     selected : Iterable[Any], default ()
         Initially selected row ids.
-    selects : str, default ''
-        Selection mode. Use ``""``, ``"single"``, or ``"multiple"``.
+    selects : {'', 'single', 'multiple'}, default ''
+        Selection mode. Use ``""`` for no checkbox column.
     sortable : bool, default False
         Whether table columns should be sortable by default.
     sort_key : str, default ''
         Initially sorted table column key.
-    sort_direction : str, default ''
-        Initial sort direction, such as ``"asc"`` or ``"desc"``.
+    sort_direction : {'', 'asc', 'desc'}, default ''
+        Initial sort direction. Use ``""`` for unsorted.
     select_all_label : str, default 'Select all rows'
         Accessible label for the select-all checkbox.
     width : int | float | str | None

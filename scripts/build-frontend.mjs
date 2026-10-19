@@ -20,11 +20,14 @@ async function scopeRootTokensToHost(cssFile) {
   await writeFile(cssFile, css.replaceAll(/:root(?=[\s,{])/g, ":root,:host"));
 }
 
-for (const [entryPoint, outfile] of entries) {
+for (const [entryPoint, outfile, options] of entries) {
   await build({
     ...shared,
+    ...options,
     entryPoints: [entryPoint],
     outfile,
   });
-  await scopeRootTokensToHost(outfile.replace(/\.js$/, ".css"));
+  if (outfile.endsWith(".js")) {
+    await scopeRootTokensToHost(outfile.replace(/\.js$/, ".css"));
+  }
 }

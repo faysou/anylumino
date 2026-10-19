@@ -8,6 +8,10 @@ Base class for keyed anywidget composition layouts.
 frontend-ready widget views to the browser. Subclasses choose the Lumino
 layout that displays those children.
 
+Set `suppress_shortcuts` to `True` to keep key presses inside the
+layout from triggering JupyterLab shortcuts, such as notebook command-mode
+keys, while focus is on content that is not a text field.
+
 ## Attributes
 
 <PyAttributes>
@@ -32,4 +36,6 @@ layout that displays those children.
   <PyAttribute name="child_min_height" value="t.Unicode('0px').tag(sync=True)" />
 
   <PyAttribute name="fit_content" value="t.Bool(False).tag(sync=True)" />
+
+  <PyAttribute name="suppress_shortcuts" value="t.Bool(False).tag(sync=True)" />
 </PyAttributes>

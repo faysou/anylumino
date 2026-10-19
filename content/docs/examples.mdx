@@ -90,6 +90,65 @@ al.SplitPanel(
 
 ![Order blotter with callbacks example rendered in JupyterLab](assets/examples/examples-order-blotter-with-callbacks.png)
 
+## Chat with a streamed reply
+
+`ax.Chat` renders the messages that Python assigns. The submit callback adds
+the user message and an empty assistant message. An asyncio task then replaces
+the last message with longer text. While `is_streaming` is `True`, the composer
+shows a stop control, and the stop callback cancels the task:
+
+```python
+import asyncio
+
+import anylumino.astryx as ax
+
+chat = ax.Chat(
+    [
+        {"role": "system", "content": "Session started"},
+        {"role": "user", "content": "Load the sales data", "status": "sent"},
+        {
+            "role": "assistant",
+            "content": "Loaded **1,204 rows** from `sales.csv`.",
+            "tool_calls": [{"name": "Read", "target": "sales.csv", "status": "complete"}],
+        },
+    ],
+    placeholder="Ask about the data",
+)
+reply_task = None
+
+async def reply(text):
+    answer = ""
+    for word in f"You asked: {text}".split():
+        answer = f"{answer} {word}".strip()
+        chat.messages = [*chat.messages[:-1], {"role": "assistant", "content": answer}]
+        await asyncio.sleep(0.2)
+    chat.is_streaming = False
+
+def submit(chat, text):
+    global reply_task
+    chat.messages = [
+        *chat.messages,
+        {"role": "user", "content": text, "status": "sent"},
+        {"role": "assistant", "content": ""},
+    ]
+    chat.is_streaming = True
+    reply_task = asyncio.get_running_loop().create_task(reply(text))
+
+def stop(chat):
+    reply_task.cancel()
+    chat.messages = [*chat.messages[:-1], {**chat.messages[-1], "status": "stopped"}]
+    chat.is_streaming = False
+
+chat.on_submit(submit)
+chat.on_stop(stop)
+chat
+```
+
+![Chat with a streamed reply example rendered in JupyterLab](assets/examples/examples-chat-with-a-streamed-reply.png)
+
+Assign a new list to `messages`. Changes to the list in place do not reach
+the browser.
+
 ## Lumino action skeleton
 
 ```python
@@ -148,6 +207,13 @@ The repository includes Jupytext notebooks for smoke testing:
 - `notebooks/astryx_layout_panels.py` shows the Astryx layout panels, tabs,
   stacked, accordion, scroll box, split, and responsive, with Python-driven
   selection, open sections, and split sizes, and nests them together.
+- `notebooks/astryx_chat.py` runs an echo bot on `ax.Chat` that streams its
+  reply, updates a tool-call row, and stops on request.
+- `notebooks/openui_workbench.py` opens an OpenUI workbench with a sales data
+  frame in the namespace, for building a UI through `claude` or `codex`.
+- `notebooks/openui_workbench_fake_agent.py` runs the workbench against a fake
+  `codex` that returns a fixed sales explorer, to check the tabs, callbacks,
+  scrolling, and session restore without spending agent tokens.
 - `notebooks/astryx_table.py` focuses on Astryx table selection, sorting, and
   row helper behavior.
 - `notebooks/itables_tabs.py` places an `itables.widget.ITable` inside a tab,

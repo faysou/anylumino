@@ -19,6 +19,7 @@
     "@astryxdesign/theme-neutral": "^0.6.2",
     "@lumino/commands": "2.3.4",
     "@lumino/widgets": "2.9.0",
+    "@openuidev/lang-core": "1.0.1",
     "fumadocs-core": "16.15.11",
     "fumadocs-mdx": "15.4.1",
     "fumadocs-python": "1.0.3",
@@ -26,7 +27,8 @@
     "next": "16.3.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "shiki": "4.4.3"
+    "shiki": "4.4.3",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@astryxdesign/cli": "^0.6.2",
@@ -46,6 +48,7 @@
     "esbuild@0.28.2": true,
     "@astryxdesign/cli@0.6.2": true,
     "@astryxdesign/core@0.6.2": true,
-    "unrs-resolver@1.12.2": false
+    "unrs-resolver@1.12.2": false,
+    "@openuidev/lang-core@1.0.1": false
   }
 }
