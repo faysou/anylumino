@@ -94,7 +94,9 @@ class Chat(Widget):
             self._submit_callbacks = [
                 item for item in self._submit_callbacks if item is not callback
             ]
+
             return
+
         self._submit_callbacks.append(callback)
 
     def on_stop(
@@ -107,7 +109,9 @@ class Chat(Widget):
             self._stop_callbacks = [
                 item for item in self._stop_callbacks if item is not callback
             ]
+
             return
+
         self._stop_callbacks.append(callback)
 
     def _handle_frontend_message(
@@ -117,14 +121,19 @@ class Chat(Widget):
         if msg_type == "submit":
             if self.disabled:
                 return
+
             text = str(content.get("value", ""))
             for callback in list(self._submit_callbacks):
                 callback(self, text)
+
             return
+
         if msg_type == "stop":
             for callback in list(self._stop_callbacks):
                 callback(self)
+
             return
+
         super()._handle_frontend_message(_widget, content, _buffers)
 
 

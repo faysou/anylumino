@@ -67,7 +67,8 @@ get an empty `App` subclass.
 
 The workbench SHALL accept a namespace mapping when it is created. The callbacks SHALL run without notebook globals, and the
 `App` subclass SHALL receive the namespace as constructor keywords. The system prompt context SHALL list each namespace
-entry's name and type, plus the shape and columns of pandas and Polars data frames. The namespace
+entry's name and type, plus the shape, column names, and column types of pandas and Polars data
+frames. The namespace
 component SHALL mount widgets from that namespace.
 
 #### Scenario: Callback reads notebook data

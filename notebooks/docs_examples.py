@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # Documentation examples
-#
+
+# %% [markdown]
 # Every runnable example from the documentation pages outside the API
 # reference, in page order. Each section names the page and heading the example
 # belongs to, and cells run in order so a later fragment can use the widgets an
@@ -98,12 +99,14 @@ def make_figure(title="Trend", phase=0.0):
         yaxis_title="Price",
         yaxis={"range": [min(price) - 1.5, max(price) + 1.5]},
     )
+
     return figure
 
 
 # %% [markdown]
 # ## index.mdx: Overview
-#
+
+# %% [markdown]
 # Lines 34 to 75 of `content/docs/index.mdx`.
 
 # %%
@@ -154,7 +157,8 @@ al.SplitPanel({"controls": controls, "workspace": tabs}, sizes=[0.25, 0.75])
 
 # %% [markdown]
 # ## index.mdx: Design model
-#
+
+# %% [markdown]
 # Lines 120 to 125 of `content/docs/index.mdx`.
 
 # %%
@@ -169,7 +173,8 @@ tabs.call_owner("trend", "refresh")
 
 # %% [markdown]
 # ## guide.mdx: Child widgets
-#
+
+# %% [markdown]
 # Lines 29 to 64 of `content/docs/guide.mdx`.
 
 # %%
@@ -214,7 +219,8 @@ tabs
 
 # %% [markdown]
 # ## guide.mdx: Accessing children
-#
+
+# %% [markdown]
 # Lines 76 to 83 of `content/docs/guide.mdx`.
 
 # %%
@@ -227,7 +233,8 @@ tabs.call_owner("trend", "refresh")
 
 # %% [markdown]
 # ## guide.mdx: Adding methods to composed widgets
-#
+
+# %% [markdown]
 # Lines 91 to 126 of `content/docs/guide.mdx`.
 
 # %%
@@ -275,7 +282,8 @@ tabs["trend"].refresh()
 
 # %% [markdown]
 # ## guide.mdx: Adding methods to composed widgets
-#
+
+# %% [markdown]
 # Lines 132 to 146 of `content/docs/guide.mdx`.
 
 # %%
@@ -295,7 +303,8 @@ tabs.call_owner("trend", "refresh")
 
 # %% [markdown]
 # ## guide.mdx: Mutating layouts after display
-#
+
+# %% [markdown]
 # Lines 156 to 161 of `content/docs/guide.mdx`.
 
 # %%
@@ -311,7 +320,8 @@ removed
 
 # %% [markdown]
 # ## guide.mdx: Scroll behavior
-#
+
+# %% [markdown]
 # Lines 168 to 173 of `content/docs/guide.mdx`.
 
 # %%
@@ -337,7 +347,8 @@ vertical
 
 # %% [markdown]
 # ## guide.mdx: Scroll behavior
-#
+
+# %% [markdown]
 # Lines 179 to 188 of `content/docs/guide.mdx`.
 
 # %%
@@ -354,7 +365,8 @@ HBox(
 
 # %% [markdown]
 # ## guide.mdx: Resizing
-#
+
+# %% [markdown]
 # Lines 201 to 206 of `content/docs/guide.mdx`.
 
 # %%
@@ -369,7 +381,8 @@ SplitPanel({"left": controls, "right": chart}, resizable=False)
 
 # %% [markdown]
 # ## guide.mdx: Actions and callbacks
-#
+
+# %% [markdown]
 # Lines 220 to 246 of `content/docs/guide.mdx`.
 
 # %%
@@ -405,8 +418,9 @@ al.SplitPanel(
 
 # %% [markdown]
 # ## astryx.mdx: Notebook dashboard
-#
-# Lines 22 to 74 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 22 to 75 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-notebook-dashboard)
@@ -433,6 +447,7 @@ exposure = ax.ProgressBar(62, label="Gross exposure", variant="accent", value_la
 def mark_to_market(_button):
     for row in positions.rows:
         positions.update_row(row["symbol"], {"pnl": round(row["pnl"] * 1.1, 2)})
+
     exposure.value = min(exposure.value + 8, 100)
 
 ax.Theme(
@@ -471,8 +486,9 @@ ax.Theme(
 
 # %% [markdown]
 # ## astryx.mdx: Layout panels
-#
-# Lines 104 to 113 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 105 to 114 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-layout-panels)
@@ -493,8 +509,9 @@ workspace
 
 # %% [markdown]
 # ## astryx.mdx: Form controls
-#
-# Lines 126 to 148 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 127 to 149 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-form-controls)
@@ -525,8 +542,9 @@ order_form
 
 # %% [markdown]
 # ## astryx.mdx: Form controls
-#
-# Lines 154 to 157 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 155 to 158 of `content/docs/astryx.mdx`.
 
 # %%
 order_form["symbol"].value
@@ -534,8 +552,9 @@ order_form["quantity"].value
 
 # %% [markdown]
 # ## astryx.mdx: Form controls
-#
-# Lines 163 to 174 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 164 to 175 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-form-controls-3)
@@ -553,8 +572,9 @@ ax.Stack({"symbol": symbol, "status": status}, gap=2)
 
 # %% [markdown]
 # ## astryx.mdx: Selection controls
-#
-# Lines 183 to 209 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 184 to 210 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-selection-controls)
@@ -589,8 +609,9 @@ filters
 
 # %% [markdown]
 # ## astryx.mdx: Buttons and actions
-#
-# Lines 222 to 241 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 223 to 242 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-buttons-and-actions)
@@ -616,8 +637,9 @@ ax.Stack({"status": status, "submit": submit, "actions": actions}, gap=3)
 
 # %% [markdown]
 # ## astryx.mdx: Tables
-#
-# Lines 250 to 265 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 251 to 266 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-tables)
@@ -641,8 +663,9 @@ orders
 
 # %% [markdown]
 # ## astryx.mdx: Theme identity
-#
-# Lines 279 to 318 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 280 to 319 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-theme-identity)
@@ -690,8 +713,9 @@ panel
 
 # %% [markdown]
 # ## astryx.mdx: Notebook-safe overlays
-#
-# Lines 357 to 377 of `content/docs/astryx.mdx`.
+
+# %% [markdown]
+# Lines 358 to 378 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-notebook-safe-overlays)
@@ -718,7 +742,8 @@ ax.Stack({"preview": preview, "confirm": confirm, "details": details}, gap=3)
 
 # %% [markdown]
 # ## examples.mdx: Minimal tabs
-#
+
+# %% [markdown]
 # Lines 7 to 18 of `content/docs/examples.mdx`.
 
 # %%
@@ -737,7 +762,8 @@ TabPanel(
 
 # %% [markdown]
 # ## examples.mdx: Add a tab after display
-#
+
+# %% [markdown]
 # Lines 24 to 29 of `content/docs/examples.mdx`.
 
 # %%
@@ -755,8 +781,9 @@ tabs
 
 # %% [markdown]
 # ## examples.mdx: Order blotter with callbacks
-#
-# Lines 38 to 89 of `content/docs/examples.mdx`.
+
+# %% [markdown]
+# Lines 38 to 90 of `content/docs/examples.mdx`.
 
 # %%
 # docs-example(examples-order-blotter-with-callbacks)
@@ -778,6 +805,7 @@ orders = ax.Table(
 def fill_selected(_button):
     for order_id in orders.selected:
         orders.update_row(order_id, {"status": "FILLED"})
+
     status.text = f"Filled {len(orders.selected)} orders"
 
 filters = ax.Theme(
@@ -814,8 +842,9 @@ al.SplitPanel(
 
 # %% [markdown]
 # ## examples.mdx: Chat with a streamed reply
-#
-# Lines 100 to 145 of `content/docs/examples.mdx`.
+
+# %% [markdown]
+# Lines 101 to 147 of `content/docs/examples.mdx`.
 
 # %%
 # docs-example(examples-chat-with-a-streamed-reply)
@@ -844,6 +873,7 @@ async def reply(text):
         answer = f"{answer} {word}".strip()
         chat.messages = [*chat.messages[:-1], {"role": "assistant", "content": answer}]
         await asyncio.sleep(0.2)
+
     chat.is_streaming = False
 
 def submit(chat, text):
@@ -867,8 +897,9 @@ chat
 
 # %% [markdown]
 # ## examples.mdx: Lumino action skeleton
-#
-# Lines 154 to 183 of `content/docs/examples.mdx`.
+
+# %% [markdown]
+# Lines 156 to 185 of `content/docs/examples.mdx`.
 
 # %%
 # docs-example(examples-lumino-action-skeleton)

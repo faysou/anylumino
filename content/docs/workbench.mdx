@@ -11,10 +11,22 @@ wrote, the Python generated from that program, and the agent's callbacks.
 
 ## Requirements
 
-- `node` on `PATH`. The workbench parses OpenUI programs with the bundled
-  `@openuidev/lang-core` tool.
+- `node` on `PATH`. The workbench runs the official OpenUI parser, bundled with
+  the package, as a short Node subprocess: about twice per turn to merge and
+  parse the program, and once per session for the system prompt. JupyterLab
+  does not need Node otherwise, so install it if the kernel's `PATH` has none.
+  Without it, a turn ends with "The workbench needs `node` on PATH to parse
+  OpenUI programs."
 - The `claude` (Claude Code) or `codex` (Codex CLI) executable on `PATH`,
   signed in.
+
+The agents need no other setup. Sign in once in a terminal, with `/login` in
+`claude` or with `codex login`. Each turn then passes its own system prompt,
+tool limits, and component skill on the command line, and uses the CLI's
+default model and your account's usage. A kernel started from a desktop app can
+have a shorter `PATH` than your shell. To check what the kernel sees, run
+`shutil.which("claude")` or `shutil.which("codex")` in a cell; `None` means the
+turn will report that the CLI was not found.
 
 ## Start a workbench
 
@@ -87,17 +99,23 @@ class SalesApp(App):
   explicitly.
 - An optional `setup(self)` runs each time the UI is built. The agent uses it to
   fill tables and selectors from namespace data. The agent sees only the shape
-  and columns of a data frame, so its rows never leave the kernel.
+  of a data frame and the name and type of each column, so its rows never leave
+  the kernel.
 - `self.ask_agent(message, context=None)` sends a chat message from a handler.
   `@ToAssistant(message)` in the program does the same without a handler.
+- `Plot(layout?)` in the program creates an empty Plotly `FigureWidget`, which
+  the callbacks fill through `self.ui.<name>`. The agent adds one per chart, so a
+  request for a dashboard of several charts needs nothing from you. `Plot` is
+  available when Plotly is installed, and the generated code then imports
+  `plotly.graph_objects as go`.
 - `Widget("name")` in the program mounts the widget stored under `name` in the
-  `namespace`, such as a Plotly `FigureWidget`.
+  `namespace`, such as a figure you built yourself.
 - An exception in a handler shows in the chat. The other widgets keep working.
 - Statement names that the `UI` widget already uses, such as `label`, `value`,
   or `layout`, stop the turn from applying, and the agent renames them.
 - The callbacks share a module with the generated UI code in an export, so they
-  cannot define `UI` or bind `al` or `ax` to anything other than `anylumino` and
-  `anylumino.astryx`.
+  cannot define `UI` or bind `al`, `ax`, or `go` to anything other than
+  `anylumino`, `anylumino.astryx`, and `plotly.graph_objects`.
 - A UI without handlers gets an empty `UIApp(App)` subclass, so it can still be
   exported.
 
@@ -132,9 +150,16 @@ names and types. An unknown option or a value of the wrong type stops the turn
 from applying, and the chat shows the error.
 
 The agent looks options up in the `openui-components` skill, which the workbench
-ships in `anylumino/workbench/plugin/`. Claude loads it as a plugin for each
-turn. Codex reads the same files by the path in its system prompt. After you
-change a widget's keywords, run `make workbench-skill` to regenerate the skill.
+ships in `anylumino/workbench/plugin/skills/openui-components/`: a `SKILL.md`
+index and one file per component. Each file gives the component's options and
+the Python constructor of its widget, such as
+`ax.TextInput(label=..., value=..., placeholder=...)`, which handlers use to fill
+a container. The Python positional order differs from the OpenUI one, so the
+skill tells the agent to pass arguments by keyword. Claude loads the skill as a
+plugin for each turn. Codex reads the same files by the path in its system
+prompt. Both read a component's file only when they need it, which keeps the
+system prompt small. After you change a widget's keywords or the catalog, run
+`make workbench-skill` to regenerate the skill.
 
 ## Sessions
 
@@ -177,7 +202,7 @@ a failed turn leave all four tabs unchanged.
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `catalog.py`          | Defines the components the agent can use: props, child slots, action slots, and the event of each action slot. Emits the OpenUI library spec. |
 | `prompt.py`           | Builds the system prompt from the catalog with the OpenUI prompt generator, and adds the callback contract and the namespace summary.         |
-| `skill.py`, `plugin/` | Write and hold the `openui-components` skill, one file per component with its options.                                                        |
+| `skill.py`, `plugin/` | Write and hold the `openui-components` skill, one file per component with its options and Python constructor.                                 |
 | `openui.py`           | Runs `static/openui/openui_tool.bundle.mjs` under Node with JSON on stdin and stdout, for `parse`, `merge`, and `prompt`.                     |
 | `reply.py`            | Splits a reply and rejects a reply with two fences of the same kind.                                                                          |
 | `codegen.py`          | Emits deterministic Python, children before parents, and raises a named error for dynamic props and unsupported features.                     |
@@ -288,9 +313,12 @@ is a widget, so it composes like any other: put it in a `TabPanel`, a
 ## Limits
 
 - The agent can use the components in the workbench catalog only: layout
-  panels, cards, text, inputs, badges, tables, code blocks, and mounted
-  namespace widgets.
+  panels, cards, text, inputs, badges, tables, code blocks, Plotly figures, and
+  mounted namespace widgets.
 - Options that take Python callables, such as a button's `callbacks`, are not
   available. Option values must be literals.
-- OpenUI `$state` variables, `Query`, `Mutation`, and `@OpenUrl` are not
-  supported. The agent's system prompt does not teach them.
+- OpenUI `$state` variables, `Query`, `Mutation`, `@Each`, and `@OpenUrl`
+  are not supported, and a reply that uses them is not applied. The `App` class
+  holds the state and reads the data instead. For content whose size depends on
+  the data, such as one card per region, the program declares an empty
+  container and a handler fills its `widgets`. The system prompt teaches this.

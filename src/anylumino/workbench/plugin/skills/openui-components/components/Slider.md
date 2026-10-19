@@ -1,6 +1,10 @@
-# Slider options
+# Slider
 
 A numeric slider; on_change runs with the new number.
+
+In Python: `ax.Slider(label=..., value=..., min=..., max=..., step=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

@@ -201,6 +201,7 @@ class Heading(Widget):
     ) -> None:
         if not 1 <= level <= 6:
             raise ValueError("heading level must be between 1 and 6")
+
         legacy_props = props.pop("props", None)
         extra_props = {**dict(legacy_props or {}), **props}
         super().__init__(
@@ -1202,6 +1203,7 @@ class SelectionSlider(Widget):
                 if isinstance(first, Mapping)
                 else first
             )
+
         super().__init__(
             "SelectionSlider",
             label=label,
@@ -1680,11 +1682,14 @@ def _label_props(
 ) -> dict[str, Any]:
     if label_position not in ("top", "left"):
         raise ValueError("label_position must be 'top' or 'left'")
+
     normalized = _named_props(props, **values)
     if label_position == "left":
         normalized["labelPosition"] = label_position
+
     if label_width is not None:
         normalized["labelWidth"] = _size_to_css(label_width, "auto")
+
     return normalized
 
 

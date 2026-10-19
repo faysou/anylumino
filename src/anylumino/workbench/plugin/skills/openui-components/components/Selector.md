@@ -1,6 +1,10 @@
-# Selector options
+# Selector
 
 A dropdown of string items; on_change runs with the chosen item.
+
+In Python: `ax.Selector(items=..., value=..., label=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

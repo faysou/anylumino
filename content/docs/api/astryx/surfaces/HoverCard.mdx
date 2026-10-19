@@ -59,6 +59,7 @@ Attach a hover card with richer preview content.
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
             children["content"] = content
+
         super().__init__(
             "HoverCard",
             children,

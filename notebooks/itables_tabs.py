@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # anylumino with itables
-#
+
+# %% [markdown]
 # `itables.widget.ITable` is an AnyWidget, so it can be placed directly inside
 # an `anylumino.TabPanel`. This example appends lab sample rows to a pandas
 # DataFrame and calls `ITable.update(...)` so the table inside the tab reflects
@@ -172,7 +173,8 @@ dashboard
 
 # %% [markdown]
 # ## What matters
-#
+
+# %% [markdown]
 # The `ITable` instance is the child of the `TabPanel`. The callback keeps the
 # source data in `state["df"]`, appends a row, then calls:
 #

@@ -70,34 +70,43 @@ class ClaudeStream:
         kind = data.get("type")
         if kind == "system" and data.get("subtype") == "init":
             return [Session(data["session_id"])]
+
         if kind == "stream_event":
             return self.stream_event(data["event"])
+
         if kind == "assistant":
             return [
                 ToolStarted(block["id"], block["name"], _target(block.get("input", {})))
                 for block in data["message"]["content"]
                 if block.get("type") == "tool_use"
             ]
+
         if kind == "user":
             content = data["message"].get("content")
             if not isinstance(content, list):
                 return []
+
             return [
                 ToolFinished(block["tool_use_id"], bool(block.get("is_error")))
                 for block in content
                 if block.get("type") == "tool_result"
             ]
+
         if kind == "result" and data.get("is_error"):
             return [Failed(str(data.get("result") or data.get("subtype")))]
+
         return []
 
     def stream_event(self, event: dict[str, Any]) -> list[Event]:
         if event.get("type") == "content_block_start" and event["content_block"].get("type") == "text":
             return [Text("\n\n")] if self.wrote else []
+
         delta = event.get("delta", {}) if event.get("type") == "content_block_delta" else {}
         if delta.get("type") == "text_delta" and delta["text"]:
             self.wrote = True
+
             return [Text(delta["text"])]
+
         return []
 
 
@@ -112,23 +121,32 @@ class CodexStream:
         kind = data.get("type")
         if kind == "thread.started":
             return [Session(data["thread_id"])]
+
         if kind in ("turn.failed", "error"):
             error = data.get("error") or {}
+
             return [Failed(str(error.get("message") or data.get("message") or kind))]
+
         item = data.get("item") or {}
         item_type = item.get("type")
         if item_type == "agent_message" and kind == "item.completed":
             text = item["text"]
             events: list[Event] = [Text("\n\n")] if self.wrote else []
             self.wrote = True
+
             return [*events, Text(text)]
+
         if item_type in (None, "agent_message", "reasoning"):
             return []
+
         if kind == "item.started":
             return [ToolStarted(item["id"], item_type, _target(item))]
+
         if kind == "item.completed":
             failed = item.get("status") == "failed" or item.get("exit_code") not in (None, 0)
+
             return [ToolFinished(item["id"], failed)]
+
         return []
 
 
@@ -136,11 +154,13 @@ def _target(fields: dict[str, Any]) -> str:
     for key in ("file_path", "path", "pattern", "command", "query"):
         if isinstance(fields.get(key), str):
             return fields[key]
+
     return ""
 
 
 def claude_argv(session_id: str, resume: bool, name: str, system_prompt: str) -> list[str]:
     session = ["--resume", session_id] if resume else ["--session-id", session_id, "-n", name]
+
     return [
         "claude",
         "-p",
@@ -178,6 +198,7 @@ def codex_argv(session_id: str | None, cwd: Path, system_prompt: str, mcp_overri
             *disabled,
             "-",
         ]
+
     return [
         "codex",
         "exec",
@@ -216,15 +237,19 @@ async def codex_mcp_overrides(cwd: Path) -> list[str]:
     except json.JSONDecodeError:
         message = errors.decode().strip()[-2000:]
         raise AgentError(f"`codex mcp list --json` failed, so its MCP servers cannot be turned off: {message}") from None
+
     overrides = []
     for server in servers:
         name = server["name"]
         if not server.get("enabled"):
             continue
+
         transport = _PLACEHOLDER_TRANSPORTS.get(server.get("transport", {}).get("type"))
         if transport is None or not re.fullmatch(r"[A-Za-z0-9_-]+", name):
             raise AgentError(f"The codex MCP server {name!r} cannot be turned off.")
+
         overrides.append(f"mcp_servers.{name}={{{transport},enabled=false}}")
+
     return overrides
 
 
@@ -240,6 +265,7 @@ class AgentRunner:
     def __init__(self, agent: str, cwd: Path, name: str, session_id: str | None = None) -> None:
         if agent not in AGENTS:
             raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(AGENTS)}.")
+
         self.agent = agent
         self.cwd = cwd
         self.name = name
@@ -255,8 +281,10 @@ class AgentRunner:
         """Run one turn and yield its events; raise `AgentError` when it cannot run."""
         if self.running:
             raise AgentError("A turn is already running.")
+
         if shutil.which(self.agent) is None:
             raise AgentError(f"`{self.agent}` was not found on PATH.")
+
         if self.agent == "claude":
             resume = self.session_id is not None
             session_id = self.session_id or str(uuid.uuid4())
@@ -265,8 +293,10 @@ class AgentRunner:
         else:
             argv = codex_argv(self.session_id, self.cwd, system_prompt, await codex_mcp_overrides(self.cwd))
             stream = CodexStream()
+
         if self.stopped:
             return
+
         self.process = await asyncio.create_subprocess_exec(
             shutil.which(argv[0]) or argv[0],
             *argv[1:],
@@ -287,10 +317,13 @@ class AgentRunner:
             async for line in process.stdout:
                 if not line.strip():
                     continue
+
                 for event in stream.feed(line.decode()):
                     if isinstance(event, Session):
                         self.session_id = event.id
+
                     yield event
+
             code = await process.wait()
             errors = (await stderr).decode().strip()
             if code != 0 and not self.stopped:
@@ -298,6 +331,7 @@ class AgentRunner:
         finally:
             if process.returncode is None:
                 await self.terminate(process)
+
             self.process = None
 
     async def stop(self) -> None:
@@ -310,9 +344,11 @@ class AgentRunner:
     async def terminate(process: asyncio.subprocess.Process) -> None:
         with contextlib.suppress(ProcessLookupError):
             os.killpg(process.pid, signal.SIGTERM)
+
         try:
             await asyncio.wait_for(process.wait(), STOP_GRACE)
         except TimeoutError:
             with contextlib.suppress(ProcessLookupError):
                 os.killpg(process.pid, signal.SIGKILL)
+
             await process.wait()

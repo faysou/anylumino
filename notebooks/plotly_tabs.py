@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # anylumino Plotly tab smoke test
-#
+
+# %% [markdown]
 # This notebook exercises `anylumino.TabPanel` with basic anywidget children
 # and Plotly `FigureWidget` children.
 
@@ -41,6 +42,7 @@ def make_wave_figure(title: str, phase: float = 0.0) -> go.FigureWidget:
         margin={"l": 42, "r": 24, "t": 54, "b": 42},
         template="plotly_white",
     )
+
     return figure
 
 

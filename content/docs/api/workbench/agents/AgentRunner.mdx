@@ -35,6 +35,7 @@ process starts still cancels the turn.
     def __init__(self, agent: str, cwd: Path, name: str, session_id: str | None = None) -> None:
         if agent not in AGENTS:
             raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(AGENTS)}.")
+
         self.agent = agent
         self.cwd = cwd
         self.name = name
@@ -66,8 +67,10 @@ process starts still cancels the turn.
         """Run one turn and yield its events; raise `AgentError` when it cannot run."""
         if self.running:
             raise AgentError("A turn is already running.")
+
         if shutil.which(self.agent) is None:
             raise AgentError(f"`{self.agent}` was not found on PATH.")
+
         if self.agent == "claude":
             resume = self.session_id is not None
             session_id = self.session_id or str(uuid.uuid4())
@@ -76,8 +79,10 @@ process starts still cancels the turn.
         else:
             argv = codex_argv(self.session_id, self.cwd, system_prompt, await codex_mcp_overrides(self.cwd))
             stream = CodexStream()
+
         if self.stopped:
             return
+
         self.process = await asyncio.create_subprocess_exec(
             shutil.which(argv[0]) or argv[0],
             *argv[1:],
@@ -98,10 +103,13 @@ process starts still cancels the turn.
             async for line in process.stdout:
                 if not line.strip():
                     continue
+
                 for event in stream.feed(line.decode()):
                     if isinstance(event, Session):
                         self.session_id = event.id
+
                     yield event
+
             code = await process.wait()
             errors = (await stderr).decode().strip()
             if code != 0 and not self.stopped:
@@ -109,6 +117,7 @@ process starts still cancels the turn.
         finally:
             if process.returncode is None:
                 await self.terminate(process)
+
             self.process = None
     ```
   </PySourceCode>
@@ -145,11 +154,13 @@ process starts still cancels the turn.
     async def terminate(process: asyncio.subprocess.Process) -> None:
         with contextlib.suppress(ProcessLookupError):
             os.killpg(process.pid, signal.SIGTERM)
+
         try:
             await asyncio.wait_for(process.wait(), STOP_GRACE)
         except TimeoutError:
             with contextlib.suppress(ProcessLookupError):
                 os.killpg(process.pid, signal.SIGKILL)
+
             await process.wait()
     ```
   </PySourceCode>

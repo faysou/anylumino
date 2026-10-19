@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # anylumino input controls
-#
+
+# %% [markdown]
 # Every Astryx input wrapper in one scrollable panel, each reporting its value to
 # the status line below.
 
@@ -31,10 +32,13 @@ import anylumino.astryx as ax
 def describe_value(value: Any) -> str:
     if isinstance(value, bytes):
         return f"{len(value)} bytes"
+
     if isinstance(value, dict):
         return f"{len(value)} item(s)"
+
     if isinstance(value, (list, tuple)):
         return ", ".join(map(str, value)) or "empty"
+
     return str(value)
 
 

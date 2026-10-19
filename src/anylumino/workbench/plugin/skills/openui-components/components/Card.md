@@ -1,6 +1,10 @@
-# Card options
+# Card
 
 A bordered surface around its children.
+
+In Python: `ax.Card(children=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

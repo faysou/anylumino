@@ -53,6 +53,7 @@ orders = ax.Table(
 def fill_selected(_button):
     for order_id in orders.selected:
         orders.update_row(order_id, {"status": "FILLED"})
+
     status.text = f"Filled {len(orders.selected)} orders"
 
 filters = ax.Theme(
@@ -122,6 +123,7 @@ async def reply(text):
         answer = f"{answer} {word}".strip()
         chat.messages = [*chat.messages[:-1], {"role": "assistant", "content": answer}]
         await asyncio.sleep(0.2)
+
     chat.is_streaming = False
 
 def submit(chat, text):

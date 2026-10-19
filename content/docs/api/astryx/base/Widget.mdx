@@ -73,12 +73,16 @@ Base anywidget for Astryx-backed components.
         action_callbacks = raw_props.pop("action_callbacks", action_callbacks)
         if width is None:
             width = raw_props.get("width")
+
         if height is None:
             height = raw_props.get("height")
+
         if not disabled and "isDisabled" in raw_props:
             disabled = bool(raw_props["isDisabled"])
+
         if open is None and "isOpen" in raw_props:
             open = bool(raw_props["isOpen"])
+
         self._search_callback = search
         self._propagates_theme = False
         super().__init__(
@@ -210,6 +214,7 @@ Base anywidget for Astryx-backed components.
         self.brand = _clean_brand(brand)
         if color_mode is not None:
             self.color_mode = _clean_theme_mode(color_mode)
+
         self._propagates_theme = True
         self._adopt_children(self.widgets)
     ```

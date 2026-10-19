@@ -96,6 +96,7 @@ than callbacks.
             )
         finally:
             self._syncing_children = False
+
         self.observe(self._observe_widgets, names="widgets")
         self.on_msg(self._handle_frontend_message)
         self._register_callbacks(callbacks, action_callbacks)

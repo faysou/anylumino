@@ -256,6 +256,7 @@ Render a data-driven Astryx table for notebook use.
         """Append one raw row and return its normalized row id."""
         normalized = self._normalize_new_row(row, row_key)
         self._set_table_props(rows=[*self.rows, normalized])
+
         return str(normalized[self.row_key])
     ```
   </PySourceCode>
@@ -278,6 +279,7 @@ Render a data-driven Astryx table for notebook use.
         """Prepend one raw row and return its normalized row id."""
         normalized = self._normalize_new_row(row, row_key)
         self._set_table_props(rows=[normalized, *self.rows])
+
         return str(normalized[self.row_key])
     ```
   </PySourceCode>
@@ -313,13 +315,16 @@ Render a data-driven Astryx table for notebook use.
             if str(row.get(self.row_key)) != target:
                 next_rows.append(row)
                 continue
+
             found = True
             updated = self._updated_row(row, values)
             next_id = str(updated[self.row_key])
             next_rows.append(updated)
+
         if not found:
             msg = f"table row not found: {target}"
             raise KeyError(msg)
+
         _table_row_ids(next_rows, self.row_key)
         with self.hold_sync(), self.hold_trait_notifications():
             self._set_table_props(rows=next_rows)
@@ -348,6 +353,7 @@ Render a data-driven Astryx table for notebook use.
         if len(next_rows) == len(self.rows):
             msg = f"table row not found: {target}"
             raise KeyError(msg)
+
         self._set_table_props(rows=next_rows)
         if target in self.selected:
             self.selected = [item for item in self.selected if item != target]
@@ -376,7 +382,9 @@ Render a data-driven Astryx table for notebook use.
             self._selection_callbacks = [
                 item for item in self._selection_callbacks if item is not callback
             ]
+
             return
+
         self._selection_callbacks.append(callback)
     ```
   </PySourceCode>
@@ -405,7 +413,9 @@ Render a data-driven Astryx table for notebook use.
             self._sort_callbacks = [
                 item for item in self._sort_callbacks if item is not callback
             ]
+
             return
+
         self._sort_callbacks.append(callback)
     ```
   </PySourceCode>

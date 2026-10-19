@@ -101,6 +101,7 @@ the kernel reads the exported file back.
             names = sorted(entry.name for entry in self.folder.iterdir() if entry.is_dir() and not entry.name.startswith("."))
         except OSError:
             names = []
+
         self.folders.widgets = [
             ax.Button(f"{name}/", variant="ghost", size="sm", callbacks=[lambda _button, name=name: self.browse(self.folder / name)])
             for name in names

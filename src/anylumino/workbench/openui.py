@@ -21,16 +21,19 @@ class OpenUIError(RuntimeError):
 
 async def parse(program: str) -> dict[str, Any]:
     """Return the evaluated tree, errors, and statement names of ``program``."""
+
     return await run_tool({"command": "parse", "program": program, "library": library_spec()})
 
 
 async def merge(current: str, patch: str) -> str:
     """Merge ``patch`` into ``current`` by statement name, as OpenUI edit mode does."""
+
     return (await run_tool({"command": "merge", "current": current, "patch": patch}))["program"]
 
 
 async def prompt(options: dict[str, Any]) -> str:
     """Return the OpenUI system prompt for the catalog with the given prompt options."""
+
     return (await run_tool({"command": "prompt", "library": library_spec(), "options": options}))["prompt"]
 
 
@@ -39,6 +42,7 @@ async def run_tool(request: dict[str, Any]) -> dict[str, Any]:
     node = shutil.which("node")
     if node is None:
         raise OpenUIError("The workbench needs `node` on PATH to parse OpenUI programs.")
+
     process = await asyncio.create_subprocess_exec(
         node,
         str(TOOL),
@@ -50,4 +54,5 @@ async def run_tool(request: dict[str, Any]) -> dict[str, Any]:
     stdout, stderr = await process.communicate(json.dumps(request).encode())
     if process.returncode != 0:
         raise OpenUIError(f"OpenUI tool failed ({process.returncode}): {stderr.decode().strip()}")
+
     return json.loads(stdout)

@@ -1,6 +1,10 @@
-# Heading options
+# Heading
 
 A section heading; level 1 is the largest.
+
+In Python: `ax.Heading(text=..., level=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

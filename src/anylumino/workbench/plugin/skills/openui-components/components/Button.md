@@ -1,6 +1,10 @@
-# Button options
+# Button
 
 A button that runs its action when clicked.
+
+In Python: `ax.Button(label=..., variant=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

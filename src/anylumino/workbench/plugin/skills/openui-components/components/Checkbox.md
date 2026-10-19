@@ -1,6 +1,10 @@
-# Checkbox options
+# Checkbox
 
 A checkbox; on_change runs with true or false.
+
+In Python: `ax.Checkbox(label=..., value=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

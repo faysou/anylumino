@@ -28,6 +28,7 @@ Astryx scrollable area holding a vertical stack of children.
         if axis not in SCROLL_AXES:
             msg = f"axis must be one of {SCROLL_AXES}, got {axis!r}"
             raise ValueError(msg)
+
         super().__init__(
             "ScrollBox",
             children,

@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # Astryx layout panels
-#
+
+# %% [markdown]
 # The `anylumino.astryx` layout panels mirror the Lumino layout widgets with
 # Astryx styling and the same keyed child API. This notebook shows each panel
 # with Python-driven state changes, so run it top to bottom and watch the
@@ -35,6 +36,7 @@ def price_figure(seed: int, title: str) -> go.FigureWidget:
     prices = 100 + rng.normal(0, 1, 120).cumsum()
     figure = go.FigureWidget(data=[go.Scatter(y=prices, mode="lines", name=title)])
     figure.update_layout(title=title, height=240, margin={"t": 40, "b": 30, "l": 40, "r": 20})
+
     return figure
 
 
@@ -42,7 +44,8 @@ status = ax.Text("Ready", text_type="supporting", color="secondary")
 
 # %% [markdown]
 # ## TabPanel
-#
+
+# %% [markdown]
 # One child per tab. A child mounts the first time its tab is selected and then
 # stays mounted, hidden, so the Plotly figure keeps its state across switches.
 
@@ -68,7 +71,8 @@ tabs.titles
 
 # %% [markdown]
 # ## StackedPanel
-#
+
+# %% [markdown]
 # Shows one child at a time without a tab strip. Drive it from a selector or
 # from Python.
 
@@ -86,7 +90,8 @@ stacked.selected_key
 
 # %% [markdown]
 # ## AccordionPanel
-#
+
+# %% [markdown]
 # Titled collapsible sections. `value` holds the open section key, or a list of
 # keys with `multiple=True`.
 
@@ -113,7 +118,8 @@ accordion.open_keys
 
 # %% [markdown]
 # ## ScrollBox
-#
+
+# %% [markdown]
 # A fixed-height scrolling region for long control lists or logs.
 
 # %%
@@ -126,7 +132,8 @@ scroll
 
 # %% [markdown]
 # ## SplitPanel
-#
+
+# %% [markdown]
 # Draggable panes. Drags write fractions back to `sizes`, and assigning `sizes`
 # from Python resizes the panes.
 
@@ -154,7 +161,8 @@ split.sizes
 
 # %% [markdown]
 # ## ResponsivePanel
-#
+
+# %% [markdown]
 # A stack that lays children out side by side when the output is wider than the
 # breakpoint and stacks them below it. Narrow the browser window to see it
 # switch.
@@ -171,7 +179,8 @@ responsive
 
 # %% [markdown]
 # ## Composition
-#
+
+# %% [markdown]
 # Panels nest like any other anylumino widget, so a tab panel can hold a split
 # panel that holds an accordion.
 

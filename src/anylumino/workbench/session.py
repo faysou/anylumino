@@ -36,6 +36,7 @@ def session_path(name: str) -> Path:
     """Return the file of session ``name``; names are limited to letters, digits, `_`, and `-`."""
     if not _NAME.fullmatch(name):
         raise ValueError(f"Invalid session name {name!r}: use letters, digits, '_', and '-'.")
+
     return sessions_dir() / f"{name}.json"
 
 
@@ -47,6 +48,7 @@ def save(state: SessionState) -> Path:
     temporary = path.with_suffix(".json.tmp")
     temporary.write_text(json.dumps(asdict(state), indent=2) + "\n")
     os.replace(temporary, path)
+
     return path
 
 
@@ -55,4 +57,5 @@ def load(name: str) -> SessionState | None:
     path = session_path(name)
     if not path.exists():
         return None
+
     return SessionState(**json.loads(path.read_text()))

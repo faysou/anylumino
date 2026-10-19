@@ -34,12 +34,14 @@ def split_reply(text: str) -> Reply:
             callbacks.append(body)
         else:
             return match.group(0)
+
         return "\n"
 
     prose = _FENCE.sub(take, text)
     for blocks, label in ((program, "openui"), (callbacks, "python")):
         if len(blocks) > 1:
             raise ReplyError(f"The reply has {len(blocks)} `{label}` blocks; send at most one.")
+
     return Reply(
         re.sub(r"\n{3,}", "\n\n", prose).strip(),
         program[0].rstrip("\n") if program else None,

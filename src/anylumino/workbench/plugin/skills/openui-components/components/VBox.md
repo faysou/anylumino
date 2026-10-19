@@ -1,6 +1,10 @@
-# VBox options
+# VBox
 
 Stacks children top to bottom at their natural size; gap is an Astryx spacing step.
+
+In Python: `ax.Stack(children=..., gap=..., direction='vertical')`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

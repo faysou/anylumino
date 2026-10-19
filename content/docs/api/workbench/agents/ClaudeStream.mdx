@@ -31,25 +31,31 @@ Turn `claude -p --output-format stream-json` lines into events.
         kind = data.get("type")
         if kind == "system" and data.get("subtype") == "init":
             return [Session(data["session_id"])]
+
         if kind == "stream_event":
             return self.stream_event(data["event"])
+
         if kind == "assistant":
             return [
                 ToolStarted(block["id"], block["name"], _target(block.get("input", {})))
                 for block in data["message"]["content"]
                 if block.get("type") == "tool_use"
             ]
+
         if kind == "user":
             content = data["message"].get("content")
             if not isinstance(content, list):
                 return []
+
             return [
                 ToolFinished(block["tool_use_id"], bool(block.get("is_error")))
                 for block in content
                 if block.get("type") == "tool_result"
             ]
+
         if kind == "result" and data.get("is_error"):
             return [Failed(str(data.get("result") or data.get("subtype")))]
+
         return []
     ```
   </PySourceCode>
@@ -67,10 +73,13 @@ Turn `claude -p --output-format stream-json` lines into events.
     def stream_event(self, event: dict[str, Any]) -> list[Event]:
         if event.get("type") == "content_block_start" and event["content_block"].get("type") == "text":
             return [Text("\n\n")] if self.wrote else []
+
         delta = event.get("delta", {}) if event.get("type") == "content_block_delta" else {}
         if delta.get("type") == "text_delta" and delta["text"]:
             self.wrote = True
+
             return [Text(delta["text"])]
+
         return []
     ```
   </PySourceCode>

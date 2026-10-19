@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # Astryx theme smoke test
-#
+
+# %% [markdown]
 # This notebook exercises runtime Astryx themes and a precompiled-style
 # `BuiltTheme` descriptor inside JupyterLab output areas.
 

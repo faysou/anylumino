@@ -110,8 +110,10 @@ _ASTRYX_COMPONENT_NAMES = {
 def _clean_value(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(key): _clean_value(item) for key, item in value.items()}
+
     if isinstance(value, (list, tuple)):
         return [_clean_value(item) for item in value]
+
     return _json_value(value)
 
 
@@ -126,28 +128,34 @@ def _named_props(
     normalized.update(
         {name: value for name, value in values.items() if value is not None}
     )
+
     return normalized
 
 
 def _clean_theme_token_name(name: object) -> str:
     token_name = str(name)
+
     return token_name if token_name.startswith("--") else f"--{token_name}"
 
 
 def _clean_theme_css(css: str | PathLike[str] | None) -> str:
     if css is None:
         return ""
+
     if isinstance(css, PathLike):
         with open(css, encoding="utf-8") as css_file:
             return css_file.read()
+
     return str(css)
 
 
 def _clean_astryx_theme(theme: Mapping[str, Any] | None) -> dict[str, Any]:
     if not theme:
         return {}
+
     if theme.get("built") or theme.get("__built"):
         tokens = theme.get("tokens", {})
+
         return {
             "name": str(theme.get("name", "neutral")),
             "built": True,
@@ -158,10 +166,12 @@ def _clean_astryx_theme(theme: Mapping[str, Any] | None) -> dict[str, Any]:
             "css": _clean_theme_css(theme.get("css")),
             "components": _clean_value(theme.get("components", {})),
         }
+
     if "tokens" in theme:
         tokens = theme.get("tokens")
     else:
         tokens = {key: value for key, value in theme.items() if key != "name"}
+
     return {
         "name": str(theme.get("name", "anylumino-brand")),
         "tokens": {
@@ -179,6 +189,7 @@ def _clean_theme_mode(mode: str) -> str:
     if mode not in _ASTRYX_THEME_MODES:
         expected = ", ".join(_ASTRYX_THEME_MODES)
         raise ValueError(f"theme mode must be one of: {expected}")
+
     return mode
 
 
@@ -198,6 +209,7 @@ def _option_records(options: Iterable[Any] | Mapping[str, Any]) -> list[Any]:
             normalized.append({"label": str(label), "value": str(value)})
         else:
             normalized.append(_clean_value(option))
+
     return normalized
 
 
@@ -211,6 +223,7 @@ def _search_records(items: Iterable[Any] | Mapping[str, Any]) -> list[dict[str, 
             normalized.append({**_clean_value(item), "id": value, "label": label})
         else:
             normalized.append({"id": str(item), "label": str(item)})
+
     return normalized
 
 
@@ -221,8 +234,10 @@ def _table_column_key(index: int) -> str:
 def _astryx_table_width(value: Any) -> Any:
     if value is None:
         return {"kind": "proportional", "value": 1}
+
     if isinstance(value, (int, float)):
         return {"kind": "proportional", "value": value}
+
     return _clean_value(value)
 
 
@@ -238,6 +253,7 @@ def _table_columns(
             columns = [_table_column_key(index) for index in range(len(first))]
         else:
             columns = ["value"]
+
     if isinstance(columns, Mapping):
         return [
             {
@@ -260,6 +276,7 @@ def _table_columns(
                 item["width"] = {"kind": "proportional", "value": 1}
             else:
                 item["width"] = _astryx_table_width(item["width"])
+
             normalized.append(item)
         elif isinstance(column, (list, tuple)) and len(column) == 2:
             header, key = column
@@ -278,6 +295,7 @@ def _table_columns(
                     "width": {"kind": "proportional", "value": 1},
                 }
             )
+
     return normalized
 
 
@@ -307,8 +325,11 @@ def _table_rows(
                 else {"value": _clean_value(row)}
             )
             item[row_key] = str(index)
+
         normalized.append(item)
+
     _table_row_ids(normalized, row_key)
+
     return normalized
 
 
@@ -318,7 +339,9 @@ def _table_row_ids(rows: Iterable[Mapping[str, Any]], row_key: str) -> set[str]:
         row_id = str(row[row_key])
         if row_id in row_ids:
             raise ValueError(f"table row already exists: {row_id}")
+
         row_ids.add(row_id)
+
     return row_ids
 
 
@@ -423,12 +446,16 @@ class Widget(ComponentWidget):
         action_callbacks = raw_props.pop("action_callbacks", action_callbacks)
         if width is None:
             width = raw_props.get("width")
+
         if height is None:
             height = raw_props.get("height")
+
         if not disabled and "isDisabled" in raw_props:
             disabled = bool(raw_props["isDisabled"])
+
         if open is None and "isOpen" in raw_props:
             open = bool(raw_props["isOpen"])
+
         self._search_callback = search
         self._propagates_theme = False
         super().__init__(
@@ -466,6 +493,7 @@ class Widget(ComponentWidget):
             selector.items = ["call", "put1"]
         """
         key = "items" if "items" in self.props else "options"
+
         return list(self.props.get(key, []))
 
     @items.setter
@@ -480,12 +508,14 @@ class Widget(ComponentWidget):
         self.brand = _clean_brand(brand)
         if color_mode is not None:
             self.color_mode = _clean_theme_mode(color_mode)
+
         self._propagates_theme = True
         self._adopt_children(self.widgets)
 
     def _adopt_children(self, views: Iterable[object]) -> None:
         if not self._propagates_theme:
             return
+
         for child in views:
             if isinstance(child, Widget):
                 child.apply_brand(self.brand, color_mode=self.color_mode)
@@ -495,6 +525,7 @@ class Widget(ComponentWidget):
     ) -> None:
         if content.get("type") != "search":
             super()._handle_frontend_message(widget, content, buffers)
+
             return
 
         request_id = str(content.get("request_id", ""))
@@ -509,6 +540,7 @@ class Widget(ComponentWidget):
                     "items": [],
                 }
             )
+
             return
 
         try:
@@ -523,6 +555,7 @@ class Widget(ComponentWidget):
                     "error": str(exc),
                 },
             )
+
             return
 
         self.send(
@@ -563,6 +596,7 @@ def Brand(name: str = "anylumino-brand", **tokens: Any) -> dict[str, Any]:
     renders widgets inside Astryx ``Theme``. Use :func:`BuiltTheme`
     when you already have CSS generated by ``npx astryx theme build``.
     """
+
     return _clean_brand({"name": name, "tokens": tokens})
 
 
@@ -606,6 +640,7 @@ def BuiltTheme(
     AnyLumino injects that generated CSS into the notebook page and reuses it
     across widgets with the same content.
     """
+
     return _clean_astryx_theme(
         {
             "name": name,
@@ -652,6 +687,7 @@ class Component(Widget):
             raise ValueError(
                 f"unknown Astryx component {component_name!r}; registered components: {registered}"
             )
+
         super().__init__(
             component_name,
             children,

@@ -11,7 +11,7 @@ The workbench system prompt: the OpenUI prompt for the catalog plus the callback
 
   <PyAttribute name="MEMBER_NAMES" value="('label', 'text', 'value', 'items', 'selected', 'layout', 'keys', 'width', 'height', 'open', 'close', 'show', 'hide', 'props', 'theme', 'widgets', 'app')" />
 
-  <PyAttribute name="CALLBACKS" value="f'''## Python callbacks\n\nInteractive components run Python through `@Callback(handler, context?)`. Put the handlers in one\nfenced block labeled `python`, next to the openui-lang block, as methods of one `App` subclass. Use\nthe `python` label for that block only; label any other code you show, such as a snippet for the\nuser, `text`.\n\n```python\nfrom anylumino.workbench import App\n\n\nclass SalesApp(App):\n    def setup(self):\n        self.ui.table.set_rows(self.sales.to_dict(&#x22;records&#x22;))\n        self.ui.region.items = [&#x22;All&#x22;, *sorted(self.sales[&#x22;region&#x22;].unique())]\n\n    def on_run(self, event):\n        region = self.ui.region.value or &#x22;All&#x22;\n        self.ui.summary.text = f&#x22;Region: {{region}}&#x22;\n```\n\n- A handler is a method that takes `event`, a dict with `source` (the statement name of the\n  component that fired), `value` (the new value for `on_change`, `None` for a button), and\n  `context` (the second `@Callback` argument).\n- `self.ui` is the UI widget, with one attribute per statement name. Inputs expose `.value`;\n  Heading, Text, and Markdown expose `.text`; Button and Badge expose `.label`; Selector exposes\n  `.items`; Table has `.set_rows(records)`.\n- Statement names become attributes of that widget, so they cannot be names of widget members such\n  as {', '.join(f&#x22;'`'{name}'`'&#x22; for name in MEMBER_NAMES)}. Use names like `title_text` or\n  `region_select` instead.\n- The namespace listed below reaches the app as attributes, such as `self.sales`. There are no\n  globals: read data only through `self`.\n- An optional `setup(self)` runs once each time the UI is built. Fill tables and selectors from\n  namespace data there instead of copying the data into the program: you see only the shape and\n  columns of data frames, not their rows.\n- `self.ask_agent(message, context=None)` sends a new chat message to you from a handler.\n- Do not name a method after an `App` member: `ui`, `agent`, `on_error`, `set_ui`, `call`, or\n  `ask_agent`.\n- Every handler named in `@Callback` must be a method. The python block always holds the complete\n  class: omit the block when no handler changes, and when one changes, send the whole class. A UI\n  without handlers needs no python block.\n- The class shares a module with the generated UI code when exported, so do not define or import\n  the module-level names `UI`, `al`, or `ax`, except as `import anylumino as al` and\n  `from anylumino import astryx as ax`.\n- Handlers run in the notebook kernel.\n'''" />
+  <PyAttribute name="CALLBACKS" value="f'''## Python callbacks\n\nInteractive components run Python through `@Callback(handler, context?)`. Put the handlers in one\nfenced block labeled `python`, next to the openui-lang block, as methods of one `App` subclass. Use\nthe `python` label for that block only; label any other code you show, such as a snippet for the\nuser, `text`.\n\n```python\nfrom anylumino.workbench import App\n\n\nclass SalesApp(App):\n    def setup(self):\n        self.ui.table.set_rows(self.sales.to_dict(&#x22;records&#x22;))\n        self.ui.region.items = [&#x22;All&#x22;, *sorted(self.sales[&#x22;region&#x22;].unique())]\n\n    def on_run(self, event):\n        region = self.ui.region.value or &#x22;All&#x22;\n        self.ui.summary.text = f&#x22;Region: {{region}}&#x22;\n```\n\n- A handler is a method that takes `event`, a dict with `source` (the statement name of the\n  component that fired), `value` (the new value for `on_change`, `None` for a button), and\n  `context` (the second `@Callback` argument).\n- `self.ui` is the UI widget, with one attribute per statement name. Inputs expose `.value`;\n  Heading, Text, and Markdown expose `.text`; Button and Badge expose `.label`; Selector exposes\n  `.items`; Table has `.set_rows(records)`.\n- Statement names become attributes of that widget, so they cannot be names of widget members such\n  as {', '.join(f&#x22;'`'{name}'`'&#x22; for name in MEMBER_NAMES)}. Use names like `title_text` or\n  `region_select` instead.\n- The namespace listed below reaches the app as attributes, such as `self.sales`. There are no\n  globals: read data only through `self`.\n- An optional `setup(self)` runs once each time the UI is built. Fill tables and selectors from\n  namespace data there instead of copying the data into the program: you see only the shape and\n  columns of data frames, not their rows.\n- `self.ask_agent(message, context=None)` sends you a chat message from a handler.\n- Do not name a method after an `App` member: `ui`, `agent`, `on_error`, `set_ui`, `call`, or\n  `ask_agent`.\n- Every handler named in `@Callback` must be a method. The python block always holds the complete\n  class: omit the block when no handler changes, and when one changes, send the whole class. A UI\n  without handlers needs no python block.\n- Export puts the class in one module with the UI code, so bind the module names `UI`, `al`, `ax`,\n  and `go` only as `anylumino`, `anylumino.astryx`, and `plotly.graph_objects`.\n- A `Plot` is an empty Plotly `FigureWidget`; fill it in handlers inside\n  `with self.ui.chart.batch_update():`. Use one `Plot` per chart.\n- For one component per data item, declare an empty container, such as `cards = HBox([])`, and fill\n  it in a handler with the Python constructors of the skill, by keyword:\n  `self.ui.cards.widgets = [ax.Card(children=[ax.Text(text=n)]) for n in names]`.\n- Keep state and data in the app: `$variables`, `Query`, `Mutation`, and `@Each` are not supported.\n'''" />
 
   <PyAttribute name="COMPONENT_OPTIONS" value="f'## Component options\n\nComponents whose signature ends with `options?` take an object of extra keyword options as their\nlast argument, for example `Table(rows, [&#x22;region&#x22;], {{sortable: true}})`. Before you use the options\nof a component, look them up in the `{skill.NAME}` skill, or read `{skill.SKILL}/components/<Name>.md`.\nAn unknown option stops the reply from being applied.\n'" />
 </PyAttributes>
@@ -25,6 +25,7 @@ The workbench system prompt: the OpenUI prompt for the catalog plus the callback
         ```python
         async def system_prompt(namespace: Mapping[str, Any]) -> str:
             """Return the full system prompt, with ``namespace`` described for the agent."""
+
             return "\n\n".join([await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)])
         ```
       </PySourceCode>
@@ -46,6 +47,7 @@ The workbench system prompt: the OpenUI prompt for the catalog plus the callback
             key = hashlib.sha256(json.dumps([library_spec(), OPTIONS], sort_keys=True).encode()).hexdigest()
             if key not in _cache:
                 _cache[key] = await openui.prompt(OPTIONS)
+
             return _cache[key]
         ```
       </PySourceCode>
@@ -62,15 +64,24 @@ The workbench system prompt: the OpenUI prompt for the catalog plus the callback
             """Describe each namespace entry by name and type, with shape and columns for data frames."""
             if not namespace:
                 return "## Namespace\n\nThe namespace is empty."
+
             lines = ["## Namespace", "", "The app gets these names as attributes, such as `self.<name>`; `Widget(name)` mounts the widgets among them:", ""]
             for name, value in namespace.items():
                 kind = f"{type(value).__module__}.{type(value).__qualname__}"
                 detail = ""
                 shape = getattr(value, "shape", None)
                 columns = getattr(value, "columns", None)
+                dtypes = getattr(value, "dtypes", None)
                 if shape is not None and columns is not None:
-                    detail = f", shape {tuple(shape)}, columns {[str(column) for column in columns]}"
+                    if dtypes is not None and len(dtypes) == len(columns):
+                        described = ", ".join(f"`{column}` ({dtype})" for column, dtype in zip(columns, dtypes, strict=True))
+                    else:
+                        described = ", ".join(f"`{column}`" for column in columns)
+
+                    detail = f", shape {tuple(shape)}, columns {described}"
+
                 lines.append(f"- `{name}`: `{kind}`{detail}")
+
             return "\n".join(lines)
         ```
       </PySourceCode>

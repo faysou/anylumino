@@ -64,6 +64,7 @@ Render a semantic Astryx heading.
     ) -> None:
         if not 1 <= level <= 6:
             raise ValueError("heading level must be between 1 and 6")
+
         legacy_props = props.pop("props", None)
         extra_props = {**dict(legacy_props or {}), **props}
         super().__init__(

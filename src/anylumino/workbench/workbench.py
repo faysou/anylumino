@@ -85,6 +85,7 @@ class Workbench(al.SplitPanel):
         saved = store.load(session) if session else None
         if saved is not None and agent is not None and agent != saved.agent:
             raise ValueError(f"Session {session!r} runs {saved.agent}; pass agent={saved.agent!r} or another session name.")
+
         self.state = saved or store.SessionState(
             name=session or "", agent=agent or "claude", cwd=str(Path(cwd or os.getcwd()).resolve())
         )
@@ -155,7 +156,9 @@ class Workbench(al.SplitPanel):
         """Start a turn with ``text``; refused with a system message while a turn runs."""
         if self.running:
             self.add_message("system", "A turn is already running; wait for it or stop it.")
+
             return
+
         # Set before the turn starts, so that a second submit in the meantime is refused
         self.set_running(True)
         self.runner.stopped = False
@@ -170,7 +173,9 @@ class Workbench(al.SplitPanel):
             loop = asyncio.get_running_loop()
         except RuntimeError:
             asyncio.run(coroutine)
+
             return
+
         task = loop.create_task(coroutine)
         self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
@@ -210,14 +215,17 @@ class Workbench(al.SplitPanel):
                             tool["status"] = "error" if event.error else "complete"
                 elif isinstance(event, Failed):
                     failure = event.message
+
                 if flush is None:
                     flush = loop.call_later(STREAM_INTERVAL, flush_reply)
         except (AgentError, openui.OpenUIError) as error:
             failure = str(error)
         except Exception as error:
             failure = f"{type(error).__name__}: {error}"
+
         if flush is not None:
             flush.cancel()
+
         if self.runner.stopped:
             self.update_reply(index, reply, tools, "stopped")
         elif failure:
@@ -233,10 +241,13 @@ class Workbench(al.SplitPanel):
         except ReplyError as error:
             self.update_reply(index, reply, tools)
             self.report_apply_error(str(error))
+
             return
+
         self.update_reply(index, parts.prose, tools)
         if parts.program is None and parts.callbacks is None:
             return
+
         callbacks = (self.state.callbacks or EMPTY_CALLBACKS) if parts.callbacks is None else parts.callbacks
         try:
             program = await openui.merge(self.state.program, parts.program) if parts.program else self.state.program
@@ -256,21 +267,25 @@ class Workbench(al.SplitPanel):
         if result["errors"] or result["incomplete"]:
             details = "; ".join(f"{error.get('statementId', '?')}: {error['message']}" for error in result["errors"])
             raise ApplyError(f"OpenUI errors: {details or 'the program is incomplete'}")
+
         cls = self.compile_callbacks(callbacks)
         try:
             source = codegen.generate(result, handler_names(cls), self.namespace)
         except codegen.GenerationError as error:
             raise ApplyError(f"UI code: {error}") from error
+
         try:
             app = cls(**self.namespace)
         except ValueError as error:
             raise ApplyError(f"Namespace: {error}") from error
+
         app.agent = self.ask_agent
         app.on_error = self.report_callback_error
         try:
             ui = ui_class(source)(app)
         except Exception as error:
             raise ApplyError(f"Building the UI raised {type(error).__name__}: {error}") from error
+
         self.state.program = program
         self.state.callbacks = callbacks
         self.ui_code = source
@@ -279,6 +294,7 @@ class Workbench(al.SplitPanel):
         keep = {id(value) for value in self.namespace.values() if isinstance(value, Widget)}
         for widget in previous:
             close_tree(widget, keep)
+
         self.export_button.disabled = False
         self.show_code(openui=program, ui_code=source, callbacks=callbacks)
 
@@ -298,6 +314,7 @@ class Workbench(al.SplitPanel):
     async def restore(self) -> None:
         if not self.state.program:
             return
+
         try:
             await self.apply(self.state.program, self.state.callbacks)
         except Exception as error:
@@ -311,7 +328,9 @@ class Workbench(al.SplitPanel):
             path = shown_path(write_module(folder, name, self.ui_code, self.state.callbacks))
         except OSError as error:
             self.add_message("system", f"Export failed: {error}")
+
             return
+
         arguments = [json.dumps(path), *(f"{key}={key}" for key in self.namespace)]
         # As an assistant message, since the chat shows system messages on one line without markdown
         self.add_message(
@@ -324,12 +343,16 @@ class Workbench(al.SplitPanel):
         parts = [text]
         if context is not None:
             parts.append(f"Context from the UI: {json.dumps(context, default=str)}")
+
         if self.last_error:
             parts.append(f"Your previous reply was not applied: {self.last_error}")
+
         if self.state.program:
             parts.append(f"Current program:\n```openui-lang\n{self.state.program}\n```")
+
         if self.state.callbacks:
             parts.append(f"Current callbacks:\n```python\n{self.state.callbacks}```")
+
         return "\n\n".join(parts)
 
     def show_code(self, **texts: str) -> None:
@@ -340,6 +363,7 @@ class Workbench(al.SplitPanel):
     def add_message(self, role: str, content: str, status: str | None = None) -> int:
         """Append a chat message and return its index."""
         self.set_messages([*self.chat.messages, chat_message(role, content, status)])
+
         return len(self.chat.messages) - 1
 
     # Updates the turn's reply by index, since other messages can arrive while it streams
@@ -371,8 +395,10 @@ def chat_message(
     message: dict[str, Any] = {"role": role, "content": content}
     if status:
         message["status"] = status
+
     if tools:
         message["tool_calls"] = [{key: tool[key] for key in ("name", "target", "status")} for tool in tools]
+
     return message
 
 
@@ -380,9 +406,11 @@ def close_tree(widget: Widget, keep: Collection[int]) -> None:
     """Close ``widget`` and the widgets it holds, except those whose ``id`` is in ``keep``."""
     if id(widget) in keep:
         return
+
     for child in getattr(widget, "widgets", None) or []:
         if isinstance(child, Widget):
             close_tree(child, keep)
+
     widget.close()
 
 

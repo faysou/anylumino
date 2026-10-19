@@ -6,21 +6,25 @@ import pytest
 import anylumino as al
 from anylumino import astryx as ax
 from anylumino.workbench import codegen, openui, prompt, skill
-from anylumino.workbench.catalog import CATALOG, COMPONENTS, library_spec, type_name
+from anylumino.workbench.catalog import CATALOG, COMPONENTS, go, library_spec, type_name
 
 
-SAMPLES = {"string": "s", "number": 2, "boolean": True}
+SAMPLES = {"string": "s", "number": 2, "boolean": True, "object": {"height": 300}}
 
 
 def sample(prop):
     schema = prop.schema
     if prop.kind == "children":
         return [ax.Text("first"), ax.Text("second")]
+
     if "enum" in schema:
         return schema["enum"][-1]
+
     if schema.get("type") == "array":
         item = schema["items"].get("type")
+
         return [{"a": 1}] if item == "object" else [SAMPLES[item], SAMPLES[item]]
+
     return SAMPLES[schema["type"]]
 
 
@@ -45,13 +49,14 @@ def test_catalog_lists_components_and_props_in_order():
         "Badge": ["label", "variant"],
         "Table": ["rows", "columns", "options"],
         "CodeBlock": ["code", "language", "options"],
+        "Plot": ["layout"],
         "Widget": ["name"],
     }
 
 
 @pytest.mark.parametrize("component", [c for c in COMPONENTS if c.name != "Widget"], ids=lambda c: c.name)
 def test_catalog_entry_builds_its_class(component):
-    module = {"al": al, "ax": ax}[component.module]
+    module = {"al": al, "ax": ax, "go": go}[component.module]
     kwargs = {prop.keyword: sample(prop) for prop in component.props if prop.kind not in ("action", "options")}
     kwargs.update(component.fixed)
     widget = getattr(module, component.cls)(**kwargs)
@@ -64,6 +69,7 @@ def test_library_spec_matches_catalog():
     assert list(spec["schema"]["properties"]) == list(CATALOG)
     for name, component in CATALOG.items():
         assert list(spec["schema"]["$defs"][name]["properties"]) == [prop.name for prop in component.props]
+
     assert spec["components"]["Button"] == {
         "signature": 'Button(label: string, action?: ActionExpression, variant?: "primary" | "secondary" | "ghost" | "destructive", options?: object)',
         "description": "A button that runs its action when clicked",
@@ -114,6 +120,7 @@ def test_system_prompt_teaches_only_supported_features():
     text = asyncio.run(prompt.system_prompt({}))
     for component in COMPONENTS:
         assert f"{component.name}(" in text
+
     assert "@Callback" in text
     assert "```openui-lang" in text
     assert prompt.COMPONENT_OPTIONS in text
@@ -121,6 +128,7 @@ def test_system_prompt_teaches_only_supported_features():
     assert "sort_direction" not in text
     for unsupported in ("Query(", "Mutation(", "@Run", "@Set", "$binding"):
         assert unsupported not in text
+
     assert len(text) < 12_000
 
 
@@ -197,7 +205,7 @@ def test_namespace_summary_describes_data_frames():
             "",
             "The app gets these names as attributes, such as `self.<name>`; `Widget(name)` mounts the widgets among them:",
             "",
-            "- `sales`: `pandas.DataFrame`, shape (1, 2), columns ['region', 'revenue']",
+            "- `sales`: `pandas.DataFrame`, shape (1, 2), columns `region` (str), `revenue` (float64)",
             "- `limit`: `builtins.int`",
         ]
     )

@@ -1,6 +1,10 @@
-# Text options
+# Text
 
 A run of plain text.
+
+In Python: `ax.Text(text=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

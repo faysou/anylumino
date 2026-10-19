@@ -1,6 +1,10 @@
-# CodeBlock options
+# CodeBlock
 
 Highlighted source code.
+
+In Python: `ax.CodeBlock(code=..., language=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

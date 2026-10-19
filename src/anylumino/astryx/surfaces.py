@@ -25,11 +25,14 @@ _GRID_REPEAT_COLUMNS = re.compile(
 def _grid_columns(columns: int | str | Mapping[str, Any]) -> int | dict[str, Any]:
     if isinstance(columns, Mapping):
         return _clean_value(columns)
+
     if isinstance(columns, bool):
         msg = "Grid columns must be an int or a {'minWidth': int} mapping"
         raise TypeError(msg)
+
     if isinstance(columns, int):
         return columns
+
     if isinstance(columns, str):
         match = _GRID_REPEAT_COLUMNS.match(columns)
         if match is not None:
@@ -37,12 +40,14 @@ def _grid_columns(columns: int | str | Mapping[str, Any]) -> int | dict[str, Any
                 "minWidth": int(float(match["min_width"])),
                 "repeat": match["repeat"],
             }
+
         msg = (
             f"Grid columns string {columns!r} is not supported. Pass an int, a "
             "{'minWidth': int, 'repeat': 'fit'|'fill', 'max': int} mapping, or the CSS form "
             "'repeat(auto-fit, minmax(280px, 1fr))'."
         )
         raise TypeError(msg)
+
     msg = f"Grid columns must be an int, a mapping, or a repeat() string, not {type(columns).__name__}"
     raise TypeError(msg)
 
@@ -61,13 +66,16 @@ def _lightbox_media(
         if not isinstance(record, Mapping):
             msg = "Lightbox media items must be mappings"
             raise TypeError(msg)
+
         if not record.get("src") or "alt" not in record:
             msg = "Lightbox media items require 'src' and 'alt'"
             raise ValueError(msg)
+
         item = _clean_value(record)
         if item.get("type", "image") not in {"image", "video"}:
             msg = "Lightbox media type must be 'image' or 'video'"
             raise ValueError(msg)
+
         normalized.append(item)
 
     return normalized[0] if is_single else normalized
@@ -527,6 +535,7 @@ class Overlay(Widget):
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
             slots["content"] = content
+
         super().__init__(
             "Overlay",
             slots,
@@ -1586,6 +1595,7 @@ class ToggleButtonGroup(Widget):
         if selection_mode not in {"single", "multiple"}:
             msg = "selection_mode must be 'single' or 'multiple'"
             raise ValueError(msg)
+
         if selection_mode == "multiple":
             selected = (
                 []
@@ -1598,6 +1608,7 @@ class ToggleButtonGroup(Widget):
             if value is not None and not isinstance(value, str):
                 msg = "single-selection value must be a string or None"
                 raise TypeError(msg)
+
             selected = value
 
         super().__init__(
@@ -2387,6 +2398,7 @@ class Tooltip(Widget):
             content_prop = None
         else:
             content_prop = content
+
         super().__init__(
             "Tooltip",
             children,
@@ -2485,6 +2497,7 @@ class HoverCard(Widget):
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
             children["content"] = content
+
         super().__init__(
             "HoverCard",
             children,
@@ -2587,6 +2600,7 @@ class Popover(Widget):
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
             children["content"] = content
+
         super().__init__(
             "Popover",
             children,

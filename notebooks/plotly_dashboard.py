@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # anylumino Plotly dashboard smoke test
-#
+
+# %% [markdown]
 # This notebook uses the anylumino layout and action widgets with Plotly
 # `FigureWidget` children. Toolbar, menu, and command palette actions call
 # Python callbacks that mutate figures after the dashboard is displayed.
@@ -61,6 +62,7 @@ def make_sensor_frame(rows: int = 240, phase: float = 0.0) -> pd.DataFrame:
                 "co2": 430 + math.sin(hour / 6 + phase) * 34 + index * 0.08,
             }
         )
+
     return pd.DataFrame(records)
 
 
@@ -106,8 +108,10 @@ def active_figure() -> go.FigureWidget:
     key = figure_tabs.selected_key
     if key not in figures:
         key = active_figure_key
+
     if key not in figures:
         raise RuntimeError("No active figure tab")
+
     return figures[key]
 
 
@@ -160,6 +164,7 @@ def create_figure(title: str, rows: int = 180, metric: str = "temperature") -> g
     )
     figure.update_layout(title=title, height=430, xaxis_title="Sample", yaxis_title=metric.title())
     style_figure(figure, theme_name)
+
     return figure
 
 
@@ -170,6 +175,7 @@ def refresh_figure(figure: go.FigureWidget, rows: int, metric: str) -> None:
         figure.data[0].y = frame[metric]
         figure.data[0].name = metric
         figure.layout.yaxis.title = metric.title()
+
     style_figure(figure, theme_name)
 
 
@@ -201,6 +207,7 @@ def apply_inputs(_button: Button | None = None) -> None:
     refresh_figure(figure, rows, metric)
     if auto_focus_input.value:
         focus_figure()
+
     metric_dataset.value = f"Dataset: {dataset_input.value}"
     metric_rows.value = f"Samples: {rows}"
     log(f"Applied inputs to {figure_tabs.selected_key}")
@@ -248,6 +255,7 @@ def append_sample(_action_id: str = "append") -> None:
     with figure.batch_update():
         figure.data[0].x = [*figure.data[0].x, next_x]
         figure.data[0].y = [*figure.data[0].y, next_y]
+
     log(f"Appended sample {next_x}")
 
 
@@ -257,6 +265,7 @@ def toggle_theme(_action_id: str = "theme") -> None:
     theme_name = "dark" if theme_name == "light" else "light"
     for figure in figures.values():
         style_figure(figure, theme_name)
+
     theme_input.value = theme_name
     log(f"Switched to {theme_name} theme")
 

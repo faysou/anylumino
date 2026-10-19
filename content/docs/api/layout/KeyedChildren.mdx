@@ -80,6 +80,7 @@ also gain `selected_key` and `select_key`.
     ```python
     def get_owner(self, key_or_index: str | int) -> object:
         index = self._resolve_index(key_or_index)
+
         return self._owners_by_key.get(self.child_keys[index], self.widgets[index])
     ```
   </PySourceCode>
@@ -98,6 +99,7 @@ also gain `selected_key` and `select_key`.
         if not hasattr(self, "selected_index"):
             msg = f"{type(self).__name__} does not support selection"
             raise AttributeError(msg)
+
         self.selected_index = self.get_index(key)
     ```
   </PySourceCode>
@@ -241,6 +243,7 @@ also gain `selected_key` and `select_key`.
                     self.selected_index = next_index
         finally:
             self._syncing_children = False
+
         self._adopt_children([view])
     ```
   </PySourceCode>
@@ -291,11 +294,13 @@ also gain `selected_key` and `select_key`.
                 self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
+
         if close:
             for target in {id(view): view, id(owner): owner}.values():
                 closer = getattr(target, "close", None)
                 if callable(closer):
                     closer()
+
         return owner
     ```
   </PySourceCode>
@@ -320,6 +325,7 @@ also gain `selected_key` and `select_key`.
         target = max(0, min(len(self.child_keys) - 1, index))
         if current == target:
             return
+
         selected_key = self.selected_key
         titles = self._complete_titles()
         order = [position for position in range(len(self.child_keys)) if position != current]

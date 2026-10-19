@@ -45,6 +45,7 @@ def built(agent_reply, tmp_path, monkeypatch):
     sales = pd.DataFrame({"region": ["EMEA", "APAC"], "revenue": [1.5, 2.0]})
     workbench = Workbench(agent="codex", session="sales", namespace={"sales": sales}, cwd=tmp_path)
     workbench.submit("Build it")
+
     return workbench
 
 
@@ -218,6 +219,35 @@ class UI(ax.Stack):
 
 
 class SalesApp(App):
+    pass
+'''
+
+
+def test_module_source_drops_imports_the_ui_code_already_has():
+    ui_code = '''import anylumino.astryx as ax
+import plotly.graph_objects as go
+
+
+class UI(ax.Stack):
+    pass
+'''
+    callbacks = '''import plotly.graph_objects as go
+from anylumino.workbench import App
+
+
+class ChartApp(App):
+    pass
+'''
+    assert module_source(ui_code, callbacks) == '''import anylumino.astryx as ax
+import plotly.graph_objects as go
+from anylumino.workbench import App
+
+
+class UI(ax.Stack):
+    pass
+
+
+class ChartApp(App):
     pass
 '''
 

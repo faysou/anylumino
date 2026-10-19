@@ -11,6 +11,13 @@ import anylumino as al
 import anylumino.astryx as ax
 
 
+# Plotly is optional, so the Plot component exists only where it is installed
+try:
+    import plotly.graph_objects as go
+except ImportError:
+    go = None
+
+
 ROOT = "VBox"
 CALLBACK = "Callback"
 
@@ -68,6 +75,7 @@ class Component:
     def options(self) -> dict[str, Any]:
         """Return the option schemas by keyword, or an empty dict for a component without options."""
         prop = next((prop for prop in self.props if prop.kind == "options"), None)
+
         return prop.schema["properties"] if prop else {}
 
 
@@ -223,6 +231,14 @@ _COMPONENTS: tuple[Component, ...] = (
         (Prop("code", _STRING, True), Prop("language", _STRING)),
     ),
     Component(
+        "Plot",
+        "go",
+        "FigureWidget",
+        "An empty Plotly figure that the callbacks fill, such as self.ui.chart.add_traces(...); "
+        "layout holds literal Plotly layout keys, such as {height: 320}",
+        (Prop("layout", {"type": "object"}),),
+    ),
+    Component(
         "Widget",
         "",
         "",
@@ -231,7 +247,7 @@ _COMPONENTS: tuple[Component, ...] = (
     ),
 )
 
-_MODULES = {"al": al, "ax": ax}
+_MODULES = {"al": al, "ax": ax, "go": go}
 _ANNOTATIONS = {
     "bool": _BOOLEAN,
     "int": _NUMBER,
@@ -250,6 +266,7 @@ _ANNOTATIONS = {
 def _with_options(component: Component) -> Component:
     if not component.module:
         return component
+
     cls = getattr(_MODULES[component.module], component.cls)
     taken = {prop.keyword for prop in component.props} | {key for key, _ in component.fixed}
     doc = inspect.cleandoc(cls.__doc__ or "")
@@ -260,19 +277,25 @@ def _with_options(component: Component) -> Component:
     for name, parameter in inspect.signature(cls.__init__).parameters.items():
         if name == "self" or name in taken or parameter.kind in (parameter.VAR_POSITIONAL, parameter.VAR_KEYWORD):
             continue
+
         schema = _annotation_schema(str(parameter.annotation))
         if schema is None:
             continue
+
         kind, description = parameters.get(name, ("", ""))
         values = _set_literals(kind) or literals.get(renamed.get(name, _camel(name)), [])
         if schema == _STRING and values:
             default = parameter.default
             extra = [default] if isinstance(default, str) and default not in values else []
             schema = {"type": "string", "enum": [*values, *extra]}
+
         properties[name] = {**schema, "description": description}
+
     if not properties:
         return component
+
     schema = {"type": "object", "properties": properties, "additionalProperties": False}
+
     return replace(component, props=(*component.props, Prop("options", schema, kind="options")))
 
 
@@ -282,12 +305,16 @@ def _annotation_schema(annotation: str) -> dict[str, Any] | None:
     for part in (part.strip() for part in annotation.split(" | ")):
         if part == "None":
             continue
+
         if part not in _ANNOTATIONS:
             return None
+
         if _ANNOTATIONS[part] not in schemas:
             schemas.append(_ANNOTATIONS[part])
+
     if not schemas:
         return None
+
     return schemas[0] if len(schemas) == 1 else {"anyOf": schemas}
 
 
@@ -298,6 +325,7 @@ def _parameters(doc: str) -> dict[str, tuple[str, str]]:
         start = lines.index("Parameters") + 2
     except ValueError:
         return {}
+
     kinds: dict[str, str] = {}
     descriptions: dict[str, list[str]] = {}
     current = None
@@ -306,17 +334,20 @@ def _parameters(doc: str) -> dict[str, tuple[str, str]]:
             match = re.match(r"^(\w+) : (.*)$", line)
             if match is None:
                 break
+
             current = match.group(1)
             kinds[current] = match.group(2)
             descriptions[current] = []
         elif current is not None and line.strip():
             descriptions[current].append(line.strip())
+
     return {name: (kinds[name], " ".join(text)) for name, text in descriptions.items()}
 
 
 # A numpydoc type such as ``{'top', 'left'}, default 'top'`` lists the values the wrapper accepts.
 def _set_literals(kind: str) -> list[str]:
     match = re.match(r"^\{([^}]*)\}", kind)
+
     return re.findall(r"['\"]([^'\"]*)['\"]", match.group(1)) if match else []
 
 
@@ -325,21 +356,26 @@ def _set_literals(kind: str) -> list[str]:
 def _astryx_literals(doc: str) -> dict[str, list[str]]:
     entries = re.sub(r"\n  +", " ", doc)
     matches = re.finditer(r"^- ``(\w+)`` \(((?:'[^']*'(?: or )?)+)(?:;[^)]*)?\)", entries, re.M)
+
     return {match.group(1): re.findall(r"'([^']*)'", match.group(2)) for match in matches}
 
 
 # Wrappers pass keywords on as ``astryxName=keyword``; the source gives the names that differ.
 def _astryx_names(cls: type) -> dict[str, str]:
     source = inspect.getsource(cls.__init__)
+
     return {keyword: prop for prop, keyword in re.findall(r"\b(\w+)=(\w+)[,)\s]", source) if prop != keyword}
 
 
 def _camel(name: str) -> str:
     head, *rest = name.split("_")
+
     return head + "".join(part.capitalize() for part in rest)
 
 
-COMPONENTS: tuple[Component, ...] = tuple(_with_options(component) for component in _COMPONENTS)
+COMPONENTS: tuple[Component, ...] = tuple(
+    _with_options(component) for component in _COMPONENTS if _MODULES.get(component.module, al) is not None
+)
 CATALOG: dict[str, Component] = {component.name: component for component in COMPONENTS}
 
 _CALLBACK_PARAMS = {
@@ -369,6 +405,7 @@ def library_spec() -> dict[str, Any]:
         "properties": {"type": {"type": "string", "const": CALLBACK}, "params": _CALLBACK_PARAMS},
         "required": ["type", "params"],
     }
+
     return {
         "id": "anylumino",
         "version": "1.0.0",
@@ -401,6 +438,7 @@ def _signature(component: Component) -> str:
     params = ", ".join(
         f"{prop.name}{'' if prop.required else '?'}: {type_name(prop.schema)}" for prop in component.props
     )
+
     return f"{component.name}({params})"
 
 
@@ -408,12 +446,17 @@ def type_name(schema: dict[str, Any]) -> str:
     """Return the TypeScript-style type OpenUI signatures use for ``schema``."""
     if schema.get("$ref") == "#/$defs/Component":
         return "Component"
+
     if schema.get("$ref") == "#/$defs/ActionExpression":
         return "ActionExpression"
+
     if "enum" in schema:
         return " | ".join(f'"{value}"' for value in schema["enum"])
+
     if "anyOf" in schema:
         return " | ".join(type_name(option) for option in schema["anyOf"])
+
     if schema.get("type") == "array":
         return f"{type_name(schema['items'])}[]" if "items" in schema else "any[]"
+
     return schema.get("type", "any")

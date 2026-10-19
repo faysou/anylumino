@@ -1,6 +1,10 @@
-# Markdown options
+# Markdown
 
 Rendered Markdown text.
+
+In Python: `ax.Markdown(text=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # Astryx chat
-#
+
+# %% [markdown]
 # An echo bot built on `ax.Chat`. Python owns the message list: a submit
 # appends the user message, then an asyncio task runs a tool-call row from
 # running to complete and streams the reply into the last assistant message.
@@ -53,6 +54,7 @@ async def echo(text: str) -> None:
         reply = f"{reply} {word}".strip()
         update_last(content=reply)
         await asyncio.sleep(0.25)
+
     update_last(status="sent")
     chat.is_streaming = False
 
@@ -71,6 +73,7 @@ def submit(widget: ax.Chat, text: str) -> None:
 def stop(widget: ax.Chat) -> None:
     if turn is not None:
         turn.cancel()
+
     update_last(status="stopped")
     widget.is_streaming = False
 

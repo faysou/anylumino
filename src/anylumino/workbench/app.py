@@ -44,6 +44,7 @@ class App:
         for name, value in namespace.items():
             if not name.isidentifier() or name.startswith("_") or hasattr(type(self), name):
                 raise ValueError(f"{name!r} cannot be an App namespace name; it is not an identifier or the App uses it")
+
             setattr(self, name, value)
 
     def set_ui(self, ui: Any) -> None:
@@ -61,11 +62,14 @@ class App:
         except Exception as error:
             if self.on_error is None:
                 raise
+
             self.on_error(handler, error)
 
     def ask_agent(self, message: str, context: Any = None) -> None:
         """Send ``message`` to the workbench agent; warns when no agent is attached."""
         if self.agent is None:
             warnings.warn(f"No workbench is attached, so ask_agent ignored {message!r}.", stacklevel=2)
+
             return
+
         self.agent(message, context)

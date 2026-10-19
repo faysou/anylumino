@@ -155,6 +155,7 @@ def test_codex_turn_fails_when_mcp_servers_cannot_be_turned_off(fake_cli, monkey
     monkeypatch.setenv("FAKE_STREAM", str(FIXTURES / "codex" / "resume.jsonl"))
     with pytest.raises(AgentError, match=message):
         run_turn(AgentRunner("codex", tmp_path, "sales"))
+
     assert not (tmp_path / "log.jsonl").exists()
 
 
@@ -179,11 +180,14 @@ def test_second_turn_is_refused_while_running_and_stop_ends_it(fake_cli, monkeyp
         task = asyncio.create_task(consume())
         while not events:
             await asyncio.sleep(0.01)
+
         with pytest.raises(AgentError, match="^A turn is already running.$"):
             await anext(runner.turn("Again", "SYSTEM"))
+
         started = time.monotonic()
         await runner.stop()
         await task
+
         return events, time.monotonic() - started
 
     events, elapsed = asyncio.run(scenario())

@@ -1,6 +1,10 @@
-# Table options
+# Table
 
 A table of row objects; columns lists the keys to show.
+
+In Python: `ax.Table(rows=..., columns=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

@@ -32,6 +32,7 @@ Render a single- or multiple-selection group of toggle buttons.
         if selection_mode not in {"single", "multiple"}:
             msg = "selection_mode must be 'single' or 'multiple'"
             raise ValueError(msg)
+
         if selection_mode == "multiple":
             selected = (
                 []
@@ -44,6 +45,7 @@ Render a single- or multiple-selection group of toggle buttons.
             if value is not None and not isinstance(value, str):
                 msg = "single-selection value must be a string or None"
                 raise TypeError(msg)
+
             selected = value
 
         super().__init__(

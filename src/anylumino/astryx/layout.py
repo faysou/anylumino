@@ -223,6 +223,7 @@ class AccordionPanel(Widget):
         """Keys of the open sections."""
         if isinstance(self.value, str):
             return [self.value] if self.value else []
+
         return [str(key) for key in self.value or []]
 
     def open_key(self, key_or_index: str | int) -> None:
@@ -243,14 +244,18 @@ class AccordionPanel(Widget):
         if open is None:
             if multiple:
                 return []
+
             return self.child_keys[0] if self.child_keys else ""
+
         requested = [open] if isinstance(open, (str, int)) else list(open)
         keys = [self.get_key(self.get_index(item) if isinstance(item, str) else item) for item in requested]
         if multiple:
             return keys
+
         if len(keys) != 1:
             msg = "open must name a single section unless multiple=True"
             raise ValueError(msg)
+
         return keys[0]
 
 
@@ -306,6 +311,7 @@ class ScrollBox(Widget):
         if axis not in SCROLL_AXES:
             msg = f"axis must be one of {SCROLL_AXES}, got {axis!r}"
             raise ValueError(msg)
+
         super().__init__(
             "ScrollBox",
             children,
@@ -377,6 +383,7 @@ class SplitPanel(Widget):
         if orientation not in SPLIT_ORIENTATIONS:
             msg = f"orientation must be one of {SPLIT_ORIENTATIONS}, got {orientation!r}"
             raise ValueError(msg)
+
         super().__init__(
             "SplitPanel",
             children,
@@ -440,6 +447,7 @@ class ResponsivePanel(Widget):
             if direction not in STACK_DIRECTIONS:
                 msg = f"{name} must be one of {STACK_DIRECTIONS}, got {direction!r}"
                 raise ValueError(msg)
+
         super().__init__(
             "ResponsivePanel",
             children,

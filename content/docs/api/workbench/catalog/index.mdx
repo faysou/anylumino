@@ -9,7 +9,7 @@ The anylumino components an OpenUI program may use, and the OpenUI library spec 
 
   <PyAttribute name="CALLBACK" value="'Callback'" />
 
-  <PyAttribute name="COMPONENTS" type="tuple[Component, ...]" value="tuple(_with_options(component) for component in _COMPONENTS)" />
+  <PyAttribute name="COMPONENTS" type="tuple[Component, ...]" value="tuple(_with_options(component) for component in _COMPONENTS if _MODULES.get(component.module, al) is not None)" />
 
   <PyAttribute name="CATALOG" type="dict[str, Component]" value="{component.name: component for component in COMPONENTS}" />
 </PyAttributes>
@@ -48,6 +48,7 @@ The anylumino components an OpenUI program may use, and the OpenUI library spec 
                 "properties": {"type": {"type": "string", "const": CALLBACK}, "params": _CALLBACK_PARAMS},
                 "required": ["type", "params"],
             }
+
             return {
                 "id": "anylumino",
                 "version": "1.0.0",
@@ -80,14 +81,19 @@ The anylumino components an OpenUI program may use, and the OpenUI library spec 
             """Return the TypeScript-style type OpenUI signatures use for ``schema``."""
             if schema.get("$ref") == "#/$defs/Component":
                 return "Component"
+
             if schema.get("$ref") == "#/$defs/ActionExpression":
                 return "ActionExpression"
+
             if "enum" in schema:
                 return " | ".join(f'"{value}"' for value in schema["enum"])
+
             if "anyOf" in schema:
                 return " | ".join(type_name(option) for option in schema["anyOf"])
+
             if schema.get("type") == "array":
                 return f"{type_name(schema['items'])}[]" if "items" in schema else "any[]"
+
             return schema.get("type", "any")
         ```
       </PySourceCode>

@@ -1,6 +1,10 @@
-# NumberInput options
+# NumberInput
 
 A number field; on_change runs with the new number.
+
+In Python: `ax.NumberInput(label=..., value=..., min=..., max=..., step=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

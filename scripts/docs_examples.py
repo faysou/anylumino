@@ -45,7 +45,8 @@ NOTEBOOK_HEADER = '''# ---
 
 # %% [markdown]
 # # Documentation examples
-#
+
+# %% [markdown]
 # Every runnable example from the documentation pages outside the API
 # reference, in page order. Each section names the page and heading the example
 # belongs to, and cells run in order so a later fragment can use the widgets an
@@ -128,6 +129,7 @@ def make_figure(title="Trend", phase=0.0):
         yaxis_title="Price",
         yaxis={"range": [min(price) - 1.5, max(price) + 1.5]},
     )
+
     return figure
 '''
 
@@ -225,6 +227,7 @@ class Example:
     def slug(self) -> str:
         heading = re.sub(r"[^a-z0-9]+", "-", self.heading.lower()).strip("-")
         suffix = f"-{self.occurrence + 1}" if self.occurrence else ""
+
         return f"{self.doc}-{heading}{suffix}"
 
     @property
@@ -255,19 +258,23 @@ def read_examples() -> list[Example]:
             line = lines[index]
             if line.startswith("## ") or line.startswith("### "):
                 heading = line.lstrip("# ").strip()
+
             if line.startswith("```python"):
                 end = index + 1
                 body: list[str] = []
                 while not lines[end].startswith("```"):
                     body.append(lines[end])
                     end += 1
+
                 occurrence = seen.get(heading, 0)
                 seen[heading] = occurrence + 1
                 examples.append(
                     Example(page, heading, occurrence, index + 1, end + 1, "\n".join(body))
                 )
                 index = end
+
             index += 1
+
     return examples
 
 
@@ -276,6 +283,7 @@ def rendered_name(code: str) -> str:
     statement = ast.parse(code).body[-1]
     if isinstance(statement, ast.Assign) and isinstance(statement.targets[0], ast.Name):
         return statement.targets[0].id
+
     return ""
 
 
@@ -286,19 +294,22 @@ def write_notebook(examples: list[Example]) -> None:
         marker = f"# docs-example({example.slug})" if example.screenshot else ""
         cells.append(
             f"# %% [markdown]\n"
-            f"# ## {example.title}\n"
-            f"#\n"
+            f"# ## {example.title}\n\n"
+            f"# %% [markdown]\n"
             f"# Lines {example.start} to {example.end} of `content/docs/{example.doc}.mdx`."
         )
         body = [marker] if marker else []
         setup = SETUP.get(example.key)
         if setup:
             body.append(setup)
+
         body.append(example.code.strip())
         display = DISPLAY.get(example.key, rendered_name(example.code))
         if display:
             body.append(display)
+
         cells.append("# %%\n" + "\n\n".join(body))
+
     NOTEBOOK.write_text("\n\n".join(cells) + "\n")
     print(f"{NOTEBOOK}: {len(examples)} examples")
 
@@ -312,6 +323,7 @@ def write_images(examples: list[Example]) -> None:
         for example in sorted(page_examples, key=lambda e: e.start, reverse=True):
             if not (DOCS_DIR / example.image).exists():
                 continue
+
             reference = f"![{example.alt}]({example.image})"
             after = example.end  # index of the line following the closing fence
             existing = lines[after + 1] if after + 1 < len(lines) else ""
@@ -319,9 +331,12 @@ def write_images(examples: list[Example]) -> None:
                 lines[after + 1] = reference
             else:
                 lines[after:after] = ["", reference]
+
             updated += 1
+
         text = re.sub(r"\n{3,}", "\n\n", "\n".join(lines).strip()) + "\n"
         path.write_text(text)
+
     print(f"{updated} screenshots referenced")
 
 
@@ -338,7 +353,9 @@ def main() -> int:
             print(f"{mark} {example.slug}")
     else:
         print(__doc__)
+
         return 1
+
     return 0
 
 

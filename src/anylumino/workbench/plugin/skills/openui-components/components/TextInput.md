@@ -1,6 +1,10 @@
-# TextInput options
+# TextInput
 
 A single-line text field; on_change runs with the new text.
+
+In Python: `ax.TextInput(label=..., value=..., placeholder=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

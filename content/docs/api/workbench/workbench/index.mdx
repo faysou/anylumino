@@ -33,8 +33,10 @@ The workbench: an agent chat beside the generated UI and the code behind it.
             message: dict[str, Any] = {"role": role, "content": content}
             if status:
                 message["status"] = status
+
             if tools:
                 message["tool_calls"] = [{key: tool[key] for key in ("name", "target", "status")} for tool in tools]
+
             return message
         ```
       </PySourceCode>
@@ -61,9 +63,11 @@ The workbench: an agent chat beside the generated UI and the code behind it.
             """Close ``widget`` and the widgets it holds, except those whose ``id`` is in ``keep``."""
             if id(widget) in keep:
                 return
+
             for child in getattr(widget, "widgets", None) or []:
                 if isinstance(child, Widget):
                     close_tree(child, keep)
+
             widget.close()
         ```
       </PySourceCode>

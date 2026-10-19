@@ -24,6 +24,7 @@ Render a registered Astryx component by name.
             raise ValueError(
                 f"unknown Astryx component {component_name!r}; registered components: {registered}"
             )
+
         super().__init__(
             component_name,
             children,

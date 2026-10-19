@@ -1,6 +1,10 @@
-# TextArea options
+# TextArea
 
 A multi-line text field; on_change runs with the new text.
+
+In Python: `ax.TextArea(label=..., value=..., placeholder=..., rows=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

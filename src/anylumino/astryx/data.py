@@ -162,16 +162,19 @@ class Table(Widget):
     @property
     def rows(self) -> list[dict[str, Any]]:
         """Current normalized Astryx table rows."""
+
         return list(self.props.get("rows", []))
 
     @property
     def columns(self) -> list[dict[str, Any]]:
         """Current Astryx table column definitions."""
+
         return list(self.props.get("columns", []))
 
     @property
     def row_key(self) -> str:
         """Current row id property used by Astryx Table."""
+
         return str(self.props.get("idKey", self._row_key))
 
     def set_rows(
@@ -202,12 +205,14 @@ class Table(Widget):
         """Append one raw row and return its normalized row id."""
         normalized = self._normalize_new_row(row, row_key)
         self._set_table_props(rows=[*self.rows, normalized])
+
         return str(normalized[self.row_key])
 
     def prepend_row(self, row: Any, *, row_key: str | None = None) -> str:
         """Prepend one raw row and return its normalized row id."""
         normalized = self._normalize_new_row(row, row_key)
         self._set_table_props(rows=[normalized, *self.rows])
+
         return str(normalized[self.row_key])
 
     def update_row(self, row_value: Any, values: Any) -> None:
@@ -224,13 +229,16 @@ class Table(Widget):
             if str(row.get(self.row_key)) != target:
                 next_rows.append(row)
                 continue
+
             found = True
             updated = self._updated_row(row, values)
             next_id = str(updated[self.row_key])
             next_rows.append(updated)
+
         if not found:
             msg = f"table row not found: {target}"
             raise KeyError(msg)
+
         _table_row_ids(next_rows, self.row_key)
         with self.hold_sync(), self.hold_trait_notifications():
             self._set_table_props(rows=next_rows)
@@ -243,6 +251,7 @@ class Table(Widget):
         if len(next_rows) == len(self.rows):
             msg = f"table row not found: {target}"
             raise KeyError(msg)
+
         self._set_table_props(rows=next_rows)
         if target in self.selected:
             self.selected = [item for item in self.selected if item != target]
@@ -257,7 +266,9 @@ class Table(Widget):
             self._selection_callbacks = [
                 item for item in self._selection_callbacks if item is not callback
             ]
+
             return
+
         self._selection_callbacks.append(callback)
 
     def on_sort(
@@ -270,7 +281,9 @@ class Table(Widget):
             self._sort_callbacks = [
                 item for item in self._sort_callbacks if item is not callback
             ]
+
             return
+
         self._sort_callbacks.append(callback)
 
     def _normalize_new_row(
@@ -279,10 +292,12 @@ class Table(Widget):
         if row_key is not None:
             self._row_key = row_key or "__row_id"
             self._set_table_props(idKey=self._row_key)
+
         columns = self.columns
         if not columns:
             columns = _table_columns(None, [row])
             self._set_table_props(columns=columns)
+
         normalized = _table_rows([row], columns, self._row_key)[0]
         if row_key is None and self._row_key == "__row_id":
             existing_values = {
@@ -291,11 +306,14 @@ class Table(Widget):
             next_index = len(self.rows)
             while str(next_index) in existing_values:
                 next_index += 1
+
             normalized[self._row_key] = str(next_index)
+
         row_value = str(normalized.get(self._row_key))
         if any(str(existing.get(self._row_key)) == row_value for existing in self.rows):
             msg = f"table row already exists: {row_value}"
             raise ValueError(msg)
+
         return normalized
 
     def _updated_row(self, row: Mapping[str, Any], values: Any) -> dict[str, Any]:
@@ -310,18 +328,22 @@ class Table(Widget):
                 key = column["key"]
                 if key in source:
                     updated[key] = _clean_value(source[key])
+
             if self.row_key in source:
                 updated[self.row_key] = _clean_value(source[self.row_key])
+
             return updated
 
         if isinstance(values, (list, tuple)):
             for index, column in enumerate(self.columns):
                 if index < len(values):
                     updated[column["key"]] = _clean_value(values[index])
+
             return updated
 
         if self.columns:
             updated[self.columns[0]["key"]] = _clean_value(values)
+
         return updated
 
     def _set_table_props(self, **updates: Any) -> None:
@@ -338,11 +360,15 @@ class Table(Widget):
         if msg_type == "selection":
             for callback in list(self._selection_callbacks):
                 callback(self)
+
             return
+
         if msg_type == "sort":
             for callback in list(self._sort_callbacks):
                 callback(self)
+
             return
+
         super()._handle_frontend_message(_widget, content, _buffers)
 
 

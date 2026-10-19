@@ -88,6 +88,7 @@ class ComponentWidget(KeyedChildren, anywidget.AnyWidget):
             )
         finally:
             self._syncing_children = False
+
         self.observe(self._observe_widgets, names="widgets")
         self.on_msg(self._handle_frontend_message)
         self._register_callbacks(callbacks, action_callbacks)
@@ -110,15 +111,21 @@ class ComponentWidget(KeyedChildren, anywidget.AnyWidget):
         msg_type = content.get("type")
         if msg_type == "open":
             self.is_open = bool(content.get("is_open", True))
+
             return
+
         if msg_type == "close":
             self.is_open = False
+
             return
+
         if msg_type != "click":
             return
+
         if "value" in content or "action" in content:
             self.last_action = content.get("value", content.get("action"))
             self._notify_action(self.last_action)
+
         self._notify_click()
 
 

@@ -27,6 +27,7 @@ class SalesApp(App):
 
 def app_callbacks(body):
     """Wrap method source in the App subclass a callbacks block defines."""
+
     return "from anylumino.workbench import App\n\n\nclass TestApp(App):\n" + body
 
 
@@ -34,8 +35,10 @@ def reply(prose, program=None, callbacks=None):
     parts = [prose]
     if program is not None:
         parts.append(f"```openui-lang\n{program}\n```")
+
     if callbacks is not None:
         parts.append(f"```python\n{callbacks}```")
+
     return "\n".join(parts)
 
 
@@ -231,6 +234,7 @@ def test_message_posted_during_a_turn_is_kept(agent_reply, tmp_path, monkeypatch
         workbench.submit("Build it")
         while len(workbench.chat.messages) < 2 or workbench.chat.messages[1]["content"] == "":
             await asyncio.sleep(0.01)
+
         workbench.add_message("system", "Callback `on_fail` raised KeyError: 'region'")
         while workbench.tasks:
             await asyncio.sleep(0.01)
@@ -305,10 +309,12 @@ def test_stop_marks_the_reply_and_keeps_the_ui(agent_reply, tmp_path, monkeypatc
         workbench.submit("Build it")
         while not workbench.runner.running or workbench.chat.messages[-1]["content"] == "":
             await asyncio.sleep(0.01)
+
         running = (workbench.status.label, workbench.status_text.text, workbench.status.variant)
         workbench.chat._handle_frontend_message(workbench.chat, {"type": "stop"}, None)
         while workbench.tasks:
             await asyncio.sleep(0.01)
+
         return workbench, running
 
     workbench, running = asyncio.run(scenario())
@@ -330,10 +336,12 @@ def test_stop_before_the_agent_starts_cancels_the_turn(agent_reply, tmp_path):
         workbench.chat._handle_frontend_message(workbench.chat, {"type": "stop"}, None)
         while workbench.tasks:
             await asyncio.sleep(0.01)
+
         agent_reply("Hello.")
         workbench.submit("Hi")
         while workbench.tasks:
             await asyncio.sleep(0.01)
+
         return workbench
 
     workbench = asyncio.run(scenario())

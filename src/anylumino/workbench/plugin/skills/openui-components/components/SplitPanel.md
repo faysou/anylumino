@@ -1,6 +1,10 @@
-# SplitPanel options
+# SplitPanel
 
 Resizable panes; sizes are relative weights.
+
+In Python: `al.SplitPanel(widgets=..., orientation=..., sizes=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

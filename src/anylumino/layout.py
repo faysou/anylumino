@@ -32,6 +32,7 @@ def _widget_ref(value: object) -> object:
     model_id = get_model_id(value)
     if model_id is not None:
         return f"anywidget:{model_id}"
+
     return value
 
 
@@ -46,12 +47,16 @@ def _widget_list_from_json(value: list[object], _obj: object) -> list[object]:
 def _size_to_css(value: int | float | str | None, fallback: str) -> str:
     if value is None:
         return fallback
+
     if isinstance(value, str):
         return value
+
     if isinstance(value, (int, float)):
         if 0 < value <= 1:
             return f"{value * 100:g}%"
+
         return f"{int(value)}px" if float(value).is_integer() else f"{value}px"
+
     return fallback
 
 
@@ -70,6 +75,7 @@ def _key_to_string(key: object) -> str:
     if not text:
         msg = "widget keys must not be empty"
         raise ValueError(msg)
+
     return text
 
 
@@ -82,23 +88,28 @@ def _validate_keys(key_list: list[str]) -> None:
 def _view_for_child(child: object) -> object:
     if _is_widget(child):
         return child
+
     view = getattr(child, "widget", None)
     if _is_widget(view):
         return view
+
     return child
 
 
 def _is_child(value: object) -> bool:
     if _is_widget(value):
         return True
+
     return _is_widget(getattr(value, "widget", None))
 
 
 def _as_child_list(children: ChildInput) -> list[Any]:
     if children is None:
         return []
+
     if _is_child(children):
         return [children]
+
     return list(children)
 
 
@@ -110,7 +121,9 @@ def _normalize_keys(keys: Iterable[str] | None, length: int) -> list[str]:
         if len(key_list) != length:
             msg = "keys must have the same length as widgets"
             raise ValueError(msg)
+
     _validate_keys(key_list)
+
     return key_list
 
 
@@ -122,12 +135,15 @@ def _normalize_titles(
 ) -> list[str]:
     if titles is None:
         return list(key_list) if default_to_keys else []
+
     if isinstance(titles, Mapping):
         return [str(titles.get(key, key if default_to_keys else "")) for key in key_list]
+
     title_list = [str(title) for title in titles]
     if len(title_list) != len(key_list):
         msg = "titles must be empty or have the same length as widgets"
         raise ValueError(msg)
+
     return title_list
 
 
@@ -140,6 +156,7 @@ def _normalize_children(
         if keys is not None:
             msg = "keys cannot be passed when widgets is a mapping"
             raise ValueError(msg)
+
         key_list = [_key_to_string(key) for key in children]
         _validate_keys(key_list)
         owner_list = list(children.values())
@@ -151,6 +168,7 @@ def _normalize_children(
 
     widget_list = [_view_for_child(child) for child in owner_list]
     _validate_titles(widget_list, title_list)
+
     return widget_list, owner_list, key_list, title_list
 
 
@@ -177,8 +195,10 @@ class KeyedChildren(ActivationCallbacks):
     def __contains__(self, key: object) -> bool:
         if isinstance(key, bool):
             return False
+
         if isinstance(key, int):
             return -len(self.child_keys) <= key < len(self.child_keys)
+
         return str(key).strip() in self.child_keys
 
     def __getitem__(self, key_or_index: str | int) -> object:
@@ -202,6 +222,7 @@ class KeyedChildren(ActivationCallbacks):
 
     def get_owner(self, key_or_index: str | int) -> object:
         index = self._resolve_index(key_or_index)
+
         return self._owners_by_key.get(self.child_keys[index], self.widgets[index])
 
     def _resolve_index(self, key_or_index: str | int) -> int:
@@ -209,8 +230,10 @@ class KeyedChildren(ActivationCallbacks):
         if isinstance(key_or_index, int) and not isinstance(key_or_index, bool):
             if -count <= key_or_index < count:
                 return key_or_index if key_or_index >= 0 else count + key_or_index
+
             msg = f"widget index out of range: {key_or_index}"
             raise IndexError(msg)
+
         key = str(key_or_index).strip()
         try:
             return self.child_keys.index(key)
@@ -236,7 +259,9 @@ class KeyedChildren(ActivationCallbacks):
             if key is None:
                 key = self._unused_key(key_list)
                 adopted.append(view)
+
             key_list.append(key)
+
         owners = {key: self._owners_by_key.get(key, view) for key, view in zip(key_list, current)}
         self._syncing_children = True
         try:
@@ -247,11 +272,13 @@ class KeyedChildren(ActivationCallbacks):
                 self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
+
         self._adopt_children(adopted)
 
     def _observe_widgets(self, change: dict[str, Any]) -> None:
         if self._syncing_children:
             return
+
         self._rekey_children(list(change["old"]), list(change["new"]))
 
     def _unused_key(self, taken: Iterable[str]) -> str:
@@ -259,11 +286,13 @@ class KeyedChildren(ActivationCallbacks):
         index = len(used) + 1
         while f"widget-{index}" in used:
             index += 1
+
         return f"widget-{index}"
 
     def _restore_selection(self, selected_key: str | None) -> None:
         if not hasattr(self, "selected_index"):
             return
+
         if selected_key in self.child_keys:
             self.selected_index = self.child_keys.index(selected_key)
         else:
@@ -274,24 +303,29 @@ class KeyedChildren(ActivationCallbacks):
         selected_index = getattr(self, "selected_index", None)
         if selected_index is None or not self.child_keys:
             return None
+
         if selected_index < 0 or selected_index >= len(self.child_keys):
             return None
+
         return self.child_keys[selected_index]
 
     @property
     def selected_widget(self) -> object | None:
         selected_key = self.selected_key
+
         return self.get_widget(selected_key) if selected_key is not None else None
 
     @property
     def selected_owner(self) -> object | None:
         selected_key = self.selected_key
+
         return self.get_owner(selected_key) if selected_key is not None else None
 
     def select_key(self, key: str) -> None:
         if not hasattr(self, "selected_index"):
             msg = f"{type(self).__name__} does not support selection"
             raise AttributeError(msg)
+
         self.selected_index = self.get_index(key)
 
     def apply_widget(self, key_or_index: str | int, callback: Callable[[object], Any]) -> Any:
@@ -341,6 +375,7 @@ class KeyedChildren(ActivationCallbacks):
                     self.selected_index = next_index
         finally:
             self._syncing_children = False
+
         self._adopt_children([view])
 
     def remove_widget(self, key_or_index: str | int, *, close: bool = False) -> object:
@@ -367,11 +402,13 @@ class KeyedChildren(ActivationCallbacks):
                 self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
+
         if close:
             for target in {id(view): view, id(owner): owner}.values():
                 closer = getattr(target, "close", None)
                 if callable(closer):
                     closer()
+
         return owner
 
     def move_widget(self, key_or_index: str | int, index: int) -> None:
@@ -380,6 +417,7 @@ class KeyedChildren(ActivationCallbacks):
         target = max(0, min(len(self.child_keys) - 1, index))
         if current == target:
             return
+
         selected_key = self.selected_key
         titles = self._complete_titles()
         order = [position for position in range(len(self.child_keys)) if position != current]
@@ -406,7 +444,9 @@ class KeyedChildren(ActivationCallbacks):
             if child_key in self.child_keys:
                 msg = f"widget key already exists: {child_key}"
                 raise ValueError(msg)
+
             return child_key
+
         return self._unused_key(())
 
     def _complete_titles(self) -> list[str]:
@@ -419,6 +459,7 @@ class KeyedChildren(ActivationCallbacks):
                 complete.append(f"{self._title_prefix} {index + 1}")
             else:
                 complete.append(key)
+
         return complete
 
 class LayoutWidget(KeyedChildren, anywidget.AnyWidget):
@@ -486,18 +527,22 @@ class LayoutWidget(KeyedChildren, anywidget.AnyWidget):
             )
         finally:
             self._syncing_children = False
+
         self.observe(self._observe_widgets, names="widgets")
         self.on_msg(self._handle_frontend_message)
 
     def _handle_frontend_message(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
         if content.get("type") != "move":
             return
+
         from_index = content.get("from")
         to_index = content.get("to")
         if not isinstance(from_index, int) or not isinstance(to_index, int):
             return
+
         if not 0 <= from_index < len(self.child_keys):
             return
+
         self.move_widget(from_index, to_index)
 
 
@@ -1266,12 +1311,15 @@ class _ActionWidget(ActivationCallbacks, anywidget.AnyWidget):
     def _handle_frontend_event(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
         if content.get("type") != "activate":
             return
+
         action_id = content.get("id")
         if not isinstance(action_id, str):
             return
+
         callback = self.callbacks.get(action_id)
         if callback is not None:
             callback(action_id)
+
         self._notify_action(action_id)
         self._notify_click()
 

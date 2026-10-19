@@ -12,11 +12,12 @@ import anylumino
 from anylumino import astryx as ax
 
 from .app import App
+from .catalog import go
 
 
 MODULE = "anylumino_workbench"
 # Globals of the generated UI code, which an export shares with the callbacks
-UI_GLOBALS = {"UI": None, "al": anylumino, "ax": ax}
+UI_GLOBALS = {"UI": None, "al": anylumino, "ax": ax, "go": go}
 
 
 class CallbacksError(ValueError):
@@ -37,17 +38,20 @@ def app_class(source: str) -> type[App]:
     taken = sorted(name for name, value in UI_GLOBALS.items() if name in scope and scope[name] is not value)
     if taken:
         raise CallbacksError(f"the generated UI code uses the global names {', '.join(taken)}; rename them")
+
     return find_app(scope)
 
 
 def ui_class(source: str) -> type:
     """Execute the generated UI ``source`` and return its ``UI`` class."""
+
     return run_module(source, "ui.py")["UI"]
 
 
 def run_module(source: str, filename: str) -> dict[str, Any]:
     scope: dict[str, Any] = {"__name__": MODULE}
     exec(compile(source, filename, "exec"), scope)
+
     return scope
 
 
@@ -60,6 +64,7 @@ def find_app(scope: dict[str, Any]) -> type[App]:
     if len(classes) != 1:
         found = ", ".join(cls.__name__ for cls in classes) or "none"
         raise CallbacksError(f"define exactly one App subclass; found {found}")
+
     (cls,) = classes
     shadowed = sorted(
         name
@@ -69,16 +74,19 @@ def find_app(scope: dict[str, Any]) -> type[App]:
     )
     if shadowed:
         raise CallbacksError(f"{cls.__name__} replaces App members: {', '.join(shadowed)}")
+
     return cls
 
 
 def handler_names(cls: type[App]) -> set[str]:
     """Return the handler methods ``cls`` adds to ``App``."""
+
     return {name for name in dir(cls) if not name.startswith("_") and not hasattr(App, name) and callable(getattr(cls, name))}
 
 
 def file_name(name: str) -> str:
     """Return the file name of an export called ``name``."""
+
     return f"{name}.py"
 
 
@@ -90,6 +98,12 @@ def module_source(ui_code: str, callbacks: str) -> str:
     """
     ui = split_head(ui_code)
     callbacks_parts = {key: text.lstrip("\n") for key, text in split_head(callbacks).items()}
+    # Both parts may import the same module, such as Plotly for a Plot statement
+    shared = set(ui["imports"].splitlines(keepends=True))
+    callbacks_parts["imports"] = "".join(
+        line for line in callbacks_parts["imports"].splitlines(keepends=True) if line not in shared
+    )
+
     return "".join(
         [
             ui["docstring"],
@@ -120,10 +134,13 @@ def split_head(source: str) -> dict[str, str]:
             key = "imports"
         else:
             break
+
         end = node.end_lineno or start
         parts[key] += "".join(lines[start:end])
         start = end
+
     parts["body"] = "".join(lines[start:])
+
     return parts
 
 
@@ -131,6 +148,7 @@ def write_module(folder: str | Path, name: str, ui_code: str, callbacks: str) ->
     """Write ``ui_code`` and ``callbacks`` as one module into ``folder``, replacing an existing file."""
     path = Path(folder) / file_name(name)
     path.write_text(module_source(ui_code, callbacks))
+
     return path
 
 
@@ -160,7 +178,9 @@ def load(path: str | Path, **namespace: Any) -> Any:
     path = Path(path)
     if not path.is_absolute():
         path = get_notebook_path(frames_back=2) / path
+
     scope = run_module(path.read_text(), str(path))
+
     return scope["UI"](find_app(scope)(**namespace))
 
 

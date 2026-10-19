@@ -35,6 +35,7 @@ panes.
         if orientation not in SPLIT_ORIENTATIONS:
             msg = f"orientation must be one of {SPLIT_ORIENTATIONS}, got {orientation!r}"
             raise ValueError(msg)
+
         super().__init__(
             "SplitPanel",
             children,

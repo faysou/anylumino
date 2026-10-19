@@ -43,6 +43,7 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
         ```python
         def claude_argv(session_id: str, resume: bool, name: str, system_prompt: str) -> list[str]:
             session = ["--resume", session_id] if resume else ["--session-id", session_id, "-n", name]
+
             return [
                 "claude",
                 "-p",
@@ -97,6 +98,7 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
                     *disabled,
                     "-",
                 ]
+
             return [
                 "codex",
                 "exec",
@@ -158,15 +160,19 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
             except json.JSONDecodeError:
                 message = errors.decode().strip()[-2000:]
                 raise AgentError(f"`codex mcp list --json` failed, so its MCP servers cannot be turned off: {message}") from None
+
             overrides = []
             for server in servers:
                 name = server["name"]
                 if not server.get("enabled"):
                     continue
+
                 transport = _PLACEHOLDER_TRANSPORTS.get(server.get("transport", {}).get("type"))
                 if transport is None or not re.fullmatch(r"[A-Za-z0-9_-]+", name):
                     raise AgentError(f"The codex MCP server {name!r} cannot be turned off.")
+
                 overrides.append(f"mcp_servers.{name}={{{transport},enabled=false}}")
+
             return overrides
         ```
       </PySourceCode>

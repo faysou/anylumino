@@ -41,6 +41,7 @@ class ActivationCallbacks:
     ) -> None:
         for callback in callbacks or ():
             self.on_click(callback)
+
         for callback in action_callbacks or ():
             self.on_action(callback)
 
@@ -48,14 +49,18 @@ class ActivationCallbacks:
         """Register or unregister a callback for activations."""
         if remove:
             self._click_callbacks = [item for item in self._click_callbacks if item is not callback]
+
             return
+
         self._click_callbacks.append(callback)
 
     def on_action(self, callback: Callable[..., None], remove: bool = False) -> None:
         """Register or unregister a callback for activations that carry a value."""
         if remove:
             self._action_callbacks = [item for item in self._action_callbacks if item is not callback]
+
             return
+
         self._action_callbacks.append(callback)
 
     def _notify_action(self, value: Any) -> None:
@@ -87,22 +92,27 @@ def static_asset(filename: str) -> Path | LazyStaticAsset:
     path = STATIC_DIR / filename
     if path.is_file():
         return path
+
     return LazyStaticAsset(path)
 
 
 def json_value(value: Any) -> Any:
     if isinstance(value, (datetime, date, time)):
         return value.isoformat()
+
     if isinstance(value, tuple):
         return [json_value(item) for item in value]
+
     if isinstance(value, list):
         return [json_value(item) for item in value]
+
     return value
 
 
 def options_tuple(options: Iterable[Any] | None) -> tuple[Any, ...]:
     if options is None:
         return ()
+
     if isinstance(options, Mapping):
         return tuple((str(label), json_value(value)) for label, value in options.items())
 
@@ -113,10 +123,12 @@ def options_tuple(options: Iterable[Any] | None) -> tuple[Any, ...]:
             normalized.append((str(label), json_value(value)))
         else:
             normalized.append(json_value(option))
+
     return tuple(normalized)
 
 
 def option_value(option: Any) -> Any:
     if isinstance(option, (list, tuple)) and len(option) == 2:
         return option[1]
+
     return option

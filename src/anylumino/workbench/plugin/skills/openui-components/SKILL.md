@@ -1,11 +1,11 @@
 ---
 name: openui-components
-description: Options of the anylumino OpenUI components. Use before you pass an options object to a component in an openui-lang program.
+description: Options and Python constructors of the anylumino OpenUI components. Use before you pass an options object to a component in an openui-lang program, or build a component's widget in Python.
 ---
 
 # OpenUI component options
 
-Each component below takes an optional `options` object as its last argument. Its keys are extra
+Most components below take an optional `options` object as their last argument. Its keys are extra
 keyword options of the anylumino widget, for example:
 
 ```openui-lang
@@ -16,8 +16,12 @@ Read the component's file before you use its options. Each file lists the option
 and meanings. Option values must be literals. An unknown option or a value of the wrong type stops
 the workbench from applying the reply.
 
-| Component | Options |
-| --------- | ------- |
+Each file also gives the Python constructor that builds the component's widget, for callbacks that
+fill a container in Python. Pass the arguments by keyword: the Python positional order differs from
+the OpenUI one.
+
+| Component | File |
+| --------- | ---- |
 | `VBox` | [components/VBox.md](components/VBox.md) |
 | `HBox` | [components/HBox.md](components/HBox.md) |
 | `SplitPanel` | [components/SplitPanel.md](components/SplitPanel.md) |
@@ -34,5 +38,7 @@ the workbench from applying the reply.
 | `Slider` | [components/Slider.md](components/Slider.md) |
 | `Switch` | [components/Switch.md](components/Switch.md) |
 | `Checkbox` | [components/Checkbox.md](components/Checkbox.md) |
+| `Badge` | [components/Badge.md](components/Badge.md) |
 | `Table` | [components/Table.md](components/Table.md) |
 | `CodeBlock` | [components/CodeBlock.md](components/CodeBlock.md) |
+| `Plot` | [components/Plot.md](components/Plot.md) |

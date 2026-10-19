@@ -28,6 +28,7 @@ def fake_cli(tmp_path, monkeypatch):
         path = bin_dir / name
         path.write_text(FAKE_CLI)
         path.chmod(0o755)
+
     log = tmp_path / "log.jsonl"
     # Keep `node` reachable for the OpenUI tool; the fakes shadow any real agent CLI.
     node_dir = os.path.dirname(shutil.which("node") or "")
@@ -55,4 +56,5 @@ def agent_reply(fake_cli, tmp_path, monkeypatch):
         stream.write_text("".join(json.dumps(event) + "\n" for event in events))
 
     set_reply.calls = fake_cli
+
     return set_reply

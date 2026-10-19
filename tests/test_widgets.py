@@ -36,6 +36,7 @@ from anylumino.common import static_asset
 def _asset_path(asset: object) -> Path:
     path = getattr(asset, "_path", None)
     assert isinstance(path, Path)
+
     return path
 
 
@@ -234,6 +235,7 @@ def test_wrapper_children_keep_owner_and_render_widget_separate() -> None:
 
         def fit(self) -> str:
             self.calls.append("fit")
+
             return "fit-ok"
 
     wrapper = ChartWrapper()
@@ -770,12 +772,16 @@ def test_astryx_lightbox_toggle_group_and_overlay_adapt_native_props() -> None:
 def test_astryx_lightbox_and_toggle_group_reject_invalid_shapes() -> None:
     with pytest.raises(ValueError, match="at least one item"):
         ax.Lightbox([])
+
     with pytest.raises(ValueError, match="require 'src' and 'alt'"):
         ax.Lightbox({"src": "chart.jpg"})
+
     with pytest.raises(ValueError, match="must be 'image' or 'video'"):
         ax.Lightbox({"src": "chart.jpg", "alt": "Chart", "type": "audio"})
+
     with pytest.raises(ValueError, match="selection_mode"):
         ax.ToggleButtonGroup([], label="View", selection_mode="exclusive")
+
     with pytest.raises(TypeError, match="single-selection value"):
         ax.ToggleButtonGroup([], value=["grid"], label="View")
 
@@ -1021,6 +1027,7 @@ def test_astryx_table_normalizes_rows_and_supports_notebook_row_helpers() -> Non
         table.append_row(
             {"symbol": "MSFT", "price": 1, "venue": "XNAS", "status": "Duplicate"}
         )
+
     with pytest.raises(KeyError, match="table row not found: AAPL"):
         table.remove_row("AAPL")
 
@@ -1168,6 +1175,7 @@ def test_keyed_children_widgets_reject_iteration() -> None:
 
     with pytest.raises(TypeError, match="Field is not iterable"):
         list(field)
+
     with pytest.raises(TypeError, match="TabPanel is not iterable"):
         list(panel)
 
@@ -1191,6 +1199,7 @@ def test_keyed_access_matches_across_layouts_and_components() -> None:
         assert keyed.get_index("second") == 1
         with pytest.raises(KeyError, match="unknown widget key 'missing'"):
             keyed["missing"]
+
         with pytest.raises(IndexError, match="widget index out of range: 5"):
             keyed[5]
 
@@ -1366,6 +1375,7 @@ def test_astryx_grid_columns_accept_ints_mappings_and_repeat_strings() -> None:
 def test_astryx_grid_rejects_css_columns_astryx_cannot_render() -> None:
     with pytest.raises(TypeError, match="'1fr 1fr' is not supported"):
         ax.Grid(columns="1fr 1fr")
+
     with pytest.raises(TypeError, match="must be an int, a mapping, or a repeat"):
         ax.Grid(columns=2.5)
 

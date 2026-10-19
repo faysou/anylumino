@@ -1,6 +1,10 @@
-# TabPanel options
+# TabPanel
 
 One tab per child, titled in order.
+
+In Python: `al.TabPanel(widgets=..., titles=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

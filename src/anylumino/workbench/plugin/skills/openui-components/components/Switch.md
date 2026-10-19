@@ -1,6 +1,10 @@
-# Switch options
+# Switch
 
 An on/off switch; on_change runs with true or false.
+
+In Python: `ax.Switch(label=..., value=...)`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |

@@ -27,6 +27,7 @@ Astryx stack that switches direction when its width crosses a breakpoint.
             if direction not in STACK_DIRECTIONS:
                 msg = f"{name} must be one of {STACK_DIRECTIONS}, got {direction!r}"
                 raise ValueError(msg)
+
         super().__init__(
             "ResponsivePanel",
             children,

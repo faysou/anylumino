@@ -13,8 +13,8 @@ The system SHALL define one catalog of the anylumino and Astryx components that 
 may use. Each entry SHALL name the component, describe it, and list its props in positional order
 with types and required flags. The catalog SHALL cover at least: split, tab, horizontal, and
 vertical layout panels; Card; Heading; Text; Markdown; Button; TextInput; TextArea; NumberInput;
-Selector; Slider; Switch; Checkbox; Badge; Table; CodeBlock; and a component that mounts a widget
-from the workbench namespace by name. The OpenUI library spec SHALL be derived from this catalog,
+Selector; Slider; Switch; Checkbox; Badge; Table; CodeBlock; a Plotly figure, when Plotly is
+installed; and a component that mounts a widget from the workbench namespace by name. The OpenUI library spec SHALL be derived from this catalog,
 not written separately.
 
 #### Scenario: Library spec matches the catalog

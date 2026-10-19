@@ -15,7 +15,7 @@ Run `make workbench-skill` after changing the catalog or a wrapper's keywords.
 
   <PyAttribute name="SKILL" value="PLUGIN / 'skills' / NAME" />
 
-  <PyAttribute name="DESCRIPTION" value="'Options of the anylumino OpenUI components. Use before you pass an options object to a component in an openui-lang program.'" />
+  <PyAttribute name="DESCRIPTION" value="&#x22;Options and Python constructors of the anylumino OpenUI components. Use before you pass an options object to a component in an openui-lang program, or build a component's widget in Python.&#x22;" />
 </PyAttributes>
 
 <Tabs items={["Functions"]}>
@@ -30,8 +30,9 @@ Run `make workbench-skill` after changing the catalog or a wrapper's keywords.
             manifest = {"name": "anylumino", "description": "anylumino workbench skills", "version": "1.0.0"}
             result = {".claude-plugin/plugin.json": json.dumps(manifest, indent=2) + "\n", f"skills/{NAME}/SKILL.md": _skill()}
             for component in COMPONENTS:
-                if component.options:
+                if component.module:
                     result[f"skills/{NAME}/components/{component.name}.md"] = _component(component)
+
             return result
         ```
       </PySourceCode>
@@ -50,6 +51,7 @@ Run `make workbench-skill` after changing the catalog or a wrapper's keywords.
             for path in (SKILL / "components").glob("*.md"):
                 if str(path.relative_to(PLUGIN)) not in expected:
                     path.unlink()
+
             for relative, text in expected.items():
                 path = PLUGIN / relative
                 path.parent.mkdir(parents=True, exist_ok=True)

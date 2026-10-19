@@ -223,3 +223,15 @@
   with pytest.
 - [x] 13.4 Wrap long chat system messages and post the export message as an assistant message.
   Verify in JupyterLab with ego lite.
+
+## 14. Charts
+
+- [x] 14.1 Add a `Plot(layout?)` catalog component that builds an empty Plotly `FigureWidget` when
+  Plotly is installed, import Plotly in generated code only when a program uses it, and drop
+  imports the callbacks repeat when exporting. Verify with a codegen snapshot test, an export
+  test, a live Claude Code turn that builds two charts without a namespace figure, and JupyterLab.
+- [x] 14.2 List the column types of data frames in the namespace summary. Verify with pytest.
+- [x] 14.3 Teach the agent to fill an empty container from a handler for content that repeats per
+  data item, and to keep state in the app instead of OpenUI `$variables`, `Query`, `Mutation`, and
+  `@Each`. Give each component's skill file its Python constructor. Document the Node requirement.
+  Verify with pytest and a live Claude Code turn that builds one chart and one card per product.

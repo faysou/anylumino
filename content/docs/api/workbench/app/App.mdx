@@ -34,6 +34,7 @@ call a handler in a test.
         for name, value in namespace.items():
             if not name.isidentifier() or name.startswith("_") or hasattr(type(self), name):
                 raise ValueError(f"{name!r} cannot be an App namespace name; it is not an identifier or the App uses it")
+
             setattr(self, name, value)
     ```
   </PySourceCode>
@@ -89,6 +90,7 @@ call a handler in a test.
         except Exception as error:
             if self.on_error is None:
                 raise
+
             self.on_error(handler, error)
     ```
   </PySourceCode>
@@ -111,7 +113,9 @@ call a handler in a test.
         """Send ``message`` to the workbench agent; warns when no agent is attached."""
         if self.agent is None:
             warnings.warn(f"No workbench is attached, so ask_agent ignored {message!r}.", stacklevel=2)
+
             return
+
         self.agent(message, context)
     ```
   </PySourceCode>

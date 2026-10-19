@@ -15,7 +15,8 @@
 
 # %% [markdown]
 # # Astryx components smoke test
-#
+
+# %% [markdown]
 # This notebook exercises Astryx-backed anylumino widgets in a JupyterLab-sized
 # panel. The layout intentionally stays dense and quiet so it fits notebook use.
 

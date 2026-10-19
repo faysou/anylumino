@@ -66,16 +66,20 @@ class SalesApp(App):
 - An optional `setup(self)` runs once each time the UI is built. Fill tables and selectors from
   namespace data there instead of copying the data into the program: you see only the shape and
   columns of data frames, not their rows.
-- `self.ask_agent(message, context=None)` sends a new chat message to you from a handler.
+- `self.ask_agent(message, context=None)` sends you a chat message from a handler.
 - Do not name a method after an `App` member: `ui`, `agent`, `on_error`, `set_ui`, `call`, or
   `ask_agent`.
 - Every handler named in `@Callback` must be a method. The python block always holds the complete
   class: omit the block when no handler changes, and when one changes, send the whole class. A UI
   without handlers needs no python block.
-- The class shares a module with the generated UI code when exported, so do not define or import
-  the module-level names `UI`, `al`, or `ax`, except as `import anylumino as al` and
-  `from anylumino import astryx as ax`.
-- Handlers run in the notebook kernel.
+- Export puts the class in one module with the UI code, so bind the module names `UI`, `al`, `ax`,
+  and `go` only as `anylumino`, `anylumino.astryx`, and `plotly.graph_objects`.
+- A `Plot` is an empty Plotly `FigureWidget`; fill it in handlers inside
+  `with self.ui.chart.batch_update():`. Use one `Plot` per chart.
+- For one component per data item, declare an empty container, such as `cards = HBox([])`, and fill
+  it in a handler with the Python constructors of the skill, by keyword:
+  `self.ui.cards.widgets = [ax.Card(children=[ax.Text(text=n)]) for n in names]`.
+- Keep state and data in the app: `$variables`, `Query`, `Mutation`, and `@Each` are not supported.
 """
 
 COMPONENT_OPTIONS = f"""## Component options
@@ -91,6 +95,7 @@ _cache: dict[str, str] = {}
 
 async def system_prompt(namespace: Mapping[str, Any]) -> str:
     """Return the full system prompt, with ``namespace`` described for the agent."""
+
     return "\n\n".join([await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)])
 
 
@@ -99,6 +104,7 @@ async def base_prompt() -> str:
     key = hashlib.sha256(json.dumps([library_spec(), OPTIONS], sort_keys=True).encode()).hexdigest()
     if key not in _cache:
         _cache[key] = await openui.prompt(OPTIONS)
+
     return _cache[key]
 
 
@@ -106,13 +112,22 @@ def namespace_summary(namespace: Mapping[str, Any]) -> str:
     """Describe each namespace entry by name and type, with shape and columns for data frames."""
     if not namespace:
         return "## Namespace\n\nThe namespace is empty."
+
     lines = ["## Namespace", "", "The app gets these names as attributes, such as `self.<name>`; `Widget(name)` mounts the widgets among them:", ""]
     for name, value in namespace.items():
         kind = f"{type(value).__module__}.{type(value).__qualname__}"
         detail = ""
         shape = getattr(value, "shape", None)
         columns = getattr(value, "columns", None)
+        dtypes = getattr(value, "dtypes", None)
         if shape is not None and columns is not None:
-            detail = f", shape {tuple(shape)}, columns {[str(column) for column in columns]}"
+            if dtypes is not None and len(dtypes) == len(columns):
+                described = ", ".join(f"`{column}` ({dtype})" for column, dtype in zip(columns, dtypes, strict=True))
+            else:
+                described = ", ".join(f"`{column}`" for column in columns)
+
+            detail = f", shape {tuple(shape)}, columns {described}"
+
         lines.append(f"- `{name}`: `{kind}`{detail}")
+
     return "\n".join(lines)

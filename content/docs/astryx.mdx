@@ -36,6 +36,7 @@ exposure = ax.ProgressBar(62, label="Gross exposure", variant="accent", value_la
 def mark_to_market(_button):
     for row in positions.rows:
         positions.update_row(row["symbol"], {"pnl": round(row["pnl"] * 1.1, 2)})
+
     exposure.value = min(exposure.value + 8, 100)
 
 ax.Theme(

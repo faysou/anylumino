@@ -1,6 +1,10 @@
-# HBox options
+# HBox
 
 Places children left to right at their natural size; gap is an Astryx spacing step.
+
+In Python: `ax.Stack(children=..., gap=..., direction='horizontal')`, plus any option below as a keyword.
+
+## Options
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |
