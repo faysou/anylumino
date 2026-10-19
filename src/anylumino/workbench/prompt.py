@@ -25,38 +25,57 @@ OPTIONS: dict[str, Any] = {
     "bindings": False,
 }
 
-SETUP = "setup"
+# Common statement names that the UI widget already uses; generation rejects them
+MEMBER_NAMES = (
+    "label", "text", "value", "items", "selected", "layout", "keys", "width",
+    "height", "open", "close", "show", "hide", "props", "theme", "widgets", "app",
+)
 
 CALLBACKS = f"""## Python callbacks
 
-Interactive components run Python through `@Callback(handler, context?)`. Put every handler in one
-fenced block labeled `python`, next to the openui-lang block. Use the `python` label for that block
-only; label any other code you show, such as a snippet for the user, `text`.
+Interactive components run Python through `@Callback(handler, context?)`. Put the handlers in one
+fenced block labeled `python`, next to the openui-lang block, as methods of one `App` subclass. Use
+the `python` label for that block only; label any other code you show, such as a snippet for the
+user, `text`.
 
 ```python
-def {SETUP}(widgets):
-    widgets["table"].set_rows(sales.to_dict("records"))
-    widgets["region"].items = ["All", *sorted(sales["region"].unique())]
+from anylumino.workbench import App
 
 
-def on_run(event, widgets):
-    region = widgets["region"].value or "All"
-    widgets["summary"].text = f"Region: {{region}}"
+class SalesApp(App):
+    def setup(self):
+        self.ui.table.set_rows(self.sales.to_dict("records"))
+        self.ui.region.items = ["All", *sorted(self.sales["region"].unique())]
+
+    def on_run(self, event):
+        region = self.ui.region.value or "All"
+        self.ui.summary.text = f"Region: {{region}}"
 ```
 
-- A handler takes `event` and `widgets`. `event` is a dict with `source` (the statement name of the
+- A handler is a method that takes `event`, a dict with `source` (the statement name of the
   component that fired), `value` (the new value for `on_change`, `None` for a button), and
   `context` (the second `@Callback` argument).
-- `widgets` maps every statement name to its live widget. Inputs expose `.value`; Heading, Text,
-  and Markdown expose `.text`; Button and Badge expose `.label`; Selector exposes `.items`; Table
-  has `.set_rows(records)`.
-- An optional `{SETUP}(widgets)` function runs once each time the UI is built. Fill tables and
-  selectors from namespace data there instead of copying the data into the program: you see only
-  the shape and columns of data frames, not their rows.
-- `ask_agent(message, context=None)` sends a new chat message to you from a handler.
-- Every handler named in `@Callback` must be defined. The python block always holds the complete
-  set of handlers: omit the block when no handler changes, and when one changes, send them all.
-- Handlers run in the notebook kernel with the namespace listed below as globals.
+- `self.ui` is the UI widget, with one attribute per statement name. Inputs expose `.value`;
+  Heading, Text, and Markdown expose `.text`; Button and Badge expose `.label`; Selector exposes
+  `.items`; Table has `.set_rows(records)`.
+- Statement names become attributes of that widget, so they cannot be names of widget members such
+  as {", ".join(f"`{name}`" for name in MEMBER_NAMES)}. Use names like `title_text` or
+  `region_select` instead.
+- The namespace listed below reaches the app as attributes, such as `self.sales`. There are no
+  globals: read data only through `self`.
+- An optional `setup(self)` runs once each time the UI is built. Fill tables and selectors from
+  namespace data there instead of copying the data into the program: you see only the shape and
+  columns of data frames, not their rows.
+- `self.ask_agent(message, context=None)` sends a new chat message to you from a handler.
+- Do not name a method after an `App` member: `ui`, `agent`, `on_error`, `set_ui`, `call`, or
+  `ask_agent`.
+- Every handler named in `@Callback` must be a method. The python block always holds the complete
+  class: omit the block when no handler changes, and when one changes, send the whole class. A UI
+  without handlers needs no python block.
+- The class shares a module with the generated UI code when exported, so do not define or import
+  the module-level names `UI`, `al`, or `ax`, except as `import anylumino as al` and
+  `from anylumino import astryx as ax`.
+- Handlers run in the notebook kernel.
 """
 
 COMPONENT_OPTIONS = f"""## Component options
@@ -87,7 +106,7 @@ def namespace_summary(namespace: Mapping[str, Any]) -> str:
     """Describe each namespace entry by name and type, with shape and columns for data frames."""
     if not namespace:
         return "## Namespace\n\nThe namespace is empty."
-    lines = ["## Namespace", "", "Callbacks can read these names; `Widget(name)` mounts the widgets among them:", ""]
+    lines = ["## Namespace", "", "The app gets these names as attributes, such as `self.<name>`; `Widget(name)` mounts the widgets among them:", ""]
     for name, value in namespace.items():
         kind = f"{type(value).__module__}.{type(value).__qualname__}"
         detail = ""

@@ -62,29 +62,46 @@ the error. The agent also gets the error with the next message.
 
 The program binds events with `@Callback(handler, context?)`: a button's action
 runs on click, and an input's `on_change` runs when its value changes. The
-handler receives the event and the widgets by statement name:
+agent writes the handlers as methods of one `App` subclass:
 
 ```python
-def on_total(event, widgets):
-    region = widgets["region"].value
-    total = sales.loc[sales["region"] == region, "revenue"].sum()
-    widgets["result"].text = f"{region}: {total}"
+from anylumino.workbench import App
+
+
+class SalesApp(App):
+    def setup(self):
+        self.ui.table.set_rows(self.sales.to_dict("records"))
+
+    def on_total(self, event):
+        region = self.ui.region.value
+        total = self.sales.loc[self.sales["region"] == region, "revenue"].sum()
+        self.ui.result.text = f"{region}: {total}"
 ```
 
+- `self.ui` is the generated `UI` widget, with one attribute per statement name.
+  The `UI` tab shows that widget.
 - `event` has `source` (the statement name), `value` (the new value, or `None`
   for a button), and `context` (the second `@Callback` argument).
-- Callbacks run in the kernel with the `namespace` names as globals.
-- An optional `setup(widgets)` runs each time the UI is built. The agent uses it
-  to fill tables and selectors from namespace data, for example with
-  `widgets["table"].set_rows(sales.to_dict("records"))`. The agent sees only
-  the shape and columns of a data frame, so its rows never leave the kernel.
-- `ask_agent(message, context=None)` sends a chat message from a handler.
+- The `namespace` names reach the app as attributes, such as `self.sales`. The
+  callbacks read no notebook globals, so the exported file takes its data
+  explicitly.
+- An optional `setup(self)` runs each time the UI is built. The agent uses it to
+  fill tables and selectors from namespace data. The agent sees only the shape
+  and columns of a data frame, so its rows never leave the kernel.
+- `self.ask_agent(message, context=None)` sends a chat message from a handler.
   `@ToAssistant(message)` in the program does the same without a handler.
 - `Widget("name")` in the program mounts the widget stored under `name` in the
   `namespace`, such as a Plotly `FigureWidget`.
 - An exception in a handler shows in the chat. The other widgets keep working.
+- Statement names that the `UI` widget already uses, such as `label`, `value`,
+  or `layout`, stop the turn from applying, and the agent renames them.
+- The callbacks share a module with the generated UI code in an export, so they
+  cannot define `UI` or bind `al` or `ax` to anything other than `anylumino` and
+  `anylumino.astryx`.
+- A UI without handlers gets an empty `UIApp(App)` subclass, so it can still be
+  exported.
 
-![Callbacks tab with setup and the event handlers](assets/workbench/workbench-callbacks.png)
+![Callbacks tab with the App subclass and its handlers](assets/workbench/workbench-callbacks.png)
 
 <Callout type="warn" title="Warning">
   The workbench runs agent-written Python in your kernel: the callbacks and the
@@ -127,6 +144,11 @@ new `Workbench(session="<session>")` restores all four tabs and resumes the
 agent's own session, so the agent still has the earlier conversation. If the
 saved UI cannot be built, for example because a mounted widget is missing from
 the new `namespace`, the `UI` tab shows the error and the chat stays usable.
+A session keeps the agent it started with: passing another `agent` for a saved
+session raises `ValueError`, since the agent's session ID only works with that
+agent.
+
+Sessions have no picker. List `~/.anylumino/sessions/` to see the saved names.
 
 ## How it works
 
@@ -139,10 +161,10 @@ chat submit (ax.Chat)
   -> agents.py    run claude or codex as a subprocess, stream text and tool rows into the chat
   -> reply.py     split the reply into prose, one openui fence, and one python fence
   -> openui.py    merge the openui fence into the current program, then parse it (Node)
-  -> exec         run the callbacks module with the namespace names as globals
-  -> codegen.py   turn the parsed tree into a Python module with build(callbacks, namespace, ask_agent)
-  -> exec build   create the widgets and bind each @Callback to its handler
-  -> commit       set the four tabs and swap the UI tab child
+  -> export.py    run the callbacks without globals and find their App subclass
+  -> codegen.py   turn the parsed tree into a module with a UI widget class
+  -> UI(app)      create the app with the namespace, build the UI, run setup
+  -> commit       set the four tabs and show the UI in the UI tab
   -> session.py   save the session file
 ```
 
@@ -161,6 +183,9 @@ a failed turn leave all four tabs unchanged.
 | `codegen.py`          | Emits deterministic Python, children before parents, and raises a named error for dynamic props and unsupported features.                     |
 | `agents.py`           | Builds the CLI arguments, parses the Claude and Codex event streams, and stops a turn.                                                        |
 | `session.py`          | Saves and loads sessions with an atomic write, and validates session names.                                                                   |
+| `app.py`              | The `App` base class: namespace attributes, `setup`, handler calls with error routing, and `ask_agent`.                                       |
+| `export.py`           | Runs the callbacks and the UI code for both the workbench and `load`, and writes the exported file.                                           |
+| `export_dialog.py`    | The export dialog, which browses the kernel's folders rather than the browser's, since the kernel reads the files back.                       |
 | `workbench.py`        | Assembles the panels and runs the turn.                                                                                                       |
 
 The frontend parts are `ax.Chat` in `static/astryx/astryx_widget.js` and the
@@ -182,6 +207,13 @@ OpenUI bundle; `npm run build` bundles it.
 - **Generated code, not an interpreter:** the `UI` tab is built by executing the
   module in the `UI code` tab, so the two cannot differ. The module also runs
   without the workbench.
+- **App and UI classes:** the callbacks are an `App` subclass and the generated
+  code is a `UI` widget class built as `UI(app)`. The app holds the data and the
+  handlers and works without a widget; the UI is the widget, so it composes
+  with other widgets. The namespace reaches the app through its constructor
+  rather than as globals, so an export runs with explicit inputs. Statement
+  names become `UI` attributes, which is why names of widget members are
+  rejected.
 - **The catalog is Python:** it sits next to the widget classes, and prop names
   match the constructor keywords. A test builds every entry, so a renamed
   keyword fails it. The catalog `VBox` and `HBox` build `ax.Stack`, not Lumino
@@ -209,6 +241,49 @@ OpenUI bundle; `npm run build` bundles it.
 - **`node --test`:** the OpenUI bundle and the chat message mapping.
 - **Browser:** `notebooks/openui_workbench_fake_agent.py` drives a full turn in
   JupyterLab without spending tokens.
+
+## Export and load
+
+**Export** in the workbench header writes the current UI to one Python file,
+so the same UI runs without the workbench or the agent. It is available once a
+UI is built.
+
+1. Select **Export**. The dialog browses the kernel's folders, starting in the
+   kernel's current directory.
+2. Open the target folder, enter a name such as `sales`, and select **Export**.
+   The name defaults to the session name, with `-` replaced by `_` so the file
+   can be imported as a module.
+   The workbench writes `sales.py`, replacing an existing file, and posts the
+   `load` call for it in the chat. The file holds the `UI code` tab and then the
+   `Callbacks` tab, with the imports of both at the top.
+3. Run that call in a notebook cell:
+
+```python
+from anylumino.workbench import load
+
+load("exports/sales.py", sales=sales)
+```
+
+`load` creates the `App` subclass with the keyword arguments, builds a `UI` for
+it, runs `setup`, and returns the `UI` widget, so the cell shows the same UI.
+The app is `ui.app`. A relative path is relative to the notebook's directory, or
+to the calling script's directory outside Jupyter. In Jupyter that is the
+kernel's current directory when `load` runs, the same directory the export
+message makes its paths relative to. `ask_agent` and `@ToAssistant` warn and do
+nothing outside a workbench.
+
+The file reads no notebook globals, so it also works as an ordinary module:
+
+```python
+from exports.sales import UI, SalesApp
+
+app = SalesApp(sales=sales)
+ui = UI(app)
+```
+
+The app works without a UI, for example to call a handler in a test. The `UI`
+is a widget, so it composes like any other: put it in a `TabPanel`, a
+`SplitPanel`, or a stack next to other widgets.
 
 ## Limits
 

@@ -64,8 +64,9 @@ to the skill and its file path before it uses options.
 
 The system SHALL generate the agent system prompt from the library spec with the OpenUI prompt
 generator, with inline mode and edit mode on, and with tools, queries, mutations, and `$state`
-bindings off. The prompt SHALL also teach the `@Callback(handler, context?)` action, the callback
-function signature, and that callbacks are returned in one fenced `python` block.
+bindings off. The prompt SHALL also teach the `@Callback(handler, context?)` action, the `App`
+subclass that holds the handlers as methods, and that the callbacks are returned in one fenced
+`python` block.
 
 #### Scenario: Prompt teaches only supported features
 
@@ -100,13 +101,13 @@ OpenUI incremental editing, before parsing.
 
 ### Requirement: Python code generation
 
-The system SHALL generate, from a parsed tree, a Python module that imports anylumino, defines
-`build(callbacks, namespace=None, ask_agent=None)`, creates each widget with its catalog constructor
-(namespace components take the widget stored under their name), and registers each named widget
-under its statement name in a `widgets` dict. `build` SHALL return the root
-widget and `widgets`. The same tree SHALL always produce the same source text. Generation SHALL fail
-with an error that names the statement when a prop holds a dynamic expression, when a referenced
-namespace widget is missing, or when an `@Callback` handler is not defined in the callbacks.
+The system SHALL generate, from a parsed tree, a Python module that imports anylumino and defines
+a `UI` widget class. `UI(app)` SHALL create each widget with its catalog constructor (namespace
+components take the `app` attribute of their name), store each named widget as an attribute named
+after its statement, bind the actions to `app`, show the root widget, and call `app.set_ui`. The same tree SHALL
+always produce the same source text. Generation SHALL fail with an error that names the statement
+when a prop holds a dynamic expression, when a referenced namespace widget is missing, or when an
+`@Callback` handler is not a method of the `App` subclass.
 
 #### Scenario: Deterministic output
 
@@ -115,28 +116,29 @@ namespace widget is missing, or when an `@Callback` handler is not defined in th
 
 #### Scenario: Generated module runs on its own
 
-- **WHEN** the generated module and its callbacks module are loaded in a new kernel and `build` is
-  called with the callbacks and the namespace
-- **THEN** it returns a root widget, and `widgets` holds an entry for every named statement
+- **WHEN** the exported module is imported in a new kernel, and `UI(app)` is called with an `App`
+  subclass created with the namespace
+- **THEN** the UI shows the root widget, `app.ui` is that UI, and it has an attribute for every named
+  statement
 
 #### Scenario: Missing handler
 
-- **WHEN** a program uses `@Callback("on_run")` and the callbacks define no `on_run`
+- **WHEN** a program uses `@Callback("on_run")` and the `App` subclass has no `on_run` method
 - **THEN** generation fails with an error naming `on_run` and the statement that uses it
 
 ### Requirement: Callback binding
 
 Generated code SHALL connect each `@Callback(handler, context)` action to the widget event that
 the catalog assigns to that prop (activation for buttons, value change for inputs). It SHALL call
-`handler(event, widgets)`, where `event` holds the source statement name, the new value or `None`,
-and the action context. Generated code SHALL connect an `@ToAssistant(message, context)` action
-to `ask_agent` with the message and context.
+the app's `handler(event)` method through `app.call`, where `event` holds the source statement
+name, the new value or `None`, and the action context. Generated code SHALL connect an
+`@ToAssistant(message, context)` action to `app.ask_agent` with the message and context.
 
 #### Scenario: Button click runs its handler
 
 - **WHEN** the user activates a Button that was generated from `@Callback("on_run", "q3")`
-- **THEN** `on_run` receives an event with source `go`, value `None`, and context `q3`, plus the
-  widgets dict
+- **THEN** the app's `on_run` method receives an event with source `go`, value `None`, and
+  context `q3`
 
 #### Scenario: Input change runs its handler
 
@@ -147,4 +149,25 @@ to `ask_agent` with the message and context.
 #### Scenario: Ask the assistant from the UI
 
 - **WHEN** the user activates a Button generated from `@ToAssistant("Explain this chart")`
-- **THEN** `ask_agent` is called with `Explain this chart`
+- **THEN** `app.ask_agent` is called with `Explain this chart`
+
+### Requirement: App controller
+
+`anylumino.workbench.App` SHALL be a widget that shows the UI it controls, so it composes like any
+other anylumino widget. `App(**namespace)` SHALL store each namespace entry as an attribute and
+SHALL reject a name that is not an identifier or that an `App` attribute or method already uses.
+`app.set_ui(ui)` SHALL build `ui` with the app, show its root, keep `ui` as `app.ui`, and run
+`setup`. `app.call(handler, event)` SHALL run the handler method, and SHALL pass an exception to
+`app.on_error` when one is set. `app.ask_agent(message, context)` SHALL call `app.agent` when one
+is set, and SHALL warn and do nothing otherwise. A callbacks module SHALL define exactly one `App`
+subclass, and its methods SHALL NOT replace an `App` attribute other than `setup`.
+
+#### Scenario: App in another layout
+
+- **WHEN** `SalesApp(sales=sales)` with a built UI is a tab of an `al.TabPanel`
+- **THEN** the tab shows the UI, and its handlers read `self.sales`
+
+#### Scenario: Handler shadows a widget member
+
+- **WHEN** the `App` subclass defines a method `close`
+- **THEN** the callbacks are rejected with an error that names `close`

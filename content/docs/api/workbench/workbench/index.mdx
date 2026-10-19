@@ -10,14 +10,92 @@ The workbench: an agent chat beside the generated UI and the code behind it.
   <PyAttribute name="STREAM_INTERVAL" value="0.05" />
 
   <PyAttribute name="HEADER_HEIGHT" value="40" />
+
+  <PyAttribute name="EMPTY_CALLBACKS" value="'from anylumino.workbench import App\n\n\nclass UIApp(App):\n    pass\n'" />
 </PyAttributes>
 
-<Tabs items={["Class"]}>
+<Tabs items={["Class","Functions"]}>
   <Tab value="Class">
     <Cards>
       <Card title="ApplyError" href="/docs/api/workbench/workbench/ApplyError" />
 
       <Card title="Workbench" href="/docs/api/workbench/workbench/Workbench" />
     </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="chat_message" type="(role, content, status=None, tools=None) -> dict[str, Any]">
+      <PySourceCode>
+        ```python
+        def chat_message(
+            role: str, content: str, status: str | None = None, tools: list[dict[str, Any]] | None = None
+        ) -> dict[str, Any]:
+            message: dict[str, Any] = {"role": role, "content": content}
+            if status:
+                message["status"] = status
+            if tools:
+                message["tool_calls"] = [{key: tool[key] for key in ("name", "target", "status")} for tool in tools]
+            return message
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="role" type="str" />
+
+        <PyParameter name="content" type="str" />
+
+        <PyParameter name="status" type="str | None" value="None" />
+
+        <PyParameter name="tools" type="list[dict[str, Any]] | None" value="None" />
+      </div>
+
+      <PyFunctionReturn type="dict[str, typing.Any]" />
+    </PyFunction>
+
+    <PyFunction name="close_tree" type="(widget, keep) -> None">
+      Close `widget` and the widgets it holds, except those whose `id` is in `keep`.
+
+      <PySourceCode>
+        ```python
+        def close_tree(widget: Widget, keep: Collection[int]) -> None:
+            """Close ``widget`` and the widgets it holds, except those whose ``id`` is in ``keep``."""
+            if id(widget) in keep:
+                return
+            for child in getattr(widget, "widgets", None) or []:
+                if isinstance(child, Widget):
+                    close_tree(child, keep)
+            widget.close()
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="widget" type="Widget" />
+
+        <PyParameter name="keep" type="Collection[int]" />
+      </div>
+
+      <PyFunctionReturn type="None" />
+    </PyFunction>
+
+    <PyFunction name="shown_path" type="(path) -> str">
+      Return `path` relative to the current directory when it is inside it.
+
+      <PySourceCode>
+        ```python
+        def shown_path(path: Path) -> str:
+            """Return ``path`` relative to the current directory when it is inside it."""
+            try:
+                return str(path.resolve().relative_to(Path.cwd()))
+            except ValueError:
+                return str(path.resolve())
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="path" type="Path" />
+      </div>
+
+      <PyFunctionReturn type="str" />
+    </PyFunction>
   </Tab>
 </Tabs>

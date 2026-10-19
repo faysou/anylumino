@@ -232,7 +232,9 @@ class AgentRunner:
     """Run turns of one agent session, one at a time.
 
     ``session_id`` is the agent's own session ID once a turn has recorded it;
-    later turns resume it.
+    later turns resume it. ``stopped`` is set by `stop` and stays set until the
+    caller clears it for the next turn, so a stop that comes before the
+    process starts still cancels the turn.
     """
 
     def __init__(self, agent: str, cwd: Path, name: str, session_id: str | None = None) -> None:
@@ -263,7 +265,8 @@ class AgentRunner:
         else:
             argv = codex_argv(self.session_id, self.cwd, system_prompt, await codex_mcp_overrides(self.cwd))
             stream = CodexStream()
-        self.stopped = False
+        if self.stopped:
+            return
         self.process = await asyncio.create_subprocess_exec(
             shutil.which(argv[0]) or argv[0],
             *argv[1:],
@@ -298,9 +301,9 @@ class AgentRunner:
             self.process = None
 
     async def stop(self) -> None:
-        """Stop the running turn, if any."""
+        """Stop the current turn, including one whose process has not started yet."""
+        self.stopped = True
         if self.process is not None:
-            self.stopped = True
             await self.terminate(self.process)
 
     @staticmethod

@@ -3,7 +3,7 @@ import asyncio
 import pytest
 
 from anylumino import astryx as ax
-from anylumino.workbench import codegen, openui
+from anylumino.workbench import App, codegen, openui
 
 
 PROGRAM = """root = VBox([title, form, card, tabs])
@@ -23,40 +23,43 @@ import anylumino as al
 import anylumino.astryx as ax
 
 
-def build(callbacks, namespace=None, ask_agent=None):
-    namespace = namespace or {}
-    widgets = {}
-    title = widgets['title'] = ax.Heading(text='Sales', level=2)
-    region = widgets['region'] = ax.TextInput(label='Region', value='', placeholder='Enter region')
-    go = widgets['go'] = ax.Button(label='Run', variant='primary')
-    ask = widgets['ask'] = ax.Button(label='Explain')
-    form = widgets['form'] = ax.Stack(children=[region, go, ask], direction='horizontal')
-    _text_1 = ax.Text(text='inline')
-    _markdown_2 = ax.Markdown(text='**bold**')
-    card = widgets['card'] = ax.Card(children=[_text_1, _markdown_2])
-    table = widgets['table'] = ax.Table(rows=[{'region': 'EMEA', 'revenue': 1.5}], columns=['region', 'revenue'], sortable=True, density='compact')
-    chart = widgets['chart'] = namespace['fig']
-    tabs = widgets['tabs'] = al.TabPanel(widgets=[table, chart], titles=['Rows', 'Chart'])
-    root = widgets['root'] = ax.Stack(children=[title, form, card, tabs], direction='vertical')
+class UI(ax.Stack):
+    """The generated widget for ``app``, with one attribute per OpenUI statement."""
 
-    def region_on_change(_widget, value=None):
-        callbacks['on_region']({'source': 'region', 'value': value, 'context': None}, widgets)
+    def __init__(self, app):
+        super().__init__([])
+        self.app = app
+        self.title = ax.Heading(text='Sales', level=2)
+        self.region = ax.TextInput(label='Region', value='', placeholder='Enter region')
+        self.go = ax.Button(label='Run', variant='primary')
+        self.ask = ax.Button(label='Explain')
+        self.form = ax.Stack(children=[self.region, self.go, self.ask], direction='horizontal')
+        _text_1 = ax.Text(text='inline')
+        _markdown_2 = ax.Markdown(text='**bold**')
+        self.card = ax.Card(children=[_text_1, _markdown_2])
+        self.table = ax.Table(rows=[{'region': 'EMEA', 'revenue': 1.5}], columns=['region', 'revenue'], sortable=True, density='compact')
+        self.chart = app.fig
+        self.tabs = al.TabPanel(widgets=[self.table, self.chart], titles=['Rows', 'Chart'])
+        self.root = ax.Stack(children=[self.title, self.form, self.card, self.tabs], direction='vertical')
 
-    region.on_action(region_on_change)
+        def region_on_change(_widget, value=None):
+            app.call('on_region', {'source': 'region', 'value': value, 'context': None})
 
-    def go_action(_widget, value=None):
-        callbacks['on_run']({'source': 'go', 'value': value, 'context': 'q3'}, widgets)
+        self.region.on_action(region_on_change)
 
-    go.on_click(go_action)
+        def go_action(_widget, value=None):
+            app.call('on_run', {'source': 'go', 'value': value, 'context': 'q3'})
 
-    def ask_action(_widget, value=None):
-        callbacks['on_run']({'source': 'ask', 'value': value, 'context': None}, widgets)
-        if ask_agent is not None:
-            ask_agent('Explain this', 'ctx')
+        self.go.on_click(go_action)
 
-    ask.on_click(ask_action)
+        def ask_action(_widget, value=None):
+            app.call('on_run', {'source': 'ask', 'value': value, 'context': None})
+            app.ask_agent('Explain this', 'ctx')
 
-    return root, widgets
+        self.ask.on_click(ask_action)
+
+        self.widgets = [self.root]
+        app.set_ui(self)
 '''
 
 
@@ -66,10 +69,26 @@ def parsed(program):
     return result
 
 
-def build(source, callbacks, namespace=None, ask_agent=None):
+class RecordingApp(App):
+    def __init__(self, **namespace):
+        super().__init__(**namespace)
+        self.events = []
+        self.asks = []
+
+    def on_region(self, event):
+        self.events.append(("on_region", event))
+
+    def on_run(self, event):
+        self.events.append(("on_run", event))
+
+    def ask_agent(self, message, context=None):
+        self.asks.append((message, context))
+
+
+def ui_class(source):
     module = {}
     exec(compile(source, "ui.py", "exec"), module)
-    return module["build"](callbacks, namespace, ask_agent)
+    return module["UI"]
 
 
 def test_generate_matches_snapshot():
@@ -83,44 +102,34 @@ def test_generate_is_deterministic():
     assert codegen.generate(result, {"on_region", "on_run"}, {"fig": None}) == first
 
 
-def test_generated_module_builds_every_named_widget():
+def test_generated_ui_builds_every_named_widget():
     fig = ax.Text("figure")
-    root, widgets = build(EXPECTED, {"on_region": print, "on_run": print}, {"fig": fig})
-    assert list(widgets) == ["title", "region", "go", "ask", "form", "card", "table", "chart", "tabs", "root"]
-    assert root is widgets["root"]
-    assert widgets["chart"] is fig
-    assert widgets["tabs"].widgets == [widgets["table"], fig]
-    assert widgets["root"].widgets == [widgets["title"], widgets["form"], widgets["card"], widgets["tabs"]]
-    assert widgets["title"].text == "Sales"
-    assert (widgets["table"].sortable, widgets["table"].props["density"]) == (True, "compact")
+    app = RecordingApp(fig=fig)
+    ui = ui_class(EXPECTED)(app)
+
+    assert (ui.app, app.ui, ui.widgets) == (app, ui, [ui.root])
+    assert ui.chart is fig
+    assert ui.tabs.widgets == [ui.table, fig]
+    assert ui.root.widgets == [ui.title, ui.form, ui.card, ui.tabs]
+    assert ui.form.widgets == [ui.region, ui.go, ui.ask]
+    assert ui.title.text == "Sales"
+    assert (ui.table.sortable, ui.table.props["density"]) == (True, "compact")
 
 
-def test_generated_callbacks_receive_events():
-    events = []
-    asks = []
-    callbacks = {
-        "on_region": lambda event, widgets: events.append(("on_region", event, widgets)),
-        "on_run": lambda event, widgets: events.append(("on_run", event, widgets)),
-    }
-    _, widgets = build(EXPECTED, callbacks, {"fig": ax.Text("figure")}, lambda *args: asks.append(args))
+def test_generated_ui_sends_events_to_the_app():
+    app = RecordingApp(fig=ax.Text("figure"))
+    ui = ui_class(EXPECTED)(app)
 
-    widgets["go"]._handle_frontend_message(widgets["go"], {"type": "click"}, None)
-    widgets["region"].value = "EMEA"
-    widgets["ask"]._handle_frontend_message(widgets["ask"], {"type": "click"}, None)
+    ui.go._handle_frontend_message(ui.go, {"type": "click"}, None)
+    ui.region.value = "EMEA"
+    ui.ask._handle_frontend_message(ui.ask, {"type": "click"}, None)
 
-    assert events == [
-        ("on_run", {"source": "go", "value": None, "context": "q3"}, widgets),
-        ("on_region", {"source": "region", "value": "EMEA", "context": None}, widgets),
-        ("on_run", {"source": "ask", "value": None, "context": None}, widgets),
+    assert app.events == [
+        ("on_run", {"source": "go", "value": None, "context": "q3"}),
+        ("on_region", {"source": "region", "value": "EMEA", "context": None}),
+        ("on_run", {"source": "ask", "value": None, "context": None}),
     ]
-    assert asks == [("Explain this", "ctx")]
-
-
-def test_reserved_statement_names_get_a_suffix():
-    source = codegen.generate(parsed('root = VBox([widgets])\nwidgets = Text("a")'), set(), {})
-    assert "    widgets_ = widgets['widgets'] = ax.Text(text='a')\n" in source
-    _, widgets = build(source, {})
-    assert widgets["widgets"].text == "a"
+    assert app.asks == [("Explain this", "ctx")]
 
 
 @pytest.mark.parametrize(
@@ -129,10 +138,12 @@ def test_reserved_statement_names_get_a_suffix():
         ('root = VBox([go])\ngo = Button("Run", @Callback("on_run"))', set(), {}, "go.action: callback 'on_run' is not defined"),
         ('root = VBox([chart])\nchart = Widget("fig")', set(), {}, "chart: no widget named 'fig' in the namespace"),
         ('root = VBox([go])\ngo = Button("Docs", @OpenUrl("https://x"))', set(), {}, "go.action: unsupported action open_url"),
+        ('root = VBox([label])\nlabel = Text("a")', set(), {}, "label: the name is a member of the UI widget; rename the statement"),
+        ('root = VBox([app])\napp = Text("a")', set(), {}, "app: the name is a member of the UI widget; rename the statement"),
         ('root = VBox([t])\nt = Table([], [], {sorted: true})', set(), {}, "t.options: Table has no option 'sorted'"),
         ('$sel = "a"\nroot = VBox([Text($sel)])', set(), {}, r"\$state variables is not supported: \$sel"),
     ],
-    ids=["missing-handler", "missing-namespace-widget", "unsupported-action", "unknown-option", "state"],
+    ids=["missing-handler", "missing-namespace-widget", "unsupported-action", "member-name", "app-name", "unknown-option", "state"],
 )
 def test_generate_rejects_with_named_error(program, handlers, namespace, message):
     result = asyncio.run(openui.parse(program))

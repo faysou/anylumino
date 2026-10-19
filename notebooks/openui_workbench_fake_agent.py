@@ -64,25 +64,26 @@ summary = Text("Pick a region, then press Total revenue.")
 about = Markdown("Data comes from the `sales` frame in the namespace.")
 notes = Markdown(""" + json.dumps(NOTES) + ")"
 
-CALLBACKS = '''def setup(widgets):
-    widgets["table"].set_rows(sales.to_dict("records"))
+CALLBACKS = '''from anylumino.workbench import App
 
 
-def selected(widgets):
-    region = widgets["region"].value or "All"
-    return region, sales if region == "All" else sales[sales["region"] == region]
+class SalesApp(App):
+    def setup(self):
+        self.ui.table.set_rows(self.sales.to_dict("records"))
 
+    def selected(self):
+        region = self.ui.region.value or "All"
+        return region, self.sales if region == "All" else self.sales[self.sales["region"] == region]
 
-def on_region(event, widgets):
-    region, rows = selected(widgets)
-    widgets["table"].set_rows(rows.to_dict("records"))
-    widgets["status"].label = "All regions" if region == "All" else region
-    widgets["title"].text = f"Sales by region: {region}"
+    def on_region(self, event):
+        region, rows = self.selected()
+        self.ui.table.set_rows(rows.to_dict("records"))
+        self.ui.status.label = "All regions" if region == "All" else region
+        self.ui.title.text = f"Sales by region: {region}"
 
-
-def on_total(event, widgets):
-    region, rows = selected(widgets)
-    widgets["summary"].text = f"Total revenue for {region}: {rows['revenue'].sum():.1f}"
+    def on_total(self, event):
+        region, rows = self.selected()
+        self.ui.summary.text = f"Total revenue for {region}: {rows['revenue'].sum():.1f}"
 '''
 
 REPLY = (

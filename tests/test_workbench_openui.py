@@ -5,7 +5,7 @@ import pytest
 
 import anylumino as al
 from anylumino import astryx as ax
-from anylumino.workbench import openui, prompt, skill
+from anylumino.workbench import codegen, openui, prompt, skill
 from anylumino.workbench.catalog import CATALOG, COMPONENTS, library_spec, type_name
 
 
@@ -117,6 +117,7 @@ def test_system_prompt_teaches_only_supported_features():
     assert "@Callback" in text
     assert "```openui-lang" in text
     assert prompt.COMPONENT_OPTIONS in text
+    assert prompt.CALLBACKS in text
     assert "sort_direction" not in text
     for unsupported in ("Query(", "Mutation(", "@Run", "@Set", "$binding"):
         assert unsupported not in text
@@ -194,10 +195,15 @@ def test_namespace_summary_describes_data_frames():
         [
             "## Namespace",
             "",
-            "Callbacks can read these names; `Widget(name)` mounts the widgets among them:",
+            "The app gets these names as attributes, such as `self.<name>`; `Widget(name)` mounts the widgets among them:",
             "",
             "- `sales`: `pandas.DataFrame`, shape (1, 2), columns ['region', 'revenue']",
             "- `limit`: `builtins.int`",
         ]
     )
     assert prompt.namespace_summary({}) == "## Namespace\n\nThe namespace is empty."
+
+
+def test_prompt_member_names_are_rejected_by_generation():
+    assert ", ".join(f"`{name}`" for name in prompt.MEMBER_NAMES) in prompt.CALLBACKS
+    assert set(prompt.MEMBER_NAMES) <= codegen.RESERVED

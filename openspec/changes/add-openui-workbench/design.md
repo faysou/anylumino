@@ -63,7 +63,6 @@ See `proposal.md` for the motivation. The facts below constrain the design.
 - OpenUI `$state`, `Query`, `Mutation`, forms, or `@Each`. The prompt does not teach them.
   Programs that use them fail code generation with a named error.
 - Streaming the UI while a turn runs. The UI changes once per turn.
-- A standalone export button. The generated module and the callbacks already run on their own.
 - Changing the agent mid-session.
 
 ## Decisions
@@ -139,44 +138,63 @@ namespace summary.
 exporter, which could drift apart. Here the live UI runs the generated source with `exec` in a
 fresh module namespace, so what the tab shows is what runs.
 
-The generated module has this shape:
+The generated module defines a `UI` class:
 
 ```python
 import anylumino as al
 import anylumino.astryx as ax
 
 
-def build(callbacks, namespace=None, ask_agent=None):
-    namespace = namespace or {}
-    widgets = {}
-    title = widgets['title'] = ax.Heading(text='Sales')
-    go = widgets['go'] = ax.Button(label='Run', variant='primary')
-    root = widgets['root'] = ax.Stack(children=[title, go], direction='vertical')
+class UI(ax.Stack):
+    def __init__(self, app):
+        super().__init__([])
+        self.app = app
+        self.title = ax.Heading(text='Sales')
+        self.go = ax.Button(label='Run', variant='primary')
+        self.root = ax.Stack(children=[self.title, self.go], direction='vertical')
 
-    def go_action(_widget, value=None):
-        callbacks['on_run']({'source': 'go', 'value': value, 'context': 'q3'}, widgets)
+        def go_action(_widget, value=None):
+            app.call('on_run', {'source': 'go', 'value': value, 'context': 'q3'})
 
-    go.on_click(go_action)
+        self.go.on_click(go_action)
 
-    return root, widgets
+        self.widgets = [self.root]
+        app.set_ui(self)
 ```
 
-Statement names become variable names and `widgets` keys. Statements are emitted children before
-parents, in the stable order of `spec/language.md` section 9.2, which keeps the output
-deterministic. Literal props are written with `repr`. A prop that holds a dynamic AST node is a
-generation error that names the statement.
+Statement names become attributes. Statements are emitted children before parents, in the stable
+order of `spec/language.md` section 9.2, which keeps the output deterministic. Literal props are
+written with `repr`. A prop that holds a dynamic AST node is a generation error that names the
+statement.
 
-### The callback contract uses one custom action
+### The callbacks are an App subclass that controls the UI
 
-Programs bind events with `@Callback(handler, context?)`. The fenced `python` block defines
-`def handler(event, widgets)`, where `event` is `{"source", "value", "context"}`.
+Programs bind events with `@Callback(handler, context?)`. The fenced `python` block defines one
+subclass of `anylumino.workbench.App` with a `handler(self, event)` method per handler, where
+`event` is `{"source", "value", "context"}`, and an optional `setup(self)`. `@ToAssistant` maps to
+`app.ask_agent`.
 
-Before the UI code runs, the callbacks run in a module namespace seeded with the workbench
-namespace and `ask_agent`. `@ToAssistant` maps to `ask_agent`.
+`App` is a plain class, so an app works without a widget, for example to call a handler in a test.
+The generated `UI(app)` is the widget, so it composes like any other: it can be a tab, a split
+side, or a child of another UI. The workbench shows that `UI` in the `UI` tab. The `UI` constructor
+calls `app.set_ui(self)`, which keeps it as `app.ui` and runs `setup`. Statement names become `UI`
+attributes, so names of widget members are rejected.
 
-This keeps the OpenUI action model instead of the draft's `on_click` and `on_change` props. The
-catalog decides the event per action slot, so the agent does not need to know about `clicks` or
-`value` traits. Each handler runs inside a wrapper that sends any exception to the chat.
+The namespace reaches the app as constructor keywords, `SalesApp(sales=sales)`, and handlers read
+`self.sales`. The callbacks run in a module without notebook globals, so an exported pair of files
+works as an ordinary module, and the caller passes the data explicitly. A namespace name that is
+not an identifier or that an `App` member uses is rejected, and so is a handler that replaces an
+`App` member other than `setup`, since a method named `call` or `ui` would break the app.
+
+Export writes one module: the UI code first, then the callbacks, with the callbacks' leading
+imports moved up. One file is simpler to move and import than a pair, and `UI` only needs `app` at
+call time, so it can come before the `App` subclass.
+
+`app.call` runs a handler and passes an exception to `app.on_error` when set; the workbench sets it
+to post the error in the chat. `app.ask_agent` calls `app.agent`, which the workbench sets; outside
+a workbench it warns. This keeps the OpenUI action model instead of the draft's `on_click` and
+`on_change` props. The catalog decides the event per action slot, so the agent does not need to
+know about `clicks` or `value` traits.
 
 ### Edit mode always merges
 

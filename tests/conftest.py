@@ -38,3 +38,21 @@ def fake_cli(tmp_path, monkeypatch):
         return [json.loads(line) for line in log.read_text().splitlines()]
 
     return calls
+
+
+@pytest.fixture
+def agent_reply(fake_cli, tmp_path, monkeypatch):
+    stream = tmp_path / "stream.jsonl"
+    monkeypatch.setenv("FAKE_STREAM", str(stream))
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+
+    def set_reply(text):
+        events = [
+            {"type": "thread.started", "thread_id": "thread-1"},
+            {"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "text": text}},
+            {"type": "turn.completed"},
+        ]
+        stream.write_text("".join(json.dumps(event) + "\n" for event in events))
+
+    set_reply.calls = fake_cli
+    return set_reply

@@ -1,0 +1,140 @@
+---
+title: "ExportDialog"
+---
+
+Browse the kernel's folders, then call `on_export(folder, name)`.
+
+The dialog browses the kernel's file system, not the browser's, because
+the kernel reads the exported file back.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="on_export" value="on_export" />
+
+  <PyAttribute name="folder" type="Path | None" value="None" />
+
+  <PyAttribute name="path" value="ax.Text('', text_type='supporting')" />
+
+  <PyAttribute name="folders" value="ax.Stack([], direction='vertical', gap=0, height=220, scrollable=True)" />
+
+  <PyAttribute name="name" value="ax.TextInput('ui', label='Name')" />
+
+  <PyAttribute name="files" value="ax.Text('', text_type='supporting')" />
+
+  <PyAttribute name="props" value="{**self.props, 'width': 480}" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(on_export) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, on_export: Callable[[Path, str], None]) -> None:
+        self.on_export = on_export
+        self.folder: Path | None = None
+        self.path = ax.Text("", text_type="supporting")
+        self.folders = ax.Stack([], direction="vertical", gap=0, height=220, scrollable=True)
+        self.name = ax.TextInput("ui", label="Name")
+        self.files = ax.Text("", text_type="supporting")
+        self.name.observe(lambda _change: self.show_files(), names="value")
+        up = ax.Button("Up", variant="ghost", size="sm", callbacks=[lambda _button: self.browse(self.folder.parent)])
+        cancel = ax.Button("Cancel", callbacks=[lambda _button: self.hide()])
+        export = ax.Button("Export", variant="primary", callbacks=[lambda _button: self.export()])
+        super().__init__(
+            ax.Stack(
+                [
+                    ax.Heading("Export UI"),
+                    ax.Stack([self.path, up], direction="horizontal", justify="between", align="center"),
+                    self.folders,
+                    self.name,
+                    self.files,
+                    ax.Stack([cancel, export], direction="horizontal", justify="end"),
+                ],
+                direction="vertical",
+                gap=3,
+                padding=4,
+            ),
+            open=False,
+            inline=False,
+        )
+        # Set as a prop only: the width argument also sizes the widget host, which then
+        # takes header space while the dialog is closed
+        self.props = {**self.props, "width": 480}
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="on_export" type="Callable[[Path, str], None]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="open_with" type="(name) -> None">
+  Show the dialog with `name` filled in, in the last browsed folder or the current directory.
+
+  <PySourceCode>
+    ```python
+    def open_with(self, name: str) -> None:
+        """Show the dialog with ``name`` filled in, in the last browsed folder or the current directory."""
+        self.name.value = name
+        self.browse(self.folder or Path.cwd())
+        self.show()
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="name" type="str" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="browse" type="(folder) -> None">
+  <PySourceCode>
+    ```python
+    def browse(self, folder: Path) -> None:
+        self.folder = folder.resolve()
+        self.path.text = str(self.folder)
+        try:
+            names = sorted(entry.name for entry in self.folder.iterdir() if entry.is_dir() and not entry.name.startswith("."))
+        except OSError:
+            names = []
+        self.folders.widgets = [
+            ax.Button(f"{name}/", variant="ghost", size="sm", callbacks=[lambda _button, name=name: self.browse(self.folder / name)])
+            for name in names
+        ]
+        self.show_files()
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="folder" type="Path" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="show_files" type="() -> None">
+  <PySourceCode>
+    ```python
+    def show_files(self) -> None:
+        self.files.text = f"Writes {file_name(self.name.value or 'ui')} here, replacing an existing file."
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="export" type="() -> None">
+  <PySourceCode>
+    ```python
+    def export(self) -> None:
+        self.hide()
+        self.on_export(self.folder, self.name.value or "ui")
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

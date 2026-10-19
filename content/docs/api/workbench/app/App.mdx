@@ -1,0 +1,126 @@
+---
+title: "App"
+---
+
+Hold the data of a generated UI and handle its events.
+
+Subclass `App` with one `handler(self, event)` method per
+`@Callback` handler, and optionally `setup(self)`. A generated
+`UI(app)` is the widget; the app works without one, for example to
+call a handler in a test.
+
+<Callout title="Notes" type="note">
+  Set `on_error` to receive handler exceptions as `on_error(handler,
+  error)` instead of raising them, and `agent` to receive
+  `ask_agent(message, context)` calls.
+</Callout>
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="ui" type="Any" value="None" />
+
+  <PyAttribute name="agent" type="Callable[[str, Any], None] | None" value="None" />
+
+  <PyAttribute name="on_error" type="Callable[[str, Exception], None] | None" value="None" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(**namespace) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, **namespace: Any) -> None:
+        for name, value in namespace.items():
+            if not name.isidentifier() or name.startswith("_") or hasattr(type(self), name):
+                raise ValueError(f"{name!r} cannot be an App namespace name; it is not an identifier or the App uses it")
+            setattr(self, name, value)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="namespace" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="set_ui" type="(ui) -> None">
+  Keep `ui` as `self.ui` and run `setup`; a generated `UI(app)` calls it.
+
+  <PySourceCode>
+    ```python
+    def set_ui(self, ui: Any) -> None:
+        """Keep ``ui`` as ``self.ui`` and run ``setup``; a generated ``UI(app)`` calls it."""
+        self.ui = ui
+        self.call("setup")
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="ui" type="Any" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="setup" type="() -> None">
+  Fill the UI after it is built; override it to load data into widgets.
+
+  <PySourceCode>
+    ```python
+    def setup(self) -> None:
+        """Fill the UI after it is built; override it to load data into widgets."""
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="call" type="(handler, *args) -> None">
+  Run the `handler` method with `args`, passing an exception to `on_error` when set.
+
+  <PySourceCode>
+    ```python
+    def call(self, handler: str, *args: Any) -> None:
+        """Run the ``handler`` method with ``args``, passing an exception to ``on_error`` when set."""
+        try:
+            getattr(self, handler)(*args)
+        except Exception as error:
+            if self.on_error is None:
+                raise
+            self.on_error(handler, error)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="handler" type="str" />
+
+    <PyParameter name="args" type="Any" value="()" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="ask_agent" type="(message, context=None) -> None">
+  Send `message` to the workbench agent; warns when no agent is attached.
+
+  <PySourceCode>
+    ```python
+    def ask_agent(self, message: str, context: Any = None) -> None:
+        """Send ``message`` to the workbench agent; warns when no agent is attached."""
+        if self.agent is None:
+            warnings.warn(f"No workbench is attached, so ask_agent ignored {message!r}.", stacklevel=2)
+            return
+        self.agent(message, context)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="message" type="str" />
+
+    <PyParameter name="context" type="Any" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

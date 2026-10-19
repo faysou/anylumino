@@ -36,6 +36,18 @@
   pointer-events: none !important;
 }
 
+/*
+ * Astryx keeps a chat system message on one line, so a long notice is clipped
+ * on both sides. Wrap it and keep its line breaks.
+ */
+.anylumino-AstryxWidgetHost .astryx-chat-system-message > span {
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+  text-align: start !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+}
+
 .anylumino-AstryxChild {
   min-width: 0;
 }

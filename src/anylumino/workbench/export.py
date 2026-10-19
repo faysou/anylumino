@@ -1,0 +1,186 @@
+"""Run the workbench's UI code and callbacks, and export them to a file that runs without it."""
+
+from __future__ import annotations
+
+import ast
+import inspect
+import os
+from pathlib import Path
+from typing import Any
+
+import anylumino
+from anylumino import astryx as ax
+
+from .app import App
+
+
+MODULE = "anylumino_workbench"
+# Globals of the generated UI code, which an export shares with the callbacks
+UI_GLOBALS = {"UI": None, "al": anylumino, "ax": ax}
+
+
+class CallbacksError(ValueError):
+    """The callbacks do not define exactly one usable ``App`` subclass."""
+
+
+def app_class(source: str) -> type[App]:
+    """Execute the callbacks ``source`` without notebook globals and return its ``App`` subclass.
+
+    Raises
+    ------
+    CallbacksError
+        If the source defines no ``App`` subclass or several, a method
+        replaces an ``App`` member other than ``setup``, or a global takes
+        a name of the generated UI code.
+    """
+    scope = run_module(source, "callbacks.py")
+    taken = sorted(name for name, value in UI_GLOBALS.items() if name in scope and scope[name] is not value)
+    if taken:
+        raise CallbacksError(f"the generated UI code uses the global names {', '.join(taken)}; rename them")
+    return find_app(scope)
+
+
+def ui_class(source: str) -> type:
+    """Execute the generated UI ``source`` and return its ``UI`` class."""
+    return run_module(source, "ui.py")["UI"]
+
+
+def run_module(source: str, filename: str) -> dict[str, Any]:
+    scope: dict[str, Any] = {"__name__": MODULE}
+    exec(compile(source, filename, "exec"), scope)
+    return scope
+
+
+def find_app(scope: dict[str, Any]) -> type[App]:
+    classes = [
+        value
+        for value in scope.values()
+        if isinstance(value, type) and issubclass(value, App) and value.__module__ == MODULE
+    ]
+    if len(classes) != 1:
+        found = ", ".join(cls.__name__ for cls in classes) or "none"
+        raise CallbacksError(f"define exactly one App subclass; found {found}")
+    (cls,) = classes
+    shadowed = sorted(
+        name
+        for klass in cls.__mro__[: cls.__mro__.index(App)]
+        for name in vars(klass)
+        if name != "setup" and not name.startswith("__") and hasattr(App, name)
+    )
+    if shadowed:
+        raise CallbacksError(f"{cls.__name__} replaces App members: {', '.join(shadowed)}")
+    return cls
+
+
+def handler_names(cls: type[App]) -> set[str]:
+    """Return the handler methods ``cls`` adds to ``App``."""
+    return {name for name in dir(cls) if not name.startswith("_") and not hasattr(App, name) and callable(getattr(cls, name))}
+
+
+def file_name(name: str) -> str:
+    """Return the file name of an export called ``name``."""
+    return f"{name}.py"
+
+
+def module_source(ui_code: str, callbacks: str) -> str:
+    """Join ``ui_code`` and then ``callbacks`` into one module, with the callbacks' imports moved up.
+
+    ``__future__`` imports go first, after the UI code's docstring, since Python
+    rejects them anywhere else.
+    """
+    ui = split_head(ui_code)
+    callbacks_parts = {key: text.lstrip("\n") for key, text in split_head(callbacks).items()}
+    return "".join(
+        [
+            ui["docstring"],
+            ui["future"],
+            callbacks_parts["future"],
+            ui["imports"],
+            callbacks_parts["docstring"],
+            callbacks_parts["imports"],
+            ui["body"].rstrip(),
+            "\n\n\n",
+            callbacks_parts["body"],
+        ]
+    )
+
+
+def split_head(source: str) -> dict[str, str]:
+    # Splits the leading docstring, __future__ imports, and other imports from the body;
+    # comments and blank lines go with the statement after them
+    parts = dict.fromkeys(("docstring", "future", "imports", "body"), "")
+    lines = source.splitlines(keepends=True)
+    start = 0
+    for index, node in enumerate(ast.parse(source).body):
+        if index == 0 and isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
+            key = "docstring"
+        elif isinstance(node, ast.ImportFrom) and node.module == "__future__":
+            key = "future"
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            key = "imports"
+        else:
+            break
+        end = node.end_lineno or start
+        parts[key] += "".join(lines[start:end])
+        start = end
+    parts["body"] = "".join(lines[start:])
+    return parts
+
+
+def write_module(folder: str | Path, name: str, ui_code: str, callbacks: str) -> Path:
+    """Write ``ui_code`` and ``callbacks`` as one module into ``folder``, replacing an existing file."""
+    path = Path(folder) / file_name(name)
+    path.write_text(module_source(ui_code, callbacks))
+    return path
+
+
+def load(path: str | Path, **namespace: Any) -> Any:
+    """Build a UI exported from a workbench, outside the workbench.
+
+    Parameters
+    ----------
+    path : str | Path
+        The exported file, ``<name>.py``. A relative path is relative to the
+        notebook's directory, or to the calling script's directory outside
+        Jupyter.
+    **namespace : Any
+        Data for the ``App`` subclass, such as ``sales=sales``.
+
+    Returns
+    -------
+    UI
+        The UI widget, after ``setup`` has run. Its app is ``ui.app``.
+
+    Notes
+    -----
+    ``load`` runs the file in this kernel. The file reads no notebook
+    globals, so it also works as an imported module:
+    ``UI(SalesApp(sales=sales))``.
+    """
+    path = Path(path)
+    if not path.is_absolute():
+        path = get_notebook_path(frames_back=2) / path
+    scope = run_module(path.read_text(), str(path))
+    return scope["UI"](find_app(scope)(**namespace))
+
+
+# Copied from option_trader.utils.get_notebook_path, with the caller's frame depth as a parameter
+def get_notebook_path(frames_back: int = 1) -> Path:
+    # 1. Check if we are in an interactive Jupyter environment
+    try:
+        from IPython import get_ipython
+
+        shell = get_ipython().__class__.__name__
+        if shell == "ZMQInteractiveShell":
+            # Jupyter Lab/Notebook: Return the directory
+            return Path(os.path.abspath(""))
+    except ImportError, NameError:
+        pass
+
+    # 2. Script execution: Get the directory of the caller
+    # We look `frames_back` frames back to see who called this function
+    frame = inspect.stack()[frames_back]
+    caller_file = frame.filename
+
+    # Return the directory containing the caller file
+    return Path(os.path.dirname(os.path.abspath(caller_file)))

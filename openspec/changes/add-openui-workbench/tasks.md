@@ -175,3 +175,51 @@
   the finished reply, carries the `sent` status; and a `fit_content` tab panel follows content
   changes and measures through box-less mount roots wherever the panel is scrolled. Verify with pytest, `node --test`, and an ego lite
   recheck in JupyterLab.
+
+## 11. Export and load
+
+- [x] 11.1 Move running the callbacks and the UI code out of `Workbench.apply` into
+  `src/anylumino/workbench/export.py`, and add `load(ui, callbacks, namespace=None)` there,
+  exported from `anylumino.workbench`. Verify with pytest: a loaded fake-agent UI fires a button
+  callback against a `__main__` global and runs `setup`, and `ask_agent` warns.
+- [x] 11.2 Add the `Export` header button and the folder dialog: a path, an up button, one button
+  per subfolder, a name input, and `Cancel` and `Export`. Verify with pytest that it browses a
+  temporary tree, writes both files equal to the tabs, and posts the `load` call; and with ego lite
+  in JupyterLab that the dialog opens, browses, exports, and a `load` cell shows the same UI.
+- [x] 11.3 Document export and load on the workbench page. Verify that `make docs-check` passes.
+
+## 12. App and UI classes
+
+- [x] 12.1 Add `App` in `src/anylumino/workbench/app.py`, a plain class with `set_ui`, `setup`,
+  `call`, `ask_agent`, and namespace keywords, exported from `anylumino.workbench`. Verify with
+  pytest: namespace attributes, rejected names, `on_error`, and the detached `ask_agent` warning.
+- [x] 12.2 Generate a `UI(app)` widget class with attribute widgets, find the single `App`
+  subclass in the callbacks, run the callbacks without globals, and show the UI in the `UI` tab.
+  Teach the contract in the system prompt. Verify with the updated codegen snapshot and workbench
+  tests, and with tests that a handler replacing an `App` member and a statement named after a
+  widget member are rejected.
+- [x] 12.3 Change `load` to `load(ui, callbacks, **namespace)` returning the UI, and put the
+  namespace keywords in the export message. Verify with pytest, with a test that imports the
+  exported files as modules and composes two UIs in an `al.TabPanel`, and with ego lite in
+  JupyterLab.
+- [x] 12.4 Update the fake-agent notebook, the workbench docs, and the screenshots. Verify that
+  `make docs-check` passes.
+- [x] 12.5 Export one module `<name>.py`, the UI code then the callbacks, with the callbacks'
+  imports moved up, and change `load` to `load(path, **namespace)`. Verify with pytest, including
+  the joined source and importing the module, and with a live Claude Code turn exported and
+  loaded.
+
+## 13. Review fixes
+
+- [x] 13.1 End a turn with a system message on any agent failure, refuse a second submit before
+  the agent starts, update the turn's reply by index, and send an apply error only with the next
+  turn. Verify with pytest: unreadable agent output, a double submit, a message posted mid-turn,
+  and prose-only turns after a failed apply.
+- [x] 13.2 Put the callbacks' `__future__` imports first in an export, reject callbacks that bind
+  `UI`, `al`, or `ax`, give a UI without handlers an empty `App` subclass, and default the export
+  name to an importable session name. Verify with pytest.
+- [x] 13.3 Raise when a restored session gets another agent, close the previous UI's widgets
+  except namespace widgets, and let a stop before the agent process starts cancel the turn. Verify
+  with pytest.
+- [x] 13.4 Wrap long chat system messages and post the export message as an assistant message.
+  Verify in JupyterLab with ego lite.

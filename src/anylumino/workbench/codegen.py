@@ -6,6 +6,8 @@ import keyword
 from collections.abc import Collection, Mapping
 from typing import Any
 
+from anylumino import astryx as ax
+
 from .catalog import CALLBACK, CATALOG, Prop
 
 
@@ -15,12 +17,16 @@ import anylumino as al
 import anylumino.astryx as ax
 
 
-def build(callbacks, namespace=None, ask_agent=None):
-    namespace = namespace or {}
-    widgets = {}
+class UI(ax.Stack):
+    """The generated widget for ``app``, with one attribute per OpenUI statement."""
+
+    def __init__(self, app):
+        super().__init__([])
+        self.app = app
 '''
 
-_RESERVED = {"al", "ax", "build", "callbacks", "namespace", "ask_agent", "widgets"}
+# Statement names become attributes of the UI widget, so they must not replace its members
+RESERVED = {"app", *(name for name in dir(ax.Stack) if not name.startswith("_"))}
 _BINDERS = {"click": "on_click", "change": "on_action"}
 
 
@@ -35,8 +41,8 @@ def generate(
 ) -> str:
     """Return the module source for a parse result.
 
-    ``handlers`` are the callback names the callbacks module defines, and
-    ``namespace`` holds the widgets that `Widget(name)` may mount.
+    ``handlers`` are the handler methods of the callbacks' ``App`` subclass,
+    and ``namespace`` holds the names that `Widget(name)` may mount from the app.
     """
     for key, label in (("states", "$state variables"), ("queries", "Query"), ("mutations", "Mutation")):
         if result.get(key):
@@ -45,7 +51,8 @@ def generate(
         raise GenerationError("The program has no root component.")
     writer = _Writer(set(handlers), namespace)
     root = writer.element(result["root"])
-    return "".join([HEADER, *writer.lines, *writer.bindings, f"\n    return {root}, widgets\n"])
+    footer = f"\n        self.widgets = [{root}]\n        app.set_ui(self)\n"
+    return "".join([HEADER, *writer.lines, *writer.bindings, footer])
 
 
 class _Writer:
@@ -64,8 +71,10 @@ class _Writer:
             return self.names[statement]
         component = CATALOG[node["typeName"]]
         if statement:
-            variable = f"{statement}_" if keyword.iskeyword(statement) or statement in _RESERVED else statement
-            target = f"{variable} = widgets[{statement!r}]"
+            if statement in RESERVED:
+                raise GenerationError(f"{statement}: the name is a member of the UI widget; rename the statement")
+            attribute = f"{statement}_" if keyword.iskeyword(statement) else statement
+            variable = target = f"self.{attribute}"
             self.names[statement] = variable
         else:
             self.inline += 1
@@ -77,7 +86,7 @@ class _Writer:
             name = props["name"]
             if name not in self.namespace:
                 raise GenerationError(f"{label}: no widget named {name!r} in the namespace")
-            self.lines.append(f"    {target} = namespace[{name!r}]\n")
+            self.lines.append(f"        {target} = app.{name}\n")
             return variable
         arguments = []
         for prop in component.props:
@@ -98,7 +107,7 @@ class _Writer:
                 self.check_literal(label, prop, value)
                 arguments.append(f"{prop.keyword}={value!r}")
         arguments.extend(f"{key}={value!r}" for key, value in component.fixed)
-        self.lines.append(f"    {target} = {component.factory}({', '.join(arguments)})\n")
+        self.lines.append(f"        {target} = {component.factory}({', '.join(arguments)})\n")
         return variable
 
     def action(self, label: str, variable: str, prop: Prop, value: Any) -> None:
@@ -111,18 +120,15 @@ class _Writer:
                 if handler not in self.handlers:
                     raise GenerationError(f"{label}.{prop.name}: callback {handler!r} is not defined")
                 event = f"{{'source': {label!r}, 'value': value, 'context': {step['params'].get('context')!r}}}"
-                calls.append(f"        callbacks[{handler!r}]({event}, widgets)\n")
+                calls.append(f"            app.call({handler!r}, {event})\n")
             elif step.get("type") == "continue_conversation":
-                calls.append(
-                    "        if ask_agent is not None:\n"
-                    f"            ask_agent({step['message']!r}, {step.get('context')!r})\n"
-                )
+                calls.append(f"            app.ask_agent({step['message']!r}, {step.get('context')!r})\n")
             else:
                 raise GenerationError(f"{label}.{prop.name}: unsupported action {step.get('name') or step.get('type')}")
-        function = f"{variable}_{prop.name}"
-        self.bindings.append(f"\n    def {function}(_widget, value=None):\n")
+        function = f"{label}_{prop.name}"
+        self.bindings.append(f"\n        def {function}(_widget, value=None):\n")
         self.bindings.extend(calls)
-        self.bindings.append(f"\n    {variable}.{_BINDERS[prop.event]}({function})\n")
+        self.bindings.append(f"\n        {variable}.{_BINDERS[prop.event]}({function})\n")
 
     # Literal props come from evaluation; anything else means an unsupported expression.
     def check_literal(self, label: str, prop: Prop, value: Any) -> None:
