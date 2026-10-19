@@ -22,8 +22,9 @@ wrote, the Python generated from that program, and the agent's callbacks.
 
 The agents need no other setup. Sign in once in a terminal, with `/login` in
 `claude` or with `codex login`. Each turn then passes its own system prompt,
-tool limits, and component skill on the command line, and uses the CLI's
-default model and your account's usage. A kernel started from a desktop app can
+tool limits, and component skill on the command line, and uses your account's
+usage. The CLI's own default model and reasoning effort apply unless you pass
+`model` or `effort`. A kernel started from a desktop app can
 have a shorter `PATH` than your shell. To check what the kernel sees, run
 `shutil.which("claude")` or `shutil.which("codex")` in a cell; `None` means the
 turn will report that the CLI was not found.
@@ -43,12 +44,26 @@ Ask for a UI in the chat, for example "Show the sales table with a region
 selector and a button that totals the selected region". Each reply can change
 the program, the callbacks, or both.
 
-| Argument    | Effect                                                                                  |
-| ----------- | --------------------------------------------------------------------------------------- |
-| `agent`     | `"claude"` or `"codex"`. A restored session keeps the agent it was created with.         |
-| `session`   | Saves the session after every turn and restores it when a workbench uses the same name. |
-| `namespace` | Names the callbacks can read and the agent sees, with data frame shapes and columns.     |
-| `cwd`       | Directory the agent runs in. Defaults to the current directory.                          |
+| Argument    | Effect                                                                                    |
+| ----------- | ----------------------------------------------------------------------------------------- |
+| `agent`     | `"claude"` or `"codex"`. A restored session keeps the agent it was created with.          |
+| `session`   | Saves the session after every turn and restores it when a workbench uses the same name.   |
+| `namespace` | Names the callbacks can read and the agent sees, with data frame shapes and column types. |
+| `cwd`       | Directory the agent runs in. Defaults to the current directory.                           |
+| `model`     | Model name passed to the CLI, such as `"sonnet"`. Saved with the session.                 |
+| `effort`    | Reasoning effort passed to the CLI, such as `"low"` or `"high"`. Saved with the session.  |
+
+`model` and `effort` apply only to the workbench's turns, not to your other CLI
+use. Claude Code receives `--model` and `--effort` (`low`, `medium`, `high`,
+`xhigh`, or `max`). Codex receives the `model` and `model_reasoning_effort`
+config values (`minimal`, `low`, `medium`, `high`, or `xhigh`). A restored
+session keeps its saved values unless you pass new ones, and the agent badge in
+the header shows them. The workbench passes the values as given, so a name the
+CLI does not know ends the turn with the CLI's error.
+
+```python
+Workbench(agent="codex", session="sales", namespace={"sales": sales}, effort="low")
+```
 
 ## Tabs
 

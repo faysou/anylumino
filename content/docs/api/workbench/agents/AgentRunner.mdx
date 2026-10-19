@@ -5,7 +5,8 @@ title: "AgentRunner"
 Run turns of one agent session, one at a time.
 
 `session_id` is the agent's own session ID once a turn has recorded it;
-later turns resume it. `stopped` is set by `stop` and stays set until the
+later turns resume it. `model` and `effort` go to the CLI's model and
+reasoning effort settings for each turn; `None` keeps the CLI's default. `stopped` is set by `stop` and stays set until the
 caller clears it for the next turn, so a stop that comes before the
 process starts still cancels the turn.
 
@@ -20,6 +21,10 @@ process starts still cancels the turn.
 
   <PyAttribute name="session_id" value="session_id" />
 
+  <PyAttribute name="model" value="model" />
+
+  <PyAttribute name="effort" value="effort" />
+
   <PyAttribute name="process" type="asyncio.subprocess.Process | None" value="None" />
 
   <PyAttribute name="stopped" value="False" />
@@ -29,10 +34,18 @@ process starts still cancels the turn.
 
 ## Functions
 
-<PyFunction name="__init__" type="(agent, cwd, name, session_id=None) -> None" kind="constructor">
+<PyFunction name="__init__" type="(agent, cwd, name, session_id=None, model=None, effort=None) -> None" kind="constructor">
   <PySourceCode>
     ```python
-    def __init__(self, agent: str, cwd: Path, name: str, session_id: str | None = None) -> None:
+    def __init__(
+        self,
+        agent: str,
+        cwd: Path,
+        name: str,
+        session_id: str | None = None,
+        model: str | None = None,
+        effort: str | None = None,
+    ) -> None:
         if agent not in AGENTS:
             raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(AGENTS)}.")
 
@@ -40,6 +53,8 @@ process starts still cancels the turn.
         self.cwd = cwd
         self.name = name
         self.session_id = session_id
+        self.model = model
+        self.effort = effort
         self.process: asyncio.subprocess.Process | None = None
         self.stopped = False
     ```
@@ -53,6 +68,10 @@ process starts still cancels the turn.
     <PyParameter name="name" type="str" />
 
     <PyParameter name="session_id" type="str | None" value="None" />
+
+    <PyParameter name="model" type="str | None" value="None" />
+
+    <PyParameter name="effort" type="str | None" value="None" />
   </div>
 
   <PyFunctionReturn type="None" />
@@ -74,10 +93,11 @@ process starts still cancels the turn.
         if self.agent == "claude":
             resume = self.session_id is not None
             session_id = self.session_id or str(uuid.uuid4())
-            argv = claude_argv(session_id, resume, self.name, system_prompt)
+            argv = claude_argv(session_id, resume, self.name, system_prompt, self.model, self.effort)
             stream: ClaudeStream | CodexStream = ClaudeStream()
         else:
-            argv = codex_argv(self.session_id, self.cwd, system_prompt, await codex_mcp_overrides(self.cwd))
+            overrides = await codex_mcp_overrides(self.cwd)
+            argv = codex_argv(self.session_id, self.cwd, system_prompt, overrides, self.model, self.effort)
             stream = CodexStream()
 
         if self.stopped:

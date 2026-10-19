@@ -58,6 +58,14 @@ class Workbench(al.SplitPanel):
     cwd : str | Path | None, default None
         Directory the agent runs in. Defaults to the current directory, or the
         directory stored with a restored session.
+    model : str | None, default None
+        The model the agent CLI runs, such as ``"sonnet"`` for Claude Code.
+        Defaults to the restored session's model, or the CLI's own default.
+    effort : str | None, default None
+        The reasoning effort: ``low``, ``medium``, ``high``, ``xhigh``, or
+        ``max`` for Claude Code, and ``minimal``, ``low``, ``medium``,
+        ``high``, or ``xhigh`` for Codex. Defaults to the restored session's
+        effort, or the CLI's own default.
     height : int | float | str | None, default 640
         CSS height of the workbench.
 
@@ -80,6 +88,8 @@ class Workbench(al.SplitPanel):
         namespace: Mapping[str, Any] | None = None,
         cwd: str | Path | None = None,
         *,
+        model: str | None = None,
+        effort: str | None = None,
         height: int | float | str | None = 640,
     ) -> None:
         saved = store.load(session) if session else None
@@ -89,9 +99,17 @@ class Workbench(al.SplitPanel):
         self.state = saved or store.SessionState(
             name=session or "", agent=agent or "claude", cwd=str(Path(cwd or os.getcwd()).resolve())
         )
+        # A restored session resumes the agent's conversation with new settings when they are given
+        self.state.model = model or self.state.model
+        self.state.effort = effort or self.state.effort
         self.namespace = dict(namespace or {})
         self.runner = AgentRunner(
-            self.state.agent, Path(self.state.cwd), self.state.name or "anylumino", self.state.agent_session_id
+            self.state.agent,
+            Path(self.state.cwd),
+            self.state.name or "anylumino",
+            self.state.agent_session_id,
+            self.state.model,
+            self.state.effort,
         )
         self.ui_code = ""
         self.last_error = ""
@@ -112,7 +130,7 @@ class Workbench(al.SplitPanel):
         )
         header = ax.Stack(
             [
-                ax.Badge(self.state.agent, variant="info"),
+                ax.Badge(" ".join(filter(None, [self.state.agent, self.state.model, self.state.effort])), variant="info"),
                 ax.Badge(self.state.name or "unsaved"),
                 self.status,
                 self.status_text,

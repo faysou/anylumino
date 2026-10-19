@@ -235,3 +235,7 @@
   data item, and to keep state in the app instead of OpenUI `$variables`, `Query`, `Mutation`, and
   `@Each`. Give each component's skill file its Python constructor. Document the Node requirement.
   Verify with pytest and a live Claude Code turn that builds one chart and one card per product.
+- [x] 14.4 Add `model` and `effort` workbench arguments, passed to Claude Code as `--model` and
+  `--effort` and to Codex as config overrides on every turn, saved with the session and shown in
+  the header. Verify with pytest and a live Codex turn that builds one chart and one card per
+  product.

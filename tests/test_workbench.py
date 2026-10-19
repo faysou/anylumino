@@ -383,6 +383,21 @@ def test_session_restore_rejects_another_agent(agent_reply, tmp_path):
         Workbench(agent="claude", session="sales")
 
 
+def test_model_and_effort_are_saved_and_can_change_on_restore(agent_reply, tmp_path):
+    agent_reply("Hello.")
+    first = Workbench(agent="codex", session="sales", cwd=tmp_path, model="gpt-5.4", effort="low")
+    first.submit("Hi")
+
+    kept = Workbench(session="sales")
+    changed = Workbench(session="sales", effort="high")
+
+    assert first.chat.messages[-1] == {"role": "assistant", "content": "Hello."}
+    assert (kept.runner.model, kept.runner.effort) == ("gpt-5.4", "low")
+    assert (changed.runner.model, changed.runner.effort) == ("gpt-5.4", "high")
+    assert changed.widgets[0].widgets[0].widgets[0].label == "codex gpt-5.4 high"
+    assert Workbench(agent="claude", cwd=tmp_path).widgets[0].widgets[0].widgets[0].label == "claude"
+
+
 def test_session_restore_with_missing_namespace_widget(agent_reply, tmp_path):
     program = 'root = VBox([chart])\nchart = Widget("fig")'
     callbacks = app_callbacks("    pass\n")

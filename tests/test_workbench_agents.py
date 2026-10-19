@@ -105,6 +105,27 @@ def test_claude_first_turn_then_resume(fake_cli, monkeypatch, tmp_path):
     assert runner.session_id == CLAUDE_SESSION
 
 
+def test_claude_model_and_effort_reach_every_turn(fake_cli, monkeypatch, tmp_path):
+    runner = AgentRunner("claude", tmp_path, "sales", model="sonnet", effort="low")
+    monkeypatch.setenv("FAKE_STREAM", str(FIXTURES / "claude" / "first.jsonl"))
+    run_turn(runner, "Hi")
+    monkeypatch.setenv("FAKE_STREAM", str(FIXTURES / "claude" / "resume.jsonl"))
+    run_turn(runner, "Again")
+
+    assert [call["argv"][-4:] for call in fake_cli()] == [["--model", "sonnet", "--effort", "low"]] * 2
+
+
+def test_codex_model_and_effort_reach_every_turn(fake_cli, monkeypatch, tmp_path):
+    runner = AgentRunner("codex", tmp_path, "sales", model="gpt-5.4", effort="minimal")
+    monkeypatch.setenv("FAKE_STREAM", str(FIXTURES / "codex" / "first.jsonl"))
+    run_turn(runner, "Hi")
+    monkeypatch.setenv("FAKE_STREAM", str(FIXTURES / "codex" / "resume.jsonl"))
+    run_turn(runner, "Again")
+
+    settings = ["-c", 'model="gpt-5.4"', "-c", 'model_reasoning_effort="minimal"', "-"]
+    assert [call["argv"][-5:] for call in fake_cli()] == [settings] * 2
+
+
 def test_codex_first_turn_then_resume(fake_cli, monkeypatch, tmp_path):
     runner = AgentRunner("codex", tmp_path, "sales")
     monkeypatch.setenv("FAKE_MCP", MCP_SERVERS)

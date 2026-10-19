@@ -16,7 +16,7 @@ Build notebook UIs by chatting with a local coding agent.
 
   <PyAttribute name="namespace" value="dict(namespace or {})" />
 
-  <PyAttribute name="runner" value="AgentRunner(self.state.agent, Path(self.state.cwd), self.state.name or 'anylumino', self.state.agent_session_id)" />
+  <PyAttribute name="runner" value="AgentRunner(self.state.agent, Path(self.state.cwd), self.state.name or 'anylumino', self.state.agent_session_id, self.state.model, self.state.effort)" />
 
   <PyAttribute name="ui_code" value="''" />
 
@@ -47,7 +47,7 @@ Build notebook UIs by chatting with a local coding agent.
 
 ## Functions
 
-<PyFunction name="__init__" type="(agent=None, session=None, namespace=None, cwd=None, *, height=640) -> None" kind="constructor">
+<PyFunction name="__init__" type="(agent=None, session=None, namespace=None, cwd=None, *, model=None, effort=None, height=640) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -57,6 +57,8 @@ Build notebook UIs by chatting with a local coding agent.
         namespace: Mapping[str, Any] | None = None,
         cwd: str | Path | None = None,
         *,
+        model: str | None = None,
+        effort: str | None = None,
         height: int | float | str | None = 640,
     ) -> None:
         saved = store.load(session) if session else None
@@ -66,9 +68,17 @@ Build notebook UIs by chatting with a local coding agent.
         self.state = saved or store.SessionState(
             name=session or "", agent=agent or "claude", cwd=str(Path(cwd or os.getcwd()).resolve())
         )
+        # A restored session resumes the agent's conversation with new settings when they are given
+        self.state.model = model or self.state.model
+        self.state.effort = effort or self.state.effort
         self.namespace = dict(namespace or {})
         self.runner = AgentRunner(
-            self.state.agent, Path(self.state.cwd), self.state.name or "anylumino", self.state.agent_session_id
+            self.state.agent,
+            Path(self.state.cwd),
+            self.state.name or "anylumino",
+            self.state.agent_session_id,
+            self.state.model,
+            self.state.effort,
         )
         self.ui_code = ""
         self.last_error = ""
@@ -89,7 +99,7 @@ Build notebook UIs by chatting with a local coding agent.
         )
         header = ax.Stack(
             [
-                ax.Badge(self.state.agent, variant="info"),
+                ax.Badge(" ".join(filter(None, [self.state.agent, self.state.model, self.state.effort])), variant="info"),
                 ax.Badge(self.state.name or "unsaved"),
                 self.status,
                 self.status_text,
@@ -147,6 +157,18 @@ Build notebook UIs by chatting with a local coding agent.
     <PyParameter name="cwd" type="str | Path | None" value="None">
       Directory the agent runs in. Defaults to the current directory, or the
       directory stored with a restored session.
+    </PyParameter>
+
+    <PyParameter name="model" type="str | None" value="None">
+      The model the agent CLI runs, such as `"sonnet"` for Claude Code.
+      Defaults to the restored session's model, or the CLI's own default.
+    </PyParameter>
+
+    <PyParameter name="effort" type="str | None" value="None">
+      The reasoning effort: `low`, `medium`, `high`, `xhigh`, or
+      `max` for Claude Code, and `minimal`, `low`, `medium`,
+      `high`, or `xhigh` for Codex. Defaults to the restored session's
+      effort, or the CLI's own default.
     </PyParameter>
 
     <PyParameter name="height" type="int | float | str | None" value="640">

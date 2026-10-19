@@ -22,6 +22,8 @@ class SessionState:
     agent: str
     cwd: str
     agent_session_id: str | None = None
+    model: str | None = None
+    effort: str | None = None
     messages: list[dict[str, Any]] = field(default_factory=list)
     program: str = ""
     callbacks: str = ""

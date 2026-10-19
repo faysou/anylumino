@@ -158,8 +158,11 @@ def _target(fields: dict[str, Any]) -> str:
     return ""
 
 
-def claude_argv(session_id: str, resume: bool, name: str, system_prompt: str) -> list[str]:
+def claude_argv(
+    session_id: str, resume: bool, name: str, system_prompt: str, model: str | None = None, effort: str | None = None
+) -> list[str]:
     session = ["--resume", session_id] if resume else ["--session-id", session_id, "-n", name]
+    settings = [*(["--model", model] if model else []), *(["--effort", effort] if effort else [])]
 
     return [
         "claude",
@@ -180,11 +183,22 @@ def claude_argv(session_id: str, resume: bool, name: str, system_prompt: str) ->
         CLAUDE_TOOLS,
         "--permission-mode",
         "dontAsk",
+        *settings,
     ]
 
 
-def codex_argv(session_id: str | None, cwd: Path, system_prompt: str, mcp_overrides: list[str]) -> list[str]:
-    disabled = [part for override in mcp_overrides for part in ("-c", override)]
+def codex_argv(
+    session_id: str | None,
+    cwd: Path,
+    system_prompt: str,
+    mcp_overrides: list[str],
+    model: str | None = None,
+    effort: str | None = None,
+) -> list[str]:
+    # Config overrides rather than `-m`, since they apply the same way to a resumed thread
+    settings = {"model": model, "model_reasoning_effort": effort}
+    overrides = [*mcp_overrides, *(f"{key}={json.dumps(value)}" for key, value in settings.items() if value)]
+    disabled = [part for override in overrides for part in ("-c", override)]
     if session_id:
         return [
             "codex",
@@ -257,12 +271,21 @@ class AgentRunner:
     """Run turns of one agent session, one at a time.
 
     ``session_id`` is the agent's own session ID once a turn has recorded it;
-    later turns resume it. ``stopped`` is set by `stop` and stays set until the
+    later turns resume it. ``model`` and ``effort`` go to the CLI's model and
+    reasoning effort settings for each turn; `None` keeps the CLI's default. ``stopped`` is set by `stop` and stays set until the
     caller clears it for the next turn, so a stop that comes before the
     process starts still cancels the turn.
     """
 
-    def __init__(self, agent: str, cwd: Path, name: str, session_id: str | None = None) -> None:
+    def __init__(
+        self,
+        agent: str,
+        cwd: Path,
+        name: str,
+        session_id: str | None = None,
+        model: str | None = None,
+        effort: str | None = None,
+    ) -> None:
         if agent not in AGENTS:
             raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(AGENTS)}.")
 
@@ -270,6 +293,8 @@ class AgentRunner:
         self.cwd = cwd
         self.name = name
         self.session_id = session_id
+        self.model = model
+        self.effort = effort
         self.process: asyncio.subprocess.Process | None = None
         self.stopped = False
 
@@ -288,10 +313,11 @@ class AgentRunner:
         if self.agent == "claude":
             resume = self.session_id is not None
             session_id = self.session_id or str(uuid.uuid4())
-            argv = claude_argv(session_id, resume, self.name, system_prompt)
+            argv = claude_argv(session_id, resume, self.name, system_prompt, self.model, self.effort)
             stream: ClaudeStream | CodexStream = ClaudeStream()
         else:
-            argv = codex_argv(self.session_id, self.cwd, system_prompt, await codex_mcp_overrides(self.cwd))
+            overrides = await codex_mcp_overrides(self.cwd)
+            argv = codex_argv(self.session_id, self.cwd, system_prompt, overrides, self.model, self.effort)
             stream = CodexStream()
 
         if self.stopped:

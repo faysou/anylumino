@@ -38,11 +38,14 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
   </Tab>
 
   <Tab value="Functions">
-    <PyFunction name="claude_argv" type="(session_id, resume, name, system_prompt) -> list[str]">
+    <PyFunction name="claude_argv" type="(session_id, resume, name, system_prompt, model=None, effort=None) -> list[str]">
       <PySourceCode>
         ```python
-        def claude_argv(session_id: str, resume: bool, name: str, system_prompt: str) -> list[str]:
+        def claude_argv(
+            session_id: str, resume: bool, name: str, system_prompt: str, model: str | None = None, effort: str | None = None
+        ) -> list[str]:
             session = ["--resume", session_id] if resume else ["--session-id", session_id, "-n", name]
+            settings = [*(["--model", model] if model else []), *(["--effort", effort] if effort else [])]
 
             return [
                 "claude",
@@ -63,6 +66,7 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
                 CLAUDE_TOOLS,
                 "--permission-mode",
                 "dontAsk",
+                *settings,
             ]
         ```
       </PySourceCode>
@@ -75,16 +79,30 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
         <PyParameter name="name" type="str" />
 
         <PyParameter name="system_prompt" type="str" />
+
+        <PyParameter name="model" type="str | None" value="None" />
+
+        <PyParameter name="effort" type="str | None" value="None" />
       </div>
 
       <PyFunctionReturn type="list[str]" />
     </PyFunction>
 
-    <PyFunction name="codex_argv" type="(session_id, cwd, system_prompt, mcp_overrides) -> list[str]">
+    <PyFunction name="codex_argv" type="(session_id, cwd, system_prompt, mcp_overrides, model=None, effort=None) -> list[str]">
       <PySourceCode>
         ```python
-        def codex_argv(session_id: str | None, cwd: Path, system_prompt: str, mcp_overrides: list[str]) -> list[str]:
-            disabled = [part for override in mcp_overrides for part in ("-c", override)]
+        def codex_argv(
+            session_id: str | None,
+            cwd: Path,
+            system_prompt: str,
+            mcp_overrides: list[str],
+            model: str | None = None,
+            effort: str | None = None,
+        ) -> list[str]:
+            # Config overrides rather than `-m`, since they apply the same way to a resumed thread
+            settings = {"model": model, "model_reasoning_effort": effort}
+            overrides = [*mcp_overrides, *(f"{key}={json.dumps(value)}" for key, value in settings.items() if value)]
+            disabled = [part for override in overrides for part in ("-c", override)]
             if session_id:
                 return [
                     "codex",
@@ -124,6 +142,10 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
         <PyParameter name="system_prompt" type="str" />
 
         <PyParameter name="mcp_overrides" type="list[str]" />
+
+        <PyParameter name="model" type="str | None" value="None" />
+
+        <PyParameter name="effort" type="str | None" value="None" />
       </div>
 
       <PyFunctionReturn type="list[str]" />
