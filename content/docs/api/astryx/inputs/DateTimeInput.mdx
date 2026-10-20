@@ -69,12 +69,13 @@ Render an Astryx date-time input.
         min: str | None = None,
         max: str | None = None,
         seconds: bool | None = None,
-        hour_format: str | None = None,
+        hour_format: HourFormat | str | None = None,
         time_increment: int | None = None,
         clear: bool | None = None,
         number_of_months: int | None = None,
         **props: Any,
     ) -> None:
+        hour_format = optional_choice(hour_format, HourFormat, "hour_format")
         super().__init__(
             "DateTimeInput",
             label=label,
@@ -119,7 +120,7 @@ Render an Astryx date-time input.
       Whether to include seconds.
     </PyParameter>
 
-    <PyParameter name="hour_format" type="str | None" value="None">
+    <PyParameter name="hour_format" type="HourFormat | str | None" value="None">
       Twelve- or twenty-four-hour display format.
     </PyParameter>
 

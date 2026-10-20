@@ -40,9 +40,10 @@ Render a table-of-contents outline.
         *,
         active_id: str = "",
         label: str = "Table of contents",
-        density: str = "compact",
+        density: CompactDensity | str = "compact",
         **props: Any,
     ) -> None:
+        density = choice(density, CompactDensity, "density")
         super().__init__(
             "Outline",
             label=label,
@@ -70,7 +71,7 @@ Render a table-of-contents outline.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="density" type="str" value="'compact'">
+    <PyParameter name="density" type="CompactDensity | str" value="'compact'">
       Astryx density or spacing mode.
     </PyParameter>
 

@@ -41,11 +41,13 @@ Render an Astryx button group from item records.
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
         | None = None,
-        orientation: str | None = None,
-        size: str | None = None,
+        orientation: Orientation | str | None = None,
+        size: Size | str | None = None,
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "ButtonGroup",
             label=label,
@@ -80,11 +82,11 @@ Render an Astryx button group from item records.
       Python callbacks receiving the selected item value.
     </PyParameter>
 
-    <PyParameter name="orientation" type="str | None" value="None">
+    <PyParameter name="orientation" type="Orientation | str | None" value="None">
       Horizontal or vertical group orientation.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Default child button size.
     </PyParameter>
 

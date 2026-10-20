@@ -57,12 +57,12 @@ Render a single-line Astryx text input.
         value: str = "",
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         placeholder: str = "",
         disabled: bool = False,
-        input_type: str | None = None,
-        size: str | None = None,
+        input_type: InputType | str | None = None,
+        size: Size | str | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
         optional: bool | None = None,
@@ -74,6 +74,9 @@ Render a single-line Astryx text input.
         select_on_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        label_position = choice(label_position, LabelPosition, "label_position")
+        input_type = optional_choice(input_type, InputType, "input_type")
         super().__init__(
             "TextInput",
             label=label,
@@ -109,7 +112,7 @@ Render a single-line Astryx text input.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="label_position" type="str" value="'top'">
+    <PyParameter name="label_position" type="LabelPosition | str" value="'top'">
       Place the label above the control or beside it in a compact row.
     </PyParameter>
 
@@ -125,11 +128,11 @@ Render a single-line Astryx text input.
       Whether the component should render disabled.
     </PyParameter>
 
-    <PyParameter name="input_type" type="str | None" value="None">
+    <PyParameter name="input_type" type="InputType | str | None" value="None">
       HTML text input type.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Input size.
     </PyParameter>
 

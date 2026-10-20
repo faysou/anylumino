@@ -37,7 +37,7 @@ Render an Astryx card container.
         self,
         children: ChildInput = None,
         *,
-        variant: str = "default",
+        variant: CardVariant | str = "default",
         padding: int | float | None = None,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
@@ -45,6 +45,7 @@ Render an Astryx card container.
         min_height: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, CardVariant, "variant")
         super().__init__(
             "Card",
             children,
@@ -69,7 +70,7 @@ Render an Astryx card container.
       Child widget, sequence of widgets, or mapping of slot names to widgets.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'default'">
+    <PyParameter name="variant" type="CardVariant | str" value="'default'">
       Astryx visual variant.
     </PyParameter>
 

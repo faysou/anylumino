@@ -44,15 +44,17 @@ Render an Astryx banner for prominent status messages.
         self,
         title: str,
         *,
-        status: str = "info",
+        status: BannerStatus | str = "info",
         description: str = "",
         dismissable: bool | None = None,
-        container: str | None = None,
+        container: Container | str | None = None,
         expanded: bool | None = None,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
         | None = None,
         **props: Any,
     ) -> None:
+        status = choice(status, BannerStatus, "status")
+        container = optional_choice(container, Container, "container")
         super().__init__(
             "Banner",
             label=title,
@@ -75,7 +77,7 @@ Render an Astryx banner for prominent status messages.
       Dialog or empty-state title.
     </PyParameter>
 
-    <PyParameter name="status" type="str" value="'info'">
+    <PyParameter name="status" type="BannerStatus | str" value="'info'">
       Validation or status record displayed by Astryx.
     </PyParameter>
 
@@ -87,7 +89,7 @@ Render an Astryx banner for prominent status messages.
       Whether the user can dismiss the banner.
     </PyParameter>
 
-    <PyParameter name="container" type="str | None" value="None">
+    <PyParameter name="container" type="Container | str | None" value="None">
       Card or section container presentation.
     </PyParameter>
 

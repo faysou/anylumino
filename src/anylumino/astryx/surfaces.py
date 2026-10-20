@@ -7,6 +7,8 @@ from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Mapping
 from typing import Any
+from anylumino.enums import choice
+from anylumino.enums import optional_choice
 
 from ..components import ComponentWidget
 from ..layout import ChildInput
@@ -15,7 +17,35 @@ from .base import _clean_value
 from .base import _named_props
 from .base import _option_records
 from .base import _search_records
-
+from .enums import Align
+from .enums import Axis
+from .enums import BreadcrumbsVariant
+from .enums import CalendarMode
+from .enums import CardVariant
+from .enums import CitationStyle
+from .enums import ClickableCardVariant
+from .enums import CompactDensity
+from .enums import CompactSize
+from .enums import Density
+from .enums import DialogPurpose
+from .enums import DialogVariant
+from .enums import DividerVariant
+from .enums import FieldStatusType
+from .enums import FileInputMode
+from .enums import FormDirection
+from .enums import ItemLayout
+from .enums import Justify
+from .enums import LayerAlignment
+from .enums import LayerPlacement
+from .enums import ListStyle
+from .enums import Orientation
+from .enums import OverlayPosition
+from .enums import OverlayTrigger
+from .enums import SectionVariant
+from .enums import SelectionMode
+from .enums import Size
+from .enums import StatusPlacement
+from .enums import Wrap
 
 _GRID_REPEAT_COLUMNS = re.compile(
     r"^\s*repeat\(\s*auto-(?P<repeat>fit|fill)\s*,\s*minmax\(\s*(?P<min_width>\d+(?:\.\d+)?)px\s*,\s*1fr\s*\)\s*\)\s*$"
@@ -88,13 +118,13 @@ class Stack(Widget):
     ----------
     children : ChildInput
         Child widget, sequence of widgets, or mapping of slot names to widgets.
-    direction : str, default 'vertical'
+    direction : Orientation | str, default 'vertical'
         Layout direction.
     gap : int | float, default 2
         Astryx spacing step between children.
-    align : {'start', 'center', 'end', 'stretch'}, optional
+    align : Align | str, optional
         Cross-axis alignment.
-    justify : {'start', 'center', 'end', 'between', 'around', 'evenly'}, optional
+    justify : Justify | str, optional
         Main-axis alignment.
     width : int | float | str | None, default None
         Container width.
@@ -102,7 +132,7 @@ class Stack(Widget):
         Container height.
     padding : int | float | None, default None
         Inner padding using the Astryx spacing scale.
-    wrap : str | None, default None
+    wrap : Wrap | str | None, default None
         Stack wrapping behavior.
     scrollable : bool | None, default None
         Whether overflow should scroll.
@@ -155,17 +185,21 @@ class Stack(Widget):
         self,
         children: ChildInput = None,
         *,
-        direction: str = "vertical",
+        direction: Orientation | str = "vertical",
         gap: int | float = 2,
-        align: str | None = None,
-        justify: str | None = None,
+        align: Align | str | None = None,
+        justify: Justify | str | None = None,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         padding: int | float | None = None,
-        wrap: str | None = None,
+        wrap: Wrap | str | None = None,
         scrollable: bool | None = None,
         **props: Any,
     ) -> None:
+        wrap = optional_choice(wrap, Wrap, "wrap")
+        justify = optional_choice(justify, Justify, "justify")
+        direction = choice(direction, Orientation, "direction")
+        align = optional_choice(align, Align, "align")
         super().__init__(
             "Stack",
             children,
@@ -398,7 +432,7 @@ class Center(Widget):
     ----------
     children : ChildInput
         Child widget, sequence of widgets, or mapping of slot names to widgets.
-    axis : str, default 'both'
+    axis : Axis | str, default 'both'
         Axis used for centering child content.
     width : int | float | str | None, default None
         Container width.
@@ -434,12 +468,13 @@ class Center(Widget):
         self,
         children: ChildInput = None,
         *,
-        axis: str = "both",
+        axis: Axis | str = "both",
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         inline: bool | None = None,
         **props: Any,
     ) -> None:
+        axis = choice(axis, Axis, "axis")
         super().__init__(
             "Center",
             children,
@@ -496,16 +531,16 @@ class Overlay(Widget):
         Base widget displayed beneath the overlay.
     content : str | ChildInput
         Text or widget rendered inside the overlay scrim.
-    show_on : str, default 'always'
+    show_on : OverlayTrigger | str, default 'always'
         Visibility trigger: ``"always"``, ``"hover"``, ``"focus"``, or
         ``"hover-or-focus"``.
     open : bool | None, default None
         Optional visibility override. When omitted, ``show_on`` controls visibility.
     scrim : str | bool, default 'dark'
         Dark or light scrim, or ``False`` for no scrim.
-    position : str, default 'fill'
+    position : OverlayPosition | str, default 'fill'
         Overlay placement: ``"fill"``, ``"bottom"``, or ``"top"``.
-    align : str, default 'end'
+    align : LayerAlignment | str, default 'end'
         Content alignment: ``"start"``, ``"center"``, or ``"end"``.
     **props : Any
         Additional JSON-safe Overlay props forwarded to Astryx.
@@ -524,13 +559,16 @@ class Overlay(Widget):
         children: ChildInput,
         content: str | ChildInput,
         *,
-        show_on: str = "always",
+        show_on: OverlayTrigger | str = "always",
         open: bool | None = None,
         scrim: str | bool = "dark",
-        position: str = "fill",
-        align: str = "end",
+        position: OverlayPosition | str = "fill",
+        align: LayerAlignment | str = "end",
         **props: Any,
     ) -> None:
+        show_on = choice(show_on, OverlayTrigger, "show_on")
+        position = choice(position, OverlayPosition, "position")
+        align = choice(align, LayerAlignment, "align")
         slots = {"base": children}
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
@@ -559,7 +597,7 @@ class Card(Widget):
     ----------
     children : ChildInput
         Child widget, sequence of widgets, or mapping of slot names to widgets.
-    variant : str, default 'default'
+    variant : CardVariant | str, default 'default'
         Astryx visual variant.
     padding : int | float | None, default None
         Inner padding using the Astryx spacing scale.
@@ -603,7 +641,7 @@ class Card(Widget):
         self,
         children: ChildInput = None,
         *,
-        variant: str = "default",
+        variant: CardVariant | str = "default",
         padding: int | float | None = None,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
@@ -611,6 +649,7 @@ class Card(Widget):
         min_height: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, CardVariant, "variant")
         super().__init__(
             "Card",
             children,
@@ -638,7 +677,7 @@ class ClickableCard(Widget):
         Child widget, sequence of widgets, or mapping of slot names to widgets.
     label : str
         Visible or accessible label for the component.
-    variant : str, default 'default'
+    variant : ClickableCardVariant | str, default 'default'
         Astryx visual variant.
     disabled : bool, default False
         Whether the card is disabled.
@@ -692,7 +731,7 @@ class ClickableCard(Widget):
         children: ChildInput = None,
         *,
         label: str,
-        variant: str = "default",
+        variant: ClickableCardVariant | str = "default",
         disabled: bool = False,
         href: str | None = None,
         target: str | None = None,
@@ -703,6 +742,7 @@ class ClickableCard(Widget):
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, ClickableCardVariant, "variant")
         super().__init__(
             "ClickableCard",
             children,
@@ -736,7 +776,7 @@ class SelectableCard(Widget):
         Synchronized component value.
     label : str
         Visible or accessible label for the component.
-    variant : str, default 'default'
+    variant : ClickableCardVariant | str, default 'default'
         Astryx visual variant.
     disabled : bool, default False
         Whether the card is disabled.
@@ -784,7 +824,7 @@ class SelectableCard(Widget):
         value: bool = False,
         *,
         label: str,
-        variant: str = "default",
+        variant: ClickableCardVariant | str = "default",
         disabled: bool = False,
         padding: int | float | None = None,
         width: int | float | str | None = None,
@@ -792,6 +832,7 @@ class SelectableCard(Widget):
         max_width: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, ClickableCardVariant, "variant")
         super().__init__(
             "SelectableCard",
             children,
@@ -819,7 +860,7 @@ class Section(Widget):
     ----------
     children : ChildInput
         Child widget, sequence of widgets, or mapping of slot names to widgets.
-    variant : str, default 'section'
+    variant : SectionVariant | str, default 'section'
         Astryx visual variant.
     padding : int | float | None, default None
         Inner padding using the Astryx spacing scale.
@@ -872,7 +913,7 @@ class Section(Widget):
         self,
         children: ChildInput = None,
         *,
-        variant: str = "section",
+        variant: SectionVariant | str = "section",
         padding: int | float | None = None,
         padding_block: int | float | None = None,
         dividers: Iterable[str] | None = None,
@@ -881,6 +922,7 @@ class Section(Widget):
         max_width: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, SectionVariant, "variant")
         super().__init__(
             "Section",
             children,
@@ -905,9 +947,9 @@ class Divider(Widget):
 
     Parameters
     ----------
-    orientation : str, default 'horizontal'
+    orientation : Orientation | str, default 'horizontal'
         Astryx component option.
-    variant : str, default 'subtle'
+    variant : DividerVariant | str, default 'subtle'
         Astryx visual variant.
     label : str | None, default None
         Optional text centered on the divider.
@@ -939,12 +981,14 @@ class Divider(Widget):
     def __init__(
         self,
         *,
-        orientation: str = "horizontal",
-        variant: str = "subtle",
+        orientation: Orientation | str = "horizontal",
+        variant: DividerVariant | str = "subtle",
         label: str | None = None,
         full_bleed: bool | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, DividerVariant, "variant")
+        orientation = choice(orientation, Orientation, "orientation")
         super().__init__(
             "Divider",
             variant=variant,
@@ -967,11 +1011,11 @@ class List(Widget):
         Item records used by generated child components or static search sources.
     header : str, default ''
         Optional header text or content.
-    density : str | None, default None
+    density : Density | str | None, default None
         Item spacing density.
     dividers : bool | None, default None
         Whether to show dividers between items.
-    list_style : str | None, default None
+    list_style : ListStyle | str | None, default None
         List marker style.
     start : int | None, default None
         Starting number for ordered lists.
@@ -1007,12 +1051,14 @@ class List(Widget):
         items: Iterable[Any],
         *,
         header: str = "",
-        density: str | None = None,
+        density: Density | str | None = None,
         dividers: bool | None = None,
-        list_style: str | None = None,
+        list_style: ListStyle | str | None = None,
         start: int | None = None,
         **props: Any,
     ) -> None:
+        list_style = optional_choice(list_style, ListStyle, "list_style")
+        density = optional_choice(density, Density, "density")
         super().__init__(
             "List",
             props=_named_props(
@@ -1040,7 +1086,7 @@ class MetadataList(Widget):
         Label position and width configuration.
     max_items : int | None, default None
         Maximum visible items before the expansion control.
-    orientation : str | None, default None
+    orientation : Orientation | str | None, default None
         Vertical or horizontal layout.
     title : str | None, default None
         Optional title above the metadata.
@@ -1080,10 +1126,11 @@ class MetadataList(Widget):
         columns: str | int | None = None,
         label: Mapping[str, Any] | None = None,
         max_items: int | None = None,
-        orientation: str | None = None,
+        orientation: Orientation | str | None = None,
         title: str | None = None,
         **props: Any,
     ) -> None:
+        orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "MetadataList",
             props=_named_props(
@@ -1107,7 +1154,7 @@ class Breadcrumbs(Widget):
         Item records used by generated child components or static search sources.
     separator : str | None, default None
         Separator text between breadcrumb items.
-    variant : str | None, default None
+    variant : BreadcrumbsVariant | str | None, default None
         Default or supporting visual treatment.
     label : str | None, default None
         Accessible navigation label.
@@ -1141,10 +1188,11 @@ class Breadcrumbs(Widget):
         items: Iterable[Any],
         *,
         separator: str | None = None,
-        variant: str | None = None,
+        variant: BreadcrumbsVariant | str | None = None,
         label: str | None = None,
         **props: Any,
     ) -> None:
+        variant = optional_choice(variant, BreadcrumbsVariant, "variant")
         super().__init__(
             "Breadcrumbs",
             props=_named_props(
@@ -1166,13 +1214,13 @@ class TabList(Widget):
         Item records used by generated child components or static search sources.
     value : str
         Synchronized component value.
-    size : str | None, default None
+    size : Size | str | None, default None
         Tab size.
-    layout : str | None, default None
+    layout : ItemLayout | str | None, default None
         Hug or fill tab layout.
     divider : bool | None, default None
         Whether to show the tab-list divider.
-    orientation : str | None, default None
+    orientation : Orientation | str | None, default None
         Horizontal or vertical tab orientation.
     **props : Any
         JSON-safe TabList props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1209,12 +1257,15 @@ class TabList(Widget):
         items: Iterable[Any],
         value: str,
         *,
-        size: str | None = None,
-        layout: str | None = None,
+        size: Size | str | None = None,
+        layout: ItemLayout | str | None = None,
         divider: bool | None = None,
-        orientation: str | None = None,
+        orientation: Orientation | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        orientation = optional_choice(orientation, Orientation, "orientation")
+        layout = optional_choice(layout, ItemLayout, "layout")
         super().__init__(
             "TabList",
             value=value,
@@ -1240,9 +1291,9 @@ class SegmentedControl(Widget):
         Synchronized component value.
     label : str
         Visible or accessible label for the component.
-    size : str | None, default None
+    size : Size | str | None, default None
         Control size.
-    layout : str | None, default None
+    layout : ItemLayout | str | None, default None
         Hug or fill segment layout.
     disabled : bool, default False
         Whether the entire control is disabled.
@@ -1280,11 +1331,13 @@ class SegmentedControl(Widget):
         value: str,
         *,
         label: str,
-        size: str | None = None,
-        layout: str | None = None,
+        size: Size | str | None = None,
+        layout: ItemLayout | str | None = None,
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        layout = optional_choice(layout, ItemLayout, "layout")
         super().__init__(
             "SegmentedControl",
             label=label,
@@ -1307,11 +1360,11 @@ class RadioList(Widget):
         Synchronized component value.
     label : str
         Visible or accessible label for the component.
-    orientation : str | None, default None
+    orientation : Orientation | str | None, default None
         Vertical or horizontal item layout.
     disabled : bool, default False
         Whether all radio items are disabled.
-    size : str | None, default None
+    size : CompactSize | str | None, default None
         Radio control size.
     label_hidden : bool | None, default None
         Whether to visually hide the accessible label.
@@ -1359,14 +1412,16 @@ class RadioList(Widget):
         value: str,
         *,
         label: str,
-        orientation: str | None = None,
+        orientation: Orientation | str | None = None,
         disabled: bool = False,
-        size: str | None = None,
+        size: CompactSize | str | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, CompactSize, "size")
+        orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "RadioList",
             label=label,
@@ -1395,7 +1450,7 @@ class CheckboxList(Widget):
         Synchronized component value.
     label : str
         Visible or accessible label for the component.
-    density : str | None, default None
+    density : Density | str | None, default None
         Item spacing density.
     dividers : bool | None, default None
         Whether to show item dividers.
@@ -1446,7 +1501,7 @@ class CheckboxList(Widget):
         value: Iterable[str] = (),
         *,
         label: str,
-        density: str | None = None,
+        density: Density | str | None = None,
         dividers: bool | None = None,
         disabled: bool = False,
         label_hidden: bool | None = None,
@@ -1454,6 +1509,7 @@ class CheckboxList(Widget):
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        density = optional_choice(density, Density, "density")
         super().__init__(
             "CheckboxList",
             label=label,
@@ -1484,9 +1540,9 @@ class ButtonGroup(Widget):
         Python callbacks invoked for frontend activations.
     action_callbacks : Iterable[Callable[[ComponentWidget, Any], None]] | None
         Python callbacks receiving the selected item value.
-    orientation : str | None, default None
+    orientation : Orientation | str | None, default None
         Horizontal or vertical group orientation.
-    size : str | None, default None
+    size : Size | str | None, default None
         Default child button size.
     disabled : bool, default False
         Whether all buttons are disabled.
@@ -1526,11 +1582,13 @@ class ButtonGroup(Widget):
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
         | None = None,
-        orientation: str | None = None,
-        size: str | None = None,
+        orientation: Orientation | str | None = None,
+        size: Size | str | None = None,
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "ButtonGroup",
             label=label,
@@ -1559,7 +1617,7 @@ class ToggleButtonGroup(Widget):
         Selected value for single selection, or selected values for multiple selection.
     label : str
         Accessible label for the group.
-    selection_mode : str, default 'single'
+    selection_mode : SelectionMode | str, default 'single'
         ``"single"`` for exclusive selection or ``"multiple"`` for
         independent selections.
     orientation : str, default 'horizontal'
@@ -1586,12 +1644,13 @@ class ToggleButtonGroup(Widget):
         value: str | Iterable[str] | None = None,
         *,
         label: str,
-        selection_mode: str = "single",
+        selection_mode: SelectionMode | str = "single",
         orientation: str = "horizontal",
         size: str | None = None,
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        selection_mode = choice(selection_mode, SelectionMode, "selection_mode")
         if selection_mode not in {"single", "multiple"}:
             msg = "selection_mode must be 'single' or 'multiple'"
             raise ValueError(msg)
@@ -1722,7 +1781,7 @@ class Citation(Widget):
         Citation source metadata.
     number : int, default 1
         Citation number.
-    variant : str, default 'number'
+    variant : CitationStyle | str, default 'number'
         Astryx visual variant.
     **props : Any
         JSON-safe Citation props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1747,9 +1806,10 @@ class Citation(Widget):
         source: Mapping[str, Any],
         *,
         number: int = 1,
-        variant: str = "number",
+        variant: CitationStyle | str = "number",
         **props: Any,
     ) -> None:
+        variant = choice(variant, CitationStyle, "variant")
         super().__init__(
             "Citation",
             value=number,
@@ -1786,7 +1846,7 @@ class Field(Widget):
         Whether to mark the field optional.
     required : bool | None, default None
         Whether to mark the field required.
-    status_variant : str | None, default None
+    status_variant : StatusPlacement | str | None, default None
         Attached or detached status presentation.
     width : int | float | str | None, default None
         Width of the complete field.
@@ -1848,10 +1908,11 @@ class Field(Widget):
         label_hidden: bool | None = None,
         optional: bool | None = None,
         required: bool | None = None,
-        status_variant: str | None = None,
+        status_variant: StatusPlacement | str | None = None,
         width: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        status_variant = optional_choice(status_variant, StatusPlacement, "status_variant")
         super().__init__(
             "Field",
             children,
@@ -1880,9 +1941,9 @@ class FieldStatus(Widget):
     ----------
     message : str
         Astryx component option.
-    type : str, default 'success'
+    type : FieldStatusType | str, default 'success'
         Astryx component option.
-    variant : str, default 'detached'
+    variant : StatusPlacement | str, default 'detached'
         Astryx visual variant.
     **props : Any
         JSON-safe FieldStatus props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1906,10 +1967,12 @@ class FieldStatus(Widget):
         self,
         message: str,
         *,
-        type: str = "success",
-        variant: str = "detached",
+        type: FieldStatusType | str = "success",
+        variant: StatusPlacement | str = "detached",
         **props: Any,
     ) -> None:
+        variant = choice(variant, StatusPlacement, "variant")
+        type = choice(type, FieldStatusType, "type")
         super().__init__(
             "FieldStatus",
             label=message,
@@ -1925,7 +1988,7 @@ class FormLayout(Widget):
     ----------
     children : ChildInput
         Child widget, sequence of widgets, or mapping of slot names to widgets.
-    direction : str, default 'vertical'
+    direction : FormDirection | str, default 'vertical'
         Layout direction.
     **props : Any
         JSON-safe FormLayout props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1953,8 +2016,9 @@ class FormLayout(Widget):
     """
 
     def __init__(
-        self, children: ChildInput = None, *, direction: str = "vertical", **props: Any
+        self, children: ChildInput = None, *, direction: FormDirection | str = "vertical", **props: Any
     ) -> None:
+        direction = choice(direction, FormDirection, "direction")
         super().__init__(
             "FormLayout", children, props={"direction": direction, **props}
         )
@@ -1983,7 +2047,7 @@ class InputGroup(Widget):
         Whether to mark the group optional.
     required : bool | None, default None
         Whether to mark the group required.
-    size : str | None, default None
+    size : Size | str | None, default None
         Default child input size.
     status : Mapping[str, Any] | None, default None
         Validation status record.
@@ -2028,10 +2092,11 @@ class InputGroup(Widget):
         description: str | None = None,
         optional: bool | None = None,
         required: bool | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "InputGroup",
             children,
@@ -2122,7 +2187,7 @@ class Outline(Widget):
         Currently active outline item id.
     label : str, default 'Table of contents'
         Visible or accessible label for the component.
-    density : str, default 'compact'
+    density : CompactDensity | str, default 'compact'
         Astryx density or spacing mode.
     **props : Any
         JSON-safe Outline props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -2159,9 +2224,10 @@ class Outline(Widget):
         *,
         active_id: str = "",
         label: str = "Table of contents",
-        density: str = "compact",
+        density: CompactDensity | str = "compact",
         **props: Any,
     ) -> None:
+        density = choice(density, CompactDensity, "density")
         super().__init__(
             "Outline",
             label=label,
@@ -2184,7 +2250,7 @@ class TreeList(Widget):
         Item records used by generated child components or static search sources.
     header : str, default ''
         Optional header text or content.
-    density : str, default 'balanced'
+    density : Density | str, default 'balanced'
         Astryx density or spacing mode.
     **props : Any
         JSON-safe TreeList props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -2218,9 +2284,10 @@ class TreeList(Widget):
         items: Iterable[Mapping[str, Any]],
         *,
         header: str = "",
-        density: str = "balanced",
+        density: Density | str = "balanced",
         **props: Any,
     ) -> None:
+        density = choice(density, Density, "density")
         super().__init__(
             "TreeList",
             props={
@@ -2241,11 +2308,11 @@ class Toolbar(Widget):
         Child widget, sequence of widgets, or mapping of slot names to widgets.
     label : str
         Visible or accessible label for the component.
-    size : str, default 'sm'
+    size : Size | str, default 'sm'
         Astryx component option.
     gap : int | float, default 1
         Astryx spacing step between children.
-    orientation : str | None, default None
+    orientation : Orientation | str | None, default None
         Horizontal or vertical keyboard navigation.
     variant : str | None, default None
         Toolbar section visual variant.
@@ -2290,13 +2357,15 @@ class Toolbar(Widget):
         children: ChildInput = None,
         *,
         label: str,
-        size: str = "sm",
+        size: Size | str = "sm",
         gap: int | float = 1,
-        orientation: str | None = None,
+        orientation: Orientation | str | None = None,
         variant: str | None = None,
         dividers: Iterable[str] | None = None,
         **props: Any,
     ) -> None:
+        size = choice(size, Size, "size")
+        orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "Toolbar",
             children,
@@ -2324,9 +2393,9 @@ class Tooltip(Widget):
         Trigger content used by disclosure or overlay components.
     label : str, default ''
         Visible or accessible label for the component.
-    placement : str | None, default None
+    placement : LayerPlacement | str | None, default None
         Placement relative to the trigger.
-    alignment : str | None, default None
+    alignment : LayerAlignment | str | None, default None
         Alignment along the placement axis.
     delay : int | None, default None
         Show delay in milliseconds.
@@ -2379,8 +2448,8 @@ class Tooltip(Widget):
         trigger: ChildInput = None,
         *,
         label: str = "",
-        placement: str | None = None,
-        alignment: str | None = None,
+        placement: LayerPlacement | str | None = None,
+        alignment: LayerAlignment | str | None = None,
         delay: int | None = None,
         hide_delay: int | None = None,
         enabled: bool | None = None,
@@ -2388,6 +2457,8 @@ class Tooltip(Widget):
         default_open: bool | None = None,
         **props: Any,
     ) -> None:
+        placement = optional_choice(placement, LayerPlacement, "placement")
+        alignment = optional_choice(alignment, LayerAlignment, "alignment")
         children = {"trigger": trigger} if trigger is not None else None
         if not isinstance(content, str):
             children = (
@@ -2429,9 +2500,9 @@ class HoverCard(Widget):
         Trigger content used by disclosure or overlay components.
     label : str, default ''
         Visible or accessible label for the component.
-    placement : str | None, default None
+    placement : LayerPlacement | str | None, default None
         Placement relative to the trigger.
-    alignment : str | None, default None
+    alignment : LayerAlignment | str | None, default None
         Alignment along the placement axis.
     delay : int | None, default None
         Show delay in milliseconds.
@@ -2484,8 +2555,8 @@ class HoverCard(Widget):
         trigger: ChildInput,
         *,
         label: str = "",
-        placement: str | None = None,
-        alignment: str | None = None,
+        placement: LayerPlacement | str | None = None,
+        alignment: LayerAlignment | str | None = None,
         delay: int | None = None,
         hide_delay: int | None = None,
         enabled: bool | None = None,
@@ -2493,6 +2564,8 @@ class HoverCard(Widget):
         default_open: bool | None = None,
         **props: Any,
     ) -> None:
+        placement = optional_choice(placement, LayerPlacement, "placement")
+        alignment = optional_choice(alignment, LayerAlignment, "alignment")
         children = {"trigger": trigger}
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
@@ -2528,9 +2601,9 @@ class Popover(Widget):
         Trigger content used by disclosure or overlay components.
     label : str
         Visible or accessible label for the component.
-    placement : str | None, default None
+    placement : LayerPlacement | str | None, default None
         Placement relative to the trigger.
-    alignment : str | None, default None
+    alignment : LayerAlignment | str | None, default None
         Alignment along the placement axis.
     open : bool | None, default None
         Optional controlled open state.
@@ -2587,8 +2660,8 @@ class Popover(Widget):
         trigger: ChildInput,
         *,
         label: str,
-        placement: str | None = None,
-        alignment: str | None = None,
+        placement: LayerPlacement | str | None = None,
+        alignment: LayerAlignment | str | None = None,
         open: bool | None = None,
         enabled: bool | None = None,
         width: int | float | str | None = None,
@@ -2596,6 +2669,8 @@ class Popover(Widget):
         auto_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        placement = optional_choice(placement, LayerPlacement, "placement")
+        alignment = optional_choice(alignment, LayerAlignment, "alignment")
         children = {"trigger": trigger}
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
@@ -2645,7 +2720,7 @@ class DropdownMenu(Widget):
         Menu width; defaults to the trigger width.
     chevron : bool | None, default None
         Whether the trigger shows a chevron.
-    placement : str | None, default None
+    placement : LayerPlacement | str | None, default None
         Menu placement relative to the trigger.
     auto_focus : bool | None, default None
         Whether the first menu item receives focus on open.
@@ -2693,10 +2768,11 @@ class DropdownMenu(Widget):
         open: bool = False,
         menu_width: int | float | str | None = None,
         chevron: bool | None = None,
-        placement: str | None = None,
+        placement: LayerPlacement | str | None = None,
         auto_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        placement = optional_choice(placement, LayerPlacement, "placement")
         super().__init__(
             "DropdownMenu",
             label=label,
@@ -2807,7 +2883,7 @@ class Calendar(Widget):
     ----------
     value : str | Mapping[str, str] | None
         Synchronized component value.
-    mode : str, default 'single'
+    mode : CalendarMode | str, default 'single'
         Component mode.
     number_of_months : int | None, default None
         Number of months displayed.
@@ -2862,7 +2938,7 @@ class Calendar(Widget):
         self,
         value: str | Mapping[str, str] | None = None,
         *,
-        mode: str = "single",
+        mode: CalendarMode | str = "single",
         number_of_months: int | None = None,
         min: str | None = None,
         max: str | None = None,
@@ -2872,6 +2948,7 @@ class Calendar(Widget):
         week_starts_on: int | str | None = None,
         **props: Any,
     ) -> None:
+        mode = choice(mode, CalendarMode, "mode")
         super().__init__(
             "Calendar",
             value=value,
@@ -2916,7 +2993,7 @@ class FileInput(Widget):
         Whether to show the loading state.
     placeholder : str | None, default None
         Placeholder text.
-    mode : str | None, default None
+    mode : FileInputMode | str | None, default None
         Compact input or dropzone presentation.
     status : Mapping[str, Any] | None, default None
         Validation status record.
@@ -2985,10 +3062,11 @@ class FileInput(Widget):
         description: str | None = None,
         loading: bool | None = None,
         placeholder: str | None = None,
-        mode: str | None = None,
+        mode: FileInputMode | str | None = None,
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        mode = optional_choice(mode, FileInputMode, "mode")
         super().__init__(
             "FileInput",
             label=label,
@@ -3044,7 +3122,7 @@ class Typeahead(Widget):
         Whether to visually hide the accessible label.
     description : str | None, default None
         Helper text displayed with the input.
-    size : str | None, default None
+    size : Size | str | None, default None
         Input size.
     debounce_ms : int | None, default None
         Search debounce duration.
@@ -3114,10 +3192,11 @@ class Typeahead(Widget):
         max_menu_items: int | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         debounce_ms: int | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "Typeahead",
             label=label,
@@ -3174,7 +3253,7 @@ class Tokenizer(Widget):
         Whether to visually hide the accessible label.
     description : str | None, default None
         Helper text displayed with the input.
-    size : str | None, default None
+    size : Size | str | None, default None
         Input and token size.
     debounce_ms : int | None, default None
         Search debounce duration.
@@ -3254,10 +3333,11 @@ class Tokenizer(Widget):
         max_menu_items: int | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         debounce_ms: int | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "Tokenizer",
             label=label,
@@ -3463,9 +3543,9 @@ class Dialog(Widget):
         Maximum dialog height.
     position : Mapping[str, Any] | None, default None
         Static top, right, bottom, and left position values.
-    variant : str | None, default None
+    variant : DialogVariant | str | None, default None
         Standard or fullscreen dialog presentation.
-    purpose : str | None, default None
+    purpose : DialogPurpose | str | None, default None
         Required, form, or informational dismissal behavior.
     **props : Any
         JSON-safe Dialog props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -3513,10 +3593,12 @@ class Dialog(Widget):
         width: int | float | str | None = None,
         max_height: int | float | str | None = None,
         position: Mapping[str, Any] | None = None,
-        variant: str | None = None,
-        purpose: str | None = None,
+        variant: DialogVariant | str | None = None,
+        purpose: DialogPurpose | str | None = None,
         **props: Any,
     ) -> None:
+        variant = optional_choice(variant, DialogVariant, "variant")
+        purpose = optional_choice(purpose, DialogPurpose, "purpose")
         super().__init__(
             "Dialog",
             children,

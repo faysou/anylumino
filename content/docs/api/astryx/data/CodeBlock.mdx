@@ -64,13 +64,15 @@ Render syntax-highlighted code with Astryx styling.
         copy_button: bool | None = None,
         wrapped: bool | None = None,
         max_height: int | float | str | None = None,
-        size: str | None = None,
+        size: CompactSize | str | None = None,
         width: str | None = None,
-        container: str | None = None,
+        container: Container | str | None = None,
         collapsible: bool | None = None,
         collapsible_threshold: int | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, CompactSize, "size")
+        container = optional_choice(container, Container, "container")
         super().__init__(
             "CodeBlock",
             width=width,
@@ -134,7 +136,7 @@ Render syntax-highlighted code with Astryx styling.
       Maximum height before vertical scrolling.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="CompactSize | str | None" value="None">
       Code text size.
     </PyParameter>
 
@@ -142,7 +144,7 @@ Render syntax-highlighted code with Astryx styling.
       CSS width of the code block.
     </PyParameter>
 
-    <PyParameter name="container" type="str | None" value="None">
+    <PyParameter name="container" type="Container | str | None" value="None">
       Card or section presentation.
     </PyParameter>
 

@@ -34,10 +34,12 @@ Render an Astryx loading spinner.
         self,
         *,
         label: str = "Loading",
-        size: str | None = None,
-        shade: str | None = None,
+        size: Size | str | None = None,
+        shade: SpinnerShade | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        shade = optional_choice(shade, SpinnerShade, "shade")
         super().__init__(
             "Spinner",
             label=label,
@@ -53,11 +55,11 @@ Render an Astryx loading spinner.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Spinner size.
     </PyParameter>
 
-    <PyParameter name="shade" type="str | None" value="None">
+    <PyParameter name="shade" type="SpinnerShade | str | None" value="None">
       Spinner color treatment for its background.
     </PyParameter>
 

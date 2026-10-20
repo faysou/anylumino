@@ -27,10 +27,12 @@ Render an Astryx field status message.
         self,
         message: str,
         *,
-        type: str = "success",
-        variant: str = "detached",
+        type: FieldStatusType | str = "success",
+        variant: StatusPlacement | str = "detached",
         **props: Any,
     ) -> None:
+        variant = choice(variant, StatusPlacement, "variant")
+        type = choice(type, FieldStatusType, "type")
         super().__init__(
             "FieldStatus",
             label=message,
@@ -45,11 +47,11 @@ Render an Astryx field status message.
       Astryx component option.
     </PyParameter>
 
-    <PyParameter name="type" type="str" value="'success'">
+    <PyParameter name="type" type="FieldStatusType | str" value="'success'">
       Astryx component option.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'detached'">
+    <PyParameter name="variant" type="StatusPlacement | str" value="'detached'">
       Astryx visual variant.
     </PyParameter>
 

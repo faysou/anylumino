@@ -13,7 +13,7 @@ Base anywidget for Astryx-backed components.
 
   <PyAttribute name="props" value="t.Dict(default_value={}).tag(sync=True)" />
 
-  <PyAttribute name="color_mode" value="t.Enum(_ASTRYX_THEME_MODES, default_value='light').tag(sync=True)" />
+  <PyAttribute name="color_mode" value="t.Enum(tuple(ColorMode), default_value=ColorMode.LIGHT).tag(sync=True)" />
 
   <PyAttribute name="theme" value="t.Unicode('neutral').tag(sync=True)" />
 
@@ -39,7 +39,7 @@ Base anywidget for Astryx-backed components.
 
 ## Functions
 
-<PyFunction name="__init__" type="(component_name='Stack', children=None, *, props=None, text='', label='', value=None, disabled=False, variant='', brand=None, color_mode='light', continuous_update=True, search=None, callbacks=None, action_callbacks=None, open=None, width=None, height=None, **kwargs) -> None" kind="constructor">
+<PyFunction name="__init__" type="(component_name='Stack', children=None, *, props=None, text='', label='', value=None, disabled=False, variant='', brand=None, color_mode=ColorMode.LIGHT, continuous_update=True, search=None, callbacks=None, action_callbacks=None, open=None, width=None, height=None, **kwargs) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -54,7 +54,7 @@ Base anywidget for Astryx-backed components.
         disabled: bool = False,
         variant: str = "",
         brand: Mapping[str, Any] | None = None,
-        color_mode: str = "light",
+        color_mode: ColorMode | str = ColorMode.LIGHT,
         continuous_update: bool = True,
         search: Callable[[str], Iterable[Any]] | None = None,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
@@ -153,7 +153,7 @@ Base anywidget for Astryx-backed components.
       Runtime or built Astryx theme descriptor.
     </PyParameter>
 
-    <PyParameter name="color_mode" type="str" value="'light'">
+    <PyParameter name="color_mode" type="ColorMode | str" value="ColorMode.LIGHT">
       Astryx `Theme` mode. Use `"light"`, `"dark"`, `"system"` to
       follow the OS `prefers-color-scheme`, or `"jupyterlab"` to follow
       the JupyterLab theme.
@@ -208,7 +208,7 @@ Base anywidget for Astryx-backed components.
   <PySourceCode>
     ```python
     def apply_brand(
-        self, brand: Mapping[str, Any] | None, *, color_mode: str | None = None
+        self, brand: Mapping[str, Any] | None, *, color_mode: ColorMode | str | None = None
     ) -> None:
         """Apply a reusable Astryx brand identity to this widget subtree."""
         self.brand = _clean_brand(brand)
@@ -223,7 +223,7 @@ Base anywidget for Astryx-backed components.
   <div>
     <PyParameter name="brand" type="Mapping[str, Any] | None" />
 
-    <PyParameter name="color_mode" type="str | None" value="None" />
+    <PyParameter name="color_mode" type="ColorMode | str | None" value="None" />
   </div>
 
   <PyFunctionReturn type="None" />

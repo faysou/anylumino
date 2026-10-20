@@ -39,11 +39,13 @@ Render a compact Astryx segmented control.
         value: str,
         *,
         label: str,
-        size: str | None = None,
-        layout: str | None = None,
+        size: Size | str | None = None,
+        layout: ItemLayout | str | None = None,
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        layout = optional_choice(layout, ItemLayout, "layout")
         super().__init__(
             "SegmentedControl",
             label=label,
@@ -69,11 +71,11 @@ Render a compact Astryx segmented control.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Control size.
     </PyParameter>
 
-    <PyParameter name="layout" type="str | None" value="None">
+    <PyParameter name="layout" type="ItemLayout | str | None" value="None">
       Hug or fill segment layout.
     </PyParameter>
 

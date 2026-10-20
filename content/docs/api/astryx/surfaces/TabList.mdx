@@ -40,12 +40,15 @@ Render an Astryx tab list.
         items: Iterable[Any],
         value: str,
         *,
-        size: str | None = None,
-        layout: str | None = None,
+        size: Size | str | None = None,
+        layout: ItemLayout | str | None = None,
         divider: bool | None = None,
-        orientation: str | None = None,
+        orientation: Orientation | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        orientation = optional_choice(orientation, Orientation, "orientation")
+        layout = optional_choice(layout, ItemLayout, "layout")
         super().__init__(
             "TabList",
             value=value,
@@ -70,11 +73,11 @@ Render an Astryx tab list.
       Synchronized component value.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Tab size.
     </PyParameter>
 
-    <PyParameter name="layout" type="str | None" value="None">
+    <PyParameter name="layout" type="ItemLayout | str | None" value="None">
       Hug or fill tab layout.
     </PyParameter>
 
@@ -82,7 +85,7 @@ Render an Astryx tab list.
       Whether to show the tab-list divider.
     </PyParameter>
 
-    <PyParameter name="orientation" type="str | None" value="None">
+    <PyParameter name="orientation" type="Orientation | str | None" value="None">
       Horizontal or vertical tab orientation.
     </PyParameter>
 

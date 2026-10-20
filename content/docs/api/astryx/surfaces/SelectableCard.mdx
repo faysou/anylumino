@@ -41,7 +41,7 @@ Render an Astryx card with a selected state.
         value: bool = False,
         *,
         label: str,
-        variant: str = "default",
+        variant: ClickableCardVariant | str = "default",
         disabled: bool = False,
         padding: int | float | None = None,
         width: int | float | str | None = None,
@@ -49,6 +49,7 @@ Render an Astryx card with a selected state.
         max_width: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, ClickableCardVariant, "variant")
         super().__init__(
             "SelectableCard",
             children,
@@ -83,7 +84,7 @@ Render an Astryx card with a selected state.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'default'">
+    <PyParameter name="variant" type="ClickableCardVariant | str" value="'default'">
       Astryx visual variant.
     </PyParameter>
 

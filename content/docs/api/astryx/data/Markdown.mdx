@@ -61,17 +61,21 @@ Render Markdown content through Astryx.
         self,
         text: str,
         *,
-        display: str | None = None,
-        density: str | None = None,
+        display: Display | str | None = None,
+        density: CompactDensity | str | None = None,
         heading_level_start: int | None = None,
         streaming: bool | None = None,
         sources: Mapping[str, Any] | None = None,
-        citation_style: str | None = None,
+        citation_style: CitationStyle | str | None = None,
         content_width: int | float | str | None = None,
-        content_align: str | None = None,
+        content_align: ContentAlign | str | None = None,
         autolink: str | None = None,
         **props: Any,
     ) -> None:
+        display = optional_choice(display, Display, "display")
+        density = optional_choice(density, CompactDensity, "density")
+        content_align = optional_choice(content_align, ContentAlign, "content_align")
+        citation_style = optional_choice(citation_style, CitationStyle, "citation_style")
         super().__init__(
             "Markdown",
             text=text,
@@ -96,11 +100,11 @@ Render Markdown content through Astryx.
       Text content synchronized to the frontend component.
     </PyParameter>
 
-    <PyParameter name="display" type="str | None" value="None">
+    <PyParameter name="display" type="Display | str | None" value="None">
       Block or inline display.
     </PyParameter>
 
-    <PyParameter name="density" type="str | None" value="None">
+    <PyParameter name="density" type="CompactDensity | str | None" value="None">
       Default or compact block spacing.
     </PyParameter>
 
@@ -116,7 +120,7 @@ Render Markdown content through Astryx.
       Citation sources keyed by identifier.
     </PyParameter>
 
-    <PyParameter name="citation_style" type="str | None" value="None">
+    <PyParameter name="citation_style" type="CitationStyle | str | None" value="None">
       Label or numeric citations.
     </PyParameter>
 
@@ -124,7 +128,7 @@ Render Markdown content through Astryx.
       Maximum prose width.
     </PyParameter>
 
-    <PyParameter name="content_align" type="str | None" value="None">
+    <PyParameter name="content_align" type="ContentAlign | str | None" value="None">
       Prose alignment inside the available width.
     </PyParameter>
 

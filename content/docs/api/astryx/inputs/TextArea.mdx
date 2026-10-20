@@ -73,7 +73,7 @@ Render a multiline Astryx text area.
         placeholder: str = "",
         rows: int = 3,
         disabled: bool = False,
-        size: str | None = None,
+        size: Size | str | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
         optional: bool | None = None,
@@ -84,6 +84,7 @@ Render a multiline Astryx text area.
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "TextArea",
             label=label,
@@ -128,7 +129,7 @@ Render a multiline Astryx text area.
       Whether the component should render disabled.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Text-area size.
     </PyParameter>
 

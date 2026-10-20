@@ -52,11 +52,11 @@ Render a single-value Astryx selector.
         value: str | None = None,
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         disabled: bool = False,
         placeholder: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         clear: bool | None = None,
         search: bool | None = None,
         search_placeholder: str | None = None,
@@ -65,6 +65,8 @@ Render a single-value Astryx selector.
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        label_position = choice(label_position, LabelPosition, "label_position")
         super().__init__(
             "Selector",
             label=label,
@@ -101,7 +103,7 @@ Render a single-value Astryx selector.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="label_position" type="str" value="'top'">
+    <PyParameter name="label_position" type="LabelPosition | str" value="'top'">
       Place the label above the control or beside it in a compact row.
     </PyParameter>
 
@@ -117,7 +119,7 @@ Render a single-value Astryx selector.
       Placeholder shown when no option is selected.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Selector size.
     </PyParameter>
 

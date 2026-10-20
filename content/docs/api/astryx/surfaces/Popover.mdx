@@ -50,8 +50,8 @@ Render click-triggered popover content.
         trigger: ChildInput,
         *,
         label: str,
-        placement: str | None = None,
-        alignment: str | None = None,
+        placement: LayerPlacement | str | None = None,
+        alignment: LayerAlignment | str | None = None,
         open: bool | None = None,
         enabled: bool | None = None,
         width: int | float | str | None = None,
@@ -59,6 +59,8 @@ Render click-triggered popover content.
         auto_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        placement = optional_choice(placement, LayerPlacement, "placement")
+        alignment = optional_choice(alignment, LayerAlignment, "alignment")
         children = {"trigger": trigger}
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
@@ -99,11 +101,11 @@ Render click-triggered popover content.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="placement" type="str | None" value="None">
+    <PyParameter name="placement" type="LayerPlacement | str | None" value="None">
       Placement relative to the trigger.
     </PyParameter>
 
-    <PyParameter name="alignment" type="str | None" value="None">
+    <PyParameter name="alignment" type="LayerAlignment | str | None" value="None">
       Alignment along the placement axis.
     </PyParameter>
 

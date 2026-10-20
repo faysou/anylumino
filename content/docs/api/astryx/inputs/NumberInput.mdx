@@ -65,7 +65,7 @@ Render an Astryx numeric input.
         max: int | float | None = None,
         step: int | float | None = None,
         units: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         placeholder: str | None = None,
         integer_only: bool | None = None,
         clear: bool | None = None,
@@ -74,6 +74,7 @@ Render an Astryx numeric input.
         select_on_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "NumberInput",
             label=label,
@@ -126,7 +127,7 @@ Render an Astryx numeric input.
       Units displayed after the value.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Input size.
     </PyParameter>
 

@@ -61,10 +61,12 @@ Render an Astryx switch for binary settings.
         description: str | None = None,
         loading: bool | None = None,
         status: Mapping[str, Any] | None = None,
-        label_position: str | None = None,
-        label_spacing: str | None = None,
+        label_position: SwitchLabelPosition | str | None = None,
+        label_spacing: LabelSpacing | str | None = None,
         **props: Any,
     ) -> None:
+        label_spacing = optional_choice(label_spacing, LabelSpacing, "label_spacing")
+        label_position = optional_choice(label_position, SwitchLabelPosition, "label_position")
         super().__init__(
             "Switch",
             label=label,
@@ -112,11 +114,11 @@ Render an Astryx switch for binary settings.
       Validation status record.
     </PyParameter>
 
-    <PyParameter name="label_position" type="str | None" value="None">
+    <PyParameter name="label_position" type="SwitchLabelPosition | str | None" value="None">
       Whether the label appears before or after the switch.
     </PyParameter>
 
-    <PyParameter name="label_spacing" type="str | None" value="None">
+    <PyParameter name="label_spacing" type="LabelSpacing | str | None" value="None">
       Default or spread label spacing.
     </PyParameter>
 

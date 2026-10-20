@@ -6,15 +6,14 @@ from collections.abc import Iterable
 from typing import Any
 
 import traitlets as t
+from anylumino.enums import choice
 
 from ..layout import ChildInput
 from ..layout import TitleInput
 from .base import Widget
 from .base import _named_props
-
-SPLIT_ORIENTATIONS = ("horizontal", "vertical")
-STACK_DIRECTIONS = ("horizontal", "vertical")
-SCROLL_AXES = ("block", "inline", "both")
+from .enums import Orientation
+from .enums import ScrollAxis
 
 
 class TabPanel(Widget):
@@ -270,7 +269,7 @@ class ScrollBox(Widget):
         Optional labels associated with children.
     keys : Iterable[str] | None, default None
         Stable child keys for iterable ``children``.
-    axis : str, default 'block'
+    axis : ScrollAxis | str, default 'block'
         Scroll axis, ``"block"``, ``"inline"``, or ``"both"``.
     label : str, default 'Scrollable content'
         Accessible name of the scroll viewport.
@@ -298,7 +297,7 @@ class ScrollBox(Widget):
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        axis: str = "block",
+        axis: ScrollAxis | str = "block",
         label: str = "Scrollable content",
         gap: int | float = 2,
         padding: int | float | None = None,
@@ -308,9 +307,7 @@ class ScrollBox(Widget):
         min_height: int | float | str | None = None,
         **props: Any,
     ) -> None:
-        if axis not in SCROLL_AXES:
-            msg = f"axis must be one of {SCROLL_AXES}, got {axis!r}"
-            raise ValueError(msg)
+        axis = choice(axis, ScrollAxis, "axis")
 
         super().__init__(
             "ScrollBox",
@@ -348,7 +345,7 @@ class SplitPanel(Widget):
         Optional labels associated with children.
     keys : Iterable[str] | None, default None
         Stable child keys for iterable ``children``.
-    orientation : str, default 'horizontal'
+    orientation : Orientation | str, default 'horizontal'
         Split direction. Horizontal places panes side by side; vertical stacks
         them.
     sizes : Iterable[float] | None, default None
@@ -373,16 +370,14 @@ class SplitPanel(Widget):
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        orientation: str = "horizontal",
+        orientation: Orientation | str = Orientation.HORIZONTAL,
         sizes: Iterable[float] | None = None,
         min_size: int = 80,
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         **props: Any,
     ) -> None:
-        if orientation not in SPLIT_ORIENTATIONS:
-            msg = f"orientation must be one of {SPLIT_ORIENTATIONS}, got {orientation!r}"
-            raise ValueError(msg)
+        orientation = choice(orientation, Orientation, "orientation")
 
         super().__init__(
             "SplitPanel",
@@ -413,9 +408,9 @@ class ResponsivePanel(Widget):
         Stable child keys for iterable ``children``.
     breakpoint : int, default 760
         Width in CSS pixels where the layout switches direction.
-    wide_direction : str, default 'horizontal'
+    wide_direction : Orientation | str, default 'horizontal'
         Stack direction at or above the breakpoint.
-    narrow_direction : str, default 'vertical'
+    narrow_direction : Orientation | str, default 'vertical'
         Stack direction below the breakpoint.
     gap : int | float, default 2
         Astryx spacing step between children.
@@ -436,17 +431,15 @@ class ResponsivePanel(Widget):
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
         breakpoint: int = 760,
-        wide_direction: str = "horizontal",
-        narrow_direction: str = "vertical",
+        wide_direction: Orientation | str = "horizontal",
+        narrow_direction: Orientation | str = "vertical",
         gap: int | float = 2,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         **props: Any,
     ) -> None:
-        for name, direction in (("wide_direction", wide_direction), ("narrow_direction", narrow_direction)):
-            if direction not in STACK_DIRECTIONS:
-                msg = f"{name} must be one of {STACK_DIRECTIONS}, got {direction!r}"
-                raise ValueError(msg)
+        wide_direction = choice(wide_direction, Orientation, "wide_direction")
+        narrow_direction = choice(narrow_direction, Orientation, "narrow_direction")
 
         super().__init__(
             "ResponsivePanel",

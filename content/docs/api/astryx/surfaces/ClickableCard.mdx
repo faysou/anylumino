@@ -41,7 +41,7 @@ Render an Astryx card that behaves like an action target.
         children: ChildInput = None,
         *,
         label: str,
-        variant: str = "default",
+        variant: ClickableCardVariant | str = "default",
         disabled: bool = False,
         href: str | None = None,
         target: str | None = None,
@@ -52,6 +52,7 @@ Render an Astryx card that behaves like an action target.
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, ClickableCardVariant, "variant")
         super().__init__(
             "ClickableCard",
             children,
@@ -84,7 +85,7 @@ Render an Astryx card that behaves like an action target.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'default'">
+    <PyParameter name="variant" type="ClickableCardVariant | str" value="'default'">
       Astryx visual variant.
     </PyParameter>
 

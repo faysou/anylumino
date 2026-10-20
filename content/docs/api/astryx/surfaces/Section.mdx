@@ -44,7 +44,7 @@ Render an Astryx section container.
         self,
         children: ChildInput = None,
         *,
-        variant: str = "section",
+        variant: SectionVariant | str = "section",
         padding: int | float | None = None,
         padding_block: int | float | None = None,
         dividers: Iterable[str] | None = None,
@@ -53,6 +53,7 @@ Render an Astryx section container.
         max_width: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, SectionVariant, "variant")
         super().__init__(
             "Section",
             children,
@@ -78,7 +79,7 @@ Render an Astryx section container.
       Child widget, sequence of widgets, or mapping of slot names to widgets.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'section'">
+    <PyParameter name="variant" type="SectionVariant | str" value="'section'">
       Astryx visual variant.
     </PyParameter>
 

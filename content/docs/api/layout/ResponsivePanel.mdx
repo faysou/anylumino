@@ -11,9 +11,9 @@ Box layout that switches direction when its width crosses a breakpoint.
 
   <PyAttribute name="breakpoint" value="t.Int(760).tag(sync=True)" />
 
-  <PyAttribute name="wide_direction" value="t.Enum(BOX_DIRECTIONS, default_value='left-to-right').tag(sync=True)" />
+  <PyAttribute name="wide_direction" value="t.Enum(tuple(Direction), default_value=Direction.LEFT_TO_RIGHT).tag(sync=True)" />
 
-  <PyAttribute name="narrow_direction" value="t.Enum(BOX_DIRECTIONS, default_value='top-to-bottom').tag(sync=True)" />
+  <PyAttribute name="narrow_direction" value="t.Enum(tuple(Direction), default_value=Direction.TOP_TO_BOTTOM).tag(sync=True)" />
 
   <PyAttribute name="spacing" value="t.Int(8).tag(sync=True)" />
 </PyAttributes>
@@ -30,14 +30,16 @@ Box layout that switches direction when its width crosses a breakpoint.
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
         breakpoint: int = 760,
-        wide_direction: str = "left-to-right",
-        narrow_direction: str = "top-to-bottom",
+        wide_direction: Direction | str = "left-to-right",
+        narrow_direction: Direction | str = "top-to-bottom",
         spacing: int = 8,
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
+        wide_direction = choice(wide_direction, Direction, "wide_direction")
+        narrow_direction = choice(narrow_direction, Direction, "narrow_direction")
         self._init_composed(
             widgets,
             titles,
@@ -71,11 +73,11 @@ Box layout that switches direction when its width crosses a breakpoint.
       Width in CSS pixels where the layout switches direction.
     </PyParameter>
 
-    <PyParameter name="wide_direction" type="str" value="'left-to-right'">
+    <PyParameter name="wide_direction" type="Direction | str" value="'left-to-right'">
       Box direction used when the container is wider than `breakpoint`.
     </PyParameter>
 
-    <PyParameter name="narrow_direction" type="str" value="'top-to-bottom'">
+    <PyParameter name="narrow_direction" type="Direction | str" value="'top-to-bottom'">
       Box direction used when the container is narrower than `breakpoint`.
     </PyParameter>
 

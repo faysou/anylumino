@@ -44,7 +44,7 @@ Render a multi-choice Astryx checkbox list.
         value: Iterable[str] = (),
         *,
         label: str,
-        density: str | None = None,
+        density: Density | str | None = None,
         dividers: bool | None = None,
         disabled: bool = False,
         label_hidden: bool | None = None,
@@ -52,6 +52,7 @@ Render a multi-choice Astryx checkbox list.
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        density = optional_choice(density, Density, "density")
         super().__init__(
             "CheckboxList",
             label=label,
@@ -83,7 +84,7 @@ Render a multi-choice Astryx checkbox list.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="density" type="str | None" value="None">
+    <PyParameter name="density" type="Density | str | None" value="None">
       Item spacing density.
     </PyParameter>
 

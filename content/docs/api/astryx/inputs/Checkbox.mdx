@@ -58,7 +58,7 @@ Render an Astryx checkbox input.
         *,
         label: str = "",
         disabled: bool = False,
-        size: str | None = None,
+        size: CompactSize | str | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
         loading: bool | None = None,
@@ -66,6 +66,7 @@ Render an Astryx checkbox input.
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, CompactSize, "size")
         super().__init__(
             "CheckboxInput",
             label=label,
@@ -97,7 +98,7 @@ Render an Astryx checkbox input.
       Whether the component should render disabled.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="CompactSize | str | None" value="None">
       Checkbox size.
     </PyParameter>
 

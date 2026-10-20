@@ -28,9 +28,10 @@ Render a compact inline citation reference.
         source: Mapping[str, Any],
         *,
         number: int = 1,
-        variant: str = "number",
+        variant: CitationStyle | str = "number",
         **props: Any,
     ) -> None:
+        variant = choice(variant, CitationStyle, "variant")
         super().__init__(
             "Citation",
             value=number,
@@ -54,7 +55,7 @@ Render a compact inline citation reference.
       Citation number.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'number'">
+    <PyParameter name="variant" type="CitationStyle | str" value="'number'">
       Astryx visual variant.
     </PyParameter>
 

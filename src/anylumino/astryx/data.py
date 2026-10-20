@@ -8,6 +8,8 @@ from collections.abc import Mapping
 from typing import Any
 
 import traitlets as t
+from anylumino.enums import choice
+from anylumino.enums import optional_choice
 
 from ..components import ComponentWidget
 from .base import Widget
@@ -17,6 +19,26 @@ from .base import _named_props
 from .base import _table_columns
 from .base import _table_row_ids
 from .base import _table_rows
+from .enums import BannerStatus
+from .enums import CitationStyle
+from .enums import CompactDensity
+from .enums import CompactSize
+from .enums import Container
+from .enums import ContentAlign
+from .enums import Density
+from .enums import Display
+from .enums import IconColor
+from .enums import IconSize
+from .enums import Selects
+from .enums import Size
+from .enums import SortDirection
+from .enums import SpinnerShade
+from .enums import StatusVariant
+from .enums import TableDividers
+from .enums import TextOverflow
+from .enums import TimestampFormat
+from .enums import TokenColor
+from .enums import VerticalAlign
 
 
 class Table(Widget):
@@ -32,13 +54,13 @@ class Table(Widget):
         Row id field. Use ``None`` to generate notebook-local row ids.
     selected : Iterable[Any], default ()
         Initially selected row ids.
-    selects : {'', 'single', 'multiple'}, default ''
+    selects : Selects | str, default ''
         Selection mode. Use ``""`` for no checkbox column.
     sortable : bool, default False
         Whether table columns should be sortable by default.
     sort_key : str, default ''
         Initially sorted table column key.
-    sort_direction : {'', 'asc', 'desc'}, default ''
+    sort_direction : SortDirection | str, default ''
         Initial sort direction. Use ``""`` for unsorted.
     select_all_label : str, default 'Select all rows'
         Accessible label for the select-all checkbox.
@@ -46,17 +68,17 @@ class Table(Widget):
         CSS width. Numbers are normalized by anylumino where supported.
     height : int | float | str | None
         CSS height. Numbers are normalized by anylumino where supported.
-    density : str | None, default None
+    density : Density | str | None, default None
         Compact, balanced, or spacious row density.
-    dividers : str | None, default None
+    dividers : TableDividers | str | None, default None
         Row, column, grid, or no divider treatment.
     striped : bool | None, default None
         Whether alternating rows receive a background wash.
     hover : bool | None, default None
         Whether rows highlight on pointer hover.
-    vertical_align : str | None, default None
+    vertical_align : VerticalAlign | str | None, default None
         Body-cell vertical alignment.
-    text_overflow : str | None, default None
+    text_overflow : TextOverflow | str | None, default None
         Wrap or truncate overflowing cell text.
     **props : Any
         JSON-safe Table props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -115,21 +137,27 @@ class Table(Widget):
         *,
         row_key: str | None = "id",
         selected: Iterable[Any] = (),
-        selects: str = "",
+        selects: Selects | str = "",
         sortable: bool = False,
         sort_key: str = "",
-        sort_direction: str = "",
+        sort_direction: SortDirection | str = "",
         select_all_label: str = "Select all rows",
         width: int | float | str | None = None,
         height: int | float | str | None = None,
-        density: str | None = None,
-        dividers: str | None = None,
+        density: Density | str | None = None,
+        dividers: TableDividers | str | None = None,
         striped: bool | None = None,
         hover: bool | None = None,
-        vertical_align: str | None = None,
-        text_overflow: str | None = None,
+        vertical_align: VerticalAlign | str | None = None,
+        text_overflow: TextOverflow | str | None = None,
         **props: Any,
     ) -> None:
+        vertical_align = optional_choice(vertical_align, VerticalAlign, "vertical_align")
+        text_overflow = optional_choice(text_overflow, TextOverflow, "text_overflow")
+        sort_direction = choice(sort_direction, SortDirection, "sort_direction")
+        selects = choice(selects, Selects, "selects")
+        dividers = optional_choice(dividers, TableDividers, "dividers")
+        density = optional_choice(density, Density, "density")
         row_list = list(rows)
         column_list = _table_columns(columns, row_list)
         self._row_key = row_key or "__row_id"
@@ -444,13 +472,13 @@ class Banner(Widget):
     ----------
     title : str
         Dialog or empty-state title.
-    status : str, default 'info'
+    status : BannerStatus | str, default 'info'
         Validation or status record displayed by Astryx.
     description : str, default ''
         Supporting description text.
     dismissable : bool | None, default None
         Whether the user can dismiss the banner.
-    container : str | None, default None
+    container : Container | str | None, default None
         Card or section container presentation.
     expanded : bool | None, default None
         Whether child content starts expanded.
@@ -495,15 +523,17 @@ class Banner(Widget):
         self,
         title: str,
         *,
-        status: str = "info",
+        status: BannerStatus | str = "info",
         description: str = "",
         dismissable: bool | None = None,
-        container: str | None = None,
+        container: Container | str | None = None,
         expanded: bool | None = None,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
         | None = None,
         **props: Any,
     ) -> None:
+        status = choice(status, BannerStatus, "status")
+        container = optional_choice(container, Container, "container")
         super().__init__(
             "Banner",
             label=title,
@@ -608,7 +638,7 @@ class StatusDot(Widget):
     label : str
         Accessible label describing the status. Screen readers announce it; it
         is not rendered as visible text.
-    variant : str, default 'neutral'
+    variant : StatusVariant | str, default 'neutral'
         Astryx visual variant.
     pulsing : bool | None, default None
         Whether to animate the status dot.
@@ -642,11 +672,12 @@ class StatusDot(Widget):
         self,
         label: str,
         *,
-        variant: str = "neutral",
+        variant: StatusVariant | str = "neutral",
         pulsing: bool | None = None,
         tooltip: str | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, StatusVariant, "variant")
         super().__init__(
             "StatusDot",
             label=label,
@@ -664,7 +695,7 @@ class ProgressBar(Widget):
         Synchronized component value.
     label : str
         Visible or accessible label for the component.
-    variant : str, default 'accent'
+    variant : StatusVariant | str, default 'accent'
         Astryx visual variant.
     max : int | float | None, default None
         Maximum progress value.
@@ -712,7 +743,7 @@ class ProgressBar(Widget):
         value: int | float = 0,
         *,
         label: str,
-        variant: str = "accent",
+        variant: StatusVariant | str = "accent",
         max: int | float | None = None,
         label_hidden: bool | None = None,
         value_label: bool | None = None,
@@ -720,6 +751,7 @@ class ProgressBar(Widget):
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        variant = choice(variant, StatusVariant, "variant")
         super().__init__(
             "ProgressBar",
             label=label,
@@ -743,9 +775,9 @@ class Spinner(Widget):
     ----------
     label : str, default 'Loading'
         Visible or accessible label for the component.
-    size : str | None, default None
+    size : Size | str | None, default None
         Spinner size.
-    shade : str | None, default None
+    shade : SpinnerShade | str | None, default None
         Spinner color treatment for its background.
     **props : Any
         JSON-safe Spinner props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -776,10 +808,12 @@ class Spinner(Widget):
         self,
         *,
         label: str = "Loading",
-        size: str | None = None,
-        shade: str | None = None,
+        size: Size | str | None = None,
+        shade: SpinnerShade | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        shade = optional_choice(shade, SpinnerShade, "shade")
         super().__init__(
             "Spinner",
             label=label,
@@ -847,9 +881,9 @@ class Token(Widget):
     ----------
     label : str
         Visible or accessible label for the component.
-    color : str, default 'default'
+    color : TokenColor | str, default 'default'
         Astryx component option.
-    size : str | None, default None
+    size : Size | str | None, default None
         Token size.
     disabled : bool, default False
         Whether the token is disabled.
@@ -905,8 +939,8 @@ class Token(Widget):
         self,
         label: str,
         *,
-        color: str = "default",
-        size: str | None = None,
+        color: TokenColor | str = "default",
+        size: Size | str | None = None,
         disabled: bool = False,
         href: str | None = None,
         description: str | None = None,
@@ -917,6 +951,8 @@ class Token(Widget):
         | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        color = choice(color, TokenColor, "color")
         super().__init__(
             "Token",
             label=label,
@@ -1163,9 +1199,9 @@ class Icon(Widget):
     ----------
     icon : str
         Astryx icon name.
-    color : str | None, default None
+    color : IconColor | str | None, default None
         Theme icon color.
-    size : str | None, default None
+    size : IconSize | str | None, default None
         Icon size.
     **props : Any
         JSON-safe Icon props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1194,10 +1230,12 @@ class Icon(Widget):
         self,
         icon: str,
         *,
-        color: str | None = None,
-        size: str | None = None,
+        color: IconColor | str | None = None,
+        size: IconSize | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, IconSize, "size")
+        color = optional_choice(color, IconColor, "color")
         super().__init__(
             "Icon",
             text=icon,
@@ -1314,11 +1352,11 @@ class CodeBlock(Widget):
         Whether long lines wrap instead of scrolling.
     max_height : int | float | str | None, default None
         Maximum height before vertical scrolling.
-    size : str | None, default None
+    size : CompactSize | str | None, default None
         Code text size.
     width : str | None, default None
         CSS width of the code block.
-    container : str | None, default None
+    container : Container | str | None, default None
         Card or section presentation.
     collapsible : bool | None, default None
         Whether long code can collapse.
@@ -1383,13 +1421,15 @@ class CodeBlock(Widget):
         copy_button: bool | None = None,
         wrapped: bool | None = None,
         max_height: int | float | str | None = None,
-        size: str | None = None,
+        size: CompactSize | str | None = None,
         width: str | None = None,
-        container: str | None = None,
+        container: Container | str | None = None,
         collapsible: bool | None = None,
         collapsible_threshold: int | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, CompactSize, "size")
+        container = optional_choice(container, Container, "container")
         super().__init__(
             "CodeBlock",
             width=width,
@@ -1422,9 +1462,9 @@ class Markdown(Widget):
     ----------
     text : str
         Text content synchronized to the frontend component.
-    display : str | None, default None
+    display : Display | str | None, default None
         Block or inline display.
-    density : str | None, default None
+    density : CompactDensity | str | None, default None
         Default or compact block spacing.
     heading_level_start : int | None, default None
         Heading level corresponding to Markdown ``#``.
@@ -1432,11 +1472,11 @@ class Markdown(Widget):
         Whether to use incremental streaming presentation.
     sources : Mapping[str, Any] | None, default None
         Citation sources keyed by identifier.
-    citation_style : str | None, default None
+    citation_style : CitationStyle | str | None, default None
         Label or numeric citations.
     content_width : int | float | str | None, default None
         Maximum prose width.
-    content_align : str | None, default None
+    content_align : ContentAlign | str | None, default None
         Prose alignment inside the available width.
     autolink : str | None, default None
         Optional GFM bare-link handling.
@@ -1496,17 +1536,21 @@ class Markdown(Widget):
         self,
         text: str,
         *,
-        display: str | None = None,
-        density: str | None = None,
+        display: Display | str | None = None,
+        density: CompactDensity | str | None = None,
         heading_level_start: int | None = None,
         streaming: bool | None = None,
         sources: Mapping[str, Any] | None = None,
-        citation_style: str | None = None,
+        citation_style: CitationStyle | str | None = None,
         content_width: int | float | str | None = None,
-        content_align: str | None = None,
+        content_align: ContentAlign | str | None = None,
         autolink: str | None = None,
         **props: Any,
     ) -> None:
+        display = optional_choice(display, Display, "display")
+        density = optional_choice(density, CompactDensity, "density")
+        content_align = optional_choice(content_align, ContentAlign, "content_align")
+        citation_style = optional_choice(citation_style, CitationStyle, "citation_style")
         super().__init__(
             "Markdown",
             text=text,
@@ -1566,7 +1610,7 @@ class Timestamp(Widget):
     ----------
     value : str | int | float
         Synchronized component value.
-    format : str | None, default None
+    format : TimestampFormat | str | None, default None
         Relative, automatic, date, time, or system display format.
     auto_threshold : int | float | None, default None
         Automatic-format threshold in seconds.
@@ -1620,7 +1664,7 @@ class Timestamp(Widget):
         self,
         value: str | int | float,
         *,
-        format: str | None = None,
+        format: TimestampFormat | str | None = None,
         auto_threshold: int | float | None = None,
         tooltip: bool | None = None,
         timezone: bool | None = None,
@@ -1631,6 +1675,7 @@ class Timestamp(Widget):
         weight: str | None = None,
         **props: Any,
     ) -> None:
+        format = optional_choice(format, TimestampFormat, "format")
         super().__init__(
             "Timestamp",
             value=value,

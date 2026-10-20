@@ -37,11 +37,12 @@ widget in a horizontal `Stack` when the status needs a visible caption.
         self,
         label: str,
         *,
-        variant: str = "neutral",
+        variant: StatusVariant | str = "neutral",
         pulsing: bool | None = None,
         tooltip: str | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, StatusVariant, "variant")
         super().__init__(
             "StatusDot",
             label=label,
@@ -57,7 +58,7 @@ widget in a horizontal `Stack` when the status needs a visible caption.
       is not rendered as visible text.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'neutral'">
+    <PyParameter name="variant" type="StatusVariant | str" value="'neutral'">
       Astryx visual variant.
     </PyParameter>
 

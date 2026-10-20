@@ -37,9 +37,10 @@ Render hierarchical notebook data as an expandable tree.
         items: Iterable[Mapping[str, Any]],
         *,
         header: str = "",
-        density: str = "balanced",
+        density: Density | str = "balanced",
         **props: Any,
     ) -> None:
+        density = choice(density, Density, "density")
         super().__init__(
             "TreeList",
             props={
@@ -61,7 +62,7 @@ Render hierarchical notebook data as an expandable tree.
       Optional header text or content.
     </PyParameter>
 
-    <PyParameter name="density" type="str" value="'balanced'">
+    <PyParameter name="density" type="Density | str" value="'balanced'">
       Astryx density or spacing mode.
     </PyParameter>
 

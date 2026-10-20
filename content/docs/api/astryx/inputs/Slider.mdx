@@ -55,19 +55,22 @@ Render an Astryx slider control.
         value: int | float | tuple[int | float, int | float] | list[int | float] = 0,
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         disabled: bool = False,
         min: int | float | None = None,
         max: int | float | None = None,
         step: int | float | None = None,
-        orientation: str | None = None,
-        value_display: str | None = None,
+        orientation: Orientation | str | None = None,
+        value_display: ValueDisplay | str | None = None,
         marks: Iterable[Mapping[str, Any]] | None = None,
         description: str | None = None,
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        value_display = optional_choice(value_display, ValueDisplay, "value_display")
+        orientation = optional_choice(orientation, Orientation, "orientation")
+        label_position = choice(label_position, LabelPosition, "label_position")
         super().__init__(
             "Slider",
             label=label,
@@ -99,7 +102,7 @@ Render an Astryx slider control.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="label_position" type="str" value="'top'">
+    <PyParameter name="label_position" type="LabelPosition | str" value="'top'">
       Place the label above the slider or beside it in a compact row.
     </PyParameter>
 
@@ -123,11 +126,11 @@ Render an Astryx slider control.
       Slider step increment.
     </PyParameter>
 
-    <PyParameter name="orientation" type="str | None" value="None">
+    <PyParameter name="orientation" type="Orientation | str | None" value="None">
       Horizontal or vertical orientation.
     </PyParameter>
 
-    <PyParameter name="value_display" type="str | None" value="None">
+    <PyParameter name="value_display" type="ValueDisplay | str | None" value="None">
       Tooltip, text, or hidden value presentation.
     </PyParameter>
 

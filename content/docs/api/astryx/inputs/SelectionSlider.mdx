@@ -23,7 +23,7 @@ two-item `value` to select a range instead of a single option.
         value: Any = None,
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         marks: bool = False,
         disabled: bool = False,
@@ -31,6 +31,7 @@ two-item `value` to select a range instead of a single option.
         description: str | None = None,
         **props: Any,
     ) -> None:
+        label_position = choice(label_position, LabelPosition, "label_position")
         records = _option_records(items)
         if value is None and records:
             first = records[0]
@@ -73,7 +74,7 @@ two-item `value` to select a range instead of a single option.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="label_position" type="str" value="'top'">
+    <PyParameter name="label_position" type="LabelPosition | str" value="'top'">
       Place the label above the slider or beside it in a compact row.
     </PyParameter>
 

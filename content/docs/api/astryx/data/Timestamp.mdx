@@ -41,7 +41,7 @@ Render a timestamp value with Astryx formatting.
         self,
         value: str | int | float,
         *,
-        format: str | None = None,
+        format: TimestampFormat | str | None = None,
         auto_threshold: int | float | None = None,
         tooltip: bool | None = None,
         timezone: bool | None = None,
@@ -52,6 +52,7 @@ Render a timestamp value with Astryx formatting.
         weight: str | None = None,
         **props: Any,
     ) -> None:
+        format = optional_choice(format, TimestampFormat, "format")
         super().__init__(
             "Timestamp",
             value=value,
@@ -76,7 +77,7 @@ Render a timestamp value with Astryx formatting.
       Synchronized component value.
     </PyParameter>
 
-    <PyParameter name="format" type="str | None" value="None">
+    <PyParameter name="format" type="TimestampFormat | str | None" value="None">
       Relative, automatic, date, time, or system display format.
     </PyParameter>
 

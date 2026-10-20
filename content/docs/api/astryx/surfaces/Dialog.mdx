@@ -52,10 +52,12 @@ Render Astryx dialog content inline in notebook output.
         width: int | float | str | None = None,
         max_height: int | float | str | None = None,
         position: Mapping[str, Any] | None = None,
-        variant: str | None = None,
-        purpose: str | None = None,
+        variant: DialogVariant | str | None = None,
+        purpose: DialogPurpose | str | None = None,
         **props: Any,
     ) -> None:
+        variant = optional_choice(variant, DialogVariant, "variant")
+        purpose = optional_choice(purpose, DialogPurpose, "purpose")
         super().__init__(
             "Dialog",
             children,
@@ -101,11 +103,11 @@ Render Astryx dialog content inline in notebook output.
       Static top, right, bottom, and left position values.
     </PyParameter>
 
-    <PyParameter name="variant" type="str | None" value="None">
+    <PyParameter name="variant" type="DialogVariant | str | None" value="None">
       Standard or fullscreen dialog presentation.
     </PyParameter>
 
-    <PyParameter name="purpose" type="str | None" value="None">
+    <PyParameter name="purpose" type="DialogPurpose | str | None" value="None">
       Required, form, or informational dismissal behavior.
     </PyParameter>
 

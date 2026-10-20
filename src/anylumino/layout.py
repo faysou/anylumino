@@ -9,15 +9,12 @@ import traitlets as t
 # anywidget keeps the model id lookup private until
 # https://github.com/manzt/anywidget/pull/1024 lands.
 from anywidget._descriptor import _try_get_model_id as get_model_id
+from anylumino.enums import choice
 
 from .common import ActivationCallbacks
 from .common import static_asset
+from .enums import Direction, DockMode, Orientation, TabPlacement
 
-
-TAB_PLACEMENTS = ("top", "bottom", "left", "right")
-BOX_DIRECTIONS = ("left-to-right", "right-to-left", "top-to-bottom", "bottom-to-top")
-ORIENTATIONS = ("horizontal", "vertical")
-DOCK_MODES = ("tab-after", "split-right", "split-left", "split-top", "split-bottom")
 ACTION_KINDS = ("toolbar", "menubar", "command_palette")
 ActionCallback = Callable[[str], None]
 ChildInput = Iterable[object] | Mapping[str, object] | None
@@ -585,7 +582,7 @@ class TabPanel(LayoutWidget):
         ``widgets`` is a mapping.
     selected_index : int, default 0
         Initially selected tab index.
-    tab_placement : {"top", "bottom", "left", "right"}, default "top"
+    tab_placement : TabPlacement | str, default "top"
         Where Lumino should place the tab bar.
     tabs_movable : bool, default False
         Whether tabs can be reordered in the frontend. A drag reorders
@@ -609,7 +606,7 @@ class TabPanel(LayoutWidget):
     _title_prefix = "Tab"
 
     selected_index = t.Int(0).tag(sync=True)
-    tab_placement = t.Enum(TAB_PLACEMENTS, default_value="top").tag(sync=True)
+    tab_placement = t.Enum(tuple(TabPlacement), default_value=TabPlacement.TOP).tag(sync=True)
     tabs_movable = t.Bool(False).tag(sync=True)
 
     def __init__(
@@ -619,13 +616,14 @@ class TabPanel(LayoutWidget):
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
         selected_index: int = 0,
-        tab_placement: str = "top",
+        tab_placement: TabPlacement | str = "top",
         tabs_movable: bool = False,
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
+        tab_placement = choice(tab_placement, TabPlacement, "tab_placement")
         self._init_composed(
             widgets,
             titles,
@@ -671,7 +669,7 @@ class BoxPanel(LayoutWidget):
         by child key.
     keys : iterable of str, optional
         Stable child keys for iterable ``widgets``.
-    direction : {"left-to-right", "right-to-left", "top-to-bottom", "bottom-to-top"}
+    direction : Direction | str
         Lumino box direction.
     spacing : int, default 8
         Pixel spacing between children.
@@ -703,7 +701,7 @@ class BoxPanel(LayoutWidget):
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("box").tag(sync=True)
-    direction = t.Enum(BOX_DIRECTIONS, default_value="left-to-right").tag(sync=True)
+    direction = t.Enum(tuple(Direction), default_value=Direction.LEFT_TO_RIGHT).tag(sync=True)
     spacing = t.Int(8).tag(sync=True)
     stretches = t.List(t.Int(), default_value=[]).tag(sync=True)
 
@@ -713,7 +711,7 @@ class BoxPanel(LayoutWidget):
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        direction: str = "left-to-right",
+        direction: Direction | str = "left-to-right",
         spacing: int = 8,
         stretches: Iterable[int] | None = None,
         width: int | float | str | None = "100%",
@@ -726,6 +724,7 @@ class BoxPanel(LayoutWidget):
         child_min_height: int | float | str | None = None,
         fit_content: bool = False,
     ) -> None:
+        direction = choice(direction, Direction, "direction")
         horizontal = direction in ("left-to-right", "right-to-left")
         resolved_scroll_x = bool(scroll_x if scroll_x is not None else scroll and horizontal)
         resolved_scroll_y = bool(scroll_y if scroll_y is not None else scroll and not horizontal)
@@ -962,7 +961,7 @@ class SplitPanel(LayoutWidget):
         Optional labels associated with children.
     keys : iterable of str, optional
         Stable child keys for iterable ``widgets``.
-    orientation : {"horizontal", "vertical"}, default "horizontal"
+    orientation : Orientation | str, default "horizontal"
         Split direction. Horizontal places panes side by side; vertical stacks
         panes top to bottom.
     spacing : int, default 6
@@ -987,7 +986,7 @@ class SplitPanel(LayoutWidget):
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("split").tag(sync=True)
-    orientation = t.Enum(ORIENTATIONS, default_value="horizontal").tag(sync=True)
+    orientation = t.Enum(tuple(Orientation), default_value=Orientation.HORIZONTAL).tag(sync=True)
     spacing = t.Int(6).tag(sync=True)
     sizes = t.List(t.Float(), default_value=[]).tag(sync=True)
 
@@ -997,7 +996,7 @@ class SplitPanel(LayoutWidget):
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        orientation: str = "horizontal",
+        orientation: Orientation | str = "horizontal",
         spacing: int = 6,
         sizes: Iterable[float] | None = None,
         width: int | float | str | None = "100%",
@@ -1005,6 +1004,7 @@ class SplitPanel(LayoutWidget):
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
+        orientation = choice(orientation, Orientation, "orientation")
         self._init_composed(
             widgets,
             titles,
@@ -1035,7 +1035,7 @@ class DockPanel(LayoutWidget):
         Tab titles associated with children.
     keys : iterable of str, optional
         Stable child keys for iterable ``widgets``.
-    mode : {"tab-after", "split-right", "split-left", "split-top", "split-bottom"}
+    mode : DockMode | str
         Placement mode used as children are added to the dock layout.
     width : int, float, str, or None
         Widget width.
@@ -1049,7 +1049,7 @@ class DockPanel(LayoutWidget):
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("dock").tag(sync=True)
-    mode = t.Enum(DOCK_MODES, default_value="split-right").tag(sync=True)
+    mode = t.Enum(tuple(DockMode), default_value=DockMode.SPLIT_RIGHT).tag(sync=True)
 
     def __init__(
         self,
@@ -1057,12 +1057,13 @@ class DockPanel(LayoutWidget):
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        mode: str = "split-right",
+        mode: DockMode | str = "split-right",
         width: int | float | str | None = "100%",
         height: int | float | str | None = 520,
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
+        mode = choice(mode, DockMode, "mode")
         self._init_composed(widgets, titles, keys, width, height, resizable, fit_content=fit_content, mode=mode)
 
 
@@ -1244,9 +1245,9 @@ class ResponsivePanel(LayoutWidget):
         Stable child keys for iterable ``widgets``.
     breakpoint : int, default 760
         Width in CSS pixels where the layout switches direction.
-    wide_direction : str, default "left-to-right"
+    wide_direction : Direction | str, default "left-to-right"
         Box direction used when the container is wider than ``breakpoint``.
-    narrow_direction : str, default "top-to-bottom"
+    narrow_direction : Direction | str, default "top-to-bottom"
         Box direction used when the container is narrower than ``breakpoint``.
     spacing : int, default 8
         Pixel spacing between children.
@@ -1263,8 +1264,8 @@ class ResponsivePanel(LayoutWidget):
 
     layout_kind = t.Unicode("responsive").tag(sync=True)
     breakpoint = t.Int(760).tag(sync=True)
-    wide_direction = t.Enum(BOX_DIRECTIONS, default_value="left-to-right").tag(sync=True)
-    narrow_direction = t.Enum(BOX_DIRECTIONS, default_value="top-to-bottom").tag(sync=True)
+    wide_direction = t.Enum(tuple(Direction), default_value=Direction.LEFT_TO_RIGHT).tag(sync=True)
+    narrow_direction = t.Enum(tuple(Direction), default_value=Direction.TOP_TO_BOTTOM).tag(sync=True)
     spacing = t.Int(8).tag(sync=True)
 
     def __init__(
@@ -1274,14 +1275,16 @@ class ResponsivePanel(LayoutWidget):
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
         breakpoint: int = 760,
-        wide_direction: str = "left-to-right",
-        narrow_direction: str = "top-to-bottom",
+        wide_direction: Direction | str = "left-to-right",
+        narrow_direction: Direction | str = "top-to-bottom",
         spacing: int = 8,
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
+        wide_direction = choice(wide_direction, Direction, "wide_direction")
+        narrow_direction = choice(narrow_direction, Direction, "narrow_direction")
         self._init_composed(
             widgets,
             titles,

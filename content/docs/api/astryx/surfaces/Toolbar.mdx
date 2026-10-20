@@ -44,13 +44,15 @@ Render an Astryx toolbar with optional slots.
         children: ChildInput = None,
         *,
         label: str,
-        size: str = "sm",
+        size: Size | str = "sm",
         gap: int | float = 1,
-        orientation: str | None = None,
+        orientation: Orientation | str | None = None,
         variant: str | None = None,
         dividers: Iterable[str] | None = None,
         **props: Any,
     ) -> None:
+        size = choice(size, Size, "size")
+        orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "Toolbar",
             children,
@@ -77,7 +79,7 @@ Render an Astryx toolbar with optional slots.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="size" type="str" value="'sm'">
+    <PyParameter name="size" type="Size | str" value="'sm'">
       Astryx component option.
     </PyParameter>
 
@@ -85,7 +87,7 @@ Render an Astryx toolbar with optional slots.
       Astryx spacing step between children.
     </PyParameter>
 
-    <PyParameter name="orientation" type="str | None" value="None">
+    <PyParameter name="orientation" type="Orientation | str | None" value="None">
       Horizontal or vertical keyboard navigation.
     </PyParameter>
 

@@ -23,12 +23,13 @@ Render a single- or multiple-selection group of toggle buttons.
         value: str | Iterable[str] | None = None,
         *,
         label: str,
-        selection_mode: str = "single",
+        selection_mode: SelectionMode | str = "single",
         orientation: str = "horizontal",
         size: str | None = None,
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        selection_mode = choice(selection_mode, SelectionMode, "selection_mode")
         if selection_mode not in {"single", "multiple"}:
             msg = "selection_mode must be 'single' or 'multiple'"
             raise ValueError(msg)
@@ -78,7 +79,7 @@ Render a single- or multiple-selection group of toggle buttons.
       Accessible label for the group.
     </PyParameter>
 
-    <PyParameter name="selection_mode" type="str" value="'single'">
+    <PyParameter name="selection_mode" type="SelectionMode | str" value="'single'">
       `"single"` for exclusive selection or `"multiple"` for
       independent selections.
     </PyParameter>

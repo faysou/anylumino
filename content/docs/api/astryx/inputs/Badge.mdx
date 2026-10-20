@@ -29,7 +29,8 @@ Render a compact status or category badge.
 <PyFunction name="__init__" type="(label, *, variant='neutral', **props) -> None" kind="constructor">
   <PySourceCode>
     ```python
-    def __init__(self, label: str, *, variant: str = "neutral", **props: Any) -> None:
+    def __init__(self, label: str, *, variant: BadgeVariant | str = "neutral", **props: Any) -> None:
+        variant = choice(variant, BadgeVariant, "variant")
         super().__init__("Badge", label=label, variant=variant, props=props)
     ```
   </PySourceCode>
@@ -39,7 +40,7 @@ Render a compact status or category badge.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'neutral'">
+    <PyParameter name="variant" type="BadgeVariant | str" value="'neutral'">
       Astryx visual variant.
     </PyParameter>
 

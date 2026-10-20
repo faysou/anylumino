@@ -9,7 +9,7 @@ Lumino dock panel for tabbed or split workspace-style layouts.
 <PyAttributes>
   <PyAttribute name="layout_kind" value="t.Unicode('dock').tag(sync=True)" />
 
-  <PyAttribute name="mode" value="t.Enum(DOCK_MODES, default_value='split-right').tag(sync=True)" />
+  <PyAttribute name="mode" value="t.Enum(tuple(DockMode), default_value=DockMode.SPLIT_RIGHT).tag(sync=True)" />
 </PyAttributes>
 
 ## Functions
@@ -23,12 +23,13 @@ Lumino dock panel for tabbed or split workspace-style layouts.
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        mode: str = "split-right",
+        mode: DockMode | str = "split-right",
         width: int | float | str | None = "100%",
         height: int | float | str | None = 520,
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
+        mode = choice(mode, DockMode, "mode")
         self._init_composed(widgets, titles, keys, width, height, resizable, fit_content=fit_content, mode=mode)
     ```
   </PySourceCode>
@@ -47,7 +48,7 @@ Lumino dock panel for tabbed or split workspace-style layouts.
       Stable child keys for iterable `widgets`.
     </PyParameter>
 
-    <PyParameter name="mode" type="str" value="'split-right'">
+    <PyParameter name="mode" type="DockMode | str" value="'split-right'">
       Placement mode used as children are added to the dock layout.
     </PyParameter>
 

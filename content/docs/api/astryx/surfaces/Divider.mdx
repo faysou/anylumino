@@ -31,12 +31,14 @@ Render an Astryx divider.
     def __init__(
         self,
         *,
-        orientation: str = "horizontal",
-        variant: str = "subtle",
+        orientation: Orientation | str = "horizontal",
+        variant: DividerVariant | str = "subtle",
         label: str | None = None,
         full_bleed: bool | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, DividerVariant, "variant")
+        orientation = choice(orientation, Orientation, "orientation")
         super().__init__(
             "Divider",
             variant=variant,
@@ -52,11 +54,11 @@ Render an Astryx divider.
   </PySourceCode>
 
   <div>
-    <PyParameter name="orientation" type="str" value="'horizontal'">
+    <PyParameter name="orientation" type="Orientation | str" value="'horizontal'">
       Astryx component option.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'subtle'">
+    <PyParameter name="variant" type="DividerVariant | str" value="'subtle'">
       Astryx visual variant.
     </PyParameter>
 

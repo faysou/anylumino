@@ -1,0 +1,84 @@
+---
+title: "enums"
+---
+
+Enums for the fixed option values of anylumino layout widgets.
+
+Each enum is a `StrEnum`, so a member compares equal to its string value and
+syncs as that string. Keywords that take one accept the member or its value,
+such as `Orientation.VERTICAL` or `"vertical"`, and reject any other value.
+
+<PyAttributes>
+  <PyAttribute name="E" value="TypeVar('E', bound=StrEnum)" />
+</PyAttributes>
+
+<Tabs items={["Class","Functions"]}>
+  <Tab value="Class">
+    <Cards>
+      <Card title="Orientation" href="/docs/api/enums/Orientation" />
+
+      <Card title="Direction" href="/docs/api/enums/Direction" />
+
+      <Card title="TabPlacement" href="/docs/api/enums/TabPlacement" />
+
+      <Card title="DockMode" href="/docs/api/enums/DockMode" />
+    </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="choice" type="(value, enum, name) -> E">
+      Return `value` as a member of `enum`.
+
+      <PySourceCode>
+        ```python
+        def choice(value: E | str, enum: type[E], name: str) -> E:
+            """Return ``value`` as a member of ``enum``.
+
+            Raises
+            ------
+            ValueError
+                If ``value`` is not a value of ``enum``; the message names the
+                keyword ``name`` and lists the allowed values.
+            """
+            try:
+                return enum(value)
+            except ValueError:
+                allowed = ", ".join(repr(member.value) for member in enum)
+                raise ValueError(f"{name}={value!r} is not a valid {enum.__name__}; use one of {allowed}") from None
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="value" type="E | str" />
+
+        <PyParameter name="enum" type="type[E]" />
+
+        <PyParameter name="name" type="str" />
+      </div>
+
+      <PyFunctionReturn type="anylumino.enums.E" />
+    </PyFunction>
+
+    <PyFunction name="optional_choice" type="(value, enum, name) -> E | None">
+      Return `value` as a member of `enum`, or `None` when it is `None`.
+
+      <PySourceCode>
+        ```python
+        def optional_choice(value: E | str | None, enum: type[E], name: str) -> E | None:
+            """Return ``value`` as a member of ``enum``, or `None` when it is `None`."""
+            return None if value is None else choice(value, enum, name)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="value" type="E | str | None" />
+
+        <PyParameter name="enum" type="type[E]" />
+
+        <PyParameter name="name" type="str" />
+      </div>
+
+      <PyFunctionReturn type="anylumino.enums.E | None" />
+    </PyFunction>
+  </Tab>
+</Tabs>

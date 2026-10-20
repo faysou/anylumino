@@ -13,7 +13,7 @@ stable child identifiers and default tab titles. Use `select_key` or
 <PyAttributes>
   <PyAttribute name="selected_index" value="t.Int(0).tag(sync=True)" />
 
-  <PyAttribute name="tab_placement" value="t.Enum(TAB_PLACEMENTS, default_value='top').tag(sync=True)" />
+  <PyAttribute name="tab_placement" value="t.Enum(tuple(TabPlacement), default_value=TabPlacement.TOP).tag(sync=True)" />
 
   <PyAttribute name="tabs_movable" value="t.Bool(False).tag(sync=True)" />
 </PyAttributes>
@@ -30,13 +30,14 @@ stable child identifiers and default tab titles. Use `select_key` or
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
         selected_index: int = 0,
-        tab_placement: str = "top",
+        tab_placement: TabPlacement | str = "top",
         tabs_movable: bool = False,
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
+        tab_placement = choice(tab_placement, TabPlacement, "tab_placement")
         self._init_composed(
             widgets,
             titles,
@@ -73,7 +74,7 @@ stable child identifiers and default tab titles. Use `select_key` or
       Initially selected tab index.
     </PyParameter>
 
-    <PyParameter name="tab_placement" type="str" value="'top'">
+    <PyParameter name="tab_placement" type="TabPlacement | str" value="'top'">
       Where Lumino should place the tab bar.
     </PyParameter>
 

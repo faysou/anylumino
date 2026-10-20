@@ -33,12 +33,13 @@ Center child content in an Astryx container.
         self,
         children: ChildInput = None,
         *,
-        axis: str = "both",
+        axis: Axis | str = "both",
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         inline: bool | None = None,
         **props: Any,
     ) -> None:
+        axis = choice(axis, Axis, "axis")
         super().__init__(
             "Center",
             children,
@@ -56,7 +57,7 @@ Center child content in an Astryx container.
       Child widget, sequence of widgets, or mapping of slot names to widgets.
     </PyParameter>
 
-    <PyParameter name="axis" type="str" value="'both'">
+    <PyParameter name="axis" type="Axis | str" value="'both'">
       Axis used for centering child content.
     </PyParameter>
 

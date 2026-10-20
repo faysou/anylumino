@@ -31,8 +31,9 @@ Arrange Astryx form controls with consistent spacing.
   <PySourceCode>
     ```python
     def __init__(
-        self, children: ChildInput = None, *, direction: str = "vertical", **props: Any
+        self, children: ChildInput = None, *, direction: FormDirection | str = "vertical", **props: Any
     ) -> None:
+        direction = choice(direction, FormDirection, "direction")
         super().__init__(
             "FormLayout", children, props={"direction": direction, **props}
         )
@@ -44,7 +45,7 @@ Arrange Astryx form controls with consistent spacing.
       Child widget, sequence of widgets, or mapping of slot names to widgets.
     </PyParameter>
 
-    <PyParameter name="direction" type="str" value="'vertical'">
+    <PyParameter name="direction" type="FormDirection | str" value="'vertical'">
       Layout direction.
     </PyParameter>
 

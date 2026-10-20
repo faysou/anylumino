@@ -9,14 +9,19 @@ from os import PathLike
 from typing import Any
 
 import traitlets as t
+from anylumino.enums import choice
+from anylumino.enums import optional_choice
 
 from ..common import json_value as _json_value
 from ..common import static_asset
 from ..components import ComponentWidget
 from ..layout import ChildInput
+from .enums import Align
+from .enums import ColorMode
+from .enums import Justify
+from .enums import Orientation
+from .enums import Wrap
 
-
-_ASTRYX_THEME_MODES = ("light", "dark", "system", "jupyterlab")
 _ASTRYX_COMPONENT_NAMES = {
     "AlertDialog",
     "AspectRatio",
@@ -185,12 +190,8 @@ def _clean_brand(brand: Mapping[str, Any] | None) -> dict[str, Any]:
     return _clean_astryx_theme(brand)
 
 
-def _clean_theme_mode(mode: str) -> str:
-    if mode not in _ASTRYX_THEME_MODES:
-        expected = ", ".join(_ASTRYX_THEME_MODES)
-        raise ValueError(f"theme mode must be one of: {expected}")
-
-    return mode
+def _clean_theme_mode(mode: ColorMode | str) -> ColorMode:
+    return choice(mode, ColorMode, "color_mode")
 
 
 def _option_records(options: Iterable[Any] | Mapping[str, Any]) -> list[Any]:
@@ -374,7 +375,7 @@ class Widget(ComponentWidget):
         Astryx visual variant.
     brand : Mapping[str, Any] | None, default None
         Runtime or built Astryx theme descriptor.
-    color_mode : str, default 'light'
+    color_mode : ColorMode | str, default 'light'
         Astryx ``Theme`` mode. Use ``"light"``, ``"dark"``, ``"system"`` to
         follow the OS ``prefers-color-scheme``, or ``"jupyterlab"`` to follow
         the JupyterLab theme.
@@ -409,7 +410,7 @@ class Widget(ComponentWidget):
     component_family = t.Unicode("astryx").tag(sync=True)
     component_name = t.Unicode("Stack").tag(sync=True)
     props = t.Dict(default_value={}).tag(sync=True)
-    color_mode = t.Enum(_ASTRYX_THEME_MODES, default_value="light").tag(sync=True)
+    color_mode = t.Enum(tuple(ColorMode), default_value=ColorMode.LIGHT).tag(sync=True)
     theme = t.Unicode("neutral").tag(sync=True)
     brand = t.Dict(default_value={}).tag(sync=True)
     continuous_update = t.Bool(True).tag(sync=True)
@@ -427,7 +428,7 @@ class Widget(ComponentWidget):
         disabled: bool = False,
         variant: str = "",
         brand: Mapping[str, Any] | None = None,
-        color_mode: str = "light",
+        color_mode: ColorMode | str = ColorMode.LIGHT,
         continuous_update: bool = True,
         search: Callable[[str], Iterable[Any]] | None = None,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
@@ -502,7 +503,7 @@ class Widget(ComponentWidget):
         self.props = {**self.props, key: _option_records(records)}
 
     def apply_brand(
-        self, brand: Mapping[str, Any] | None, *, color_mode: str | None = None
+        self, brand: Mapping[str, Any] | None, *, color_mode: ColorMode | str | None = None
     ) -> None:
         """Apply a reusable Astryx brand identity to this widget subtree."""
         self.brand = _clean_brand(brand)
@@ -708,20 +709,20 @@ class Theme(Widget):
     brand : Mapping[str, Any] | None
         Reusable Astryx theme descriptor created by :func:`Brand` or
         :func:`BuiltTheme`.
-    color_mode : str, default 'light'
+    color_mode : ColorMode | str, default 'light'
         Astryx ``Theme`` mode for this component or subtree. Use ``"light"``,
         ``"dark"``, ``"system"`` to follow the OS ``prefers-color-scheme``, or
         ``"jupyterlab"`` to follow the JupyterLab theme.
-    mode : str | None
+    mode : ColorMode | str | None
         Alias for ``color_mode`` matching the Astryx ``Theme`` prop name. When
         provided, it takes precedence over ``color_mode``.
-    direction : str, default 'vertical'
+    direction : Orientation | str, default 'vertical'
         Layout direction.
     gap : int | float, default 2
         Astryx spacing step between children.
-    align : {'start', 'center', 'end', 'stretch'}, optional
+    align : Align | str, optional
         Cross-axis alignment.
-    justify : {'start', 'center', 'end', 'between', 'around', 'evenly'}, optional
+    justify : Justify | str, optional
         Main-axis alignment.
     width : int | float | str | None, default None
         Theme container width.
@@ -729,7 +730,7 @@ class Theme(Widget):
         Theme container height.
     padding : int | float | None, default None
         Inner padding using the Astryx spacing scale.
-    wrap : str | None, default None
+    wrap : Wrap | str | None, default None
         Stack wrapping behavior.
     scrollable : bool | None, default None
         Whether overflow should scroll.
@@ -787,19 +788,23 @@ class Theme(Widget):
         children: ChildInput = None,
         *,
         brand: Mapping[str, Any] | None = None,
-        color_mode: str = "light",
-        mode: str | None = None,
-        direction: str = "vertical",
+        color_mode: ColorMode | str = ColorMode.LIGHT,
+        mode: ColorMode | str | None = None,
+        direction: Orientation | str = "vertical",
         gap: int | float = 2,
-        align: str | None = None,
-        justify: str | None = None,
+        align: Align | str | None = None,
+        justify: Justify | str | None = None,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         padding: int | float | None = None,
-        wrap: str | None = None,
+        wrap: Wrap | str | None = None,
         scrollable: bool | None = None,
         **props: Any,
     ) -> None:
+        wrap = optional_choice(wrap, Wrap, "wrap")
+        justify = optional_choice(justify, Justify, "justify")
+        direction = choice(direction, Orientation, "direction")
+        align = optional_choice(align, Align, "align")
         effective_mode = _clean_theme_mode(mode or color_mode)
         super().__init__(
             "Stack",

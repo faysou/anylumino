@@ -16,17 +16,15 @@ Astryx stack that switches direction when its width crosses a breakpoint.
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
         breakpoint: int = 760,
-        wide_direction: str = "horizontal",
-        narrow_direction: str = "vertical",
+        wide_direction: Orientation | str = "horizontal",
+        narrow_direction: Orientation | str = "vertical",
         gap: int | float = 2,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         **props: Any,
     ) -> None:
-        for name, direction in (("wide_direction", wide_direction), ("narrow_direction", narrow_direction)):
-            if direction not in STACK_DIRECTIONS:
-                msg = f"{name} must be one of {STACK_DIRECTIONS}, got {direction!r}"
-                raise ValueError(msg)
+        wide_direction = choice(wide_direction, Orientation, "wide_direction")
+        narrow_direction = choice(narrow_direction, Orientation, "narrow_direction")
 
         super().__init__(
             "ResponsivePanel",
@@ -63,11 +61,11 @@ Astryx stack that switches direction when its width crosses a breakpoint.
       Width in CSS pixels where the layout switches direction.
     </PyParameter>
 
-    <PyParameter name="wide_direction" type="str" value="'horizontal'">
+    <PyParameter name="wide_direction" type="Orientation | str" value="'horizontal'">
       Stack direction at or above the breakpoint.
     </PyParameter>
 
-    <PyParameter name="narrow_direction" type="str" value="'vertical'">
+    <PyParameter name="narrow_direction" type="Orientation | str" value="'vertical'">
       Stack direction below the breakpoint.
     </PyParameter>
 

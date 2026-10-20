@@ -71,10 +71,11 @@ Render an Astryx file input.
         description: str | None = None,
         loading: bool | None = None,
         placeholder: str | None = None,
-        mode: str | None = None,
+        mode: FileInputMode | str | None = None,
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        mode = optional_choice(mode, FileInputMode, "mode")
         super().__init__(
             "FileInput",
             label=label,
@@ -143,7 +144,7 @@ Render an Astryx file input.
       Placeholder text.
     </PyParameter>
 
-    <PyParameter name="mode" type="str | None" value="None">
+    <PyParameter name="mode" type="FileInputMode | str | None" value="None">
       Compact input or dropzone presentation.
     </PyParameter>
 

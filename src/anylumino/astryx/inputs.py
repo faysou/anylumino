@@ -6,12 +6,34 @@ from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Mapping
 from typing import Any
+from anylumino.enums import choice
+from anylumino.enums import optional_choice
 
 from ..components import ComponentWidget
 from ..layout import _size_to_css
 from .base import Widget
 from .base import _named_props
 from .base import _option_records
+from .enums import BadgeVariant
+from .enums import ButtonVariant
+from .enums import CompactSize
+from .enums import Display
+from .enums import DisplayType
+from .enums import FontWeight
+from .enums import HourFormat
+from .enums import InputType
+from .enums import LabelPosition
+from .enums import LabelSpacing
+from .enums import Orientation
+from .enums import Size
+from .enums import SwitchLabelPosition
+from .enums import TextColor
+from .enums import TextJustify
+from .enums import TextSize
+from .enums import TextType
+from .enums import TextWrap
+from .enums import TriggerDisplay
+from .enums import ValueDisplay
 
 
 class Text(Widget):
@@ -21,21 +43,21 @@ class Text(Widget):
     ----------
     text : str
         Text content synchronized to the frontend component.
-    text_type : str | None, default None
+    text_type : TextType | str | None, default None
         Semantic Astryx text type, such as ``"body"``, ``"supporting"``, or ``"display-1"``.
-    size : str | None, default None
+    size : TextSize | str | None, default None
         Explicit font-size override.
-    color : str | None, default None
+    color : TextColor | str | None, default None
         Theme text color.
-    weight : str | None, default None
+    weight : FontWeight | str | None, default None
         Font-weight override.
-    display : str | None, default None
+    display : Display | str | None, default None
         Inline or block display mode.
     max_lines : int | None, default None
         Maximum rendered lines before truncation.
-    text_wrap : str | None, default None
+    text_wrap : TextWrap | str | None, default None
         Text wrapping behavior.
-    justify : str | None, default None
+    justify : TextJustify | str | None, default None
         Logical text alignment.
     tabular_numbers : bool | None, default None
         Whether numeric glyphs use tabular widths.
@@ -91,17 +113,24 @@ class Text(Widget):
         self,
         text: str,
         *,
-        text_type: str | None = None,
-        size: str | None = None,
-        color: str | None = None,
-        weight: str | None = None,
-        display: str | None = None,
+        text_type: TextType | str | None = None,
+        size: TextSize | str | None = None,
+        color: TextColor | str | None = None,
+        weight: FontWeight | str | None = None,
+        display: Display | str | None = None,
         max_lines: int | None = None,
-        text_wrap: str | None = None,
-        justify: str | None = None,
+        text_wrap: TextWrap | str | None = None,
+        justify: TextJustify | str | None = None,
         tabular_numbers: bool | None = None,
         **props: Any,
     ) -> None:
+        weight = optional_choice(weight, FontWeight, "weight")
+        text_wrap = optional_choice(text_wrap, TextWrap, "text_wrap")
+        text_type = optional_choice(text_type, TextType, "text_type")
+        size = optional_choice(size, TextSize, "size")
+        justify = optional_choice(justify, TextJustify, "justify")
+        display = optional_choice(display, Display, "display")
+        color = optional_choice(color, TextColor, "color")
         legacy_props = props.pop("props", None)
         extra_props = {**dict(legacy_props or {}), **props}
         super().__init__(
@@ -131,15 +160,15 @@ class Heading(Widget):
         Text content synchronized to the frontend component.
     level : int, default 3
         Heading level from 1 through 6.
-    display_type : str | None, default None
+    display_type : DisplayType | str | None, default None
         Optional Astryx display-scale type.
-    color : str | None, default None
+    color : TextColor | str | None, default None
         Theme text color.
     max_lines : int | None, default None
         Maximum rendered lines before truncation.
-    text_wrap : str | None, default None
+    text_wrap : TextWrap | str | None, default None
         Text wrapping behavior.
-    justify : str | None, default None
+    justify : TextJustify | str | None, default None
         Logical text alignment.
     **props : Any
         Additional JSON-safe Heading props forwarded to Astryx. The older
@@ -192,13 +221,17 @@ class Heading(Widget):
         text: str,
         *,
         level: int = 3,
-        display_type: str | None = None,
-        color: str | None = None,
+        display_type: DisplayType | str | None = None,
+        color: TextColor | str | None = None,
         max_lines: int | None = None,
-        text_wrap: str | None = None,
-        justify: str | None = None,
+        text_wrap: TextWrap | str | None = None,
+        justify: TextJustify | str | None = None,
         **props: Any,
     ) -> None:
+        text_wrap = optional_choice(text_wrap, TextWrap, "text_wrap")
+        justify = optional_choice(justify, TextJustify, "justify")
+        display_type = optional_choice(display_type, DisplayType, "display_type")
+        color = optional_choice(color, TextColor, "color")
         if not 1 <= level <= 6:
             raise ValueError("heading level must be between 1 and 6")
 
@@ -226,7 +259,7 @@ class Badge(Widget):
     ----------
     label : str
         Visible or accessible label for the component.
-    variant : str, default 'neutral'
+    variant : BadgeVariant | str, default 'neutral'
         Astryx visual variant.
     **props : Any
         JSON-safe Badge props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -252,7 +285,8 @@ class Badge(Widget):
     See Astryx component docs: <https://astryx.atmeta.com/components/Badge>.
     """
 
-    def __init__(self, label: str, *, variant: str = "neutral", **props: Any) -> None:
+    def __init__(self, label: str, *, variant: BadgeVariant | str = "neutral", **props: Any) -> None:
+        variant = choice(variant, BadgeVariant, "variant")
         super().__init__("Badge", label=label, variant=variant, props=props)
 
 
@@ -263,11 +297,11 @@ class Button(Widget):
     ----------
     label : str
         Visible or accessible label for the component.
-    variant : str, default 'secondary'
+    variant : ButtonVariant | str, default 'secondary'
         Astryx visual variant.
     disabled : bool, default False
         Whether the component should render disabled.
-    size : str | None, default None
+    size : Size | str | None, default None
         Button size.
     loading : bool | None, default None
         Whether to show the loading state.
@@ -326,14 +360,16 @@ class Button(Widget):
         self,
         label: str,
         *,
-        variant: str = "secondary",
+        variant: ButtonVariant | str = "secondary",
         disabled: bool = False,
-        size: str | None = None,
+        size: Size | str | None = None,
         loading: bool | None = None,
         tooltip: str | None = None,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, ButtonVariant, "variant")
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "Button",
             label=label,
@@ -353,11 +389,11 @@ class IconButton(Widget):
         Visible or accessible label for the component.
     icon : str, default 'close'
         Astryx icon name.
-    variant : str, default 'secondary'
+    variant : ButtonVariant | str, default 'secondary'
         Astryx visual variant.
     disabled : bool, default False
         Whether the component should render disabled.
-    size : str | None, default None
+    size : Size | str | None, default None
         Button size.
     loading : bool | None, default None
         Whether to show the loading state.
@@ -398,14 +434,16 @@ class IconButton(Widget):
         label: str,
         *,
         icon: str = "close",
-        variant: str = "secondary",
+        variant: ButtonVariant | str = "secondary",
         disabled: bool = False,
-        size: str | None = None,
+        size: Size | str | None = None,
         loading: bool | None = None,
         tooltip: str | None = None,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, ButtonVariant, "variant")
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "IconButton",
             label=label,
@@ -430,7 +468,7 @@ class ToggleButton(Widget):
         Visible or accessible label for the component.
     disabled : bool, default False
         Whether the component should render disabled.
-    size : str | None, default None
+    size : Size | str | None, default None
         Button size.
     loading : bool | None, default None
         Whether to show the loading state.
@@ -480,11 +518,12 @@ class ToggleButton(Widget):
         *,
         label: str,
         disabled: bool = False,
-        size: str | None = None,
+        size: Size | str | None = None,
         loading: bool | None = None,
         tooltip: str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "ToggleButton",
             label=label,
@@ -503,7 +542,7 @@ class TextInput(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
-    label_position : {'top', 'left'}, default 'top'
+    label_position : LabelPosition | str, default 'top'
         Place the label above the control or beside it in a compact row.
     label_width : int | float | str | None, default None
         Width of a left-side label. Use the same width to align sibling controls.
@@ -511,9 +550,9 @@ class TextInput(Widget):
         Placeholder text shown when the control is empty.
     disabled : bool, default False
         Whether the component should render disabled.
-    input_type : str | None, default None
+    input_type : InputType | str | None, default None
         HTML text input type.
-    size : str | None, default None
+    size : Size | str | None, default None
         Input size.
     label_hidden : bool | None, default None
         Whether to visually hide the accessible label.
@@ -586,12 +625,12 @@ class TextInput(Widget):
         value: str = "",
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         placeholder: str = "",
         disabled: bool = False,
-        input_type: str | None = None,
-        size: str | None = None,
+        input_type: InputType | str | None = None,
+        size: Size | str | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
         optional: bool | None = None,
@@ -603,6 +642,9 @@ class TextInput(Widget):
         select_on_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        label_position = choice(label_position, LabelPosition, "label_position")
+        input_type = optional_choice(input_type, InputType, "input_type")
         super().__init__(
             "TextInput",
             label=label,
@@ -643,7 +685,7 @@ class TextArea(Widget):
         Rows or records rendered by the component.
     disabled : bool, default False
         Whether the component should render disabled.
-    size : str | None, default None
+    size : Size | str | None, default None
         Text-area size.
     label_hidden : bool | None, default None
         Whether to visually hide the accessible label.
@@ -729,7 +771,7 @@ class TextArea(Widget):
         placeholder: str = "",
         rows: int = 3,
         disabled: bool = False,
-        size: str | None = None,
+        size: Size | str | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
         optional: bool | None = None,
@@ -740,6 +782,7 @@ class TextArea(Widget):
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "TextArea",
             label=label,
@@ -781,7 +824,7 @@ class NumberInput(Widget):
         Numeric step increment.
     units : str | None, default None
         Units displayed after the value.
-    size : str | None, default None
+    size : Size | str | None, default None
         Input size.
     placeholder : str | None, default None
         Placeholder text.
@@ -856,7 +899,7 @@ class NumberInput(Widget):
         max: int | float | None = None,
         step: int | float | None = None,
         units: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         placeholder: str | None = None,
         integer_only: bool | None = None,
         clear: bool | None = None,
@@ -865,6 +908,7 @@ class NumberInput(Widget):
         select_on_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "NumberInput",
             label=label,
@@ -896,7 +940,7 @@ class Slider(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
-    label_position : {'top', 'left'}, default 'top'
+    label_position : LabelPosition | str, default 'top'
         Place the label above the slider or beside it in a compact row.
     label_width : int | float | str | None, default None
         Width of a left-side label. Use the same width to align sibling sliders.
@@ -908,9 +952,9 @@ class Slider(Widget):
         Maximum slider value.
     step : int | float | None, default None
         Slider step increment.
-    orientation : str | None, default None
+    orientation : Orientation | str | None, default None
         Horizontal or vertical orientation.
-    value_display : str | None, default None
+    value_display : ValueDisplay | str | None, default None
         Tooltip, text, or hidden value presentation.
     marks : Iterable[Mapping[str, Any]] | None, default None
         Optional slider tick-mark records.
@@ -968,19 +1012,22 @@ class Slider(Widget):
         value: int | float | tuple[int | float, int | float] | list[int | float] = 0,
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         disabled: bool = False,
         min: int | float | None = None,
         max: int | float | None = None,
         step: int | float | None = None,
-        orientation: str | None = None,
-        value_display: str | None = None,
+        orientation: Orientation | str | None = None,
+        value_display: ValueDisplay | str | None = None,
         marks: Iterable[Mapping[str, Any]] | None = None,
         description: str | None = None,
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        value_display = optional_choice(value_display, ValueDisplay, "value_display")
+        orientation = optional_choice(orientation, Orientation, "orientation")
+        label_position = choice(label_position, LabelPosition, "label_position")
         super().__init__(
             "Slider",
             label=label,
@@ -1083,7 +1130,7 @@ class LogSlider(Widget):
         Synchronized component value on the real scale, not the exponent.
     label : str, default ''
         Visible or accessible label for the component.
-    label_position : {'top', 'left'}, default 'top'
+    label_position : LabelPosition | str, default 'top'
         Place the label above the slider or beside it in a compact row.
     label_width : int | float | str | None, default None
         Width of a left-side label. Use the same width to align sibling sliders.
@@ -1114,7 +1161,7 @@ class LogSlider(Widget):
         value: int | float = 1,
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         base: int | float = 10,
         min_exponent: int | float = 0,
@@ -1125,6 +1172,7 @@ class LogSlider(Widget):
         description: str | None = None,
         **props: Any,
     ) -> None:
+        label_position = choice(label_position, LabelPosition, "label_position")
         super().__init__(
             "LogSlider",
             label=label,
@@ -1160,7 +1208,7 @@ class SelectionSlider(Widget):
         the first option.
     label : str, default ''
         Visible or accessible label for the component.
-    label_position : {'top', 'left'}, default 'top'
+    label_position : LabelPosition | str, default 'top'
         Place the label above the slider or beside it in a compact row.
     label_width : int | float | str | None, default None
         Width of a left-side label. Use the same width to align sibling sliders.
@@ -1186,7 +1234,7 @@ class SelectionSlider(Widget):
         value: Any = None,
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         marks: bool = False,
         disabled: bool = False,
@@ -1194,6 +1242,7 @@ class SelectionSlider(Widget):
         description: str | None = None,
         **props: Any,
     ) -> None:
+        label_position = choice(label_position, LabelPosition, "label_position")
         records = _option_records(items)
         if value is None and records:
             first = records[0]
@@ -1232,7 +1281,7 @@ class Checkbox(Widget):
         Visible or accessible label for the component.
     disabled : bool, default False
         Whether the component should render disabled.
-    size : str | None, default None
+    size : CompactSize | str | None, default None
         Checkbox size.
     label_hidden : bool | None, default None
         Whether to visually hide the accessible label.
@@ -1297,7 +1346,7 @@ class Checkbox(Widget):
         *,
         label: str = "",
         disabled: bool = False,
-        size: str | None = None,
+        size: CompactSize | str | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
         loading: bool | None = None,
@@ -1305,6 +1354,7 @@ class Checkbox(Widget):
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, CompactSize, "size")
         super().__init__(
             "CheckboxInput",
             label=label,
@@ -1341,9 +1391,9 @@ class Switch(Widget):
         Whether to show the loading state.
     status : Mapping[str, Any] | None, default None
         Validation status record.
-    label_position : str | None, default None
+    label_position : SwitchLabelPosition | str | None, default None
         Whether the label appears before or after the switch.
-    label_spacing : str | None, default None
+    label_spacing : LabelSpacing | str | None, default None
         Default or spread label spacing.
     **props : Any
         JSON-safe Switch props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1401,10 +1451,12 @@ class Switch(Widget):
         description: str | None = None,
         loading: bool | None = None,
         status: Mapping[str, Any] | None = None,
-        label_position: str | None = None,
-        label_spacing: str | None = None,
+        label_position: SwitchLabelPosition | str | None = None,
+        label_spacing: LabelSpacing | str | None = None,
         **props: Any,
     ) -> None:
+        label_spacing = optional_choice(label_spacing, LabelSpacing, "label_spacing")
+        label_position = optional_choice(label_position, SwitchLabelPosition, "label_position")
         super().__init__(
             "Switch",
             label=label,
@@ -1433,7 +1485,7 @@ class Selector(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
-    label_position : {'top', 'left'}, default 'top'
+    label_position : LabelPosition | str, default 'top'
         Place the label above the control or beside it in a compact row.
     label_width : int | float | str | None, default None
         Width of a left-side label. Use the same width to align sibling controls.
@@ -1441,7 +1493,7 @@ class Selector(Widget):
         Whether the selector is disabled.
     placeholder : str | None, default None
         Placeholder shown when no option is selected.
-    size : str | None, default None
+    size : Size | str | None, default None
         Selector size.
     clear : bool | None, default None
         Whether to show a clear button.
@@ -1502,11 +1554,11 @@ class Selector(Widget):
         value: str | None = None,
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         disabled: bool = False,
         placeholder: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         clear: bool | None = None,
         search: bool | None = None,
         search_placeholder: str | None = None,
@@ -1515,6 +1567,8 @@ class Selector(Widget):
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        label_position = choice(label_position, LabelPosition, "label_position")
         super().__init__(
             "Selector",
             label=label,
@@ -1548,7 +1602,7 @@ class MultiSelector(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
-    label_position : {'top', 'left'}, default 'top'
+    label_position : LabelPosition | str, default 'top'
         Place the label above the control or beside it in a compact row.
     label_width : int | float | str | None, default None
         Width of a left-side label. Use the same width to align sibling controls.
@@ -1556,7 +1610,7 @@ class MultiSelector(Widget):
         Whether the selector is disabled.
     placeholder : str | None, default None
         Placeholder shown when no option is selected.
-    size : str | None, default None
+    size : Size | str | None, default None
         Selector size.
     loading : bool | None, default None
         Whether to show the loading state.
@@ -1566,7 +1620,7 @@ class MultiSelector(Widget):
         Whether to show the select-all control.
     search : bool | None, default None
         Whether to show option filtering.
-    trigger_display : str | None, default None
+    trigger_display : TriggerDisplay | str | None, default None
         Count, labels, or badges selection summary.
     max_badges : int | None, default None
         Maximum badges shown in the trigger.
@@ -1635,21 +1689,24 @@ class MultiSelector(Widget):
         value: Iterable[str] = (),
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         disabled: bool = False,
         placeholder: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         loading: bool | None = None,
         clear: bool | None = None,
         select_all: bool | None = None,
         search: bool | None = None,
-        trigger_display: str | None = None,
+        trigger_display: TriggerDisplay | str | None = None,
         max_badges: int | None = None,
         description: str | None = None,
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        trigger_display = optional_choice(trigger_display, TriggerDisplay, "trigger_display")
+        size = optional_choice(size, Size, "size")
+        label_position = choice(label_position, LabelPosition, "label_position")
         super().__init__(
             "MultiSelector",
             label=label,
@@ -1676,13 +1733,10 @@ class MultiSelector(Widget):
 
 def _label_props(
     props: Mapping[str, Any],
-    label_position: str,
+    label_position: LabelPosition,
     label_width: int | float | str | None,
     **values: Any,
 ) -> dict[str, Any]:
-    if label_position not in ("top", "left"):
-        raise ValueError("label_position must be 'top' or 'left'")
-
     normalized = _named_props(props, **values)
     if label_position == "left":
         normalized["labelPosition"] = label_position
@@ -1710,7 +1764,7 @@ class DateInput(Widget):
         Maximum ISO date.
     placeholder : str | None, default None
         Placeholder text.
-    size : str | None, default None
+    size : Size | str | None, default None
         Input size.
     clear : bool | None, default None
         Whether to show a clear button.
@@ -1770,11 +1824,12 @@ class DateInput(Widget):
         min: str | None = None,
         max: str | None = None,
         placeholder: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         clear: bool | None = None,
         number_of_months: int | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "DateInput",
             label=label,
@@ -1811,13 +1866,13 @@ class TimeInput(Widget):
         Whether to include seconds.
     clear : bool | None, default None
         Whether to show a clear button.
-    hour_format : str | None, default None
+    hour_format : HourFormat | str | None, default None
         Twelve- or twenty-four-hour display format.
     increment : int | None, default None
         Arrow-key minute increment.
     placeholder : str | None, default None
         Placeholder text.
-    size : str | None, default None
+    size : Size | str | None, default None
         Input size.
     **props : Any
         JSON-safe TimeInput props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1881,12 +1936,14 @@ class TimeInput(Widget):
         max: str | None = None,
         seconds: bool | None = None,
         clear: bool | None = None,
-        hour_format: str | None = None,
+        hour_format: HourFormat | str | None = None,
         increment: int | None = None,
         placeholder: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        hour_format = optional_choice(hour_format, HourFormat, "hour_format")
         super().__init__(
             "TimeInput",
             label=label,
@@ -1923,7 +1980,7 @@ class DateTimeInput(Widget):
         Maximum ISO datetime.
     seconds : bool | None, default None
         Whether to include seconds.
-    hour_format : str | None, default None
+    hour_format : HourFormat | str | None, default None
         Twelve- or twenty-four-hour display format.
     time_increment : int | None, default None
         Arrow-key minute increment.
@@ -1995,12 +2052,13 @@ class DateTimeInput(Widget):
         min: str | None = None,
         max: str | None = None,
         seconds: bool | None = None,
-        hour_format: str | None = None,
+        hour_format: HourFormat | str | None = None,
         time_increment: int | None = None,
         clear: bool | None = None,
         number_of_months: int | None = None,
         **props: Any,
     ) -> None:
+        hour_format = optional_choice(hour_format, HourFormat, "hour_format")
         super().__init__(
             "DateTimeInput",
             label=label,
@@ -2040,7 +2098,7 @@ class DateRangeInput(Widget):
         Whether to show a clear button.
     placeholder : str | None, default None
         Placeholder text.
-    size : str | None, default None
+    size : Size | str | None, default None
         Input size.
     number_of_months : int | None, default None
         Number of calendar months to display.
@@ -2099,10 +2157,11 @@ class DateRangeInput(Widget):
         presets: Iterable[Mapping[str, Any]] | None = None,
         clear: bool | None = None,
         placeholder: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         number_of_months: int | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "DateRangeInput",
             label=label,

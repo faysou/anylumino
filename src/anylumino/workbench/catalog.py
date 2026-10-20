@@ -10,7 +10,8 @@ from typing import Any
 
 import anylumino as al
 import anylumino.astryx as ax
-
+from anylumino import enums as layout_enums
+from anylumino.astryx import enums as astryx_enums
 
 # Plotly is optional, so the Plot component exists only where it is installed
 try:
@@ -266,6 +267,12 @@ _COMPONENTS: tuple[Component, ...] = (
 )
 
 _MODULES = {"al": al, "ax": ax, "go": go}
+_OPTION_ENUMS = {
+    name: value
+    for module in (layout_enums, astryx_enums)
+    for name, value in vars(module).items()
+    if isinstance(value, type) and issubclass(value, StrEnum) and value is not StrEnum
+}
 _ANNOTATIONS = {
     "bool": _BOOLEAN,
     "int": _NUMBER,
@@ -318,9 +325,15 @@ def _with_options(component: Component) -> Component:
 
 
 # Callables and other Python-only types have no OpenUI literal, so their keywords stay out of options.
+# An option enum, such as `Size | str`, allows only the enum's values: the `str` takes the same values.
 def _annotation_schema(annotation: str) -> dict[str, Any] | None:
+    parts = [part.strip() for part in annotation.split(" | ")]
+    option_enums = [_OPTION_ENUMS[part] for part in parts if part in _OPTION_ENUMS]
+    if option_enums:
+        return {"type": "string", "enum": [member.value for member in option_enums[0]]}
+
     schemas = []
-    for part in (part.strip() for part in annotation.split(" | ")):
+    for part in parts:
         if part == "None":
             continue
 

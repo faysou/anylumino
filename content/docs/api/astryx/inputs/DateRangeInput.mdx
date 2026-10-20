@@ -60,10 +60,11 @@ Render an Astryx date-range input.
         presets: Iterable[Mapping[str, Any]] | None = None,
         clear: bool | None = None,
         placeholder: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         number_of_months: int | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "DateRangeInput",
             label=label,
@@ -116,7 +117,7 @@ Render an Astryx date-range input.
       Placeholder text.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Input size.
     </PyParameter>
 

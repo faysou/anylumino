@@ -45,14 +45,16 @@ Render a single-choice Astryx radio list.
         value: str,
         *,
         label: str,
-        orientation: str | None = None,
+        orientation: Orientation | str | None = None,
         disabled: bool = False,
-        size: str | None = None,
+        size: CompactSize | str | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
         status: Mapping[str, Any] | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, CompactSize, "size")
+        orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "RadioList",
             label=label,
@@ -84,7 +86,7 @@ Render a single-choice Astryx radio list.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="orientation" type="str | None" value="None">
+    <PyParameter name="orientation" type="Orientation | str | None" value="None">
       Vertical or horizontal item layout.
     </PyParameter>
 
@@ -92,7 +94,7 @@ Render a single-choice Astryx radio list.
       Whether all radio items are disabled.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="CompactSize | str | None" value="None">
       Radio control size.
     </PyParameter>
 

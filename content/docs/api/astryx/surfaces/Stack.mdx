@@ -54,17 +54,21 @@ Arrange child widgets in an Astryx stack.
         self,
         children: ChildInput = None,
         *,
-        direction: str = "vertical",
+        direction: Orientation | str = "vertical",
         gap: int | float = 2,
-        align: str | None = None,
-        justify: str | None = None,
+        align: Align | str | None = None,
+        justify: Justify | str | None = None,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         padding: int | float | None = None,
-        wrap: str | None = None,
+        wrap: Wrap | str | None = None,
         scrollable: bool | None = None,
         **props: Any,
     ) -> None:
+        wrap = optional_choice(wrap, Wrap, "wrap")
+        justify = optional_choice(justify, Justify, "justify")
+        direction = choice(direction, Orientation, "direction")
+        align = optional_choice(align, Align, "align")
         super().__init__(
             "Stack",
             children,
@@ -91,7 +95,7 @@ Arrange child widgets in an Astryx stack.
       Child widget, sequence of widgets, or mapping of slot names to widgets.
     </PyParameter>
 
-    <PyParameter name="direction" type="str" value="'vertical'">
+    <PyParameter name="direction" type="Orientation | str" value="'vertical'">
       Layout direction.
     </PyParameter>
 
@@ -99,11 +103,11 @@ Arrange child widgets in an Astryx stack.
       Astryx spacing step between children.
     </PyParameter>
 
-    <PyParameter name="align" type="str | None" value="None">
+    <PyParameter name="align" type="Align | str | None" value="None">
       Cross-axis alignment.
     </PyParameter>
 
-    <PyParameter name="justify" type="str | None" value="None">
+    <PyParameter name="justify" type="Justify | str | None" value="None">
       Main-axis alignment.
     </PyParameter>
 
@@ -119,7 +123,7 @@ Arrange child widgets in an Astryx stack.
       Inner padding using the Astryx spacing scale.
     </PyParameter>
 
-    <PyParameter name="wrap" type="str | None" value="None">
+    <PyParameter name="wrap" type="Wrap | str | None" value="None">
       Stack wrapping behavior.
     </PyParameter>
 

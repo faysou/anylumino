@@ -49,10 +49,11 @@ Render a button-backed Astryx dropdown menu.
         open: bool = False,
         menu_width: int | float | str | None = None,
         chevron: bool | None = None,
-        placement: str | None = None,
+        placement: LayerPlacement | str | None = None,
         auto_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        placement = optional_choice(placement, LayerPlacement, "placement")
         super().__init__(
             "DropdownMenu",
             label=label,
@@ -111,7 +112,7 @@ Render a button-backed Astryx dropdown menu.
       Whether the trigger shows a chevron.
     </PyParameter>
 
-    <PyParameter name="placement" type="str | None" value="None">
+    <PyParameter name="placement" type="LayerPlacement | str | None" value="None">
       Menu placement relative to the trigger.
     </PyParameter>
 

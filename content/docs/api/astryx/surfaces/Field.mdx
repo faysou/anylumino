@@ -63,10 +63,11 @@ Wrap a custom control with an Astryx field label.
         label_hidden: bool | None = None,
         optional: bool | None = None,
         required: bool | None = None,
-        status_variant: str | None = None,
+        status_variant: StatusPlacement | str | None = None,
         width: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        status_variant = optional_choice(status_variant, StatusPlacement, "status_variant")
         super().__init__(
             "Field",
             children,
@@ -126,7 +127,7 @@ Wrap a custom control with an Astryx field label.
       Whether to mark the field required.
     </PyParameter>
 
-    <PyParameter name="status_variant" type="str | None" value="None">
+    <PyParameter name="status_variant" type="StatusPlacement | str | None" value="None">
       Attached or detached status presentation.
     </PyParameter>
 

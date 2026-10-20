@@ -22,7 +22,7 @@ including `continuous_update`, behaves like :class:`Slider`.
         value: int | float = 1,
         *,
         label: str = "",
-        label_position: str = "top",
+        label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         base: int | float = 10,
         min_exponent: int | float = 0,
@@ -33,6 +33,7 @@ including `continuous_update`, behaves like :class:`Slider`.
         description: str | None = None,
         **props: Any,
     ) -> None:
+        label_position = choice(label_position, LabelPosition, "label_position")
         super().__init__(
             "LogSlider",
             label=label,
@@ -62,7 +63,7 @@ including `continuous_update`, behaves like :class:`Slider`.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="label_position" type="str" value="'top'">
+    <PyParameter name="label_position" type="LabelPosition | str" value="'top'">
       Place the label above the slider or beside it in a compact row.
     </PyParameter>
 

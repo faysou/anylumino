@@ -56,17 +56,24 @@ Render themed Astryx body text.
         self,
         text: str,
         *,
-        text_type: str | None = None,
-        size: str | None = None,
-        color: str | None = None,
-        weight: str | None = None,
-        display: str | None = None,
+        text_type: TextType | str | None = None,
+        size: TextSize | str | None = None,
+        color: TextColor | str | None = None,
+        weight: FontWeight | str | None = None,
+        display: Display | str | None = None,
         max_lines: int | None = None,
-        text_wrap: str | None = None,
-        justify: str | None = None,
+        text_wrap: TextWrap | str | None = None,
+        justify: TextJustify | str | None = None,
         tabular_numbers: bool | None = None,
         **props: Any,
     ) -> None:
+        weight = optional_choice(weight, FontWeight, "weight")
+        text_wrap = optional_choice(text_wrap, TextWrap, "text_wrap")
+        text_type = optional_choice(text_type, TextType, "text_type")
+        size = optional_choice(size, TextSize, "size")
+        justify = optional_choice(justify, TextJustify, "justify")
+        display = optional_choice(display, Display, "display")
+        color = optional_choice(color, TextColor, "color")
         legacy_props = props.pop("props", None)
         extra_props = {**dict(legacy_props or {}), **props}
         super().__init__(
@@ -93,23 +100,23 @@ Render themed Astryx body text.
       Text content synchronized to the frontend component.
     </PyParameter>
 
-    <PyParameter name="text_type" type="str | None" value="None">
+    <PyParameter name="text_type" type="TextType | str | None" value="None">
       Semantic Astryx text type, such as `"body"`, `"supporting"`, or `"display-1"`.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="TextSize | str | None" value="None">
       Explicit font-size override.
     </PyParameter>
 
-    <PyParameter name="color" type="str | None" value="None">
+    <PyParameter name="color" type="TextColor | str | None" value="None">
       Theme text color.
     </PyParameter>
 
-    <PyParameter name="weight" type="str | None" value="None">
+    <PyParameter name="weight" type="FontWeight | str | None" value="None">
       Font-weight override.
     </PyParameter>
 
-    <PyParameter name="display" type="str | None" value="None">
+    <PyParameter name="display" type="Display | str | None" value="None">
       Inline or block display mode.
     </PyParameter>
 
@@ -117,11 +124,11 @@ Render themed Astryx body text.
       Maximum rendered lines before truncation.
     </PyParameter>
 
-    <PyParameter name="text_wrap" type="str | None" value="None">
+    <PyParameter name="text_wrap" type="TextWrap | str | None" value="None">
       Text wrapping behavior.
     </PyParameter>
 
-    <PyParameter name="justify" type="str | None" value="None">
+    <PyParameter name="justify" type="TextJustify | str | None" value="None">
       Logical text alignment.
     </PyParameter>
 

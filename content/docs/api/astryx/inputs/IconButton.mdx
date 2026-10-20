@@ -38,14 +38,16 @@ Render an icon-only Astryx button.
         label: str,
         *,
         icon: str = "close",
-        variant: str = "secondary",
+        variant: ButtonVariant | str = "secondary",
         disabled: bool = False,
-        size: str | None = None,
+        size: Size | str | None = None,
         loading: bool | None = None,
         tooltip: str | None = None,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, ButtonVariant, "variant")
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "IconButton",
             label=label,
@@ -69,7 +71,7 @@ Render an icon-only Astryx button.
       Astryx icon name.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'secondary'">
+    <PyParameter name="variant" type="ButtonVariant | str" value="'secondary'">
       Astryx visual variant.
     </PyParameter>
 
@@ -77,7 +79,7 @@ Render an icon-only Astryx button.
       Whether the component should render disabled.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Button size.
     </PyParameter>
 

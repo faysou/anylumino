@@ -41,7 +41,7 @@ Render an Astryx progress bar.
         value: int | float = 0,
         *,
         label: str,
-        variant: str = "accent",
+        variant: StatusVariant | str = "accent",
         max: int | float | None = None,
         label_hidden: bool | None = None,
         value_label: bool | None = None,
@@ -49,6 +49,7 @@ Render an Astryx progress bar.
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        variant = choice(variant, StatusVariant, "variant")
         super().__init__(
             "ProgressBar",
             label=label,
@@ -75,7 +76,7 @@ Render an Astryx progress bar.
       Visible or accessible label for the component.
     </PyParameter>
 
-    <PyParameter name="variant" type="str" value="'accent'">
+    <PyParameter name="variant" type="StatusVariant | str" value="'accent'">
       Astryx visual variant.
     </PyParameter>
 

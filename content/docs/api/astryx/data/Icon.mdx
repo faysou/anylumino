@@ -32,10 +32,12 @@ Render an Astryx icon by name.
         self,
         icon: str,
         *,
-        color: str | None = None,
-        size: str | None = None,
+        color: IconColor | str | None = None,
+        size: IconSize | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, IconSize, "size")
+        color = optional_choice(color, IconColor, "color")
         super().__init__(
             "Icon",
             text=icon,
@@ -50,11 +52,11 @@ Render an Astryx icon by name.
       Astryx icon name.
     </PyParameter>
 
-    <PyParameter name="color" type="str | None" value="None">
+    <PyParameter name="color" type="IconColor | str | None" value="None">
       Theme icon color.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="IconSize | str | None" value="None">
       Icon size.
     </PyParameter>
 

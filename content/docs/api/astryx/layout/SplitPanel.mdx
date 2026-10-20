@@ -16,7 +16,7 @@ panes.
 
 ## Functions
 
-<PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, orientation='horizontal', sizes=None, min_size=80, width='100%', height=420, **props) -> None" kind="constructor">
+<PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, orientation=Orientation.HORIZONTAL, sizes=None, min_size=80, width='100%', height=420, **props) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -25,16 +25,14 @@ panes.
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        orientation: str = "horizontal",
+        orientation: Orientation | str = Orientation.HORIZONTAL,
         sizes: Iterable[float] | None = None,
         min_size: int = 80,
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         **props: Any,
     ) -> None:
-        if orientation not in SPLIT_ORIENTATIONS:
-            msg = f"orientation must be one of {SPLIT_ORIENTATIONS}, got {orientation!r}"
-            raise ValueError(msg)
+        orientation = choice(orientation, Orientation, "orientation")
 
         super().__init__(
             "SplitPanel",
@@ -62,7 +60,7 @@ panes.
       Stable child keys for iterable `children`.
     </PyParameter>
 
-    <PyParameter name="orientation" type="str" value="'horizontal'">
+    <PyParameter name="orientation" type="Orientation | str" value="Orientation.HORIZONTAL">
       Split direction. Horizontal places panes side by side; vertical stacks
       them.
     </PyParameter>

@@ -41,10 +41,11 @@ Render label-value metadata rows.
         columns: str | int | None = None,
         label: Mapping[str, Any] | None = None,
         max_items: int | None = None,
-        orientation: str | None = None,
+        orientation: Orientation | str | None = None,
         title: str | None = None,
         **props: Any,
     ) -> None:
+        orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "MetadataList",
             props=_named_props(
@@ -77,7 +78,7 @@ Render label-value metadata rows.
       Maximum visible items before the expansion control.
     </PyParameter>
 
-    <PyParameter name="orientation" type="str | None" value="None">
+    <PyParameter name="orientation" type="Orientation | str | None" value="None">
       Vertical or horizontal layout.
     </PyParameter>
 

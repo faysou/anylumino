@@ -35,10 +35,11 @@ Render Astryx breadcrumbs from item records.
         items: Iterable[Any],
         *,
         separator: str | None = None,
-        variant: str | None = None,
+        variant: BreadcrumbsVariant | str | None = None,
         label: str | None = None,
         **props: Any,
     ) -> None:
+        variant = optional_choice(variant, BreadcrumbsVariant, "variant")
         super().__init__(
             "Breadcrumbs",
             props=_named_props(
@@ -61,7 +62,7 @@ Render Astryx breadcrumbs from item records.
       Separator text between breadcrumb items.
     </PyParameter>
 
-    <PyParameter name="variant" type="str | None" value="None">
+    <PyParameter name="variant" type="BreadcrumbsVariant | str | None" value="None">
       Default or supporting visual treatment.
     </PyParameter>
 

@@ -67,12 +67,14 @@ Render an Astryx time input.
         max: str | None = None,
         seconds: bool | None = None,
         clear: bool | None = None,
-        hour_format: str | None = None,
+        hour_format: HourFormat | str | None = None,
         increment: int | None = None,
         placeholder: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        hour_format = optional_choice(hour_format, HourFormat, "hour_format")
         super().__init__(
             "TimeInput",
             label=label,
@@ -122,7 +124,7 @@ Render an Astryx time input.
       Whether to show a clear button.
     </PyParameter>
 
-    <PyParameter name="hour_format" type="str | None" value="None">
+    <PyParameter name="hour_format" type="HourFormat | str | None" value="None">
       Twelve- or twenty-four-hour display format.
     </PyParameter>
 
@@ -134,7 +136,7 @@ Render an Astryx time input.
       Placeholder text.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Input size.
     </PyParameter>
 

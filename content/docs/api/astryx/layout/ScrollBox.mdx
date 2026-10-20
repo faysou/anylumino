@@ -15,7 +15,7 @@ Astryx scrollable area holding a vertical stack of children.
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        axis: str = "block",
+        axis: ScrollAxis | str = "block",
         label: str = "Scrollable content",
         gap: int | float = 2,
         padding: int | float | None = None,
@@ -25,9 +25,7 @@ Astryx scrollable area holding a vertical stack of children.
         min_height: int | float | str | None = None,
         **props: Any,
     ) -> None:
-        if axis not in SCROLL_AXES:
-            msg = f"axis must be one of {SCROLL_AXES}, got {axis!r}"
-            raise ValueError(msg)
+        axis = choice(axis, ScrollAxis, "axis")
 
         super().__init__(
             "ScrollBox",
@@ -64,7 +62,7 @@ Astryx scrollable area holding a vertical stack of children.
       Stable child keys for iterable `children`.
     </PyParameter>
 
-    <PyParameter name="axis" type="str" value="'block'">
+    <PyParameter name="axis" type="ScrollAxis | str" value="'block'">
       Scroll axis, `"block"`, `"inline"`, or `"both"`.
     </PyParameter>
 

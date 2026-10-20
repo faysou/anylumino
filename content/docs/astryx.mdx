@@ -96,6 +96,24 @@ reference page is.
 | Overlays and previews (`surfaces`)             | Notebook-safe contextual surfaces; dialogs render inline by default so they stay in the output area                                           | `Tooltip`, `HoverCard`, `Popover`, `Overlay`, `Lightbox`, `Dialog`, `AlertDialog`                                                                                                                                                                                                     |
 | Navigation and data (`surfaces`, `data`)       | Structured navigation and data-heavy notebook views                                                                                           | `Breadcrumbs`, `TabList`, `List`, `MetadataList`, `Outline`, `TreeList`, `Pagination`, `Table`                                                                                                                                                                                        |
 
+### Option values
+
+Keywords that take one of a fixed set of values, such as a size, a variant, or
+an orientation, accept a `StrEnum` member or its string value. Both lines below
+build the same button:
+
+```python
+ax.Button("Run", size=ax.Size.LG, variant=ax.ButtonVariant.PRIMARY)
+ax.Button("Run", size="lg", variant="primary")
+```
+
+Any other value raises `ValueError` with the allowed values, for example
+`size='small' is not a valid Size; use one of 'sm', 'md', 'lg'`. The Astryx
+enums, such as `Size`, `Density`, `ButtonVariant`, and `TextColor`, are in
+`anylumino.astryx`. The layout enums `Orientation`, `Direction`,
+`TabPlacement`, and `DockMode` are in `anylumino` and shared by the Astryx
+widgets that take them. A parameter's type in the API reference names its enum.
+
 ### Layout panels
 
 The layout panels mirror the Lumino layout widgets with the same keyed child

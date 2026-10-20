@@ -84,21 +84,27 @@ Render a data-driven Astryx table for notebook use.
         *,
         row_key: str | None = "id",
         selected: Iterable[Any] = (),
-        selects: str = "",
+        selects: Selects | str = "",
         sortable: bool = False,
         sort_key: str = "",
-        sort_direction: str = "",
+        sort_direction: SortDirection | str = "",
         select_all_label: str = "Select all rows",
         width: int | float | str | None = None,
         height: int | float | str | None = None,
-        density: str | None = None,
-        dividers: str | None = None,
+        density: Density | str | None = None,
+        dividers: TableDividers | str | None = None,
         striped: bool | None = None,
         hover: bool | None = None,
-        vertical_align: str | None = None,
-        text_overflow: str | None = None,
+        vertical_align: VerticalAlign | str | None = None,
+        text_overflow: TextOverflow | str | None = None,
         **props: Any,
     ) -> None:
+        vertical_align = optional_choice(vertical_align, VerticalAlign, "vertical_align")
+        text_overflow = optional_choice(text_overflow, TextOverflow, "text_overflow")
+        sort_direction = choice(sort_direction, SortDirection, "sort_direction")
+        selects = choice(selects, Selects, "selects")
+        dividers = optional_choice(dividers, TableDividers, "dividers")
+        density = optional_choice(density, Density, "density")
         row_list = list(rows)
         column_list = _table_columns(columns, row_list)
         self._row_key = row_key or "__row_id"
@@ -147,7 +153,7 @@ Render a data-driven Astryx table for notebook use.
       Initially selected row ids.
     </PyParameter>
 
-    <PyParameter name="selects" type="str" value="''">
+    <PyParameter name="selects" type="Selects | str" value="''">
       Selection mode. Use `""` for no checkbox column.
     </PyParameter>
 
@@ -159,7 +165,7 @@ Render a data-driven Astryx table for notebook use.
       Initially sorted table column key.
     </PyParameter>
 
-    <PyParameter name="sort_direction" type="str" value="''">
+    <PyParameter name="sort_direction" type="SortDirection | str" value="''">
       Initial sort direction. Use `""` for unsorted.
     </PyParameter>
 
@@ -175,11 +181,11 @@ Render a data-driven Astryx table for notebook use.
       CSS height. Numbers are normalized by anylumino where supported.
     </PyParameter>
 
-    <PyParameter name="density" type="str | None" value="None">
+    <PyParameter name="density" type="Density | str | None" value="None">
       Compact, balanced, or spacious row density.
     </PyParameter>
 
-    <PyParameter name="dividers" type="str | None" value="None">
+    <PyParameter name="dividers" type="TableDividers | str | None" value="None">
       Row, column, grid, or no divider treatment.
     </PyParameter>
 
@@ -191,11 +197,11 @@ Render a data-driven Astryx table for notebook use.
       Whether rows highlight on pointer hover.
     </PyParameter>
 
-    <PyParameter name="vertical_align" type="str | None" value="None">
+    <PyParameter name="vertical_align" type="VerticalAlign | str | None" value="None">
       Body-cell vertical alignment.
     </PyParameter>
 
-    <PyParameter name="text_overflow" type="str | None" value="None">
+    <PyParameter name="text_overflow" type="TextOverflow | str | None" value="None">
       Wrap or truncate overflowing cell text.
     </PyParameter>
 

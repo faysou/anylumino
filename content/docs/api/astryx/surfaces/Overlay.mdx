@@ -22,13 +22,16 @@ Render content over a base Astryx surface or media widget.
         children: ChildInput,
         content: str | ChildInput,
         *,
-        show_on: str = "always",
+        show_on: OverlayTrigger | str = "always",
         open: bool | None = None,
         scrim: str | bool = "dark",
-        position: str = "fill",
-        align: str = "end",
+        position: OverlayPosition | str = "fill",
+        align: LayerAlignment | str = "end",
         **props: Any,
     ) -> None:
+        show_on = choice(show_on, OverlayTrigger, "show_on")
+        position = choice(position, OverlayPosition, "position")
+        align = choice(align, LayerAlignment, "align")
         slots = {"base": children}
         content_prop: str | None = content if isinstance(content, str) else None
         if not isinstance(content, str):
@@ -60,7 +63,7 @@ Render content over a base Astryx surface or media widget.
       Text or widget rendered inside the overlay scrim.
     </PyParameter>
 
-    <PyParameter name="show_on" type="str" value="'always'">
+    <PyParameter name="show_on" type="OverlayTrigger | str" value="'always'">
       Visibility trigger: `"always"`, `"hover"`, `"focus"`, or
       `"hover-or-focus"`.
     </PyParameter>
@@ -73,11 +76,11 @@ Render content over a base Astryx surface or media widget.
       Dark or light scrim, or `False` for no scrim.
     </PyParameter>
 
-    <PyParameter name="position" type="str" value="'fill'">
+    <PyParameter name="position" type="OverlayPosition | str" value="'fill'">
       Overlay placement: `"fill"`, `"bottom"`, or `"top"`.
     </PyParameter>
 
-    <PyParameter name="align" type="str" value="'end'">
+    <PyParameter name="align" type="LayerAlignment | str" value="'end'">
       Content alignment: `"start"`, `"center"`, or `"end"`.
     </PyParameter>
 

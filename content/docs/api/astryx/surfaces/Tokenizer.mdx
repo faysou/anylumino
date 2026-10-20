@@ -82,10 +82,11 @@ Render a notebook-safe Astryx tokenizer.
         max_menu_items: int | None = None,
         label_hidden: bool | None = None,
         description: str | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         debounce_ms: int | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "Tokenizer",
             label=label,
@@ -164,7 +165,7 @@ Render a notebook-safe Astryx tokenizer.
       Helper text displayed with the input.
     </PyParameter>
 
-    <PyParameter name="size" type="str | None" value="None">
+    <PyParameter name="size" type="Size | str | None" value="None">
       Input and token size.
     </PyParameter>
 

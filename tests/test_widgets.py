@@ -865,7 +865,7 @@ def test_astryx_theme_accepts_supported_modes_for_runtime_and_built_themes(
 
 
 def test_astryx_theme_rejects_invalid_theme_modes() -> None:
-    with pytest.raises(ValueError, match="theme mode must be one of"):
+    with pytest.raises(ValueError, match="is not a valid ColorMode; use one of 'light', 'dark', 'system', 'jupyterlab'"):
         ax.Theme(color_mode="sepia")
 
 
@@ -1573,7 +1573,7 @@ def test_astryx_slider_label_positions(widget_type, args, value, position) -> No
 
 @pytest.mark.parametrize("widget_type, args", [(ax.Slider, ()), (ax.LogSlider, ()), (ax.SelectionSlider, (["small"],))])
 def test_astryx_sliders_reject_invalid_label_positions(widget_type, args) -> None:
-    with pytest.raises(ValueError, match="label_position must be 'top' or 'left'"):
+    with pytest.raises(ValueError, match="label_position='diagonal' is not a valid LabelPosition"):
         widget_type(*args, label_position="diagonal")
 
 
@@ -1604,7 +1604,7 @@ def test_astryx_input_label_layout_preserves_values(widget_type, args, value, po
 
 @pytest.mark.parametrize("widget_type, args", [(ax.TextInput, ()), (ax.Selector, ([],)), (ax.MultiSelector, ([],))])
 def test_astryx_inputs_reject_invalid_label_positions(widget_type, args) -> None:
-    with pytest.raises(ValueError, match="label_position must be 'top' or 'left'"):
+    with pytest.raises(ValueError, match="label_position='diagonal' is not a valid LabelPosition"):
         widget_type(*args, label_position="diagonal")
 
 
@@ -1797,7 +1797,7 @@ def test_astryx_scroll_box_forwards_viewport_options() -> None:
     assert scroll.label == "Log lines"
     assert scroll.height == "240px"
     assert scroll.props == {"axis": "both", "gap": 2, "padding": 2, "height": 240, "maxWidth": 600}
-    with pytest.raises(ValueError, match="axis must be one of"):
+    with pytest.raises(ValueError, match="axis='diagonal' is not a valid ScrollAxis"):
         ax.ScrollBox([ax.Text("Line")], axis="diagonal")
 
 
@@ -1814,7 +1814,7 @@ def test_astryx_split_panel_tracks_orientation_and_sizes() -> None:
     split.remove_widget("left")
     assert split.sizes == [0.7]
     assert split.child_keys == ["right"]
-    with pytest.raises(ValueError, match="orientation must be one of"):
+    with pytest.raises(ValueError, match="orientation='diagonal' is not a valid Orientation"):
         ax.SplitPanel([left], orientation="diagonal")
 
 
@@ -1827,7 +1827,7 @@ def test_astryx_responsive_panel_forwards_breakpoint_and_directions() -> None:
         "narrowDirection": "horizontal",
         "gap": 4,
     }
-    with pytest.raises(ValueError, match="narrow_direction must be one of"):
+    with pytest.raises(ValueError, match="narrow_direction='diagonal' is not a valid Orientation"):
         ax.ResponsivePanel([ax.Text("A")], narrow_direction="diagonal")
 
 

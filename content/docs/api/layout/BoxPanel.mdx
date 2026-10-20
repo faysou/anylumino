@@ -21,7 +21,7 @@ Lumino box layout with configurable direction, spacing, and stretch.
 <PyAttributes>
   <PyAttribute name="layout_kind" value="t.Unicode('box').tag(sync=True)" />
 
-  <PyAttribute name="direction" value="t.Enum(BOX_DIRECTIONS, default_value='left-to-right').tag(sync=True)" />
+  <PyAttribute name="direction" value="t.Enum(tuple(Direction), default_value=Direction.LEFT_TO_RIGHT).tag(sync=True)" />
 
   <PyAttribute name="spacing" value="t.Int(8).tag(sync=True)" />
 
@@ -39,7 +39,7 @@ Lumino box layout with configurable direction, spacing, and stretch.
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        direction: str = "left-to-right",
+        direction: Direction | str = "left-to-right",
         spacing: int = 8,
         stretches: Iterable[int] | None = None,
         width: int | float | str | None = "100%",
@@ -52,6 +52,7 @@ Lumino box layout with configurable direction, spacing, and stretch.
         child_min_height: int | float | str | None = None,
         fit_content: bool = False,
     ) -> None:
+        direction = choice(direction, Direction, "direction")
         horizontal = direction in ("left-to-right", "right-to-left")
         resolved_scroll_x = bool(scroll_x if scroll_x is not None else scroll and horizontal)
         resolved_scroll_y = bool(scroll_y if scroll_y is not None else scroll and not horizontal)
@@ -92,7 +93,7 @@ Lumino box layout with configurable direction, spacing, and stretch.
       Stable child keys for iterable `widgets`.
     </PyParameter>
 
-    <PyParameter name="direction" type="str" value="'left-to-right'">
+    <PyParameter name="direction" type="Direction | str" value="'left-to-right'">
       Lumino box direction.
     </PyParameter>
 

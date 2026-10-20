@@ -9,7 +9,7 @@ Lumino split panel with draggable dividers between children.
 <PyAttributes>
   <PyAttribute name="layout_kind" value="t.Unicode('split').tag(sync=True)" />
 
-  <PyAttribute name="orientation" value="t.Enum(ORIENTATIONS, default_value='horizontal').tag(sync=True)" />
+  <PyAttribute name="orientation" value="t.Enum(tuple(Orientation), default_value=Orientation.HORIZONTAL).tag(sync=True)" />
 
   <PyAttribute name="spacing" value="t.Int(6).tag(sync=True)" />
 
@@ -27,7 +27,7 @@ Lumino split panel with draggable dividers between children.
         *,
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
-        orientation: str = "horizontal",
+        orientation: Orientation | str = "horizontal",
         spacing: int = 6,
         sizes: Iterable[float] | None = None,
         width: int | float | str | None = "100%",
@@ -35,6 +35,7 @@ Lumino split panel with draggable dividers between children.
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
+        orientation = choice(orientation, Orientation, "orientation")
         self._init_composed(
             widgets,
             titles,
@@ -64,7 +65,7 @@ Lumino split panel with draggable dividers between children.
       Stable child keys for iterable `widgets`.
     </PyParameter>
 
-    <PyParameter name="orientation" type="str" value="'horizontal'">
+    <PyParameter name="orientation" type="Orientation | str" value="'horizontal'">
       Split direction. Horizontal places panes side by side; vertical stacks
       panes top to bottom.
     </PyParameter>
