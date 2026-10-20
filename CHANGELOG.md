@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.4.0
+
+This release makes option values enums across the library and gives the
+workbench's generated UI a cleaner contract. Both change user code, so read the
+breaking changes below.
+
+Breaking changes:
+
+- Keywords that take a fixed set of values, such as `size`, `variant`, or
+  `orientation`, now reject unknown values with a `ValueError` that lists the
+  allowed ones. Before, an unknown value was passed to Astryx and rendered
+  wrong without an error. Valid strings keep working.
+- The workbench generates `UI` as a subclass of `anylumino.workbench.View`
+  instead of `ax.Stack`. The root widget is `ui.widget`; anylumino containers
+  and notebook cells still accept the `UI` itself. Statement names are now free
+  except `app` and `widget`.
+- Workbench handlers receive an `Event` with `source`, `value`, and `context`
+  attributes instead of a dict: write `event.value`, not `event["value"]`.
+- An `App` drives one UI: a second `UI(app)` raises `RuntimeError`.
+
+Added:
+
+- `StrEnum`s for the option values: 62 in `anylumino.astryx`, such as `Size`,
+  `Density`, `ButtonVariant`, and `ColorMode`, and `Orientation`, `Direction`,
+  `TabPlacement`, and `DockMode` in `anylumino`.
+- `anylumino.workbench.Agent` for the agent CLIs, and the chat enums
+  `ChatRole`, `MessageStatus`, and `ToolCallStatus` in `anylumino.astryx`.
+- The workbench catalog reads option values from the enum annotations.
+
 ## 0.3.0
 
 This release lets the workbench use a notebook's own libraries through
