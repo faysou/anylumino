@@ -154,6 +154,16 @@ A workbench SHALL accept skill folders, each with a `SKILL.md` whose front matte
 a description. The system prompt SHALL list each skill's name, description, and path. Claude SHALL
 load the skills for each turn and be able to read their folders. The skill paths SHALL be saved
 with the session. A folder without a valid `SKILL.md` SHALL raise `ValueError`.
+A skill folder MAY hold a `components.py` that defines `COMPONENTS`, catalog components for its
+library's widgets. The workbench SHALL parse programs, generate code, and write the system prompt
+with the built-in catalog plus those components, and generated code SHALL import each component's
+module. A component name already in the catalog SHALL raise `ValueError`.
+
+#### Scenario: Skill component in a program
+
+- **WHEN** the `lightweight-charts` skill adds `TradingChart` and a program declares
+  `price_chart = TradingChart(520)`
+- **THEN** the generated UI builds a `NotebookChart` as `ui.price_chart`, and the callbacks fill it
 
 #### Scenario: Agent uses a private library
 

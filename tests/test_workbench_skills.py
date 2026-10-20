@@ -105,3 +105,77 @@ def test_workbench_saves_skills_and_keeps_them_on_restore(agent_reply, tmp_path)
 def test_workbench_rejects_an_invalid_skill_folder(tmp_path):
     with pytest.raises(ValueError, match="is not a skill folder: it has no SKILL.md"):
         Workbench(agent="codex", cwd=tmp_path, skills=[tmp_path])
+
+
+STATUS_COMPONENTS = '''from anylumino.workbench.catalog import Component, Prop
+
+COMPONENTS = [
+    Component(
+        "StatusBadge",
+        "anylumino.astryx",
+        "Badge",
+        "A badge for a run status",
+        (Prop("label", {"type": "string"}, True),),
+    ),
+]
+'''
+
+
+def status_skill(root):
+    folder = skill_folder(root, "status-badge")
+    (folder / "components.py").write_text(STATUS_COMPONENTS)
+
+    return folder
+
+
+def test_skill_components_join_the_catalog_and_generate_with_their_module(agent_reply, tmp_path):
+    import anylumino.astryx as ax
+
+    agent_reply(reply("Done.", 'root = VBox([state])\nstate = StatusBadge("Live", {variant: "success"})'))
+    workbench = Workbench(agent="codex", cwd=tmp_path, skills=[status_skill(tmp_path / "skills")])
+    workbench.submit("Show the status")
+
+    assert [component.name for component in workbench.skills[0].components] == ["StatusBadge"]
+    assert workbench.components[-1].options["variant"]["enum"][:2] == ["neutral", "info"]
+    assert "import anylumino.astryx\n" in workbench.ui_code
+    assert "self.state = anylumino.astryx.Badge(label='Live', variant='success')" in workbench.ui_code
+    assert isinstance(workbench.ui.state, ax.Badge)
+    assert (workbench.ui.state.label, workbench.ui.state.variant) == ("Live", "success")
+
+
+def test_skill_components_reach_the_agent_prompt(tmp_path):
+    folder = status_skill(tmp_path)
+    workbench = Workbench(agent="codex", cwd=tmp_path, skills=[folder])
+
+    prompt = asyncio.run(system_prompt({}, workbench.skills, workbench.components))
+
+    assert "StatusBadge(label: string" in prompt
+    assert "StatusBadge(" not in asyncio.run(system_prompt({}))
+
+
+def test_a_program_without_the_skill_cannot_use_its_component(agent_reply, tmp_path):
+    agent_reply(reply("Done.", 'root = VBox([state])\nstate = StatusBadge("Live")'))
+    workbench = Workbench(agent="codex", cwd=tmp_path)
+    workbench.submit("Show the status")
+
+    assert workbench.chat.messages[-1]["content"].startswith("The reply was not applied; the UI is unchanged. OpenUI errors:")
+    assert workbench.ui is None
+
+
+@pytest.mark.parametrize(
+    ("source", "message"),
+    [
+        ("COMPONENTS = 1\n", "must define COMPONENTS as a sequence of anylumino.workbench.catalog.Component"),
+        (
+            STATUS_COMPONENTS.replace('"StatusBadge"', '"Heading"'),
+            "Component names must be unique; Heading is defined twice",
+        ),
+    ],
+    ids=["not-components", "duplicate-name"],
+)
+def test_invalid_skill_components_are_rejected(tmp_path, source, message):
+    folder = skill_folder(tmp_path)
+    (folder / "components.py").write_text(source)
+
+    with pytest.raises(ValueError, match=message):
+        Workbench(agent="codex", cwd=tmp_path, skills=[folder])

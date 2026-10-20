@@ -9,21 +9,23 @@ The workbench system prompt: the OpenUI prompt for the catalog plus the callback
 
   <PyAttribute name="OPTIONS" type="dict[str, Any]" value="{'preamble': PREAMBLE, 'inlineMode': True, 'editMode': True, 'toolCalls': False, 'bindings': False}" />
 
-  <PyAttribute name="CALLBACKS" value="'## Python callbacks\n\nInteractive components run Python through `@Callback(handler, context?)`. Put the handlers in one\nfenced block labeled `python`, next to the openui-lang block, as methods of one `App` subclass. Use\nthe `python` label for that block only; label any other code you show, such as a snippet for the\nuser, `text`.\n\n```python\nfrom anylumino.workbench import App\n\n\nclass SalesApp(App):\n    def setup(self):\n        self.ui.table.set_rows(self.sales.to_dict(&#x22;records&#x22;))\n        self.ui.region.items = [&#x22;All&#x22;, *sorted(self.sales[&#x22;region&#x22;].unique())]\n\n    def on_run(self, event):\n        region = self.ui.region.value or &#x22;All&#x22;\n        self.ui.summary.text = f&#x22;Region: {region}&#x22;\n```\n\n- A handler is a method that takes `event`, an `Event` with `event.source` (the statement name of\n  the component that fired), `event.value` (the new value for `on_change`, `None` for a button), and\n  `event.context` (the second `@Callback` argument).\n- `self.ui` is the generated UI, with one attribute per statement name. Inputs expose `.value`;\n  Heading, Text, and Markdown expose `.text`; Button and Badge expose `.label`; Selector exposes\n  `.items`; Table has `.set_rows(records)`. Statement names cannot be `app` or `widget`.\n- The namespace listed below reaches the app as attributes, such as `self.sales`. There are no\n  globals: read data only through `self`.\n- An optional `setup(self)` runs once while the UI is built. Fill tables and selectors from\n  namespace data there instead of copying the data into the program: you see only the shape and\n  columns of data frames, not their rows.\n- `self.ask_agent(message, context=None)` sends you a chat message from a handler.\n- Do not name a method after an `App` member: `ui`, `agent`, `on_error`, `set_ui`, `call`, or\n  `ask_agent`.\n- Every handler named in `@Callback` must be a method. The python block always holds the complete\n  class: omit the block when no handler changes, and when one changes, send the whole class. A UI\n  without handlers needs no python block.\n- Export puts the class in one module with the UI code, so bind the module names `UI`, `al`, `ax`,\n  `go`, `Event`, and `View` only as the generated code does.\n- A `Plot` is an empty Plotly `FigureWidget`; fill it in handlers inside\n  `with self.ui.chart.batch_update():`. Use one `Plot` per chart.\n- For one component per data item, declare an empty container, such as `cards = HBox([])`, and fill\n  it in a handler with the Python constructors of the skill, by keyword:\n  `self.ui.cards.widgets = [ax.Card(children=[ax.Text(text=n)]) for n in names]`.\n- Keep state and data in the app: `$variables`, `Query`, `Mutation`, and `@Each` are not supported.\n'" />
+  <PyAttribute name="CALLBACKS" value="'## Python callbacks\n\nInteractive components run Python through `@Callback(handler, context?)`. Put the handlers in one\nfenced block labeled `python`, next to the openui-lang block, as methods of one `App` subclass. Use\nthe `python` label for that block only; label any other code you show, such as a snippet for the\nuser, `text`.\n\n```python\nfrom anylumino.workbench import App\n\n\nclass SalesApp(App):\n    def setup(self):\n        self.ui.table.set_rows(self.sales.to_dict(&#x22;records&#x22;))\n        self.ui.region.items = [&#x22;All&#x22;, *sorted(self.sales[&#x22;region&#x22;].unique())]\n\n    def on_run(self, event):\n        region = self.ui.region.value or &#x22;All&#x22;\n        self.ui.summary.text = f&#x22;Region: {region}&#x22;\n```\n\n- A handler is a method that takes `event`, an `Event` with `event.source` (the statement name of\n  the component that fired), `event.value` (the new value for `on_change`, `None` for a button), and\n  `event.context` (the second `@Callback` argument).\n- `self.ui` is the generated UI, with one attribute per statement name. Inputs expose `.value`;\n  Heading, Text, and Markdown expose `.text`; Button and Badge expose `.label`; Selector exposes\n  `.items`; Table has `.set_rows(records)`. Statement names cannot be `app` or `widget`.\n- The namespace listed below reaches the app as attributes, such as `self.sales`. There are no\n  globals: read data only through `self`.\n- An optional `setup(self)` runs once while the UI is built. Fill tables and selectors from\n  namespace data there instead of copying the data into the program: you see only the shape and\n  columns of data frames, not their rows.\n- `self.ask_agent(message, context=None)` sends you a chat message from a handler.\n- Do not name a method after an `App` member: `ui`, `agent`, `on_error`, `set_ui`, `call`, or\n  `ask_agent`.\n- Every handler named in `@Callback` must be a method. The python block always holds the complete\n  class: omit the block when no handler changes, and when one changes, send the whole class. A UI\n  without handlers needs no python block.\n- The callbacks run in their own module: import what they use, such as\n  `import anylumino.astryx as ax`. Export puts the class in one module with the UI code, so bind\n  the module names `UI`, `al`, `ax`, `go`, `Event`, and `View` only as the generated code does.\n- A `Plot` is an empty Plotly `FigureWidget`; fill it in handlers inside\n  `with self.ui.chart.batch_update():`. Use one `Plot` per chart.\n- For one component per data item, declare an empty container, such as `cards = HBox([])`, and fill\n  it in a handler with the Python constructors of the skill, by keyword:\n  `self.ui.cards.widgets = [ax.Card(children=[ax.Text(text=n)]) for n in names]`.\n- Keep state and data in the app: `$variables`, `Query`, `Mutation`, and `@Each` are not supported.\n'" />
 
   <PyAttribute name="COMPONENT_OPTIONS" value="f'## Component options\n\nComponents whose signature ends with `options?` take an object of extra keyword options as their\nlast argument, for example `Table(rows, [&#x22;region&#x22;], {{sortable: true}})`. Before you use the options\nof a component, look them up in the `{skill.NAME}` skill, or read `{skill.SKILL}/components/<Name>.md`.\nAn unknown option stops the reply from being applied.\n'" />
 </PyAttributes>
 
 <Tabs items={["Functions"]}>
   <Tab value="Functions">
-    <PyFunction name="system_prompt" type="(namespace, skills=()) -> str">
-      Return the full system prompt, with `namespace` and the notebook `skills` described for the agent.
+    <PyFunction name="system_prompt" type="(namespace, skills=(), components=COMPONENTS) -> str">
+      Return the full system prompt for the `components` catalog, with `namespace` and `skills` described.
 
       <PySourceCode>
         ```python
-        async def system_prompt(namespace: Mapping[str, Any], skills: Sequence[Skill] = ()) -> str:
-            """Return the full system prompt, with ``namespace`` and the notebook ``skills`` described for the agent."""
-            sections = [await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)]
+        async def system_prompt(
+            namespace: Mapping[str, Any], skills: Sequence[Skill] = (), components: Sequence[Component] = COMPONENTS
+        ) -> str:
+            """Return the full system prompt for the ``components`` catalog, with ``namespace`` and ``skills`` described."""
+            sections = [await base_prompt(components), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)]
 
             return "\n\n".join([*sections, *([skills_summary(skills)] if skills else [])])
         ```
@@ -33,25 +35,31 @@ The workbench system prompt: the OpenUI prompt for the catalog plus the callback
         <PyParameter name="namespace" type="Mapping[str, Any]" />
 
         <PyParameter name="skills" type="Sequence[Skill]" value="()" />
+
+        <PyParameter name="components" type="Sequence[Component]" value="COMPONENTS" />
       </div>
 
       <PyFunctionReturn type="str" />
     </PyFunction>
 
-    <PyFunction name="base_prompt" type="() -> str">
-      Return the OpenUI prompt for the catalog, generated once per catalog version.
+    <PyFunction name="base_prompt" type="(components=COMPONENTS) -> str">
+      Return the OpenUI prompt for the `components` catalog, generated once per catalog version.
 
       <PySourceCode>
         ```python
-        async def base_prompt() -> str:
-            """Return the OpenUI prompt for the catalog, generated once per catalog version."""
-            key = hashlib.sha256(json.dumps([library_spec(), OPTIONS], sort_keys=True).encode()).hexdigest()
+        async def base_prompt(components: Sequence[Component] = COMPONENTS) -> str:
+            """Return the OpenUI prompt for the ``components`` catalog, generated once per catalog version."""
+            key = hashlib.sha256(json.dumps([library_spec(components), OPTIONS], sort_keys=True).encode()).hexdigest()
             if key not in _cache:
-                _cache[key] = await openui.prompt(OPTIONS)
+                _cache[key] = await openui.prompt(OPTIONS, components)
 
             return _cache[key]
         ```
       </PySourceCode>
+
+      <div>
+        <PyParameter name="components" type="Sequence[Component]" value="COMPONENTS" />
+      </div>
 
       <PyFunctionReturn type="str" />
     </PyFunction>

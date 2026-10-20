@@ -65,6 +65,9 @@ Render a data-driven Astryx table for notebook use.
 
   <PyAttribute name="columns" type="list[dict[str, Any]]">
     Current Astryx table column definitions.
+
+    Assigning keys, labels, or column mappings, as `set_rows` takes them,
+    replaces the columns and keeps the rows.
   </PyAttribute>
 
   <PyAttribute name="row_key" type="str">

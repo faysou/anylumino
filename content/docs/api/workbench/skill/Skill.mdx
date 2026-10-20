@@ -4,6 +4,9 @@ title: "Skill"
 
 A notebook skill folder: the name and description from its `SKILL.md` front matter, and its path.
 
+`components` are the OpenUI components its `components.py` defines,
+in a `COMPONENTS` sequence of `Component`; empty without that file.
+
 ## Attributes
 
 <PyAttributes>
@@ -12,17 +15,21 @@ A notebook skill folder: the name and description from its `SKILL.md` front matt
   <PyAttribute name="description" type="str" />
 
   <PyAttribute name="path" type="Path" />
+
+  <PyAttribute name="components" type="tuple[Component, ...]" value="()" />
 </PyAttributes>
 
 ## Functions
 
-<PyFunction name="__init__" type="(name, description, path) -> None" kind="constructor">
+<PyFunction name="__init__" type="(name, description, path, components=()) -> None" kind="constructor">
   <div>
     <PyParameter name="name" type="str" />
 
     <PyParameter name="description" type="str" />
 
     <PyParameter name="path" type="Path" />
+
+    <PyParameter name="components" type="tuple[Component, ...]" value="()" />
   </div>
 
   <PyFunctionReturn type="None" />

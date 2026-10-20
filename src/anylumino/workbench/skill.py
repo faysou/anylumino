@@ -7,7 +7,9 @@ Run ``make workbench-skill`` after changing the catalog or a wrapper's keywords.
 
 A notebook skill is a folder with a ``SKILL.md`` whose front matter gives its
 ``name`` and ``description``, in the Claude Code skill format, such as the API
-of a private charting library.
+of a private charting library. A ``components.py`` in the folder can add OpenUI
+components for the library's widgets, so programs can lay them out like the
+built-in ones.
 """
 
 from __future__ import annotations
@@ -33,11 +35,16 @@ DESCRIPTION = (
 
 @dataclass(frozen=True)
 class Skill:
-    """A notebook skill folder: the name and description from its ``SKILL.md`` front matter, and its path."""
+    """A notebook skill folder: the name and description from its ``SKILL.md`` front matter, and its path.
+
+    ``components`` are the OpenUI components its ``components.py`` defines,
+    in a ``COMPONENTS`` sequence of `Component`; empty without that file.
+    """
 
     name: str
     description: str
     path: Path
+    components: tuple[Component, ...] = ()
 
 
 def read_skill(folder: str | Path) -> Skill:
@@ -67,7 +74,27 @@ def read_skill(folder: str | Path) -> Skill:
     if not re.fullmatch(r"[a-z0-9-]+", name):
         raise ValueError(f"{manifest}: the skill name {name!r} must use lowercase letters, digits, and '-'")
 
-    return Skill(name, description, path)
+    return Skill(name, description, path, skill_components(path / "components.py"))
+
+
+def skill_components(path: Path) -> tuple[Component, ...]:
+    """Return the ``COMPONENTS`` that the skill file ``path`` defines, or none when it does not exist.
+
+    Raises
+    ------
+    ValueError
+        If the file does not define ``COMPONENTS`` as a sequence of `Component`.
+    """
+    if not path.is_file():
+        return ()
+
+    scope: dict[str, Any] = {"__name__": f"anylumino_skill_{path.parent.name.replace('-', '_')}"}
+    exec(compile(path.read_text(), str(path), "exec"), scope)
+    components = scope.get("COMPONENTS")
+    if not isinstance(components, (list, tuple)) or not all(isinstance(item, Component) for item in components):
+        raise ValueError(f"{path} must define COMPONENTS as a sequence of anylumino.workbench.catalog.Component")
+
+    return tuple(components)
 
 
 def write_plugin(skills: Sequence[Skill], directory: Path) -> Path:

@@ -1846,3 +1846,13 @@ def test_assigning_widgets_unwraps_objects_exposing_a_widget(factory):
     container.widgets = [wrapper]
 
     assert container.widgets == [wrapper.widget]
+
+
+def test_astryx_table_columns_can_be_assigned_before_rows() -> None:
+    table = ax.Table([], [])
+
+    table.columns = {"id": "Cycle", "delta": "Delta"}
+    table.set_rows([{"id": "1", "delta": 12.5}])
+
+    assert [(column["key"], column["header"]) for column in table.columns] == [("id", "Cycle"), ("delta", "Delta")]
+    assert table.rows == [{"id": "1", "delta": 12.5}]

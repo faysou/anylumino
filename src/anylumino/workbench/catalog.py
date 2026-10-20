@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import importlib
 import inspect
 import re
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import Any
@@ -73,7 +75,11 @@ class Prop:
 
 @dataclass(frozen=True)
 class Component:
-    """A catalog component: the OpenUI name, the anylumino class it builds, and its props.
+    """A catalog component: the OpenUI name, the class it builds, and its props.
+
+    ``module`` is ``al``, ``ax``, or ``go`` for the built-in components, or the
+    dotted path of the module that defines ``cls``, such as
+    ``"lightweight_charts"`` for a component a notebook skill adds.
 
     ``fixed`` are constructor keywords generated code always passes, such as
     the ``direction`` of the Astryx stack behind `VBox` and `HBox`.
@@ -288,11 +294,18 @@ _ANNOTATIONS = {
 }
 
 
+def component_class(component: Component) -> type:
+    """Return the class ``component`` builds, importing its module when it is a dotted path."""
+    module = _MODULES.get(component.module) or importlib.import_module(component.module)
+
+    return getattr(module, component.cls)
+
+
 def _with_options(component: Component) -> Component:
     if not component.module:
         return component
 
-    cls = getattr(_MODULES[component.module], component.cls)
+    cls = component_class(component)
     taken = {prop.keyword for prop in component.props} | {key for key, _ in component.fixed}
     doc = inspect.cleandoc(cls.__doc__ or "")
     parameters = _parameters(doc)
@@ -409,6 +422,23 @@ COMPONENTS: tuple[Component, ...] = tuple(
 )
 CATALOG: dict[str, Component] = {component.name: component for component in COMPONENTS}
 
+
+def extend(components: Iterable[Component]) -> tuple[Component, ...]:
+    """Return the built-in components followed by ``components``, with their options added.
+
+    Raises
+    ------
+    ValueError
+        If a component reuses the name of another component.
+    """
+    added = tuple(_with_options(component) for component in components)
+    names = [component.name for component in (*COMPONENTS, *added)]
+    duplicates = sorted({name for name in names if names.count(name) > 1})
+    if duplicates:
+        raise ValueError(f"Component names must be unique; {', '.join(duplicates)} is defined twice")
+
+    return (*COMPONENTS, *added)
+
 _CALLBACK_PARAMS = {
     "type": "object",
     "properties": {"handler": _STRING, "context": {}},
@@ -417,10 +447,10 @@ _CALLBACK_PARAMS = {
 _CALLBACK_DESCRIPTION = "Calls the Python callback named handler with the event and the widgets"
 
 
-def library_spec() -> dict[str, Any]:
-    """Return the OpenUI LibrarySpec for the catalog, with the `Callback` custom action."""
-    defs: dict[str, Any] = {component.name: _component_schema(component) for component in COMPONENTS}
-    defs["Component"] = {"anyOf": [{"$ref": f"#/$defs/{component.name}"} for component in COMPONENTS]}
+def library_spec(components: Sequence[Component] = COMPONENTS) -> dict[str, Any]:
+    """Return the OpenUI LibrarySpec for ``components``, with the `Callback` custom action."""
+    defs: dict[str, Any] = {component.name: _component_schema(component) for component in components}
+    defs["Component"] = {"anyOf": [{"$ref": f"#/$defs/{component.name}"} for component in components]}
     defs["ActionExpression"] = {
         "anyOf": [
             {
@@ -442,13 +472,13 @@ def library_spec() -> dict[str, Any]:
         "version": "1.0.0",
         "root": ROOT,
         "schema": {
-            "properties": {component.name: {"$ref": f"#/$defs/{component.name}"} for component in COMPONENTS},
+            "properties": {component.name: {"$ref": f"#/$defs/{component.name}"} for component in components},
             "$defs": defs,
             "actions": {CALLBACK: {"description": _CALLBACK_DESCRIPTION, "params": _CALLBACK_PARAMS}},
         },
         "components": {
             component.name: {"signature": _signature(component), "description": component.description}
-            for component in COMPONENTS
+            for component in components
         },
         "actions": {
             CALLBACK: {"signature": f"{CALLBACK}(handler: string, context?: any)", "description": _CALLBACK_DESCRIPTION}

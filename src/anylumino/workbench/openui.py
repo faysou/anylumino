@@ -6,10 +6,11 @@ import asyncio
 import json
 import os
 import shutil
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from .catalog import library_spec
+from .catalog import COMPONENTS, Component, library_spec
 
 
 TOOL = Path(__file__).resolve().parent.parent / "static" / "openui" / "openui_tool.bundle.mjs"
@@ -19,10 +20,10 @@ class OpenUIError(RuntimeError):
     """The OpenUI tool could not run or rejected the request."""
 
 
-async def parse(program: str) -> dict[str, Any]:
-    """Return the evaluated tree, errors, and statement names of ``program``."""
+async def parse(program: str, components: Sequence[Component] = COMPONENTS) -> dict[str, Any]:
+    """Return the evaluated tree, errors, and statement names of ``program`` for the ``components`` catalog."""
 
-    return await run_tool({"command": "parse", "program": program, "library": library_spec()})
+    return await run_tool({"command": "parse", "program": program, "library": library_spec(components)})
 
 
 async def merge(current: str, patch: str) -> str:
@@ -31,10 +32,10 @@ async def merge(current: str, patch: str) -> str:
     return (await run_tool({"command": "merge", "current": current, "patch": patch}))["program"]
 
 
-async def prompt(options: dict[str, Any]) -> str:
-    """Return the OpenUI system prompt for the catalog with the given prompt options."""
+async def prompt(options: dict[str, Any], components: Sequence[Component] = COMPONENTS) -> str:
+    """Return the OpenUI system prompt for the ``components`` catalog with the given prompt options."""
 
-    return (await run_tool({"command": "prompt", "library": library_spec(), "options": options}))["prompt"]
+    return (await run_tool({"command": "prompt", "library": library_spec(components), "options": options}))["prompt"]
 
 
 async def run_tool(request: dict[str, Any]) -> dict[str, Any]:

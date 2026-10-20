@@ -15,7 +15,7 @@ import anylumino as al
 from anylumino import astryx as ax
 from anylumino.astryx import ChatRole, MessageStatus, ToolCallStatus
 
-from . import codegen, openui
+from . import catalog, codegen, openui
 from . import session as store
 from .agents import Agent, AgentError, AgentRunner, Failed, Text, ToolFinished, ToolStarted
 from .app import App, View
@@ -84,7 +84,8 @@ class Workbench(al.SplitPanel):
         charting library the callbacks import. Each holds a ``SKILL.md`` with
         ``name`` and ``description`` front matter, in the Claude Code skill
         format. The agent sees each name and description and loads a skill when
-        it needs it. Defaults to the restored session's skills.
+        it needs it. A ``components.py`` in the folder adds OpenUI components
+        for the library's widgets. Defaults to the restored session's skills.
     height : int | float | str | None, default 640
         CSS height of the workbench.
 
@@ -127,6 +128,8 @@ class Workbench(al.SplitPanel):
             self.state.skills = [str(Path(folder).expanduser().resolve()) for folder in skills]
 
         self.skills = [read_skill(folder) for folder in self.state.skills]
+        # The built-in catalog plus the components the skills add
+        self.components = catalog.extend(component for entry in self.skills for component in entry.components)
         self.namespace = dict(namespace or {})
         self.runner = AgentRunner(
             self.state.agent,
@@ -340,7 +343,7 @@ class Workbench(al.SplitPanel):
             self.update_reply(index, reply, tools, MessageStatus.SENDING)
 
         try:
-            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace, self.skills)):
+            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace, self.skills, self.components)):
                 if isinstance(event, Text):
                     reply += event.text
                 elif isinstance(event, ToolStarted):
@@ -399,14 +402,14 @@ class Workbench(al.SplitPanel):
 
     async def apply(self, program: str, callbacks: str) -> None:
         """Build the UI from ``program`` and ``callbacks``, then update all tabs at once."""
-        result = await openui.parse(program)
+        result = await openui.parse(program, self.components)
         if result["errors"] or result["incomplete"]:
             details = "; ".join(f"{error.get('statementId', '?')}: {error['message']}" for error in result["errors"])
             raise ApplyError(f"OpenUI errors: {details or 'the program is incomplete'}")
 
         cls = self.compile_callbacks(callbacks)
         try:
-            source = codegen.generate(result, handler_names(cls), self.namespace)
+            source = codegen.generate(result, handler_names(cls), self.namespace, self.components)
         except codegen.GenerationError as error:
             raise ApplyError(f"UI code: {error}") from error
 

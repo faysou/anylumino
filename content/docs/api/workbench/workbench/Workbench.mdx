@@ -16,6 +16,8 @@ Build notebook UIs by chatting with a local coding agent.
 
   <PyAttribute name="skills" value="[read_skill(folder) for folder in self.state.skills]" />
 
+  <PyAttribute name="components" value="catalog.extend(component for entry in self.skills for component in entry.components)" />
+
   <PyAttribute name="namespace" value="dict(namespace or {})" />
 
   <PyAttribute name="runner" value="AgentRunner(self.state.agent, Path(self.state.cwd), self.state.name or 'anylumino', self.state.agent_session_id, self.state.model, self.state.effort, self.skills)" />
@@ -84,6 +86,8 @@ Build notebook UIs by chatting with a local coding agent.
             self.state.skills = [str(Path(folder).expanduser().resolve()) for folder in skills]
 
         self.skills = [read_skill(folder) for folder in self.state.skills]
+        # The built-in catalog plus the components the skills add
+        self.components = catalog.extend(component for entry in self.skills for component in entry.components)
         self.namespace = dict(namespace or {})
         self.runner = AgentRunner(
             self.state.agent,
@@ -199,7 +203,8 @@ Build notebook UIs by chatting with a local coding agent.
       charting library the callbacks import. Each holds a `SKILL.md` with
       `name` and `description` front matter, in the Claude Code skill
       format. The agent sees each name and description and loads a skill when
-      it needs it. Defaults to the restored session's skills.
+      it needs it. A `components.py` in the folder adds OpenUI components
+      for the library's widgets. Defaults to the restored session's skills.
     </PyParameter>
 
     <PyParameter name="height" type="int | float | str | None" value="640">
@@ -478,7 +483,7 @@ Build notebook UIs by chatting with a local coding agent.
             self.update_reply(index, reply, tools, MessageStatus.SENDING)
 
         try:
-            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace, self.skills)):
+            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace, self.skills, self.components)):
                 if isinstance(event, Text):
                     reply += event.text
                 elif isinstance(event, ToolStarted):
@@ -585,14 +590,14 @@ Build notebook UIs by chatting with a local coding agent.
     ```python
     async def apply(self, program: str, callbacks: str) -> None:
         """Build the UI from ``program`` and ``callbacks``, then update all tabs at once."""
-        result = await openui.parse(program)
+        result = await openui.parse(program, self.components)
         if result["errors"] or result["incomplete"]:
             details = "; ".join(f"{error.get('statementId', '?')}: {error['message']}" for error in result["errors"])
             raise ApplyError(f"OpenUI errors: {details or 'the program is incomplete'}")
 
         cls = self.compile_callbacks(callbacks)
         try:
-            source = codegen.generate(result, handler_names(cls), self.namespace)
+            source = codegen.generate(result, handler_names(cls), self.namespace, self.components)
         except codegen.GenerationError as error:
             raise ApplyError(f"UI code: {error}") from error
 

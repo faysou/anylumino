@@ -66,6 +66,7 @@ such as `Orientation.VERTICAL` or `"vertical"`, and reject any other value.
         ```python
         def optional_choice(value: E | str | None, enum: type[E], name: str) -> E | None:
             """Return ``value`` as a member of ``enum``, or `None` when it is `None`."""
+
             return None if value is None else choice(value, enum, name)
         ```
       </PySourceCode>

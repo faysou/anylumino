@@ -11,7 +11,9 @@ Run `make workbench-skill` after changing the catalog or a wrapper's keywords.
 
 A notebook skill is a folder with a `SKILL.md` whose front matter gives its
 `name` and `description`, in the Claude Code skill format, such as the API
-of a private charting library.
+of a private charting library. A `components.py` in the folder can add OpenUI
+components for the library's widgets, so programs can lay them out like the
+built-in ones.
 
 <PyAttributes>
   <PyAttribute name="NAME" value="'openui-components'" />
@@ -63,7 +65,7 @@ of a private charting library.
             if not re.fullmatch(r"[a-z0-9-]+", name):
                 raise ValueError(f"{manifest}: the skill name {name!r} must use lowercase letters, digits, and '-'")
 
-            return Skill(name, description, path)
+            return Skill(name, description, path, skill_components(path / "components.py"))
         ```
       </PySourceCode>
 
@@ -72,6 +74,39 @@ of a private charting library.
       </div>
 
       <PyFunctionReturn type="anylumino.workbench.skill.Skill" />
+    </PyFunction>
+
+    <PyFunction name="skill_components" type="(path) -> tuple[Component, ...]">
+      Return the `COMPONENTS` that the skill file `path` defines, or none when it does not exist.
+
+      <PySourceCode>
+        ```python
+        def skill_components(path: Path) -> tuple[Component, ...]:
+            """Return the ``COMPONENTS`` that the skill file ``path`` defines, or none when it does not exist.
+
+            Raises
+            ------
+            ValueError
+                If the file does not define ``COMPONENTS`` as a sequence of `Component`.
+            """
+            if not path.is_file():
+                return ()
+
+            scope: dict[str, Any] = {"__name__": f"anylumino_skill_{path.parent.name.replace('-', '_')}"}
+            exec(compile(path.read_text(), str(path), "exec"), scope)
+            components = scope.get("COMPONENTS")
+            if not isinstance(components, (list, tuple)) or not all(isinstance(item, Component) for item in components):
+                raise ValueError(f"{path} must define COMPONENTS as a sequence of anylumino.workbench.catalog.Component")
+
+            return tuple(components)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="path" type="Path" />
+      </div>
+
+      <PyFunctionReturn type="tuple[anylumino.workbench.catalog.Component, ...]" />
     </PyFunction>
 
     <PyFunction name="write_plugin" type="(skills, directory) -> Path">

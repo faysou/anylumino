@@ -276,3 +276,8 @@
   option_trader, and JupyterLab.
 - [x] 16.2 Replace fixed string values with `StrEnum`s in the workbench: `Agent`, `ChatRole`,
   `MessageStatus`, `ToolCallStatus`, `PropKind`, and `ActionEvent`. Verify with pytest.
+- [x] 16.3 Let a skill's `components.py` add catalog components that programs parse, the prompt
+  lists, and codegen builds with an import of their module. Give the `lightweight-charts` skill a
+  `TradingChart` component and teach pane hiding by resizing, so a declared chart needs no rebuild.
+  Make `Table.columns` assignable. Verify with pytest and live Claude Code and Codex turns that
+  declare `TradingChart` and match `LiveDashboard`.

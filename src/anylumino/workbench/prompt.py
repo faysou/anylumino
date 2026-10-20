@@ -9,7 +9,7 @@ from typing import Any
 
 from . import openui
 from . import skill
-from .catalog import library_spec
+from .catalog import COMPONENTS, Component, library_spec
 from .skill import Skill
 
 
@@ -64,8 +64,9 @@ class SalesApp(App):
 - Every handler named in `@Callback` must be a method. The python block always holds the complete
   class: omit the block when no handler changes, and when one changes, send the whole class. A UI
   without handlers needs no python block.
-- Export puts the class in one module with the UI code, so bind the module names `UI`, `al`, `ax`,
-  `go`, `Event`, and `View` only as the generated code does.
+- The callbacks run in their own module: import what they use, such as
+  `import anylumino.astryx as ax`. Export puts the class in one module with the UI code, so bind
+  the module names `UI`, `al`, `ax`, `go`, `Event`, and `View` only as the generated code does.
 - A `Plot` is an empty Plotly `FigureWidget`; fill it in handlers inside
   `with self.ui.chart.batch_update():`. Use one `Plot` per chart.
 - For one component per data item, declare an empty container, such as `cards = HBox([])`, and fill
@@ -85,18 +86,20 @@ An unknown option stops the reply from being applied.
 _cache: dict[str, str] = {}
 
 
-async def system_prompt(namespace: Mapping[str, Any], skills: Sequence[Skill] = ()) -> str:
-    """Return the full system prompt, with ``namespace`` and the notebook ``skills`` described for the agent."""
-    sections = [await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)]
+async def system_prompt(
+    namespace: Mapping[str, Any], skills: Sequence[Skill] = (), components: Sequence[Component] = COMPONENTS
+) -> str:
+    """Return the full system prompt for the ``components`` catalog, with ``namespace`` and ``skills`` described."""
+    sections = [await base_prompt(components), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)]
 
     return "\n\n".join([*sections, *([skills_summary(skills)] if skills else [])])
 
 
-async def base_prompt() -> str:
-    """Return the OpenUI prompt for the catalog, generated once per catalog version."""
-    key = hashlib.sha256(json.dumps([library_spec(), OPTIONS], sort_keys=True).encode()).hexdigest()
+async def base_prompt(components: Sequence[Component] = COMPONENTS) -> str:
+    """Return the OpenUI prompt for the ``components`` catalog, generated once per catalog version."""
+    key = hashlib.sha256(json.dumps([library_spec(components), OPTIONS], sort_keys=True).encode()).hexdigest()
     if key not in _cache:
-        _cache[key] = await openui.prompt(OPTIONS)
+        _cache[key] = await openui.prompt(OPTIONS, components)
 
     return _cache[key]
 

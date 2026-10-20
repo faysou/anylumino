@@ -28,15 +28,65 @@ The anylumino components an OpenUI program may use, and the OpenUI library spec 
   </Tab>
 
   <Tab value="Functions">
-    <PyFunction name="library_spec" type="() -> dict[str, Any]">
-      Return the OpenUI LibrarySpec for the catalog, with the `Callback` custom action.
+    <PyFunction name="component_class" type="(component) -> type">
+      Return the class `component` builds, importing its module when it is a dotted path.
 
       <PySourceCode>
         ```python
-        def library_spec() -> dict[str, Any]:
-            """Return the OpenUI LibrarySpec for the catalog, with the `Callback` custom action."""
-            defs: dict[str, Any] = {component.name: _component_schema(component) for component in COMPONENTS}
-            defs["Component"] = {"anyOf": [{"$ref": f"#/$defs/{component.name}"} for component in COMPONENTS]}
+        def component_class(component: Component) -> type:
+            """Return the class ``component`` builds, importing its module when it is a dotted path."""
+            module = _MODULES.get(component.module) or importlib.import_module(component.module)
+
+            return getattr(module, component.cls)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="component" type="Component" />
+      </div>
+
+      <PyFunctionReturn type="type" />
+    </PyFunction>
+
+    <PyFunction name="extend" type="(components) -> tuple[Component, ...]">
+      Return the built-in components followed by `components`, with their options added.
+
+      <PySourceCode>
+        ```python
+        def extend(components: Iterable[Component]) -> tuple[Component, ...]:
+            """Return the built-in components followed by ``components``, with their options added.
+
+            Raises
+            ------
+            ValueError
+                If a component reuses the name of another component.
+            """
+            added = tuple(_with_options(component) for component in components)
+            names = [component.name for component in (*COMPONENTS, *added)]
+            duplicates = sorted({name for name in names if names.count(name) > 1})
+            if duplicates:
+                raise ValueError(f"Component names must be unique; {', '.join(duplicates)} is defined twice")
+
+            return (*COMPONENTS, *added)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="components" type="Iterable[Component]" />
+      </div>
+
+      <PyFunctionReturn type="tuple[anylumino.workbench.catalog.Component, ...]" />
+    </PyFunction>
+
+    <PyFunction name="library_spec" type="(components=COMPONENTS) -> dict[str, Any]">
+      Return the OpenUI LibrarySpec for `components`, with the `Callback` custom action.
+
+      <PySourceCode>
+        ```python
+        def library_spec(components: Sequence[Component] = COMPONENTS) -> dict[str, Any]:
+            """Return the OpenUI LibrarySpec for ``components``, with the `Callback` custom action."""
+            defs: dict[str, Any] = {component.name: _component_schema(component) for component in components}
+            defs["Component"] = {"anyOf": [{"$ref": f"#/$defs/{component.name}"} for component in components]}
             defs["ActionExpression"] = {
                 "anyOf": [
                     {
@@ -58,13 +108,13 @@ The anylumino components an OpenUI program may use, and the OpenUI library spec 
                 "version": "1.0.0",
                 "root": ROOT,
                 "schema": {
-                    "properties": {component.name: {"$ref": f"#/$defs/{component.name}"} for component in COMPONENTS},
+                    "properties": {component.name: {"$ref": f"#/$defs/{component.name}"} for component in components},
                     "$defs": defs,
                     "actions": {CALLBACK: {"description": _CALLBACK_DESCRIPTION, "params": _CALLBACK_PARAMS}},
                 },
                 "components": {
                     component.name: {"signature": _signature(component), "description": component.description}
-                    for component in COMPONENTS
+                    for component in components
                 },
                 "actions": {
                     CALLBACK: {"signature": f"{CALLBACK}(handler: string, context?: any)", "description": _CALLBACK_DESCRIPTION}
@@ -72,6 +122,10 @@ The anylumino components an OpenUI program may use, and the OpenUI library spec 
             }
         ```
       </PySourceCode>
+
+      <div>
+        <PyParameter name="components" type="Sequence[Component]" value="COMPONENTS" />
+      </div>
 
       <PyFunctionReturn type="dict[str, typing.Any]" />
     </PyFunction>

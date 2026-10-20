@@ -193,6 +193,7 @@ matter, in the Claude Code skill format, and any files it points to:
 workbench_skills/lightweight-charts/
   SKILL.md         name, description, the rules, and links to the other files
   reference.md     the API, read only when needed
+  components.py    optional OpenUI components for the library's widgets
 ```
 
 ```python
@@ -206,10 +207,39 @@ Workbench(
 The system prompt lists each skill's name, description, and `SKILL.md` path, and
 tells the agent to load a skill before it uses that library. Claude loads the
 skills as a plugin for each turn and can read their folders. Codex reads the
-same files by path. A skill only documents a library; the callbacks import it
-like any other module, so the export imports it too. Widgets that are not
-widgets themselves but expose one as `.widget`, such as a lightweight-charts
-`NotebookChart`, can be set as a container's `widgets` directly.
+same files by path.
+
+### Skill components
+
+A `components.py` in a skill folder adds OpenUI components, so a program can lay
+out the library's widgets like the built-in ones. It defines `COMPONENTS`, a
+list of `Component` entries that name the OpenUI component, the module and class
+it builds, and its positional props:
+
+```python
+from anylumino.workbench.catalog import Component, Prop
+
+COMPONENTS = [
+    Component(
+        "TradingChart",
+        "lightweight_charts",
+        "NotebookChart",
+        "A TradingView lightweight-charts chart; height is in pixels",
+        (Prop("height", {"type": "number"}), Prop("width", {"type": "string"})),
+    ),
+]
+```
+
+The program then writes `price_chart = TradingChart(520, "100%")`, and a callback
+fills `self.ui.price_chart`, such as with `self.ui.price_chart.set(bars)`. The
+workbench adds the components to the catalog it parses programs with, lists their
+signatures in the system prompt, and reads the other keywords of the class as the
+component's `options`. The generated code imports the module, such as
+`import lightweight_charts`, so the export imports it too. A component name that
+is already in the catalog raises `ValueError`. Props must be literals, so data
+such as a data frame still reaches the widget in a callback. A component's class
+can be a widget or an object that exposes one as `.widget`, such as
+`NotebookChart`.
 
 The skill paths are saved with the session. A folder without a valid `SKILL.md`
 raises `ValueError` when the workbench is created.
@@ -399,9 +429,10 @@ message, since it was not exported from a workbench.
 
 ## Limits
 
-- The agent can use the components in the workbench catalog only: layout
-  panels, cards, text, inputs, badges, tables, code blocks, Plotly figures, and
-  mounted namespace widgets.
+- The OpenUI program can use the components in the workbench catalog: layout
+  panels, cards, text, inputs, badges, tables, code blocks, Plotly figures,
+  mounted namespace widgets, and the components that
+  [notebook skills](#skill-components) add for other libraries.
 - Option values must be literals, so constructor keywords that take Python
   functions, such as a button's `callbacks`, are not options. Components still
   run Python: a button's action slot takes `@Callback("handler")`, which calls

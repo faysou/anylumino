@@ -16,20 +16,22 @@ Parse, merge, and describe OpenUI Lang programs with the bundled `@openuidev/lan
   </Tab>
 
   <Tab value="Functions">
-    <PyFunction name="parse" type="(program) -> dict[str, Any]">
-      Return the evaluated tree, errors, and statement names of `program`.
+    <PyFunction name="parse" type="(program, components=COMPONENTS) -> dict[str, Any]">
+      Return the evaluated tree, errors, and statement names of `program` for the `components` catalog.
 
       <PySourceCode>
         ```python
-        async def parse(program: str) -> dict[str, Any]:
-            """Return the evaluated tree, errors, and statement names of ``program``."""
+        async def parse(program: str, components: Sequence[Component] = COMPONENTS) -> dict[str, Any]:
+            """Return the evaluated tree, errors, and statement names of ``program`` for the ``components`` catalog."""
 
-            return await run_tool({"command": "parse", "program": program, "library": library_spec()})
+            return await run_tool({"command": "parse", "program": program, "library": library_spec(components)})
         ```
       </PySourceCode>
 
       <div>
         <PyParameter name="program" type="str" />
+
+        <PyParameter name="components" type="Sequence[Component]" value="COMPONENTS" />
       </div>
 
       <PyFunctionReturn type="dict[str, typing.Any]" />
@@ -56,20 +58,22 @@ Parse, merge, and describe OpenUI Lang programs with the bundled `@openuidev/lan
       <PyFunctionReturn type="str" />
     </PyFunction>
 
-    <PyFunction name="prompt" type="(options) -> str">
-      Return the OpenUI system prompt for the catalog with the given prompt options.
+    <PyFunction name="prompt" type="(options, components=COMPONENTS) -> str">
+      Return the OpenUI system prompt for the `components` catalog with the given prompt options.
 
       <PySourceCode>
         ```python
-        async def prompt(options: dict[str, Any]) -> str:
-            """Return the OpenUI system prompt for the catalog with the given prompt options."""
+        async def prompt(options: dict[str, Any], components: Sequence[Component] = COMPONENTS) -> str:
+            """Return the OpenUI system prompt for the ``components`` catalog with the given prompt options."""
 
-            return (await run_tool({"command": "prompt", "library": library_spec(), "options": options}))["prompt"]
+            return (await run_tool({"command": "prompt", "library": library_spec(components), "options": options}))["prompt"]
         ```
       </PySourceCode>
 
       <div>
         <PyParameter name="options" type="dict[str, Any]" />
+
+        <PyParameter name="components" type="Sequence[Component]" value="COMPONENTS" />
       </div>
 
       <PyFunctionReturn type="str" />

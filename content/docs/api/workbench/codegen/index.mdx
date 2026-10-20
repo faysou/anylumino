@@ -22,11 +22,13 @@ Generate Python that builds anylumino widgets from an evaluated OpenUI tree.
   </Tab>
 
   <Tab value="Functions">
-    <PyFunction name="generate" type="(result, handlers, namespace) -> str">
+    <PyFunction name="generate" type="(result, handlers, namespace, components=COMPONENTS) -> str">
       Return the module source for a parse result.
 
       `handlers` are the handler methods of the callbacks' `App` subclass,
       and `namespace` holds the names that `Widget(name)` may mount from the app.
+      `components` is the catalog the program was parsed with; a component
+      from another module, such as one a notebook skill adds, imports it.
 
       <PySourceCode>
         ```python
@@ -34,11 +36,14 @@ Generate Python that builds anylumino widgets from an evaluated OpenUI tree.
             result: Mapping[str, Any],
             handlers: Collection[str],
             namespace: Mapping[str, Any],
+            components: Sequence[Component] = COMPONENTS,
         ) -> str:
             """Return the module source for a parse result.
 
             ``handlers`` are the handler methods of the callbacks' ``App`` subclass,
             and ``namespace`` holds the names that `Widget(name)` may mount from the app.
+            ``components`` is the catalog the program was parsed with; a component
+            from another module, such as one a notebook skill adds, imports it.
             """
             for key, label in (("states", "$state variables"), ("queries", "Query"), ("mutations", "Mutation")):
                 if result.get(key):
@@ -47,10 +52,11 @@ Generate Python that builds anylumino widgets from an evaluated OpenUI tree.
             if result.get("root") is None:
                 raise GenerationError("The program has no root component.")
 
-            writer = _Writer(set(handlers), namespace)
+            writer = _Writer(set(handlers), namespace, {component.name: component for component in components})
             root = writer.element(result["root"])
             footer = f"\n        self.widget = {root}\n        app.set_ui(self)\n"
             imports = [text for module, text in IMPORTS.items() if module in ("al", "ax", "workbench") or module in writer.modules]
+            imports += [f"import {module}\n" for module in sorted(writer.modules - set(IMPORTS))]
 
             return "".join([DOCSTRING, *imports, CLASS, *writer.lines, *writer.bindings, footer])
         ```
@@ -62,6 +68,8 @@ Generate Python that builds anylumino widgets from an evaluated OpenUI tree.
         <PyParameter name="handlers" type="Collection[str]" />
 
         <PyParameter name="namespace" type="Mapping[str, Any]" />
+
+        <PyParameter name="components" type="Sequence[Component]" value="COMPONENTS" />
       </div>
 
       <PyFunctionReturn type="str" />

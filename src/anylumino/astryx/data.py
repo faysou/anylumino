@@ -195,9 +195,17 @@ class Table(Widget):
 
     @property
     def columns(self) -> list[dict[str, Any]]:
-        """Current Astryx table column definitions."""
+        """Current Astryx table column definitions.
+
+        Assigning keys, labels, or column mappings, as `set_rows` takes them,
+        replaces the columns and keeps the rows.
+        """
 
         return list(self.props.get("columns", []))
+
+    @columns.setter
+    def columns(self, columns: Iterable[Any] | Mapping[str, Any]) -> None:
+        self.set_rows(self.rows, columns=columns)
 
     @property
     def row_key(self) -> str:
