@@ -25,6 +25,8 @@ process starts still cancels the turn.
 
   <PyAttribute name="effort" value="effort" />
 
+  <PyAttribute name="skills" value="list(skills)" />
+
   <PyAttribute name="process" type="asyncio.subprocess.Process | None" value="None" />
 
   <PyAttribute name="stopped" value="False" />
@@ -34,7 +36,7 @@ process starts still cancels the turn.
 
 ## Functions
 
-<PyFunction name="__init__" type="(agent, cwd, name, session_id=None, model=None, effort=None) -> None" kind="constructor">
+<PyFunction name="__init__" type="(agent, cwd, name, session_id=None, model=None, effort=None, skills=()) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -45,6 +47,7 @@ process starts still cancels the turn.
         session_id: str | None = None,
         model: str | None = None,
         effort: str | None = None,
+        skills: Sequence[Skill] = (),
     ) -> None:
         if agent not in AGENTS:
             raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(AGENTS)}.")
@@ -55,6 +58,7 @@ process starts still cancels the turn.
         self.session_id = session_id
         self.model = model
         self.effort = effort
+        self.skills = list(skills)
         self.process: asyncio.subprocess.Process | None = None
         self.stopped = False
     ```
@@ -72,6 +76,8 @@ process starts still cancels the turn.
     <PyParameter name="model" type="str | None" value="None" />
 
     <PyParameter name="effort" type="str | None" value="None" />
+
+    <PyParameter name="skills" type="Sequence[Skill]" value="()" />
   </div>
 
   <PyFunctionReturn type="None" />
@@ -90,10 +96,15 @@ process starts still cancels the turn.
         if shutil.which(self.agent) is None:
             raise AgentError(f"`{self.agent}` was not found on PATH.")
 
+        # Holds the plugin that links the notebook skills for `claude`, for this turn only
+        plugins = tempfile.TemporaryDirectory(prefix="anylumino-skills-")
         if self.agent == "claude":
             resume = self.session_id is not None
             session_id = self.session_id or str(uuid.uuid4())
-            argv = claude_argv(session_id, resume, self.name, system_prompt, self.model, self.effort)
+            plugin = skill.write_plugin(self.skills, Path(plugins.name)) if self.skills else None
+            argv = claude_argv(
+                session_id, resume, self.name, system_prompt, self.model, self.effort, self.skills, plugin
+            )
             stream: ClaudeStream | CodexStream = ClaudeStream()
         else:
             overrides = await codex_mcp_overrides(self.cwd)
@@ -101,6 +112,8 @@ process starts still cancels the turn.
             stream = CodexStream()
 
         if self.stopped:
+            plugins.cleanup()
+
             return
 
         self.process = await asyncio.create_subprocess_exec(
@@ -139,6 +152,7 @@ process starts still cancels the turn.
                 await self.terminate(process)
 
             self.process = None
+            plugins.cleanup()
     ```
   </PySourceCode>
 

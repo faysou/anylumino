@@ -246,3 +246,23 @@
   callbacks, and edited programs directly, and send files with an edited `UI` class or that do not
   apply to the agent to reconcile, then report whether the reconciled `UI` class matches the file.
   Verify with pytest, in JupyterLab, and with a live turn that reconciles an edited `UI` class.
+
+## 15. Notebook skills
+
+- [x] 15.1 Add `Workbench(skills=[...])` for skill folders with a `SKILL.md`, list them in the
+  system prompt, load them in Claude as a per-turn plugin with read access to their folders, and
+  save them with the session. Verify with pytest.
+- [x] 15.2 Accept objects that expose a `.widget`, such as a lightweight-charts `NotebookChart`,
+  when a container's `widgets` is assigned, and close such children with the previous UI. Verify
+  with pytest.
+- [x] 15.3 Write a `lightweight-charts` skill and a `workbench_chart_replay.py` notebook in
+  option_trader that rebuild the delta hedge dashboard from its chart catalog. Verify with a live
+  Claude Code turn and in JupyterLab.
+- [x] 15.4 Make `fit_content` layout panels follow their children: keep the fitted height when the
+  panel's own resize observer fires, measure split panes like boxes, and refit when a child's
+  content changes size. Fit `LiveDashboard` in option_trader with it instead of setting heights
+  from Python. Verify with `node --test`, the chart explorer, and a `LiveDashboard` replay in
+  JupyterLab.
+- [x] 15.5 After a click inside a layout panel, render only children the click revealed, so an
+  already shown chart keeps its view instead of resetting through a resize notice. Verify with
+  cycle-row clicks in the chart explorer.

@@ -96,6 +96,21 @@ def _view_for_child(child: object) -> object:
     return child
 
 
+class ChildList(t.List):
+    """A list of child widgets that also accepts objects exposing a ``.widget``, such as a chart wrapper.
+
+    Each such object is replaced by its widget before the list validates its
+    items, so assigning ``widgets`` after construction accepts the same children
+    as the constructors.
+    """
+
+    def validate(self, obj: Any, value: Any) -> Any:
+        if isinstance(value, (list, tuple)):
+            value = [_view_for_child(child) for child in value]
+
+        return super().validate(obj, value)
+
+
 def _is_child(value: object) -> bool:
     if _is_widget(value):
         return True
@@ -474,7 +489,7 @@ class LayoutWidget(KeyedChildren, anywidget.AnyWidget):
     keys, while focus is on content that is not a text field.
     """
 
-    widgets = t.List(anywidget.WidgetTrait(), default_value=[]).tag(
+    widgets = ChildList(anywidget.WidgetTrait(), default_value=[]).tag(
         sync=True,
         to_json=_widget_list_to_json,
         from_json=_widget_list_from_json,
@@ -963,7 +978,9 @@ class SplitPanel(LayoutWidget):
         dividers remain draggable independently.
     fit_content : bool, default False
         Whether the panel height follows its panes' content instead of
-        ``height``.
+        ``height``: the tallest pane side by side, or the panes and handles
+        stacked. The panel refits when a pane's content changes size, such as
+        a chart frame that grows with its subcharts.
     """
 
     _esm = static_asset("layout/layout_panel.bundle.js")

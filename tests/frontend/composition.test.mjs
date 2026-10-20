@@ -246,3 +246,87 @@ test("observeResize calls back on each resize until the signal aborts", () => {
     globalThis.ResizeObserver = previous;
   }
 });
+
+test("contentObserver watches content boxes through display:contents roots and replaces them per call", async () => {
+  const { contentObserver } = await import("../../src/anylumino/static/layout/composition.js");
+  const previous = { ResizeObserver: globalThis.ResizeObserver, MutationObserver: globalThis.MutationObserver, getComputedStyle: globalThis.getComputedStyle };
+  const resizes = [];
+  const mutations = [];
+  globalThis.ResizeObserver = class {
+    constructor(callback) {
+      this.callback = callback;
+      this.observed = [];
+      resizes.push(this);
+    }
+    observe(element) {
+      this.observed.push(element.id);
+    }
+    disconnect() {
+      this.observed = [];
+    }
+  };
+  globalThis.MutationObserver = class {
+    constructor(callback) {
+      this.callback = callback;
+      this.observed = [];
+      mutations.push(this);
+    }
+    observe(element) {
+      this.observed.push(element.id);
+    }
+    disconnect() {
+      this.observed = [];
+    }
+  };
+  globalThis.getComputedStyle = (element) => ({ display: element.display ?? "block" });
+  const node = (id, children = [], display = "block") => ({ id, children, display });
+  try {
+    const controller = new AbortController();
+    let calls = 0;
+    const observe = contentObserver(() => (calls += 1), controller.signal, 2);
+    const chart = node("chart", [node("frame")]);
+    const slot = node("slot", [node("mount", [node("stack", [chart])], "contents")]);
+
+    observe([slot]);
+    const first = [...resizes[0].observed];
+    resizes[0].callback([]);
+    mutations[0].callback([]);
+    observe([]);
+
+    assert.deepEqual(first, ["stack", "chart"]);
+    assert.deepEqual(mutations[0].observed, []);
+    assert.deepEqual(resizes[0].observed, []);
+    assert.equal(calls, 2);
+  } finally {
+    Object.assign(globalThis, previous);
+  }
+});
+
+test("revealedSlots skips slots already shown, so a click does not reset a shown chart", async () => {
+  const { revealedSlots } = await import("../../src/anylumino/static/layout/composition.js");
+  const slot = (name, rendered = "true") => ({ name, visible: true, node: { dataset: { anyluminoRendered: rendered } } });
+  const chart = slot("chart");
+  const table = slot("table");
+  const section = slot("section", "false");
+  section.visible = false;
+  const shown = new WeakSet();
+  const names = (slots) => slots.map((item) => item.name);
+  const visible = (item) => item.visible;
+
+  const first = names(revealedSlots([chart, table, section], shown, visible));
+  const click = names(revealedSlots([chart, table, section], shown, visible));
+  section.visible = true;
+  const opened = names(revealedSlots([chart, table, section], shown, visible));
+  const retried = names(revealedSlots([chart, table, section], shown, visible));
+  section.node.dataset.anyluminoRendered = "true";
+  table.visible = false;
+  revealedSlots([chart, table, section], shown, visible);
+  table.visible = true;
+  const shownAgain = names(revealedSlots([chart, table, section], shown, visible));
+
+  assert.deepEqual(first, ["chart", "table"]);
+  assert.deepEqual(click, []);
+  assert.deepEqual(opened, ["section"]);
+  assert.deepEqual(retried, ["section"]);  // until it renders
+  assert.deepEqual(shownAgain, ["table"]);
+});

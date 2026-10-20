@@ -266,6 +266,71 @@ export function observeResize(element, callback, signal) {
   signal.addEventListener("abort", () => observer.disconnect(), { once: true });
 }
 
+/**
+ * Return the visible slots a click may have revealed, and record which slots are shown in
+ * `shown`, a WeakSet the caller keeps between calls.
+ *
+ * A slot counts as revealed when it was not shown at the last call or has not rendered yet,
+ * such as an accordion section the click opened. Slots that were already shown are left out:
+ * a visibility notice resizes embedded documents, which resets a chart's visible range.
+ */
+export function revealedSlots(slots, shown, isVisible) {
+  const revealed = [];
+  for (const slot of slots) {
+    if (!isVisible(slot)) {
+      shown.delete(slot);
+    } else if (!shown.has(slot) || slot.node.dataset.anyluminoRendered === "false") {
+      shown.add(slot);
+      revealed.push(slot);
+    }
+  }
+  return revealed;
+}
+
+/**
+ * Return a function that watches the content of the given nodes and calls
+ * `callback` when it changes size, until `signal` aborts; each call replaces
+ * the watched nodes.
+ *
+ * A child can resize its content after it renders, such as a chart whose frame
+ * grows with its panes, so the watch covers content boxes a few levels deep: an
+ * outer box that fills its slot does not change with its content. display:contents
+ * mount roots have no box and are walked through. Added and removed nodes, such
+ * as a closing popup, count too, since they change the height without resizing a
+ * watched box.
+ */
+export function contentObserver(callback, signal, depth = 4) {
+  const resizes = new ResizeObserver(() => callback());
+  const mutations = new MutationObserver(() => callback());
+  signal.addEventListener(
+    "abort",
+    () => {
+      resizes.disconnect();
+      mutations.disconnect();
+    },
+    { once: true },
+  );
+  const visit = (parent, remaining) => {
+    for (const child of parent.children) {
+      const contents = getComputedStyle(child).display === "contents";
+      if (!contents) {
+        resizes.observe(child);
+      }
+      if (contents || remaining > 1) {
+        visit(child, contents ? remaining : remaining - 1);
+      }
+    }
+  };
+  return (nodes) => {
+    resizes.disconnect();
+    mutations.disconnect();
+    for (const node of nodes) {
+      visit(node, depth);
+      mutations.observe(node, { childList: true, subtree: true });
+    }
+  };
+}
+
 export function disposeLuminoWidget(widget) {
   if (!widget || widget.isDisposed) {
     return;

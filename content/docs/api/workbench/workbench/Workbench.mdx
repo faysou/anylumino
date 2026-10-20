@@ -14,9 +14,11 @@ Build notebook UIs by chatting with a local coding agent.
 <PyAttributes>
   <PyAttribute name="state" value="saved or store.SessionState(name=session or '', agent=agent or 'claude', cwd=str(Path(cwd or os.getcwd()).resolve()))" />
 
+  <PyAttribute name="skills" value="[read_skill(folder) for folder in self.state.skills]" />
+
   <PyAttribute name="namespace" value="dict(namespace or {})" />
 
-  <PyAttribute name="runner" value="AgentRunner(self.state.agent, Path(self.state.cwd), self.state.name or 'anylumino', self.state.agent_session_id, self.state.model, self.state.effort)" />
+  <PyAttribute name="runner" value="AgentRunner(self.state.agent, Path(self.state.cwd), self.state.name or 'anylumino', self.state.agent_session_id, self.state.model, self.state.effort, self.skills)" />
 
   <PyAttribute name="ui_code" value="''" />
 
@@ -51,7 +53,7 @@ Build notebook UIs by chatting with a local coding agent.
 
 ## Functions
 
-<PyFunction name="__init__" type="(agent=None, session=None, namespace=None, cwd=None, *, model=None, effort=None, height=640) -> None" kind="constructor">
+<PyFunction name="__init__" type="(agent=None, session=None, namespace=None, cwd=None, *, model=None, effort=None, skills=None, height=640) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -63,6 +65,7 @@ Build notebook UIs by chatting with a local coding agent.
         *,
         model: str | None = None,
         effort: str | None = None,
+        skills: Sequence[str | Path] | None = None,
         height: int | float | str | None = 640,
     ) -> None:
         saved = store.load(session) if session else None
@@ -75,6 +78,10 @@ Build notebook UIs by chatting with a local coding agent.
         # A restored session resumes the agent's conversation with new settings when they are given
         self.state.model = model or self.state.model
         self.state.effort = effort or self.state.effort
+        if skills is not None:
+            self.state.skills = [str(Path(folder).expanduser().resolve()) for folder in skills]
+
+        self.skills = [read_skill(folder) for folder in self.state.skills]
         self.namespace = dict(namespace or {})
         self.runner = AgentRunner(
             self.state.agent,
@@ -83,6 +90,7 @@ Build notebook UIs by chatting with a local coding agent.
             self.state.agent_session_id,
             self.state.model,
             self.state.effort,
+            self.skills,
         )
         self.ui_code = ""
         self.last_error = ""
@@ -179,6 +187,14 @@ Build notebook UIs by chatting with a local coding agent.
       `max` for Claude Code, and `minimal`, `low`, `medium`,
       `high`, or `xhigh` for Codex. Defaults to the restored session's
       effort, or the CLI's own default.
+    </PyParameter>
+
+    <PyParameter name="skills" type="Sequence[str | Path] | None" value="None">
+      Skill folders that document the notebook's own libraries, such as a
+      charting library the callbacks import. Each holds a `SKILL.md` with
+      `name` and `description` front matter, in the Claude Code skill
+      format. The agent sees each name and description and loads a skill when
+      it needs it. Defaults to the restored session's skills.
     </PyParameter>
 
     <PyParameter name="height" type="int | float | str | None" value="640">
@@ -457,7 +473,7 @@ Build notebook UIs by chatting with a local coding agent.
             self.update_reply(index, reply, tools, "sending")
 
         try:
-            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace)):
+            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace, self.skills)):
                 if isinstance(event, Text):
                     reply += event.text
                 elif isinstance(event, ToolStarted):

@@ -11,6 +11,7 @@ import {
   clampIndex,
   coalesce,
   combineSignals,
+  contentObserver,
   cssSize,
   disposeLuminoWidget,
   fitContentEnabled,
@@ -23,6 +24,7 @@ import {
   observeResize,
   renderChildError,
   renderWidgetRef,
+  revealedSlots,
   reusableSlots,
   whenConnected,
 } from "./composition.js";
@@ -259,13 +261,22 @@ export default {
 
     const syncSize = () => {
       root.style.width = cssSize(model.get("width"), "100%");
-      root.style.height = cssSize(model.get("height"), "420px");
       if (!fitContentEnabled(model)) {
         lastFitHeight = 0;
       }
+      // Keep a fitted height: the root's own resize observer calls this after each fit,
+      // and resetting to the model height would undo the fit and leave the layout stale
+      root.style.height = lastFitHeight > 0 ? `${lastFitHeight}px` : cssSize(model.get("height"), "420px");
       root.classList.toggle("anylumino-mod-fitContent", fitContentEnabled(model));
       syncScroll(root, viewport, slots, model);
+      observeSlots();
       notifyResize();
+    };
+
+    // Children report their own size changes, such as a chart frame that grows with its panes
+    const observeContent = contentObserver(() => scheduleFitContent(), signal);
+    const observeSlots = () => {
+      observeContent(fitContentEnabled(model) ? slots.filter(slotIsVisible).map((slot) => slot.node) : []);
     };
 
     const fitContentNow = () => {
@@ -279,6 +290,12 @@ export default {
         return;
       }
 
+      // Measure the content alone: a minimum height from an earlier fit would keep a
+      // shrinking child, such as a chart with fewer panes, at its old height
+      const childMinHeight = cssSize(model.get("child_min_height"), "0px");
+      for (const slot of visibleSlots) {
+        slot.node.style.minHeight = childMinHeight;
+      }
       for (const slot of visibleSlots) {
         const height = measureSlotHeight(slot);
         if (height > 0) {
@@ -289,10 +306,13 @@ export default {
 
       requestAnimationFrame(() => {
         let nextHeight = measuredContentHeight(panel.node);
-        if (kind === "box" || kind === "responsive") {
-          const direction = panel.direction || model.get("direction") || "top-to-bottom";
+        if (kind === "box" || kind === "responsive" || kind === "split") {
+          // A split panel lays out like a box: side by side panes take the tallest one
+          const direction = kind === "split"
+            ? (panel.orientation === "vertical" ? "top-to-bottom" : "left-to-right")
+            : panel.direction || model.get("direction") || "top-to-bottom";
           const horizontal = direction === "left-to-right" || direction === "right-to-left";
-          const spacing = Number(model.get("spacing") ?? 8);
+          const spacing = kind === "split" ? Number(panel.spacing ?? 4) : Number(model.get("spacing") ?? 8);
           const childHeights = visibleSlots.map(measureSlotHeight).filter((height) => height > 0);
           if (childHeights.length > 0) {
             nextHeight = horizontal
@@ -381,11 +401,22 @@ export default {
       }
     };
 
+    // Slots seen visible at the last render, so a click re-renders only those it revealed
+    const shownSlots = new WeakSet();
     const renderVisibleChildren = async () => {
       for (const slot of slots) {
         if (slotIsVisible(slot)) {
+          shownSlots.add(slot);
           await renderChild(slot);
+        } else {
+          shownSlots.delete(slot);
         }
+      }
+    };
+
+    const renderRevealedChildren = async () => {
+      for (const slot of revealedSlots(slots, shownSlots, slotIsVisible)) {
+        await renderChild(slot);
       }
     };
 
@@ -451,6 +482,7 @@ export default {
       syncStackedIndex();
       panel.update();
       await renderVisibleChildren();
+      observeSlots();
       scheduleFitContent();
     };
 
@@ -460,7 +492,7 @@ export default {
       }
     });
 
-    root.addEventListener("click", () => setTimeout(() => void renderVisibleChildren(), 0), { signal });
+    root.addEventListener("click", () => setTimeout(() => void renderRevealedChildren(), 0), { signal });
     observeResize(root, syncSize, signal);
 
     const unbind = modelListeners(model, [

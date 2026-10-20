@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from . import openui
 from . import skill
 from .catalog import library_spec
+from .skill import Skill
 
 
 PREAMBLE = (
@@ -93,10 +94,11 @@ An unknown option stops the reply from being applied.
 _cache: dict[str, str] = {}
 
 
-async def system_prompt(namespace: Mapping[str, Any]) -> str:
-    """Return the full system prompt, with ``namespace`` described for the agent."""
+async def system_prompt(namespace: Mapping[str, Any], skills: Sequence[Skill] = ()) -> str:
+    """Return the full system prompt, with ``namespace`` and the notebook ``skills`` described for the agent."""
+    sections = [await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)]
 
-    return "\n\n".join([await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)])
+    return "\n\n".join([*sections, *([skills_summary(skills)] if skills else [])])
 
 
 async def base_prompt() -> str:
@@ -129,5 +131,20 @@ def namespace_summary(namespace: Mapping[str, Any]) -> str:
             detail = f", shape {tuple(shape)}, columns {described}"
 
         lines.append(f"- `{name}`: `{kind}`{detail}")
+
+    return "\n".join(lines)
+
+
+def skills_summary(skills: Sequence[Skill]) -> str:
+    """List the notebook skills by name, description, and path, so the agent loads one when needed."""
+    lines = [
+        "## Notebook skills",
+        "",
+        "These skills document libraries of this notebook that callbacks can import. Before you use one",
+        "of their APIs, load its skill: with the Skill tool when you have it, otherwise read its SKILL.md",
+        "and then the files it points to.",
+        "",
+    ]
+    lines += [f"- `{entry.name}`: {entry.description} (`{entry.path / 'SKILL.md'}`)" for entry in skills]
 
     return "\n".join(lines)

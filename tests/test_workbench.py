@@ -5,7 +5,7 @@ import pytest
 
 from anylumino import astryx as ax
 from anylumino.workbench import Workbench, openui
-from anylumino.workbench.workbench import EMPTY_CALLBACKS
+from anylumino.workbench.workbench import EMPTY_CALLBACKS, close_tree
 
 
 PROGRAM = """root = VBox([title, go, fail])
@@ -468,3 +468,17 @@ def test_unusable_callbacks_are_reported(agent_reply, tmp_path, callbacks, names
         "role": "system",
         "content": f"The reply was not applied; the UI is unchanged. {message}",
     }
+
+
+def test_close_tree_closes_children_without_a_widgets_trait():
+    import anywidget
+
+    class Leaf(anywidget.AnyWidget):
+        _esm = "export default {}"
+
+    leaf = Leaf()
+    box = ax.Stack([leaf])
+
+    close_tree(box, set())
+
+    assert (leaf.comm, box.comm) == (None, None)

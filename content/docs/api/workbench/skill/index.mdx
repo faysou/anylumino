@@ -1,0 +1,151 @@
+---
+title: "skill"
+---
+
+The workbench's agent skills: the built-in component skill and the notebook's own skill folders.
+
+The built-in skill documents each catalog component and is generated from the
+catalog. Its files live in a Claude Code plugin directory inside the package, so
+`claude` loads it with `--plugin-dir` and `codex` reads the same files by path.
+Run `make workbench-skill` after changing the catalog or a wrapper's keywords.
+
+A notebook skill is a folder with a `SKILL.md` whose front matter gives its
+`name` and `description`, in the Claude Code skill format, such as the API
+of a private charting library.
+
+<PyAttributes>
+  <PyAttribute name="NAME" value="'openui-components'" />
+
+  <PyAttribute name="PLUGIN" value="Path(__file__).parent / 'plugin'" />
+
+  <PyAttribute name="SKILL" value="PLUGIN / 'skills' / NAME" />
+
+  <PyAttribute name="DESCRIPTION" value="&#x22;Options and Python constructors of the anylumino OpenUI components. Use before you pass an options object to a component in an openui-lang program, or build a component's widget in Python.&#x22;" />
+</PyAttributes>
+
+<Tabs items={["Class","Functions"]}>
+  <Tab value="Class">
+    <Cards>
+      <Card title="Skill" href="/docs/api/workbench/skill/Skill" />
+    </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="read_skill" type="(folder) -> Skill">
+      Read the `SKILL.md` front matter of `folder`.
+
+      <PySourceCode>
+        ```python
+        def read_skill(folder: str | Path) -> Skill:
+            """Read the ``SKILL.md`` front matter of ``folder``.
+
+            Raises
+            ------
+            ValueError
+                If ``folder`` has no ``SKILL.md``, its front matter lacks ``name`` or
+                ``description``, or the name is not lowercase letters, digits, and ``-``.
+            """
+            path = Path(folder).expanduser().resolve()
+            manifest = path / "SKILL.md"
+            if not manifest.is_file():
+                raise ValueError(f"{path} is not a skill folder: it has no SKILL.md")
+
+            match = re.match(r"---\n(.*?)\n---\n", manifest.read_text(), re.DOTALL)
+            fields = {}
+            for line in match.group(1).splitlines() if match else []:
+                key, _, value = line.partition(":")
+                fields[key.strip()] = value.strip().strip("\"'")
+
+            name, description = fields.get("name", ""), fields.get("description", "")
+            if not name or not description:
+                raise ValueError(f"{manifest} needs front matter with a name and a description")
+
+            if not re.fullmatch(r"[a-z0-9-]+", name):
+                raise ValueError(f"{manifest}: the skill name {name!r} must use lowercase letters, digits, and '-'")
+
+            return Skill(name, description, path)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="folder" type="str | Path" />
+      </div>
+
+      <PyFunctionReturn type="anylumino.workbench.skill.Skill" />
+    </PyFunction>
+
+    <PyFunction name="write_plugin" type="(skills, directory) -> Path">
+      Write a Claude Code plugin into `directory` that links each of `skills`, and return it.
+
+      The links keep a skill's later edits visible to the next turn.
+
+      <PySourceCode>
+        ```python
+        def write_plugin(skills: Sequence[Skill], directory: Path) -> Path:
+            """Write a Claude Code plugin into ``directory`` that links each of ``skills``, and return it.
+
+            The links keep a skill's later edits visible to the next turn.
+            """
+            (directory / ".claude-plugin").mkdir(parents=True, exist_ok=True)
+            manifest = {"name": "notebook", "description": "Skills of this notebook", "version": "1.0.0"}
+            (directory / ".claude-plugin" / "plugin.json").write_text(json.dumps(manifest, indent=2) + "\n")
+            (directory / "skills").mkdir(exist_ok=True)
+            for skill in skills:
+                (directory / "skills" / skill.name).symlink_to(skill.path, target_is_directory=True)
+
+            return directory
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="skills" type="Sequence[Skill]" />
+
+        <PyParameter name="directory" type="Path" />
+      </div>
+
+      <PyFunctionReturn type="pathlib.Path" />
+    </PyFunction>
+
+    <PyFunction name="files" type="() -> dict[str, str]">
+      Return the plugin files by path relative to `PLUGIN`.
+
+      <PySourceCode>
+        ```python
+        def files() -> dict[str, str]:
+            """Return the plugin files by path relative to `PLUGIN`."""
+            manifest = {"name": "anylumino", "description": "anylumino workbench skills", "version": "1.0.0"}
+            result = {".claude-plugin/plugin.json": json.dumps(manifest, indent=2) + "\n", f"skills/{NAME}/SKILL.md": _skill()}
+            for component in COMPONENTS:
+                if component.module:
+                    result[f"skills/{NAME}/components/{component.name}.md"] = _component(component)
+
+            return result
+        ```
+      </PySourceCode>
+
+      <PyFunctionReturn type="dict[str, str]" />
+    </PyFunction>
+
+    <PyFunction name="write" type="() -> None">
+      Write the plugin files and remove component files that no longer have options.
+
+      <PySourceCode>
+        ```python
+        def write() -> None:
+            """Write the plugin files and remove component files that no longer have options."""
+            expected = files()
+            for path in (SKILL / "components").glob("*.md"):
+                if str(path.relative_to(PLUGIN)) not in expected:
+                    path.unlink()
+
+            for relative, text in expected.items():
+                path = PLUGIN / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(text)
+        ```
+      </PySourceCode>
+
+      <PyFunctionReturn type="None" />
+    </PyFunction>
+  </Tab>
+</Tabs>

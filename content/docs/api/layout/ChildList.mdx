@@ -1,0 +1,31 @@
+---
+title: "ChildList"
+---
+
+A list of child widgets that also accepts objects exposing a `.widget`, such as a chart wrapper.
+
+Each such object is replaced by its widget before the list validates its
+items, so assigning `widgets` after construction accepts the same children
+as the constructors.
+
+## Functions
+
+<PyFunction name="validate" type="(obj, value) -> Any">
+  <PySourceCode>
+    ```python
+    def validate(self, obj: Any, value: Any) -> Any:
+        if isinstance(value, (list, tuple)):
+            value = [_view_for_child(child) for child in value]
+
+        return super().validate(obj, value)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="obj" type="Any" />
+
+    <PyParameter name="value" type="Any" />
+  </div>
+
+  <PyFunctionReturn type="typing.Any" />
+</PyFunction>

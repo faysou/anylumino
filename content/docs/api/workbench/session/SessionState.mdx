@@ -19,6 +19,8 @@ What a workbench needs to restore a session. The UI code is derived, so it is no
 
   <PyAttribute name="effort" type="str | None" value="None" />
 
+  <PyAttribute name="skills" type="list[str]" value="field(default_factory=list)" />
+
   <PyAttribute name="messages" type="list[dict[str, Any]]" value="field(default_factory=list)" />
 
   <PyAttribute name="program" type="str" value="''" />
@@ -30,7 +32,7 @@ What a workbench needs to restore a session. The UI code is derived, so it is no
 
 ## Functions
 
-<PyFunction name="__init__" type="(name, agent, cwd, agent_session_id=None, model=None, effort=None, messages=list(), program='', callbacks='', updated_at='') -> None" kind="constructor">
+<PyFunction name="__init__" type="(name, agent, cwd, agent_session_id=None, model=None, effort=None, skills=list(), messages=list(), program='', callbacks='', updated_at='') -> None" kind="constructor">
   <div>
     <PyParameter name="name" type="str" />
 
@@ -43,6 +45,8 @@ What a workbench needs to restore a session. The UI code is derived, so it is no
     <PyParameter name="model" type="str | None" value="None" />
 
     <PyParameter name="effort" type="str | None" value="None" />
+
+    <PyParameter name="skills" type="list[str]" value="list()" />
 
     <PyParameter name="messages" type="list[dict[str, Any]]" value="list()" />
 

@@ -92,7 +92,9 @@ Lumino split panel with draggable dividers between children.
 
     <PyParameter name="fit_content" type="bool" value="False">
       Whether the panel height follows its panes' content instead of
-      `height`.
+      `height`: the tallest pane side by side, or the panes and handles
+      stacked. The panel refits when a pane's content changes size, such as
+      a chart frame that grows with its subcharts.
     </PyParameter>
   </div>
 

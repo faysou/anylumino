@@ -44,14 +44,15 @@ Ask for a UI in the chat, for example "Show the sales table with a region
 selector and a button that totals the selected region". Each reply can change
 the program, the callbacks, or both.
 
-| Argument    | Effect                                                                                    |
-| ----------- | ----------------------------------------------------------------------------------------- |
-| `agent`     | `"claude"` or `"codex"`. A restored session keeps the agent it was created with.          |
-| `session`   | Saves the session after every turn and restores it when a workbench uses the same name.   |
-| `namespace` | Names the callbacks can read and the agent sees, with data frame shapes and column types. |
-| `cwd`       | Directory the agent runs in. Defaults to the current directory.                           |
-| `model`     | Model name passed to the CLI, such as `"sonnet"`. Saved with the session.                 |
-| `effort`    | Reasoning effort passed to the CLI, such as `"low"` or `"high"`. Saved with the session.  |
+| Argument    | Effect                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------- |
+| `agent`     | `"claude"` or `"codex"`. A restored session keeps the agent it was created with.                  |
+| `session`   | Saves the session after every turn and restores it when a workbench uses the same name.           |
+| `namespace` | Names the callbacks can read and the agent sees, with data frame shapes and column types.         |
+| `cwd`       | Directory the agent runs in. Defaults to the current directory.                                   |
+| `model`     | Model name passed to the CLI, such as `"sonnet"`. Saved with the session.                         |
+| `effort`    | Reasoning effort passed to the CLI, such as `"low"` or `"high"`. Saved with the session.          |
+| `skills`    | Skill folders that document your own libraries, described in [Notebook skills](#notebook-skills). |
 
 `model` and `effort` apply only to the workbench's turns, not to your other CLI
 use. Claude Code receives `--model` and `--effort` (`low`, `medium`, `high`,
@@ -175,6 +176,38 @@ plugin for each turn. Codex reads the same files by the path in its system
 prompt. Both read a component's file only when they need it, which keeps the
 system prompt small. After you change a widget's keywords or the catalog, run
 `make workbench-skill` to regenerate the skill.
+
+## Notebook skills
+
+The catalog covers anylumino widgets. To let the agent use your own libraries,
+such as a private charting widget, write a skill for them and pass its folder in
+`skills`. A skill folder holds a `SKILL.md` with `name` and `description` front
+matter, in the Claude Code skill format, and any files it points to:
+
+```text
+workbench_skills/lightweight-charts/
+  SKILL.md         name, description, the rules, and links to the other files
+  reference.md     the API, read only when needed
+```
+
+```python
+Workbench(
+    agent="claude",
+    namespace={"chart_catalog": chart_catalog},
+    skills=["workbench_skills/lightweight-charts"],
+)
+```
+
+The system prompt lists each skill's name, description, and `SKILL.md` path, and
+tells the agent to load a skill before it uses that library. Claude loads the
+skills as a plugin for each turn and can read their folders. Codex reads the
+same files by path. A skill only documents a library; the callbacks import it
+like any other module, so the export imports it too. Widgets that are not
+widgets themselves but expose one as `.widget`, such as a lightweight-charts
+`NotebookChart`, can be set as a container's `widgets` directly.
+
+The skill paths are saved with the session. A folder without a valid `SKILL.md`
+raises `ValueError` when the workbench is created.
 
 ## Sessions
 

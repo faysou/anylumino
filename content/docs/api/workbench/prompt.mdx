@@ -18,20 +18,23 @@ The workbench system prompt: the OpenUI prompt for the catalog plus the callback
 
 <Tabs items={["Functions"]}>
   <Tab value="Functions">
-    <PyFunction name="system_prompt" type="(namespace) -> str">
-      Return the full system prompt, with `namespace` described for the agent.
+    <PyFunction name="system_prompt" type="(namespace, skills=()) -> str">
+      Return the full system prompt, with `namespace` and the notebook `skills` described for the agent.
 
       <PySourceCode>
         ```python
-        async def system_prompt(namespace: Mapping[str, Any]) -> str:
-            """Return the full system prompt, with ``namespace`` described for the agent."""
+        async def system_prompt(namespace: Mapping[str, Any], skills: Sequence[Skill] = ()) -> str:
+            """Return the full system prompt, with ``namespace`` and the notebook ``skills`` described for the agent."""
+            sections = [await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)]
 
-            return "\n\n".join([await base_prompt(), COMPONENT_OPTIONS, CALLBACKS, namespace_summary(namespace)])
+            return "\n\n".join([*sections, *([skills_summary(skills)] if skills else [])])
         ```
       </PySourceCode>
 
       <div>
         <PyParameter name="namespace" type="Mapping[str, Any]" />
+
+        <PyParameter name="skills" type="Sequence[Skill]" value="()" />
       </div>
 
       <PyFunctionReturn type="str" />
@@ -88,6 +91,34 @@ The workbench system prompt: the OpenUI prompt for the catalog plus the callback
 
       <div>
         <PyParameter name="namespace" type="Mapping[str, Any]" />
+      </div>
+
+      <PyFunctionReturn type="str" />
+    </PyFunction>
+
+    <PyFunction name="skills_summary" type="(skills) -> str">
+      List the notebook skills by name, description, and path, so the agent loads one when needed.
+
+      <PySourceCode>
+        ```python
+        def skills_summary(skills: Sequence[Skill]) -> str:
+            """List the notebook skills by name, description, and path, so the agent loads one when needed."""
+            lines = [
+                "## Notebook skills",
+                "",
+                "These skills document libraries of this notebook that callbacks can import. Before you use one",
+                "of their APIs, load its skill: with the Skill tool when you have it, otherwise read its SKILL.md",
+                "and then the files it points to.",
+                "",
+            ]
+            lines += [f"- `{entry.name}`: {entry.description} (`{entry.path / 'SKILL.md'}`)" for entry in skills]
+
+            return "\n".join(lines)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="skills" type="Sequence[Skill]" />
       </div>
 
       <PyFunctionReturn type="str" />

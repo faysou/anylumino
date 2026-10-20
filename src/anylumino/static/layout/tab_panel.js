@@ -3,6 +3,7 @@ import {
   clampIndex,
   coalesce,
   combineSignals,
+  contentObserver,
   cssSize,
   disposeLuminoWidget,
   fitContentEnabled,
@@ -123,38 +124,9 @@ export default {
       );
     };
 
-    // A callback can resize a child's content after it renders, so the fit follows the
-    // current child's content boxes a few levels deep: an outer box that fills the slot
-    // does not shrink with its content. display:contents mount roots have no box. Removed
-    // nodes, such as a closing popup, change the measured height without resizing a box.
-    const contentObserver = new ResizeObserver(scheduleFitContent);
-    const mutationObserver = new MutationObserver(scheduleFitContent);
-    signal.addEventListener(
-      "abort",
-      () => {
-        contentObserver.disconnect();
-        mutationObserver.disconnect();
-      },
-      { once: true },
-    );
+    const observeContent = contentObserver(scheduleFitContent, signal);
     const observeCurrentContent = () => {
-      contentObserver.disconnect();
-      mutationObserver.disconnect();
-      const visit = (parent, depth) => {
-        for (const child of parent.children) {
-          const contents = getComputedStyle(child).display === "contents";
-          if (!contents) {
-            contentObserver.observe(child);
-          }
-          if (contents || depth > 1) {
-            visit(child, contents ? depth : depth - 1);
-          }
-        }
-      };
-      if (fitContentEnabled(model) && panel.currentWidget) {
-        visit(panel.currentWidget.node, 4);
-        mutationObserver.observe(panel.currentWidget.node, { childList: true, subtree: true });
-      }
+      observeContent(fitContentEnabled(model) && panel.currentWidget ? [panel.currentWidget.node] : []);
     };
 
     const notifyCurrentWidgetVisible = () => {

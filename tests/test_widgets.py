@@ -1829,3 +1829,20 @@ def test_astryx_responsive_panel_forwards_breakpoint_and_directions() -> None:
     }
     with pytest.raises(ValueError, match="narrow_direction must be one of"):
         ax.ResponsivePanel([ax.Text("A")], narrow_direction="diagonal")
+
+
+class ChartWrapper:
+    """Stands in for an object such as a chart that is not a widget but exposes one."""
+
+    def __init__(self) -> None:
+        self.widget = ax.Text("chart")
+
+
+@pytest.mark.parametrize("factory", [lambda: ax.Stack([]), lambda: VBox([]), lambda: TabPanel([])], ids=["astryx", "box", "tabs"])
+def test_assigning_widgets_unwraps_objects_exposing_a_widget(factory):
+    wrapper = ChartWrapper()
+    container = factory()
+
+    container.widgets = [wrapper]
+
+    assert container.widgets == [wrapper.widget]

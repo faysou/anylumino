@@ -8,6 +8,7 @@ import anywidget
 import traitlets as t
 
 from .layout import ChildInput
+from .layout import ChildList
 from .layout import TitleInput
 from .layout import KeyedChildren
 from .layout import _normalize_children
@@ -34,7 +35,7 @@ class ComponentWidget(KeyedChildren, anywidget.AnyWidget):
     component_family = t.Unicode("").tag(sync=True)
     component_kind = t.Unicode("element").tag(sync=True)
     tag = t.Unicode("").tag(sync=True)
-    widgets = t.List(anywidget.WidgetTrait(), default_value=[]).tag(
+    widgets = ChildList(anywidget.WidgetTrait(), default_value=[]).tag(
         sync=True,
         to_json=_widget_list_to_json,
         from_json=_widget_list_from_json,

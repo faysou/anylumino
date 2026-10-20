@@ -64,7 +64,8 @@ The workbench: an agent chat beside the generated UI and the code behind it.
             if id(widget) in keep:
                 return
 
-            for child in getattr(widget, "widgets", None) or []:
+            # Only a `widgets` trait holds children: ipywidgets' class-level `Widget.widgets` raises on instances
+            for child in widget.widgets if widget.has_trait("widgets") else []:
                 if isinstance(child, Widget):
                     close_tree(child, keep)
 

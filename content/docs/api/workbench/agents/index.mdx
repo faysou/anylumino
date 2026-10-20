@@ -38,14 +38,24 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
   </Tab>
 
   <Tab value="Functions">
-    <PyFunction name="claude_argv" type="(session_id, resume, name, system_prompt, model=None, effort=None) -> list[str]">
+    <PyFunction name="claude_argv" type="(session_id, resume, name, system_prompt, model=None, effort=None, skills=(), plugin=None) -> list[str]">
       <PySourceCode>
         ```python
         def claude_argv(
-            session_id: str, resume: bool, name: str, system_prompt: str, model: str | None = None, effort: str | None = None
+            session_id: str,
+            resume: bool,
+            name: str,
+            system_prompt: str,
+            model: str | None = None,
+            effort: str | None = None,
+            skills: Sequence[Skill] = (),
+            plugin: Path | None = None,
         ) -> list[str]:
             session = ["--resume", session_id] if resume else ["--session-id", session_id, "-n", name]
             settings = [*(["--model", model] if model else []), *(["--effort", effort] if effort else [])]
+            # The plugin loads the notebook skills, and --add-dir lets Read open the files they point to
+            notebook = ["--plugin-dir", str(plugin)] if plugin else []
+            notebook += [part for notebook_skill in skills for part in ("--add-dir", str(notebook_skill.path))]
 
             return [
                 "claude",
@@ -60,6 +70,7 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
                 "--strict-mcp-config",
                 "--plugin-dir",
                 str(skill.PLUGIN),
+                *notebook,
                 "--tools",
                 CLAUDE_TOOLS,
                 "--allowedTools",
@@ -83,6 +94,10 @@ Run one chat turn with the local `claude` or `codex` CLI and stream what it does
         <PyParameter name="model" type="str | None" value="None" />
 
         <PyParameter name="effort" type="str | None" value="None" />
+
+        <PyParameter name="skills" type="Sequence[Skill]" value="()" />
+
+        <PyParameter name="plugin" type="Path | None" value="None" />
       </div>
 
       <PyFunctionReturn type="list[str]" />

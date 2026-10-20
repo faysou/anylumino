@@ -14,4 +14,4 @@ In Python: `al.SplitPanel(widgets=..., orientation=..., sizes=...)`, plus any op
 | `width` | `number \| string` | Widget width. |
 | `height` | `number \| string` | Widget height. |
 | `resizable` | `boolean` | Whether the whole panel gets a notebook resize handle. Lumino pane dividers remain draggable independently. |
-| `fit_content` | `boolean` | Whether the panel height follows its panes' content instead of `height`. |
+| `fit_content` | `boolean` | Whether the panel height follows its panes' content instead of `height`: the tallest pane side by side, or the panes and handles stacked. The panel refits when a pane's content changes size, such as a chart frame that grows with its subcharts. |

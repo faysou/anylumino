@@ -21,7 +21,7 @@ than callbacks.
 
   <PyAttribute name="tag" value="t.Unicode('').tag(sync=True)" />
 
-  <PyAttribute name="widgets" value="t.List(anywidget.WidgetTrait(), default_value=[]).tag(sync=True, to_json=_widget_list_to_json, from_json=_widget_list_from_json)" />
+  <PyAttribute name="widgets" value="ChildList(anywidget.WidgetTrait(), default_value=[]).tag(sync=True, to_json=_widget_list_to_json, from_json=_widget_list_from_json)" />
 
   <PyAttribute name="child_keys" value="t.List(t.Unicode(), default_value=[]).tag(sync=True)" />
 

@@ -24,6 +24,7 @@ class SessionState:
     agent_session_id: str | None = None
     model: str | None = None
     effort: str | None = None
+    skills: list[str] = field(default_factory=list)
     messages: list[dict[str, Any]] = field(default_factory=list)
     program: str = ""
     callbacks: str = ""

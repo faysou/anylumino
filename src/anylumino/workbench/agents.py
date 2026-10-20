@@ -9,13 +9,15 @@ import os
 import re
 import shutil
 import signal
+import tempfile
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from . import skill
+from .skill import Skill
 
 
 AGENTS = ("claude", "codex")
@@ -159,10 +161,20 @@ def _target(fields: dict[str, Any]) -> str:
 
 
 def claude_argv(
-    session_id: str, resume: bool, name: str, system_prompt: str, model: str | None = None, effort: str | None = None
+    session_id: str,
+    resume: bool,
+    name: str,
+    system_prompt: str,
+    model: str | None = None,
+    effort: str | None = None,
+    skills: Sequence[Skill] = (),
+    plugin: Path | None = None,
 ) -> list[str]:
     session = ["--resume", session_id] if resume else ["--session-id", session_id, "-n", name]
     settings = [*(["--model", model] if model else []), *(["--effort", effort] if effort else [])]
+    # The plugin loads the notebook skills, and --add-dir lets Read open the files they point to
+    notebook = ["--plugin-dir", str(plugin)] if plugin else []
+    notebook += [part for notebook_skill in skills for part in ("--add-dir", str(notebook_skill.path))]
 
     return [
         "claude",
@@ -177,6 +189,7 @@ def claude_argv(
         "--strict-mcp-config",
         "--plugin-dir",
         str(skill.PLUGIN),
+        *notebook,
         "--tools",
         CLAUDE_TOOLS,
         "--allowedTools",
@@ -285,6 +298,7 @@ class AgentRunner:
         session_id: str | None = None,
         model: str | None = None,
         effort: str | None = None,
+        skills: Sequence[Skill] = (),
     ) -> None:
         if agent not in AGENTS:
             raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(AGENTS)}.")
@@ -295,6 +309,7 @@ class AgentRunner:
         self.session_id = session_id
         self.model = model
         self.effort = effort
+        self.skills = list(skills)
         self.process: asyncio.subprocess.Process | None = None
         self.stopped = False
 
@@ -310,10 +325,15 @@ class AgentRunner:
         if shutil.which(self.agent) is None:
             raise AgentError(f"`{self.agent}` was not found on PATH.")
 
+        # Holds the plugin that links the notebook skills for `claude`, for this turn only
+        plugins = tempfile.TemporaryDirectory(prefix="anylumino-skills-")
         if self.agent == "claude":
             resume = self.session_id is not None
             session_id = self.session_id or str(uuid.uuid4())
-            argv = claude_argv(session_id, resume, self.name, system_prompt, self.model, self.effort)
+            plugin = skill.write_plugin(self.skills, Path(plugins.name)) if self.skills else None
+            argv = claude_argv(
+                session_id, resume, self.name, system_prompt, self.model, self.effort, self.skills, plugin
+            )
             stream: ClaudeStream | CodexStream = ClaudeStream()
         else:
             overrides = await codex_mcp_overrides(self.cwd)
@@ -321,6 +341,8 @@ class AgentRunner:
             stream = CodexStream()
 
         if self.stopped:
+            plugins.cleanup()
+
             return
 
         self.process = await asyncio.create_subprocess_exec(
@@ -359,6 +381,7 @@ class AgentRunner:
                 await self.terminate(process)
 
             self.process = None
+            plugins.cleanup()
 
     async def stop(self) -> None:
         """Stop the current turn, including one whose process has not started yet."""

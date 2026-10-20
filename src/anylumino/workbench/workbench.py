@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-from collections.abc import Collection, Coroutine, Mapping
+from collections.abc import Collection, Coroutine, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +32,7 @@ from .export import (
 from .file_dialogs import ExportDialog, ImportDialog
 from .prompt import system_prompt
 from .reply import ReplyError, split_reply
+from .skill import read_skill
 
 
 TABS = {"ui": "UI", "openui": "OpenUI", "ui_code": "UI code", "callbacks": "Callbacks"}
@@ -76,6 +77,12 @@ class Workbench(al.SplitPanel):
         ``max`` for Claude Code, and ``minimal``, ``low``, ``medium``,
         ``high``, or ``xhigh`` for Codex. Defaults to the restored session's
         effort, or the CLI's own default.
+    skills : Sequence[str | Path] | None, default None
+        Skill folders that document the notebook's own libraries, such as a
+        charting library the callbacks import. Each holds a ``SKILL.md`` with
+        ``name`` and ``description`` front matter, in the Claude Code skill
+        format. The agent sees each name and description and loads a skill when
+        it needs it. Defaults to the restored session's skills.
     height : int | float | str | None, default 640
         CSS height of the workbench.
 
@@ -83,7 +90,8 @@ class Workbench(al.SplitPanel):
     ------
     ValueError
         If ``agent`` differs from the agent of the restored session, since a
-        session resumes the agent's own conversation.
+        session resumes the agent's own conversation, or a skill folder has no
+        valid ``SKILL.md``.
 
     Notes
     -----
@@ -100,6 +108,7 @@ class Workbench(al.SplitPanel):
         *,
         model: str | None = None,
         effort: str | None = None,
+        skills: Sequence[str | Path] | None = None,
         height: int | float | str | None = 640,
     ) -> None:
         saved = store.load(session) if session else None
@@ -112,6 +121,10 @@ class Workbench(al.SplitPanel):
         # A restored session resumes the agent's conversation with new settings when they are given
         self.state.model = model or self.state.model
         self.state.effort = effort or self.state.effort
+        if skills is not None:
+            self.state.skills = [str(Path(folder).expanduser().resolve()) for folder in skills]
+
+        self.skills = [read_skill(folder) for folder in self.state.skills]
         self.namespace = dict(namespace or {})
         self.runner = AgentRunner(
             self.state.agent,
@@ -120,6 +133,7 @@ class Workbench(al.SplitPanel):
             self.state.agent_session_id,
             self.state.model,
             self.state.effort,
+            self.skills,
         )
         self.ui_code = ""
         self.last_error = ""
@@ -322,7 +336,7 @@ class Workbench(al.SplitPanel):
             self.update_reply(index, reply, tools, "sending")
 
         try:
-            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace)):
+            async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace, self.skills)):
                 if isinstance(event, Text):
                     reply += event.text
                 elif isinstance(event, ToolStarted):
@@ -526,7 +540,8 @@ def close_tree(widget: Widget, keep: Collection[int]) -> None:
     if id(widget) in keep:
         return
 
-    for child in getattr(widget, "widgets", None) or []:
+    # Only a `widgets` trait holds children: ipywidgets' class-level `Widget.widgets` raises on instances
+    for child in widget.widgets if widget.has_trait("widgets") else []:
         if isinstance(child, Widget):
             close_tree(child, keep)
 

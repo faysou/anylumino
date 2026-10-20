@@ -148,6 +148,18 @@ uses it.
 - **THEN** `exports/sales.py` holds the `UI code` tab followed by the `Callbacks` tab, and the chat
   shows `load("exports/sales.py", sales=sales)`
 
+### Requirement: Notebook skills
+
+A workbench SHALL accept skill folders, each with a `SKILL.md` whose front matter gives a name and
+a description. The system prompt SHALL list each skill's name, description, and path. Claude SHALL
+load the skills for each turn and be able to read their folders. The skill paths SHALL be saved
+with the session. A folder without a valid `SKILL.md` SHALL raise `ValueError`.
+
+#### Scenario: Agent uses a private library
+
+- **WHEN** a workbench gets a `lightweight-charts` skill folder and the user asks for a chart
+- **THEN** the agent loads the skill, and its callbacks build the chart and place it in a container
+
 ### Requirement: Importing an exported file
 
 The workbench header SHALL have an `Import` button that opens a dialog listing the kernel's folders
