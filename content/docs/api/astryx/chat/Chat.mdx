@@ -62,12 +62,11 @@ Render a chat thread and composer from a Python-owned message list.
 
   <div>
     <PyParameter name="messages" type="Iterable[Mapping[str, Any]]" value="()">
-      Messages in display order. Each message has a `role` of `"user"`,
-      `"assistant"`, or `"system"`, Markdown `content`, an optional
-      `status` of `"sending"`, `"sent"`, `"error"`, or `"stopped"`,
-      and optional `tool_calls`. Each tool call has a `name`, an optional
-      `target`, and a `status` of `"pending"`, `"running"`,
-      `"complete"`, or `"error"`.
+      Messages in display order. Each message has a `ChatRole` `role`,
+      Markdown `content`, an optional `MessageStatus` `status`, and
+      optional `tool_calls`. Each tool call has a `name`, an optional
+      `target`, and a `ToolCallStatus` `status`. The enum members are
+      strings, so plain strings such as `"user"` work too.
     </PyParameter>
 
     <PyParameter name="is_streaming" type="bool" value="False">

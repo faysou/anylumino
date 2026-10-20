@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Mapping
+from enum import StrEnum
 from typing import Any
 
 import traitlets as t
@@ -13,18 +14,44 @@ from .base import Widget
 from .base import _clean_props
 
 
+class ChatRole(StrEnum):
+    """Who wrote a chat message."""
+
+    USER = "user"
+    ASSISTANT = "assistant"
+    SYSTEM = "system"
+    """A notice from the application, shown between the turns."""
+
+
+class MessageStatus(StrEnum):
+    """The delivery status of a chat message."""
+
+    SENDING = "sending"
+    SENT = "sent"
+    ERROR = "error"
+    STOPPED = "stopped"
+
+
+class ToolCallStatus(StrEnum):
+    """The status of a tool call shown under a chat message."""
+
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETE = "complete"
+    ERROR = "error"
+
+
 class Chat(Widget):
     """Render a chat thread and composer from a Python-owned message list.
 
     Parameters
     ----------
     messages : Iterable[Mapping[str, Any]], default ()
-        Messages in display order. Each message has a ``role`` of ``"user"``,
-        ``"assistant"``, or ``"system"``, Markdown ``content``, an optional
-        ``status`` of ``"sending"``, ``"sent"``, ``"error"``, or ``"stopped"``,
-        and optional ``tool_calls``. Each tool call has a ``name``, an optional
-        ``target``, and a ``status`` of ``"pending"``, ``"running"``,
-        ``"complete"``, or ``"error"``.
+        Messages in display order. Each message has a `ChatRole` ``role``,
+        Markdown ``content``, an optional `MessageStatus` ``status``, and
+        optional ``tool_calls``. Each tool call has a ``name``, an optional
+        ``target``, and a `ToolCallStatus` ``status``. The enum members are
+        strings, so plain strings such as ``"user"`` work too.
     is_streaming : bool, default False
         Whether an assistant turn is in progress. While it is, the composer
         shows a stop control instead of the send button, and the last

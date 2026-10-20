@@ -1,19 +1,23 @@
 import pytest
 
-from anylumino.workbench import App
+import dataclasses
+
+import anylumino.astryx as ax
+from anylumino import TabPanel
+from anylumino.workbench import App, Event, View
 
 
 class CountingApp(App):
     def on_add(self, event):
-        self.total += event["value"]
+        self.total += event.value
 
     def on_fail(self, event):
-        raise KeyError(event["source"])
+        raise KeyError(event.source)
 
 
 def test_namespace_keywords_become_attributes_and_handlers_run_without_a_ui():
     app = CountingApp(total=1, label="sales")
-    app.call("on_add", {"source": "add", "value": 2, "context": None})
+    app.call("on_add", Event("add", 2))
     assert (app.total, app.label, app.ui) == (3, "sales", None)
 
 
@@ -37,11 +41,11 @@ def test_set_ui_keeps_the_ui_and_runs_setup():
 def test_handler_errors_raise_without_on_error_and_go_to_it_when_set():
     app = CountingApp()
     with pytest.raises(KeyError, match="'fail'"):
-        app.call("on_fail", {"source": "fail"})
+        app.call("on_fail", Event("fail"))
 
     errors = []
     app.on_error = lambda handler, error: errors.append((handler, repr(error)))
-    app.call("on_fail", {"source": "fail"})
+    app.call("on_fail", Event("fail"))
     assert errors == [("on_fail", "KeyError('fail')")]
 
 
@@ -54,3 +58,39 @@ def test_ask_agent_uses_the_attached_agent_or_warns():
     app.agent = lambda message, context: asked.append((message, context))
     app.ask_agent("Sum", {"rows": 2})
     assert asked == [("Sum", {"rows": 2})]
+
+
+def test_an_app_drives_one_ui():
+    app = CountingApp()
+    first = object()
+    app.set_ui(first)
+    app.set_ui(first)
+
+    with pytest.raises(RuntimeError, match="^This CountingApp already drives a UI; create a new app for each UI.$"):
+        app.set_ui(object())
+
+    assert app.ui is first
+
+
+def test_event_fields_are_read_only_and_default_to_none():
+    event = Event("go")
+
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        event.value = 1
+
+    assert (event.source, event.value, event.context) == ("go", None, None)
+
+
+def test_a_view_shows_and_composes_as_its_widget():
+    class LabelView(View):
+        def __init__(self, app):
+            self.app = app
+            self.label = ax.Text("Sales")
+            self.widget = ax.Stack([self.label])
+            app.set_ui(self)
+
+    view = LabelView(CountingApp())
+    tabs = TabPanel([view], titles=["Sales"])
+
+    assert view._repr_mimebundle_() == view.widget._repr_mimebundle_()
+    assert (tabs.widgets, tabs.get_owner(0), view.label.text) == ([view.widget], view, "Sales")

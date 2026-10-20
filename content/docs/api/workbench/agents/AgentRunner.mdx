@@ -13,7 +13,7 @@ process starts still cancels the turn.
 ## Attributes
 
 <PyAttributes>
-  <PyAttribute name="agent" value="agent" />
+  <PyAttribute name="agent" value="Agent(agent)" />
 
   <PyAttribute name="cwd" value="cwd" />
 
@@ -41,7 +41,7 @@ process starts still cancels the turn.
     ```python
     def __init__(
         self,
-        agent: str,
+        agent: Agent | str,
         cwd: Path,
         name: str,
         session_id: str | None = None,
@@ -49,10 +49,10 @@ process starts still cancels the turn.
         effort: str | None = None,
         skills: Sequence[Skill] = (),
     ) -> None:
-        if agent not in AGENTS:
-            raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(AGENTS)}.")
+        if agent not in set(Agent):
+            raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(Agent)}.")
 
-        self.agent = agent
+        self.agent = Agent(agent)
         self.cwd = cwd
         self.name = name
         self.session_id = session_id
@@ -65,7 +65,7 @@ process starts still cancels the turn.
   </PySourceCode>
 
   <div>
-    <PyParameter name="agent" type="str" />
+    <PyParameter name="agent" type="Agent | str" />
 
     <PyParameter name="cwd" type="Path" />
 
@@ -98,7 +98,7 @@ process starts still cancels the turn.
 
         # Holds the plugin that links the notebook skills for `claude`, for this turn only
         plugins = tempfile.TemporaryDirectory(prefix="anylumino-skills-")
-        if self.agent == "claude":
+        if self.agent == Agent.CLAUDE:
             resume = self.session_id is not None
             session_id = self.session_id or str(uuid.uuid4())
             plugin = skill.write_plugin(self.skills, Path(plugins.name)) if self.skills else None

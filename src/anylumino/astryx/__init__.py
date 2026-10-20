@@ -4,6 +4,9 @@ from .base import Component
 from .base import Theme
 from .base import Widget
 from .chat import Chat
+from .chat import ChatRole
+from .chat import MessageStatus
+from .chat import ToolCallStatus
 from .data import Avatar
 from .data import Banner
 from .data import Blockquote
@@ -115,6 +118,7 @@ __all__ = [
     "Carousel",
     "Center",
     "Chat",
+    "ChatRole",
     "Checkbox",
     "CheckboxList",
     "Citation",
@@ -148,6 +152,7 @@ __all__ = [
     "List",
     "LogSlider",
     "Markdown",
+    "MessageStatus",
     "MetadataList",
     "MoreMenu",
     "MultiSelector",
@@ -187,6 +192,7 @@ __all__ = [
     "ToggleButton",
     "ToggleButtonGroup",
     "Token",
+    "ToolCallStatus",
     "Tokenizer",
     "Toolbar",
     "Tooltip",

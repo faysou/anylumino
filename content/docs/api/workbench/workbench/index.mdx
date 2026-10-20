@@ -28,7 +28,7 @@ The workbench: an agent chat beside the generated UI and the code behind it.
       <PySourceCode>
         ```python
         def chat_message(
-            role: str, content: str, status: str | None = None, tools: list[dict[str, Any]] | None = None
+            role: ChatRole, content: str, status: MessageStatus | None = None, tools: list[dict[str, Any]] | None = None
         ) -> dict[str, Any]:
             message: dict[str, Any] = {"role": role, "content": content}
             if status:
@@ -42,11 +42,11 @@ The workbench: an agent chat beside the generated UI and the code behind it.
       </PySourceCode>
 
       <div>
-        <PyParameter name="role" type="str" />
+        <PyParameter name="role" type="ChatRole" />
 
         <PyParameter name="content" type="str" />
 
-        <PyParameter name="status" type="str | None" value="None" />
+        <PyParameter name="status" type="MessageStatus | None" value="None" />
 
         <PyParameter name="tools" type="list[dict[str, Any]] | None" value="None" />
       </div>

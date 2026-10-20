@@ -1,10 +1,30 @@
-"""The App base class: the controller that holds a UI's data and handles its events."""
+"""The App, View, and Event classes behind a generated UI: the controller, the view, and an event."""
 
 from __future__ import annotations
 
 import warnings
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import Any
+
+
+@dataclass(frozen=True)
+class Event:
+    """A widget event passed to a handler.
+
+    Attributes
+    ----------
+    source : str
+        The statement name of the component that fired.
+    value : Any
+        The new value for a value change, or `None` for a click.
+    context : Any
+        The second ``@Callback`` argument, or `None`.
+    """
+
+    source: str
+    value: Any = None
+    context: Any = None
 
 
 class App:
@@ -12,8 +32,13 @@ class App:
 
     Subclass ``App`` with one ``handler(self, event)`` method per
     ``@Callback`` handler, and optionally ``setup(self)``. A generated
-    ``UI(app)`` is the widget; the app works without one, for example to
-    call a handler in a test.
+    ``UI(app)`` builds the widgets for the app and is what a notebook cell
+    shows. The handlers read and change those widgets through ``self.ui``.
+    A ``UI`` builds without being displayed, so a test can create one, call a
+    handler, and check the widgets.
+
+    One app drives one UI: ``UI(app)`` calls `set_ui`, which runs ``setup``,
+    and a second ``UI`` for the same app raises. Create a new app for each UI.
 
     Parameters
     ----------
@@ -48,12 +73,22 @@ class App:
             setattr(self, name, value)
 
     def set_ui(self, ui: Any) -> None:
-        """Keep ``ui`` as ``self.ui`` and run ``setup``; a generated ``UI(app)`` calls it."""
+        """Keep ``ui`` as ``self.ui`` and run ``setup``; a generated ``UI(app)`` calls it.
+
+        Raises
+        ------
+        RuntimeError
+            If the app already drives another UI, whose handlers would then
+            change the new one.
+        """
+        if self.ui is not None and self.ui is not ui:
+            raise RuntimeError(f"This {type(self).__name__} already drives a UI; create a new app for each UI.")
+
         self.ui = ui
         self.call("setup")
 
     def setup(self) -> None:
-        """Fill the UI after it is built; override it to load data into widgets."""
+        """Fill the UI while it is built; override it to load data into widgets."""
 
     def call(self, handler: str, *args: Any) -> None:
         """Run the ``handler`` method with ``args``, passing an exception to ``on_error`` when set."""
@@ -73,3 +108,26 @@ class App:
             return
 
         self.agent(message, context)
+
+
+class View:
+    """The base of a generated ``UI``: its widgets by statement name, and its root ``widget``.
+
+    A view is not a widget itself. anylumino containers accept it as a child,
+    since they mount its ``widget``, and a notebook cell shows that widget.
+    Keeping the widgets on a plain object leaves statement names free, apart
+    from ``app`` and ``widget``.
+
+    Attributes
+    ----------
+    app : App
+        The app that handles the view's events.
+    widget : Any
+        The root widget, set when the view is built.
+    """
+
+    app: App
+    widget: Any = None
+
+    def _repr_mimebundle_(self, **kwargs: Any) -> Any:
+        return self.widget._repr_mimebundle_(**kwargs)

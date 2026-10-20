@@ -5,6 +5,7 @@ from __future__ import annotations
 import inspect
 import re
 from dataclasses import dataclass, replace
+from enum import StrEnum
 from typing import Any
 
 import anylumino as al
@@ -29,23 +30,40 @@ _NUMBERS = {"type": "array", "items": _NUMBER}
 _ACTION_REF = {"$ref": "#/$defs/ActionExpression"}
 
 
+class PropKind(StrEnum):
+    """What a catalog prop holds."""
+
+    VALUE = "value"
+    """A constructor keyword."""
+    CHILDREN = "children"
+    """A slot of components."""
+    ACTION = "action"
+    """An OpenUI action."""
+    OPTIONS = "options"
+    """The object of extra constructor keywords that ends every widget component."""
+
+
+class ActionEvent(StrEnum):
+    """The widget event an action prop binds to."""
+
+    CLICK = "click"
+    CHANGE = "change"
+
+
 @dataclass(frozen=True)
 class Prop:
     """One positional prop of a catalog component.
 
-    ``kind`` is ``value`` for a constructor keyword, ``children`` for a slot of
-    components, ``action`` for an OpenUI action, or ``options`` for the object
-    of extra constructor keywords that ends every widget component. ``argument`` is the
-    constructor keyword when it differs from the prop name. ``event`` is the
-    widget event an action binds to: ``click`` or ``change``.
+    ``argument`` is the constructor keyword when it differs from the prop name.
+    ``event`` is the widget event of an action prop.
     """
 
     name: str
     schema: dict[str, Any]
     required: bool = False
-    kind: str = "value"
+    kind: PropKind = PropKind.VALUE
     argument: str = ""
-    event: str = ""
+    event: ActionEvent | None = None
 
     @property
     def keyword(self) -> str:
@@ -74,17 +92,17 @@ class Component:
     @property
     def options(self) -> dict[str, Any]:
         """Return the option schemas by keyword, or an empty dict for a component without options."""
-        prop = next((prop for prop in self.props if prop.kind == "options"), None)
+        prop = next((prop for prop in self.props if prop.kind == PropKind.OPTIONS), None)
 
         return prop.schema["properties"] if prop else {}
 
 
 def _children(argument: str = "widgets", required: bool = True) -> Prop:
-    return Prop("children", {"type": "array", "items": {"$ref": "#/$defs/Component"}}, required, "children", argument)
+    return Prop("children", {"type": "array", "items": {"$ref": "#/$defs/Component"}}, required, PropKind.CHILDREN, argument)
 
 
 def _change() -> Prop:
-    return Prop("on_change", _ACTION_REF, kind="action", event="change")
+    return Prop("on_change", _ACTION_REF, kind=PropKind.ACTION, event=ActionEvent.CHANGE)
 
 
 _COMPONENTS: tuple[Component, ...] = (
@@ -139,7 +157,7 @@ _COMPONENTS: tuple[Component, ...] = (
         "A button that runs its action when clicked",
         (
             Prop("label", _STRING, True),
-            Prop("action", _ACTION_REF, kind="action", event="click"),
+            Prop("action", _ACTION_REF, kind=PropKind.ACTION, event=ActionEvent.CLICK),
             Prop("variant", {"type": "string", "enum": ["primary", "secondary", "ghost", "destructive"]}),
         ),
     ),
@@ -296,7 +314,7 @@ def _with_options(component: Component) -> Component:
 
     schema = {"type": "object", "properties": properties, "additionalProperties": False}
 
-    return replace(component, props=(*component.props, Prop("options", schema, kind="options")))
+    return replace(component, props=(*component.props, Prop("options", schema, kind=PropKind.OPTIONS)))
 
 
 # Callables and other Python-only types have no OpenUI literal, so their keywords stay out of options.

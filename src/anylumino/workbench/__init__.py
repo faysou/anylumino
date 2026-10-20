@@ -1,8 +1,9 @@
 """Build anylumino UIs by chatting with a local coding agent."""
 
-from .app import App
+from .agents import Agent
+from .app import App, Event, View
 from .export import load
 from .workbench import Workbench
 
 
-__all__ = ["App", "Workbench", "load"]
+__all__ = ["Agent", "App", "Event", "View", "Workbench", "load"]

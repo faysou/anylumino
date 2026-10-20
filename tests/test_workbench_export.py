@@ -119,7 +119,7 @@ def test_load_builds_the_ui_with_the_namespace_keywords(built, tmp_path):
     click(ui.go)
 
     assert (type(ui).__name__, type(ui.app).__name__, ui.app.sales, ui.app.ui) == ("UI", "SalesApp", sales, ui)
-    assert ui.widgets == [ui.root]
+    assert ui.widget is ui.root
     assert ui.title.text == "Total 4.0"
     assert [(row["region"], row["revenue"]) for row in ui.table.rows] == [("AMER", 4.0)]
     with pytest.warns(UserWarning, match="No workbench is attached, so ask_agent ignored 'Summarize'."):
@@ -154,7 +154,7 @@ def test_app_is_composable_in_another_layout(built, tmp_path):
     tabs = al.TabPanel([first, second], titles=["First", "Second"])
     click(second.go)
 
-    assert tabs.widgets == [first, second]
+    assert (tabs.widgets, tabs.get_owner(tabs.child_keys[0])) == ([first.widget, second.widget], first)
     assert (first.title.text, second.title.text) == ("Sales", "Total 1.0")
 
 
@@ -370,11 +370,11 @@ def test_import_keeps_callbacks_edited_outside(built, agent_reply, tmp_path, mon
     source = (tmp_path / "edited.py").read_text().replace('f"Total {', 'f"Sum {')
 
     workbench, calls = imported(agent_reply, tmp_path, source)
-    click(workbench.ui_host.widgets[0].go)
+    click(workbench.ui.go)
 
     assert calls == []
     assert code(workbench)["callbacks"] == CALLBACKS.replace('f"Total {', 'f"Sum {')
-    assert workbench.ui_host.widgets[0].title.text == "Sum 1.0"
+    assert workbench.ui.title.text == "Sum 1.0"
 
 
 @pytest.mark.parametrize(
@@ -417,7 +417,7 @@ def test_import_asks_the_agent_to_reconcile_a_changed_file(
         "Reconciled.",
         *report,
     ]
-    assert workbench.ui_host.widgets[0].title.text == "Revenue"
+    assert workbench.ui.title.text == "Revenue"
     assert workbench.running is False
 
 
@@ -435,7 +435,7 @@ def test_reconcile_that_misses_the_edit_is_reported(built, agent_reply, tmp_path
         "content": "The generated UI class still differs from `edited.py`. The UI code tab shows what applied; "
         "ask the agent in the chat to close the gap.",
     }
-    assert workbench.ui_host.widgets[0].title.text == "Sales"
+    assert workbench.ui.title.text == "Sales"
 
 
 def test_import_of_a_file_that_is_not_an_export_is_reported(agent_reply, tmp_path, monkeypatch):

@@ -26,13 +26,7 @@ OPTIONS: dict[str, Any] = {
     "bindings": False,
 }
 
-# Common statement names that the UI widget already uses; generation rejects them
-MEMBER_NAMES = (
-    "label", "text", "value", "items", "selected", "layout", "keys", "width",
-    "height", "open", "close", "show", "hide", "props", "theme", "widgets", "app",
-)
-
-CALLBACKS = f"""## Python callbacks
+CALLBACKS = """## Python callbacks
 
 Interactive components run Python through `@Callback(handler, context?)`. Put the handlers in one
 fenced block labeled `python`, next to the openui-lang block, as methods of one `App` subclass. Use
@@ -50,21 +44,18 @@ class SalesApp(App):
 
     def on_run(self, event):
         region = self.ui.region.value or "All"
-        self.ui.summary.text = f"Region: {{region}}"
+        self.ui.summary.text = f"Region: {region}"
 ```
 
-- A handler is a method that takes `event`, a dict with `source` (the statement name of the
-  component that fired), `value` (the new value for `on_change`, `None` for a button), and
-  `context` (the second `@Callback` argument).
-- `self.ui` is the UI widget, with one attribute per statement name. Inputs expose `.value`;
+- A handler is a method that takes `event`, an `Event` with `event.source` (the statement name of
+  the component that fired), `event.value` (the new value for `on_change`, `None` for a button), and
+  `event.context` (the second `@Callback` argument).
+- `self.ui` is the generated UI, with one attribute per statement name. Inputs expose `.value`;
   Heading, Text, and Markdown expose `.text`; Button and Badge expose `.label`; Selector exposes
-  `.items`; Table has `.set_rows(records)`.
-- Statement names become attributes of that widget, so they cannot be names of widget members such
-  as {", ".join(f"`{name}`" for name in MEMBER_NAMES)}. Use names like `title_text` or
-  `region_select` instead.
+  `.items`; Table has `.set_rows(records)`. Statement names cannot be `app` or `widget`.
 - The namespace listed below reaches the app as attributes, such as `self.sales`. There are no
   globals: read data only through `self`.
-- An optional `setup(self)` runs once each time the UI is built. Fill tables and selectors from
+- An optional `setup(self)` runs once while the UI is built. Fill tables and selectors from
   namespace data there instead of copying the data into the program: you see only the shape and
   columns of data frames, not their rows.
 - `self.ask_agent(message, context=None)` sends you a chat message from a handler.
@@ -74,7 +65,7 @@ class SalesApp(App):
   class: omit the block when no handler changes, and when one changes, send the whole class. A UI
   without handlers needs no python block.
 - Export puts the class in one module with the UI code, so bind the module names `UI`, `al`, `ax`,
-  and `go` only as `anylumino`, `anylumino.astryx`, and `plotly.graph_objects`.
+  `go`, `Event`, and `View` only as the generated code does.
 - A `Plot` is an empty Plotly `FigureWidget`; fill it in handlers inside
   `with self.ui.chart.batch_update():`. Use one `Plot` per chart.
 - For one component per data item, declare an empty container, such as `cards = HBox([])`, and fill

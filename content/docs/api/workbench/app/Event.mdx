@@ -1,0 +1,35 @@
+---
+title: "Event"
+---
+
+A widget event passed to a handler.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="source" type="str">
+    The statement name of the component that fired.
+  </PyAttribute>
+
+  <PyAttribute name="value" type="Any" value="None">
+    The new value for a value change, or `None` for a click.
+  </PyAttribute>
+
+  <PyAttribute name="context" type="Any" value="None">
+    The second `@Callback` argument, or `None`.
+  </PyAttribute>
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(source, value=None, context=None) -> None" kind="constructor">
+  <div>
+    <PyParameter name="source" type="str" />
+
+    <PyParameter name="value" type="Any" value="None" />
+
+    <PyParameter name="context" type="Any" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

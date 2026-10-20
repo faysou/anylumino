@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .catalog import COMPONENTS, Component, type_name
+from .catalog import COMPONENTS, Component, PropKind, type_name
 
 
 NAME = "openui-components"
@@ -146,7 +146,7 @@ the OpenUI one.
 
 def _component(component: Component) -> str:
     keywords = [
-        f"{prop.keyword}=..." for prop in component.props if prop.kind not in ("action", "options")
+        f"{prop.keyword}=..." for prop in component.props if prop.kind not in (PropKind.ACTION, PropKind.OPTIONS)
     ] + [f"{key}={value!r}" for key, value in component.fixed]
     text = f"""# {component.name}
 

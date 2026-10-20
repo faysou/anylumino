@@ -6,8 +6,13 @@ Hold the data of a generated UI and handle its events.
 
 Subclass `App` with one `handler(self, event)` method per
 `@Callback` handler, and optionally `setup(self)`. A generated
-`UI(app)` is the widget; the app works without one, for example to
-call a handler in a test.
+`UI(app)` builds the widgets for the app and is what a notebook cell
+shows. The handlers read and change those widgets through `self.ui`.
+A `UI` builds without being displayed, so a test can create one, call a
+handler, and check the widgets.
+
+One app drives one UI: `UI(app)` calls `set_ui`, which runs `setup`,
+and a second `UI` for the same app raises. Create a new app for each UI.
 
 <Callout title="Notes" type="note">
   Set `on_error` to receive handler exceptions as `on_error(handler,
@@ -52,7 +57,17 @@ call a handler in a test.
   <PySourceCode>
     ```python
     def set_ui(self, ui: Any) -> None:
-        """Keep ``ui`` as ``self.ui`` and run ``setup``; a generated ``UI(app)`` calls it."""
+        """Keep ``ui`` as ``self.ui`` and run ``setup``; a generated ``UI(app)`` calls it.
+
+        Raises
+        ------
+        RuntimeError
+            If the app already drives another UI, whose handlers would then
+            change the new one.
+        """
+        if self.ui is not None and self.ui is not ui:
+            raise RuntimeError(f"This {type(self).__name__} already drives a UI; create a new app for each UI.")
+
         self.ui = ui
         self.call("setup")
     ```
@@ -66,12 +81,12 @@ call a handler in a test.
 </PyFunction>
 
 <PyFunction name="setup" type="() -> None">
-  Fill the UI after it is built; override it to load data into widgets.
+  Fill the UI while it is built; override it to load data into widgets.
 
   <PySourceCode>
     ```python
     def setup(self) -> None:
-        """Fill the UI after it is built; override it to load data into widgets."""
+        """Fill the UI while it is built; override it to load data into widgets."""
     ```
   </PySourceCode>
 

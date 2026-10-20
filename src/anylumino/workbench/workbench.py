@@ -13,11 +13,12 @@ from ipywidgets import Widget
 
 import anylumino as al
 from anylumino import astryx as ax
+from anylumino.astryx import ChatRole, MessageStatus, ToolCallStatus
 
 from . import codegen, openui
 from . import session as store
-from .agents import AgentError, AgentRunner, Failed, Text, ToolFinished, ToolStarted
-from .app import App
+from .agents import Agent, AgentError, AgentRunner, Failed, Text, ToolFinished, ToolStarted
+from .app import App, View
 from .export import (
     CallbacksError,
     ExportedFileError,
@@ -56,9 +57,10 @@ class Workbench(al.SplitPanel):
 
     Parameters
     ----------
-    agent : str | None, default None
-        The CLI to run each turn with: ``"claude"`` or ``"codex"``. Defaults
-        to the agent of a restored session, or ``"claude"``.
+    agent : Agent | str | None, default None
+        The CLI to run each turn with, `Agent.CLAUDE` or `Agent.CODEX`, or
+        their values ``"claude"`` and ``"codex"``. Defaults to the agent of a
+        restored session, or `Agent.CLAUDE`.
     session : str | None, default None
         Session name. A named session is saved after every turn under
         ``~/.anylumino/sessions/<session>.json`` and restored when a workbench
@@ -101,7 +103,7 @@ class Workbench(al.SplitPanel):
 
     def __init__(
         self,
-        agent: str | None = None,
+        agent: Agent | str | None = None,
         session: str | None = None,
         namespace: Mapping[str, Any] | None = None,
         cwd: str | Path | None = None,
@@ -116,7 +118,7 @@ class Workbench(al.SplitPanel):
             raise ValueError(f"Session {session!r} runs {saved.agent}; pass agent={saved.agent!r} or another session name.")
 
         self.state = saved or store.SessionState(
-            name=session or "", agent=agent or "claude", cwd=str(Path(cwd or os.getcwd()).resolve())
+            name=session or "", agent=Agent(agent or Agent.CLAUDE), cwd=str(Path(cwd or os.getcwd()).resolve())
         )
         # A restored session resumes the agent's conversation with new settings when they are given
         self.state.model = model or self.state.model
@@ -136,6 +138,8 @@ class Workbench(al.SplitPanel):
             self.skills,
         )
         self.ui_code = ""
+        # The current generated UI, a View whose widget the UI tab shows
+        self.ui: View | None = None
         self.last_error = ""
         self.running = False
         self.tasks: set[asyncio.Task[Any]] = set()
@@ -203,7 +207,7 @@ class Workbench(al.SplitPanel):
     def submit(self, text: str, context: Any = None) -> None:
         """Start a turn with ``text``; refused with a system message while a turn runs."""
         if self.running:
-            self.add_message("system", "A turn is already running; wait for it or stop it.")
+            self.add_message(ChatRole.SYSTEM, "A turn is already running; wait for it or stop it.")
 
             return
 
@@ -221,7 +225,7 @@ class Workbench(al.SplitPanel):
         program and callbacks.
         """
         if self.running:
-            self.add_message("system", "A turn is already running; wait for it or stop it.")
+            self.add_message(ChatRole.SYSTEM, "A turn is already running; wait for it or stop it.")
 
             return
 
@@ -251,14 +255,14 @@ class Workbench(al.SplitPanel):
             source = path.read_text()
             reason = await self.apply_import(source)
         except (OSError, ExportedFileError) as error:
-            self.add_message("system", f"Import of `{shown}` failed: {error}")
+            self.add_message(ChatRole.SYSTEM, f"Import of `{shown}` failed: {error}")
             self.set_running(False)
 
             return
 
         if not reason:
             self.last_error = ""
-            self.add_message("system", f"Imported `{shown}`.")
+            self.add_message(ChatRole.SYSTEM, f"Imported `{shown}`.")
             self.set_running(False)
             self.save()
 
@@ -285,10 +289,10 @@ class Workbench(al.SplitPanel):
             return
 
         if ui_fingerprint(class_source(self.ui_code, "UI")) == ui_fingerprint(target):
-            self.add_message("system", f"Reconciled `{shown}`: the generated UI class matches the file.")
+            self.add_message(ChatRole.SYSTEM, f"Reconciled `{shown}`: the generated UI class matches the file.")
         else:
             self.add_message(
-                "system",
+                ChatRole.SYSTEM,
                 f"The generated UI class still differs from `{shown}`. The UI code tab shows what applied; "
                 "ask the agent in the chat to close the gap.",
             )
@@ -314,8 +318,8 @@ class Workbench(al.SplitPanel):
 
     async def run_turn(self, text: str, context: Any = None, details: str = "") -> None:
         try:
-            self.add_message("user", text, "sent")
-            index = self.add_message("assistant", "", "sending")
+            self.add_message(ChatRole.USER, text, MessageStatus.SENT)
+            index = self.add_message(ChatRole.ASSISTANT, "", MessageStatus.SENDING)
             await self.stream_reply(index, text, context, details)
         finally:
             self.state.agent_session_id = self.runner.session_id
@@ -333,18 +337,18 @@ class Workbench(al.SplitPanel):
         def flush_reply() -> None:
             nonlocal flush
             flush = None
-            self.update_reply(index, reply, tools, "sending")
+            self.update_reply(index, reply, tools, MessageStatus.SENDING)
 
         try:
             async for event in self.runner.turn(self.turn_prompt(text, context, details), await system_prompt(self.namespace, self.skills)):
                 if isinstance(event, Text):
                     reply += event.text
                 elif isinstance(event, ToolStarted):
-                    tools.append({"id": event.id, "name": event.name, "target": event.target, "status": "running"})
+                    tools.append({"id": event.id, "name": event.name, "target": event.target, "status": ToolCallStatus.RUNNING})
                 elif isinstance(event, ToolFinished):
                     for tool in tools:
                         if tool["id"] == event.id:
-                            tool["status"] = "error" if event.error else "complete"
+                            tool["status"] = ToolCallStatus.ERROR if event.error else ToolCallStatus.COMPLETE
                 elif isinstance(event, Failed):
                     failure = event.message
 
@@ -359,10 +363,10 @@ class Workbench(al.SplitPanel):
             flush.cancel()
 
         if self.runner.stopped:
-            self.update_reply(index, reply, tools, "stopped")
+            self.update_reply(index, reply, tools, MessageStatus.STOPPED)
         elif failure:
-            self.update_reply(index, reply, tools, "error")
-            self.add_message("system", f"The agent failed: {failure}")
+            self.update_reply(index, reply, tools, MessageStatus.ERROR)
+            self.add_message(ChatRole.SYSTEM, f"The agent failed: {failure}")
         else:
             await self.finish_reply(index, reply, tools)
 
@@ -391,7 +395,7 @@ class Workbench(al.SplitPanel):
 
     def report_apply_error(self, message: str) -> None:
         self.last_error = message
-        self.add_message("system", f"The reply was not applied; the UI is unchanged. {message}")
+        self.add_message(ChatRole.SYSTEM, f"The reply was not applied; the UI is unchanged. {message}")
 
     async def apply(self, program: str, callbacks: str) -> None:
         """Build the UI from ``program`` and ``callbacks``, then update all tabs at once."""
@@ -422,6 +426,7 @@ class Workbench(al.SplitPanel):
         self.state.callbacks = callbacks
         self.ui_code = source
         previous = self.ui_host.widgets
+        self.ui = ui
         self.ui_host.widgets = [ui]
         keep = {id(value) for value in self.namespace.values() if isinstance(value, Widget)}
         for widget in previous:
@@ -441,7 +446,7 @@ class Workbench(al.SplitPanel):
             raise ApplyError(f"Callbacks raised {type(error).__name__}: {error}") from error
 
     def report_callback_error(self, name: str, error: Exception) -> None:
-        self.add_message("system", f"Callback `{name}` raised {type(error).__name__}: {error}")
+        self.add_message(ChatRole.SYSTEM, f"Callback `{name}` raised {type(error).__name__}: {error}")
 
     async def restore(self) -> None:
         if not self.state.program:
@@ -459,14 +464,14 @@ class Workbench(al.SplitPanel):
         try:
             path = shown_path(write_module(folder, name, self.ui_code, self.state.callbacks, self.state.program))
         except OSError as error:
-            self.add_message("system", f"Export failed: {error}")
+            self.add_message(ChatRole.SYSTEM, f"Export failed: {error}")
 
             return
 
         arguments = [json.dumps(path), *(f"{key}={key}" for key in self.namespace)]
         # As an assistant message, since the chat shows system messages on one line without markdown
         self.add_message(
-            "assistant",
+            ChatRole.ASSISTANT,
             f"Exported `{path}`. Show the same UI in a notebook cell with:\n\n"
             f"```python\nfrom anylumino.workbench import load\n\nload({', '.join(arguments)})\n```",
         )
@@ -493,16 +498,18 @@ class Workbench(al.SplitPanel):
             view = self.code_views[key]
             view.props = {**view.props, "code": text}
 
-    def add_message(self, role: str, content: str, status: str | None = None) -> int:
+    def add_message(self, role: ChatRole, content: str, status: MessageStatus | None = None) -> int:
         """Append a chat message and return its index."""
         self.set_messages([*self.chat.messages, chat_message(role, content, status)])
 
         return len(self.chat.messages) - 1
 
     # Updates the turn's reply by index, since other messages can arrive while it streams
-    def update_reply(self, index: int, content: str, tools: list[dict[str, Any]], status: str | None = None) -> None:
+    def update_reply(
+        self, index: int, content: str, tools: list[dict[str, Any]], status: MessageStatus | None = None
+    ) -> None:
         messages = list(self.chat.messages)
-        messages[index] = chat_message("assistant", content, status, tools)
+        messages[index] = chat_message(ChatRole.ASSISTANT, content, status, tools)
         self.set_messages(messages)
 
     def set_messages(self, messages: list[dict[str, Any]]) -> None:
@@ -523,7 +530,7 @@ class Workbench(al.SplitPanel):
 
 # A finished reply has no status, so the chat shows no delivery label under it
 def chat_message(
-    role: str, content: str, status: str | None = None, tools: list[dict[str, Any]] | None = None
+    role: ChatRole, content: str, status: MessageStatus | None = None, tools: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:
     message: dict[str, Any] = {"role": role, "content": content}
     if status:

@@ -1,0 +1,22 @@
+---
+title: "View"
+---
+
+The base of a generated `UI`: its widgets by statement name, and its root `widget`.
+
+A view is not a widget itself. anylumino containers accept it as a child,
+since they mount its `widget`, and a notebook cell shows that widget.
+Keeping the widgets on a plain object leaves statement names free, apart
+from `app` and `widget`.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="app" type="App">
+    The app that handles the view's events.
+  </PyAttribute>
+
+  <PyAttribute name="widget" type="Any" value="None">
+    The root widget, set when the view is built.
+  </PyAttribute>
+</PyAttributes>

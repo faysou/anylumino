@@ -266,3 +266,13 @@
 - [x] 15.5 After a click inside a layout panel, render only children the click revealed, so an
   already shown chart keeps its view instead of resetting through a resize notice. Verify with
   cycle-row clicks in the chart explorer.
+
+## 16. View and Event
+
+- [x] 16.1 Generate `UI` as a `View` subclass that keeps its root as `widget` instead of an
+  `ax.Stack` subclass, so statement names are free except `app` and `widget`; pass an `Event`
+  to handlers; reject a second `set_ui` on an app; and document that a `UI` builds headless and
+  that `setup` runs while it is built. Verify with pytest, the delta hedge explorer tests in
+  option_trader, and JupyterLab.
+- [x] 16.2 Replace fixed string values with `StrEnum`s in the workbench: `Agent`, `ChatRole`,
+  `MessageStatus`, `ToolCallStatus`, `PropKind`, and `ActionEvent`. Verify with pytest.

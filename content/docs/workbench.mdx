@@ -46,7 +46,7 @@ the program, the callbacks, or both.
 
 | Argument    | Effect                                                                                            |
 | ----------- | ------------------------------------------------------------------------------------------------- |
-| `agent`     | `"claude"` or `"codex"`. A restored session keeps the agent it was created with.                  |
+| `agent`     | `Agent.CLAUDE` or `Agent.CODEX`, or `"claude"` and `"codex"`. A restored session keeps its agent. |
 | `session`   | Saves the session after every turn and restores it when a workbench uses the same name.           |
 | `namespace` | Names the callbacks can read and the agent sees, with data frame shapes and column types.         |
 | `cwd`       | Directory the agent runs in. Defaults to the current directory.                                   |
@@ -106,14 +106,16 @@ class SalesApp(App):
         self.ui.result.text = f"{region}: {total}"
 ```
 
-- `self.ui` is the generated `UI` widget, with one attribute per statement name.
-  The `UI` tab shows that widget.
-- `event` has `source` (the statement name), `value` (the new value, or `None`
-  for a button), and `context` (the second `@Callback` argument).
+- `self.ui` is the generated `UI`, with one attribute per statement name. It is
+  a `View`, not a widget: its root widget is `self.ui.widget`, which the `UI`
+  tab shows.
+- `event` is an `Event` with `event.source` (the statement name), `event.value`
+  (the new value, or `None` for a button), and `event.context` (the second
+  `@Callback` argument).
 - The `namespace` names reach the app as attributes, such as `self.sales`. The
   callbacks read no notebook globals, so the exported file takes its data
   explicitly.
-- An optional `setup(self)` runs each time the UI is built. The agent uses it to
+- An optional `setup(self)` runs while the UI is built, inside `UI(app)`. The agent uses it to
   fill tables and selectors from namespace data. The agent sees only the shape
   of a data frame and the name and type of each column, so its rows never leave
   the kernel.
@@ -127,11 +129,14 @@ class SalesApp(App):
 - `Widget("name")` in the program mounts the widget stored under `name` in the
   `namespace`, such as a figure you built yourself.
 - An exception in a handler shows in the chat. The other widgets keep working.
-- Statement names that the `UI` widget already uses, such as `label`, `value`,
-  or `layout`, stop the turn from applying, and the agent renames them.
+- Statement names cannot be `app` or `widget`, which the `UI` uses itself; such a
+  name stops the turn from applying, and the agent renames it.
 - The callbacks share a module with the generated UI code in an export, so they
-  cannot define `UI` or bind `al`, `ax`, or `go` to anything other than
-  `anylumino`, `anylumino.astryx`, and `plotly.graph_objects`.
+  cannot define `UI` or bind `al`, `ax`, `go`, `Event`, or `View` to anything
+  other than what the generated code imports.
+- One app drives one UI. A second `UI(app)` for the same app raises
+  `RuntimeError`, since the handlers would change the newer UI; create a new app
+  for each UI.
 - A UI without handlers gets an empty `UIApp(App)` subclass, so it can still be
   exported.
 
@@ -281,12 +286,14 @@ OpenUI bundle; `npm run build` bundles it.
   module in the `UI code` tab, so the two cannot differ. The module also runs
   without the workbench.
 - **App and UI classes:** the callbacks are an `App` subclass and the generated
-  code is a `UI` widget class built as `UI(app)`. The app holds the data and the
-  handlers and works without a widget; the UI is the widget, so it composes
-  with other widgets. The namespace reaches the app through its constructor
-  rather than as globals, so an export runs with explicit inputs. Statement
-  names become `UI` attributes, which is why names of widget members are
-  rejected.
+  code is a `UI` class built as `UI(app)`. The app holds the data and the
+  handlers; the UI holds the widgets by statement name. The `UI` is a `View`,
+  not a widget: it shows and composes through its root `widget`, which leaves
+  every statement name free except `app` and `widget`. A `UI` builds without
+  being displayed, so tests can build one, call handlers, and check widgets.
+  The namespace reaches the app through its constructor rather than as
+  globals, so an export runs with explicit inputs. One app drives one UI, so a
+  handler always changes the UI that called it.
 - **The catalog is Python:** it sits next to the widget classes, and prop names
   match the constructor keywords. A test builds every entry, so a renamed
   keyword fails it. The catalog `VBox` and `HBox` build `ax.Stack`, not Lumino
@@ -339,7 +346,7 @@ load("exports/sales.py", sales=sales)
 ```
 
 `load` creates the `App` subclass with the keyword arguments, builds a `UI` for
-it, runs `setup`, and returns the `UI` widget, so the cell shows the same UI.
+it, runs `setup`, and returns the `UI`, so the cell shows the same UI.
 The app is `ui.app`. A relative path is relative to the notebook's directory, or
 to the calling script's directory outside Jupyter. In Jupyter that is the
 kernel's current directory when `load` runs, the same directory the export
@@ -355,9 +362,10 @@ app = SalesApp(sales=sales)
 ui = UI(app)
 ```
 
-The app works without a UI, for example to call a handler in a test. The `UI`
-is a widget, so it composes like any other: put it in a `TabPanel`, a
-`SplitPanel`, or a stack next to other widgets.
+The `UI` builds without being displayed, so a test can create it, call a
+handler, and check its widgets. It is not a widget itself, but anylumino
+containers accept it as a child and a cell shows it, both through its `widget`:
+put it in a `TabPanel`, a `SplitPanel`, or a stack next to other widgets.
 
 ### Import an edited file
 

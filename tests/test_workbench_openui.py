@@ -6,7 +6,7 @@ import pytest
 import anylumino as al
 from anylumino import astryx as ax
 from anylumino.workbench import codegen, openui, prompt, skill
-from anylumino.workbench.catalog import CATALOG, COMPONENTS, go, library_spec, type_name
+from anylumino.workbench.catalog import CATALOG, COMPONENTS, PropKind, go, library_spec, type_name
 
 
 SAMPLES = {"string": "s", "number": 2, "boolean": True, "object": {"height": 300}}
@@ -14,7 +14,7 @@ SAMPLES = {"string": "s", "number": 2, "boolean": True, "object": {"height": 300
 
 def sample(prop):
     schema = prop.schema
-    if prop.kind == "children":
+    if prop.kind == PropKind.CHILDREN:
         return [ax.Text("first"), ax.Text("second")]
 
     if "enum" in schema:
@@ -57,7 +57,7 @@ def test_catalog_lists_components_and_props_in_order():
 @pytest.mark.parametrize("component", [c for c in COMPONENTS if c.name != "Widget"], ids=lambda c: c.name)
 def test_catalog_entry_builds_its_class(component):
     module = {"al": al, "ax": ax, "go": go}[component.module]
-    kwargs = {prop.keyword: sample(prop) for prop in component.props if prop.kind not in ("action", "options")}
+    kwargs = {prop.keyword: sample(prop) for prop in component.props if prop.kind not in (PropKind.ACTION, PropKind.OPTIONS)}
     kwargs.update(component.fixed)
     widget = getattr(module, component.cls)(**kwargs)
     assert isinstance(widget, getattr(module, component.cls))
@@ -212,6 +212,6 @@ def test_namespace_summary_describes_data_frames():
     assert prompt.namespace_summary({}) == "## Namespace\n\nThe namespace is empty."
 
 
-def test_prompt_member_names_are_rejected_by_generation():
-    assert ", ".join(f"`{name}`" for name in prompt.MEMBER_NAMES) in prompt.CALLBACKS
-    assert set(prompt.MEMBER_NAMES) <= codegen.RESERVED
+def test_prompt_names_the_reserved_statement_names():
+    assert codegen.RESERVED == {"app", "widget"}
+    assert "Statement names cannot be `app` or `widget`." in prompt.CALLBACKS

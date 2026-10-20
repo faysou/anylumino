@@ -102,9 +102,10 @@ OpenUI incremental editing, before parsing.
 ### Requirement: Python code generation
 
 The system SHALL generate, from a parsed tree, a Python module that imports anylumino and defines
-a `UI` widget class. `UI(app)` SHALL create each widget with its catalog constructor (namespace
+a `UI` class that subclasses `anylumino.workbench.View`. `UI(app)` SHALL create each widget with its catalog constructor (namespace
 components take the `app` attribute of their name), store each named widget as an attribute named
-after its statement, bind the actions to `app`, show the root widget, and call `app.set_ui`. The same tree SHALL
+after its statement, bind the actions to `app` with an `Event` per activation, keep the root widget as `widget`, and call
+`app.set_ui`. Statement names SHALL NOT be `app` or `widget`. The same tree SHALL
 always produce the same source text. Generation SHALL fail with an error that names the statement
 when a prop holds a dynamic expression, when a referenced namespace widget is missing, or when an
 `@Callback` handler is not a method of the `App` subclass.
@@ -118,8 +119,8 @@ when a prop holds a dynamic expression, when a referenced namespace widget is mi
 
 - **WHEN** the exported module is imported in a new kernel, and `UI(app)` is called with an `App`
   subclass created with the namespace
-- **THEN** the UI shows the root widget, `app.ui` is that UI, and it has an attribute for every named
-  statement
+- **THEN** a cell shows the UI's root `widget`, `app.ui` is that UI, and it has an attribute for every
+  named statement
 
 #### Scenario: Missing handler
 
@@ -153,21 +154,21 @@ name, the new value or `None`, and the action context. Generated code SHALL conn
 
 ### Requirement: App controller
 
-`anylumino.workbench.App` SHALL be a widget that shows the UI it controls, so it composes like any
-other anylumino widget. `App(**namespace)` SHALL store each namespace entry as an attribute and
+`anylumino.workbench.App` SHALL be a plain class that holds the data and handlers of one UI.
+`App(**namespace)` SHALL store each namespace entry as an attribute and
 SHALL reject a name that is not an identifier or that an `App` attribute or method already uses.
-`app.set_ui(ui)` SHALL build `ui` with the app, show its root, keep `ui` as `app.ui`, and run
-`setup`. `app.call(handler, event)` SHALL run the handler method, and SHALL pass an exception to
+`app.set_ui(ui)` SHALL keep `ui` as `app.ui` and run `setup`, and SHALL raise `RuntimeError` when
+the app already drives another UI. `app.call(handler, event)` SHALL run the handler method, and SHALL pass an exception to
 `app.on_error` when one is set. `app.ask_agent(message, context)` SHALL call `app.agent` when one
 is set, and SHALL warn and do nothing otherwise. A callbacks module SHALL define exactly one `App`
 subclass, and its methods SHALL NOT replace an `App` attribute other than `setup`.
 
 #### Scenario: App in another layout
 
-- **WHEN** `SalesApp(sales=sales)` with a built UI is a tab of an `al.TabPanel`
-- **THEN** the tab shows the UI, and its handlers read `self.sales`
+- **WHEN** `UI(SalesApp(sales=sales))` is a tab of an `al.TabPanel`
+- **THEN** the tab shows the UI's root widget, and its handlers read `self.sales`
 
 #### Scenario: Handler shadows a widget member
 
-- **WHEN** the `App` subclass defines a method `close`
-- **THEN** the callbacks are rejected with an error that names `close`
+- **WHEN** the `App` subclass defines a method `call`
+- **THEN** the callbacks are rejected with an error that names `call`

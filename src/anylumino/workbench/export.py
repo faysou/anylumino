@@ -14,13 +14,13 @@ from typing import Any
 import anylumino
 from anylumino import astryx as ax
 
-from .app import App
+from .app import App, Event, View
 from .catalog import go
 
 
 MODULE = "anylumino_workbench"
 # Globals of the generated UI code, which an export shares with the callbacks
-UI_GLOBALS = {"UI": None, "al": anylumino, "ax": ax, "go": go}
+UI_GLOBALS = {"UI": None, "al": anylumino, "ax": ax, "go": go, "Event": Event, "View": View}
 # The comment lines that hold the OpenUI program in an exported file; the start line also holds
 # the fingerprint of the exported UI class, which tells an edited UI class from an edited program
 PROGRAM_START = "# ```openui-lang"

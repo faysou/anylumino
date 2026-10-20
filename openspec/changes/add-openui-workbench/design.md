@@ -145,20 +145,19 @@ import anylumino as al
 import anylumino.astryx as ax
 
 
-class UI(ax.Stack):
+class UI(View):
     def __init__(self, app):
-        super().__init__([])
         self.app = app
         self.title = ax.Heading(text='Sales')
         self.go = ax.Button(label='Run', variant='primary')
         self.root = ax.Stack(children=[self.title, self.go], direction='vertical')
 
         def go_action(_widget, value=None):
-            app.call('on_run', {'source': 'go', 'value': value, 'context': 'q3'})
+            app.call('on_run', Event('go', value, 'q3'))
 
         self.go.on_click(go_action)
 
-        self.widgets = [self.root]
+        self.widget = self.root
         app.set_ui(self)
 ```
 
@@ -174,11 +173,15 @@ subclass of `anylumino.workbench.App` with a `handler(self, event)` method per h
 `event` is `{"source", "value", "context"}`, and an optional `setup(self)`. `@ToAssistant` maps to
 `app.ask_agent`.
 
-`App` is a plain class, so an app works without a widget, for example to call a handler in a test.
-The generated `UI(app)` is the widget, so it composes like any other: it can be a tab, a split
-side, or a child of another UI. The workbench shows that `UI` in the `UI` tab. The `UI` constructor
-calls `app.set_ui(self)`, which keeps it as `app.ui` and runs `setup`. Statement names become `UI`
-attributes, so names of widget members are rejected.
+`App` is a plain class that holds the data and handlers. The generated `UI(app)` is a `View`: a
+plain object with one attribute per statement and the root widget as `widget`. It is not a widget,
+so statement names cannot collide with widget members; only `app` and `widget` are taken.
+anylumino containers accept any object with a `.widget`, so the UI still composes as a tab, a
+split side, or a child of another UI, and a cell shows it through `_repr_mimebundle_`. The `UI`
+constructor calls `app.set_ui(self)`, which keeps it as `app.ui` and runs `setup`, so a `UI`
+builds headless in tests. One app drives one UI: a second `set_ui` raises, since the first UI's
+handlers would otherwise change the second. Handlers receive an immutable `Event` with
+`source`, `value`, and `context` attributes rather than a dict.
 
 The namespace reaches the app as constructor keywords, `SalesApp(sales=sales)`, and handlers read
 `self.sales`. The callbacks run in a module without notebook globals, so an exported pair of files

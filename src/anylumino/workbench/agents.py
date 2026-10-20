@@ -10,6 +10,7 @@ import re
 import shutil
 import signal
 import tempfile
+from enum import StrEnum
 import uuid
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
@@ -20,7 +21,15 @@ from . import skill
 from .skill import Skill
 
 
-AGENTS = ("claude", "codex")
+class Agent(StrEnum):
+    """The coding agent CLIs a workbench can run."""
+
+    CLAUDE = "claude"
+    """Claude Code."""
+    CODEX = "codex"
+    """Codex CLI."""
+
+
 CLAUDE_TOOLS = "Read,Grep,Glob,Skill"
 STOP_GRACE = 3.0
 _PLACEHOLDER_TRANSPORTS = {"stdio": 'command="true"', "streamable_http": 'url="http://127.0.0.1:9"'}
@@ -292,7 +301,7 @@ class AgentRunner:
 
     def __init__(
         self,
-        agent: str,
+        agent: Agent | str,
         cwd: Path,
         name: str,
         session_id: str | None = None,
@@ -300,10 +309,10 @@ class AgentRunner:
         effort: str | None = None,
         skills: Sequence[Skill] = (),
     ) -> None:
-        if agent not in AGENTS:
-            raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(AGENTS)}.")
+        if agent not in set(Agent):
+            raise AgentError(f"Unknown agent {agent!r}; expected one of {', '.join(Agent)}.")
 
-        self.agent = agent
+        self.agent = Agent(agent)
         self.cwd = cwd
         self.name = name
         self.session_id = session_id
@@ -327,7 +336,7 @@ class AgentRunner:
 
         # Holds the plugin that links the notebook skills for `claude`, for this turn only
         plugins = tempfile.TemporaryDirectory(prefix="anylumino-skills-")
-        if self.agent == "claude":
+        if self.agent == Agent.CLAUDE:
             resume = self.session_id is not None
             session_id = self.session_id or str(uuid.uuid4())
             plugin = skill.write_plugin(self.skills, Path(plugins.name)) if self.skills else None
