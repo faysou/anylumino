@@ -229,13 +229,16 @@ class SalesApp(App):
 def test_module_source_drops_imports_the_ui_code_already_has():
     ui_code = '''import anylumino.astryx as ax
 import plotly.graph_objects as go
+from anylumino.workbench import Event, View
 
 
 class UI(ax.Stack):
     pass
 '''
     callbacks = '''import plotly.graph_objects as go
-from anylumino.workbench import App
+from anylumino.workbench import App, Event
+from anylumino.workbench import View
+from anylumino.workbench import View as Base
 
 
 class ChartApp(App):
@@ -243,7 +246,9 @@ class ChartApp(App):
 '''
     assert module_source(ui_code, callbacks) == '''import anylumino.astryx as ax
 import plotly.graph_objects as go
+from anylumino.workbench import Event, View
 from anylumino.workbench import App
+from anylumino.workbench import View as Base
 
 
 class UI(ax.Stack):

@@ -126,11 +126,8 @@ def module_source(ui_code: str, callbacks: str, program: str = "") -> str:
     ui = split_head(ui_code)
     fingerprint = ui_fingerprint(class_source(ui_code, "UI"))
     callbacks_parts = {key: text.lstrip("\n") for key, text in split_head(callbacks).items()}
-    # Both parts may import the same module, such as Plotly for a Plot statement
-    shared = set(ui["imports"].splitlines(keepends=True))
-    callbacks_parts["imports"] = "".join(
-        line for line in callbacks_parts["imports"].splitlines(keepends=True) if line not in shared
-    )
+    # Both parts may import the same name, such as Plotly for a Plot statement or Event
+    callbacks_parts["imports"] = drop_imported(callbacks_parts["imports"], imported_names(ui["imports"]))
 
     return "".join(
         [
@@ -146,6 +143,39 @@ def module_source(ui_code: str, callbacks: str, program: str = "") -> str:
             callbacks_parts["body"],
         ]
     )
+
+
+def imported_names(imports: str) -> set[tuple[str | None, int, str, str | None]]:
+    """Return each name that ``imports`` binds, as its module, relative level, name, and alias."""
+    names = set()
+    for node in ast.parse(imports).body:
+        if isinstance(node, ast.Import):
+            names |= {(None, 0, alias.name, alias.asname) for alias in node.names}
+        elif isinstance(node, ast.ImportFrom):
+            names |= {(node.module, node.level, alias.name, alias.asname) for alias in node.names}
+
+    return names
+
+
+def drop_imported(imports: str, shared: set[tuple[str | None, int, str, str | None]]) -> str:
+    """Remove from ``imports`` the names already in ``shared``, and statements left with no name."""
+    lines = imports.splitlines(keepends=True)
+    kept = []
+    start = 0
+    for node in ast.parse(imports).body:
+        end = node.end_lineno or start
+        module, level = (node.module, node.level) if isinstance(node, ast.ImportFrom) else (None, 0)
+        aliases = [alias for alias in node.names if (module, level, alias.name, alias.asname) not in shared]
+        if aliases and len(aliases) < len(node.names):
+            node.names = aliases
+            lines[node.lineno - 1 : end] = [ast.unparse(node) + "\n"] + [""] * (end - node.lineno)
+
+        if aliases:
+            kept.append("".join(lines[start:end]))
+
+        start = end
+
+    return "".join(kept)
 
 
 def program_comment(program: str, fingerprint: str) -> str:
