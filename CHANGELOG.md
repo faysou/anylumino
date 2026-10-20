@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.3.0
+
+This release lets the workbench use a notebook's own libraries through
+skills, and makes layout panels fit content that changes size, such as charts.
+
+- Added `Workbench(skills=[...])` for skill folders in the Claude Code format,
+  a `SKILL.md` with `name` and `description` front matter. The agent sees each
+  skill's name and description and loads it when it needs it: Claude as a
+  plugin for each turn, Codex by path. The skill paths are saved with the
+  session.
+- Layout panels with `fit_content` now follow their children: they refit when a
+  child's content changes size, such as a chart frame that gains or loses
+  panes, keep the fitted height instead of resetting to `height`, and split
+  panels measure their panes like boxes, so they can also shrink.
+- A container's `widgets` can be assigned objects that expose a `.widget`, such
+  as a lightweight-charts `NotebookChart`, as the constructors already allowed.
+- A click inside a layout panel no longer re-notifies children that are already
+  shown, which reset a chart's visible range.
+- Closing a workbench UI no longer fails on child widgets without a `widgets`
+  trait, such as a chart's widget.
+
 ## 0.2.1
 
 - GitHub releases now carry the version's changelog entry as their notes,
