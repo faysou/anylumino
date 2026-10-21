@@ -12,10 +12,11 @@ def _():
         """
         # OpenUI workbench in marimo
 
-        Runs the fake-agent workbench of `openui_workbench_fake_agent.py` in
-        marimo, to check that anylumino widgets and the workbench work outside
-        JupyterLab. A fake `codex` on `PATH` answers every turn with a sales
-        explorer, so no agent tokens are spent.
+        Runs the fake-agent workbench of `fake_agent.py`, shared with
+        `openui_workbench_fake_agent.py`, in marimo to check that anylumino
+        widgets and the workbench work outside JupyterLab. A fake `codex` on
+        `PATH` answers every turn with a sales explorer, so no agent tokens are
+        spent.
 
         Start it with `uv run --no-sync marimo edit notebooks/marimo_workbench_fake_agent.py`,
         then type any message in the chat. Check that:
@@ -37,19 +38,9 @@ def _():
 
 @app.cell
 def _():
-    from pathlib import Path
+    import fake_agent
 
-    import jupytext
-
-    # The code cells of the JupyterLab fake-agent notebook, without its final
-    # log check, install the fake codex and build the workbench.
-    notebook = jupytext.read(Path(__file__).parent / "openui_workbench_fake_agent.py")
-    code = [cell.source for cell in notebook.cells if cell.cell_type == "code"]
-    scope = {}
-    for source in code[:-1]:
-        exec(source, scope)
-
-    workbench = scope["workbench"]
+    workbench = fake_agent.workbench()
     workbench
     return
 
