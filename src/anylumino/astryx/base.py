@@ -631,11 +631,12 @@ def BuiltTheme(
     name : str, default 'neutral'
         Astryx theme name used by the generated CSS ``data-astryx-theme``
         selectors. This must match the ``name`` in the TypeScript theme passed
-        to ``npx astryx theme build``.
+        to ``npx astryx theme build``. A `BundledTheme` name with no ``css``
+        selects that bundled Astryx theme, with its tokens, component styles,
+        and icons.
     css : str | os.PathLike[str] | None, default None
         Generated theme CSS content or a path to the generated CSS file. Pass
-        ``None`` for built themes whose CSS is already bundled by AnyLumino,
-        such as the default neutral theme.
+        ``None`` for the themes AnyLumino bundles, listed in `BundledTheme`.
     tokens : Mapping[str, Any] | None, default None
         Optional resolved token map from the built theme object. Token names may
         include or omit the leading ``"--"``. The CSS is what styles widgets;

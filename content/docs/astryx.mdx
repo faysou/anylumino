@@ -388,6 +388,12 @@ Use `BuiltTheme` when the theme has been built with
 `BuiltTheme`, then use the descriptor as the `brand` for `Theme`.
 The theme name must match the name in the Astryx TypeScript theme source.
 
+The Astryx themes in `BundledTheme` need no CSS: neutral, the default, and
+butter, chocolate, gothic, matcha, stone, and y2k. For example,
+`ax.Theme(widgets, brand=ax.BuiltTheme(ax.BundledTheme.MATCHA))`. Their web
+fonts are not loaded, so text uses the system fonts later in each theme's font
+stack, and `Theme` does not paint the page background of gothic, a dark theme.
+
 Each Astryx widget is rendered by anywidget as its own frontend root in
 JupyterLab. `Theme` therefore propagates the selected brand and mode to
 nested Astryx children instead of relying only on a React context provider

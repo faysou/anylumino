@@ -12,7 +12,7 @@ from enum import StrEnum
 
 from anylumino.enums import Orientation
 
-__all__ = ["Orientation", "Align", "Axis", "BadgeVariant", "BannerStatus", "BreadcrumbsVariant", "ButtonVariant", "CalendarMode", "CardVariant", "CitationStyle", "ClickableCardVariant", "CollapseFrom", "ColorMode", "CompactDensity", "CompactSize", "Container", "ContentAlign", "Density", "DialogPurpose", "DialogVariant", "Display", "DisplayType", "DividerVariant", "FileInputMode", "FieldStatusType", "FontWeight", "FormDirection", "FrameHeight", "FrameVariant", "HourFormat", "IconColor", "IconSize", "IndicatorKind", "IndicatorState", "InputType", "ItemLayout", "Justify", "LabelPosition", "LabelSpacing", "LayerAlignment", "LayerPlacement", "ListStyle", "MediaType", "OverlayPosition", "OverlayTrigger", "ScrollAxis", "SectionVariant", "SelectionMode", "SelectorVariant", "Selects", "Size", "SortDirection", "SpinnerShade", "StatusPlacement", "StatusVariant", "SwitchLabelPosition", "TableDividers", "TextColor", "TextJustify", "TextOverflow", "TextSize", "TextType", "TextWrap", "TimerFormat", "TimestampFormat", "ToastPosition", "ToastType", "TokenColor", "TriggerDisplay", "ValueDisplay", "VerticalAlign", "Wrap"]
+__all__ = ["Orientation", "Align", "Axis", "BadgeVariant", "BannerStatus", "BreadcrumbsVariant", "BundledTheme", "ButtonVariant", "CalendarMode", "CardVariant", "CitationStyle", "ClickableCardVariant", "CollapseFrom", "ColorMode", "CompactDensity", "CompactSize", "Container", "ContentAlign", "Density", "DialogPurpose", "DialogVariant", "Display", "DisplayType", "DividerVariant", "FileInputMode", "FieldStatusType", "FontWeight", "FormDirection", "FrameHeight", "FrameVariant", "HourFormat", "IconColor", "IconSize", "IndicatorKind", "IndicatorState", "InputType", "ItemLayout", "Justify", "LabelPosition", "LabelSpacing", "LayerAlignment", "LayerPlacement", "ListStyle", "MediaType", "OverlayPosition", "OverlayTrigger", "ScrollAxis", "SectionVariant", "SelectionMode", "SelectorVariant", "Selects", "Size", "SortDirection", "SpinnerShade", "StatusPlacement", "StatusVariant", "SwitchLabelPosition", "TableDividers", "TextColor", "TextJustify", "TextOverflow", "TextSize", "TextType", "TextWrap", "TimerFormat", "TimestampFormat", "ToastPosition", "ToastType", "TokenColor", "TriggerDisplay", "ValueDisplay", "VerticalAlign", "Wrap"]
 
 
 class Size(StrEnum):
@@ -641,3 +641,21 @@ class CollapseFrom(StrEnum):
 
     START = "start"
     END = "end"
+
+
+class BundledTheme(StrEnum):
+    """The Astryx themes bundled with anylumino, by name.
+
+    Pass one to `BuiltTheme`, such as ``ax.BuiltTheme(ax.BundledTheme.MATCHA)``.
+    anylumino does not load the web fonts a theme names first, such as DM Sans
+    for matcha, so text uses the system fonts later in the theme's font stack
+    unless the page provides them.
+    """
+
+    NEUTRAL = "neutral"
+    BUTTER = "butter"
+    CHOCOLATE = "chocolate"
+    GOTHIC = "gothic"
+    MATCHA = "matcha"
+    STONE = "stone"
+    Y2K = "y2k"

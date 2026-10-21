@@ -65,8 +65,20 @@ built_theme = ax.BuiltTheme(
 
 The `name` must match the `name` in the TypeScript theme source because the
 generated CSS is scoped by `data-astryx-theme="<name>"`. The `css` argument can
-be CSS text or a path-like object. Pass `css=None` for a built theme whose CSS
-is already bundled by AnyLumino, such as the default neutral theme.
+be CSS text or a path-like object.
+
+AnyLumino bundles the Astryx themes listed in `BundledTheme`: neutral, the
+default, and butter, chocolate, gothic, matcha, stone, and y2k. Name one with no
+`css` to use it with its tokens, component styles, and icons:
+
+```python
+matcha = ax.Theme([ax.Button("Run", variant="primary")], brand=ax.BuiltTheme(ax.BundledTheme.MATCHA))
+```
+
+AnyLumino does not load the web fonts these themes name first, so text uses
+the system fonts later in each theme's font stack. `Theme` does not paint the
+theme's page background either, so gothic, a dark theme, shows light headings
+on the notebook's background.
 
 The optional `tokens` mapping is retained in the synced theme object for Astryx
 hooks and debugging. The generated CSS is what actually styles the widgets.

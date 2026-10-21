@@ -17,7 +17,13 @@
   "dependencies": {
     "@astryxdesign/core": "^0.7.1",
     "@astryxdesign/richtext": "^0.7.1",
+    "@astryxdesign/theme-butter": "^0.7.1",
+    "@astryxdesign/theme-chocolate": "^0.7.1",
+    "@astryxdesign/theme-gothic": "^0.7.1",
+    "@astryxdesign/theme-matcha": "^0.7.1",
     "@astryxdesign/theme-neutral": "^0.7.1",
+    "@astryxdesign/theme-stone": "^0.7.1",
+    "@astryxdesign/theme-y2k": "^0.7.1",
     "@lexical/code": "0.52.0",
     "@lexical/extension": "0.52.0",
     "@lexical/headless": "0.52.0",

@@ -1,3 +1,7 @@
+// Lumino's structural styles, such as hiding inactive tabs, ship with the widget
+// rather than coming from JupyterLab, so hosts like marimo render it too.
+import "@lumino/widgets/style/index.css";
+import "./action_panel.css";
 import {
   CommandPalette,
   Menu,

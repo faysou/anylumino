@@ -3,7 +3,13 @@ import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import "@astryxdesign/core/reset.css";
 import "@astryxdesign/core/astryx.css";
+import "@astryxdesign/theme-butter/theme.css";
+import "@astryxdesign/theme-chocolate/theme.css";
+import "@astryxdesign/theme-gothic/theme.css";
+import "@astryxdesign/theme-matcha/theme.css";
 import "@astryxdesign/theme-neutral/theme.css";
+import "@astryxdesign/theme-stone/theme.css";
+import "@astryxdesign/theme-y2k/theme.css";
 import { AlertDialog } from "@astryxdesign/core/AlertDialog";
 import { AppShell } from "@astryxdesign/core/AppShell";
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
@@ -117,7 +123,13 @@ import { TopNav, TopNavHeading, TopNavItem, TopNavMenu } from "@astryxdesign/cor
 import { TreeList } from "@astryxdesign/core/TreeList";
 import { Typeahead, createStaticSource } from "@astryxdesign/core/Typeahead";
 import { Theme, defineTheme, generateThemeCSS } from "@astryxdesign/core/theme";
+import { butterTheme } from "@astryxdesign/theme-butter/built";
+import { chocolateTheme } from "@astryxdesign/theme-chocolate/built";
+import { gothicTheme } from "@astryxdesign/theme-gothic/built";
+import { matchaTheme } from "@astryxdesign/theme-matcha/built";
 import { neutralTheme } from "@astryxdesign/theme-neutral/built";
+import { stoneTheme } from "@astryxdesign/theme-stone/built";
+import { y2kTheme } from "@astryxdesign/theme-y2k/built";
 import {
   RichTextEditor,
   RichTextEditorToolbar,
@@ -386,8 +398,21 @@ function rawProps(model) {
   return { ...(model.get("props") ?? {}) };
 }
 
+// The built themes bundled with anylumino, by name. Their CSS is in the widget
+// stylesheet, so a descriptor that names one needs no CSS of its own.
+const BUNDLED_THEMES = Object.fromEntries(
+  [butterTheme, chocolateTheme, gothicTheme, matchaTheme, neutralTheme, stoneTheme, y2kTheme].map((theme) => [
+    theme.name,
+    theme,
+  ]),
+);
+
 function brandTheme(brand) {
   if (brand.built || brand.__built) {
+    const bundled = BUNDLED_THEMES[String(brand.name ?? "neutral")];
+    if (bundled && !brand.css) {
+      return bundled;
+    }
     return {
       name: String(brand.name ?? "neutral"),
       __built: true,

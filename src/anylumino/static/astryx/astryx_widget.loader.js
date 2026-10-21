@@ -1,4 +1,4 @@
-const key = Symbol.for("anylumino:astryx_widget.bundle.js:2615f6124f3f20ee");
+const key = Symbol.for("anylumino:astryx_widget.bundle.js:a459c6add9595ed6");
 
 function load(model) {
   globalThis[key] ??= new Promise((resolve, reject) => {

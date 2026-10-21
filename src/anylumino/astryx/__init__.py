@@ -117,6 +117,7 @@ from .enums import Axis
 from .enums import BadgeVariant
 from .enums import BannerStatus
 from .enums import BreadcrumbsVariant
+from .enums import BundledTheme
 from .enums import ButtonVariant
 from .enums import CalendarMode
 from .enums import CardVariant
@@ -203,6 +204,7 @@ __all__ = [
     "Breadcrumbs",
     "BreadcrumbsVariant",
     "BuiltTheme",
+    "BundledTheme",
     "Button",
     "ButtonGroup",
     "ButtonVariant",

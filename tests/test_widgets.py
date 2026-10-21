@@ -2078,3 +2078,14 @@ def test_astryx_inputs_hide_their_label_through_astryx(build) -> None:
 
     assert widget.props["isLabelHidden"] is True
     assert "label_hidden" not in widget.props
+
+
+@pytest.mark.parametrize("theme", list(ax.BundledTheme), ids=str)
+def test_astryx_bundled_themes_ship_their_css_and_built_theme(theme: str) -> None:
+    widget = ax.Theme([ax.Button("Run")], brand=ax.BuiltTheme(theme))
+    stylesheet = _asset_path(ax.Widget._css).read_text(encoding="utf-8")
+    bundle = _asset_path(ax.Widget._bundle).read_text(encoding="utf-8")
+
+    assert widget.brand == {"name": theme.value, "built": True, "tokens": {}, "css": "", "components": {}}
+    assert f"data-astryx-theme={theme.value}]" in stylesheet or f'data-astryx-theme="{theme.value}"]' in stylesheet
+    assert f'name:"{theme.value}"' in bundle

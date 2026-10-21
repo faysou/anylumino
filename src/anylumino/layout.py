@@ -610,7 +610,7 @@ class TabPanel(LayoutWidget):
 
     _esm = static_asset("layout/tab_panel.loader.js")
     _bundle = static_asset("layout/tab_panel.bundle.js")
-    _css = static_asset("layout/tab_panel.css")
+    _css = static_asset("layout/tab_panel.bundle.css")
     _title_prefix = "Tab"
 
     selected_index = t.Int(0).tag(sync=True)
@@ -717,7 +717,7 @@ class BoxPanel(LayoutWidget):
 
     _esm = static_asset("layout/layout_panel.loader.js")
     _bundle = static_asset("layout/layout_panel.bundle.js")
-    _css = static_asset("layout/layout_panel.css")
+    _css = static_asset("layout/layout_panel.bundle.css")
 
     layout_kind = t.Unicode("box").tag(sync=True)
     direction = t.Enum(tuple(Direction), default_value=Direction.LEFT_TO_RIGHT).tag(sync=True)
@@ -1031,7 +1031,7 @@ class SplitPanel(LayoutWidget):
 
     _esm = static_asset("layout/layout_panel.loader.js")
     _bundle = static_asset("layout/layout_panel.bundle.js")
-    _css = static_asset("layout/layout_panel.css")
+    _css = static_asset("layout/layout_panel.bundle.css")
 
     layout_kind = t.Unicode("split").tag(sync=True)
     orientation = t.Enum(tuple(Orientation), default_value=Orientation.HORIZONTAL).tag(sync=True)
@@ -1104,7 +1104,7 @@ class DockPanel(LayoutWidget):
 
     _esm = static_asset("layout/layout_panel.loader.js")
     _bundle = static_asset("layout/layout_panel.bundle.js")
-    _css = static_asset("layout/layout_panel.css")
+    _css = static_asset("layout/layout_panel.bundle.css")
 
     layout_kind = t.Unicode("dock").tag(sync=True)
     mode = t.Enum(tuple(DockMode), default_value=DockMode.SPLIT_RIGHT).tag(sync=True)
@@ -1156,7 +1156,7 @@ class AccordionPanel(LayoutWidget):
 
     _esm = static_asset("layout/layout_panel.loader.js")
     _bundle = static_asset("layout/layout_panel.bundle.js")
-    _css = static_asset("layout/layout_panel.css")
+    _css = static_asset("layout/layout_panel.bundle.css")
 
     layout_kind = t.Unicode("accordion").tag(sync=True)
 
@@ -1203,7 +1203,7 @@ class StackedPanel(LayoutWidget):
 
     _esm = static_asset("layout/layout_panel.loader.js")
     _bundle = static_asset("layout/layout_panel.bundle.js")
-    _css = static_asset("layout/layout_panel.css")
+    _css = static_asset("layout/layout_panel.bundle.css")
 
     layout_kind = t.Unicode("stacked").tag(sync=True)
     selected_index = t.Int(0).tag(sync=True)
@@ -1276,7 +1276,7 @@ class GridPanel(LayoutWidget):
 
     _esm = static_asset("layout/layout_panel.loader.js")
     _bundle = static_asset("layout/layout_panel.bundle.js")
-    _css = static_asset("layout/layout_panel.css")
+    _css = static_asset("layout/layout_panel.bundle.css")
 
     layout_kind = t.Unicode("grid").tag(sync=True)
     columns = t.Unicode("1fr 1fr").tag(sync=True)
@@ -1357,7 +1357,7 @@ class ResponsivePanel(LayoutWidget):
 
     _esm = static_asset("layout/layout_panel.loader.js")
     _bundle = static_asset("layout/layout_panel.bundle.js")
-    _css = static_asset("layout/layout_panel.css")
+    _css = static_asset("layout/layout_panel.bundle.css")
 
     layout_kind = t.Unicode("responsive").tag(sync=True)
     breakpoint = t.Int(760).tag(sync=True)
@@ -1400,7 +1400,7 @@ class ResponsivePanel(LayoutWidget):
 class _ActionWidget(ActivationCallbacks, SharedBundleWidget):
     _esm = static_asset("layout/action_panel.loader.js")
     _bundle = static_asset("layout/action_panel.bundle.js")
-    _css = static_asset("layout/action_panel.css")
+    _css = static_asset("layout/action_panel.bundle.css")
 
     action_kind = t.Enum(ACTION_KINDS).tag(sync=True)
     actions = t.List(t.Dict(), default_value=[]).tag(sync=True)
