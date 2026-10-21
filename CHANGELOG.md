@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.5.0
+
+This release lets notebook skills add OpenUI components for their libraries'
+widgets, and lets notebook code start, export, and import the workbench. The
+export call changed, so read the breaking change below.
+
+Breaking changes:
+
+- `Workbench.export` takes the file path, such as
+  `workbench.export("exports/sales.py")`, instead of a folder and a name.
+  Exporting before a UI exists writes nothing and says so in the chat.
+
+Added:
+
+- A skill folder can hold a `components.py` whose `COMPONENTS` list adds
+  OpenUI components, such as a chart widget from another library. The program
+  lays them out like built-in components, the agent sees them in its prompt,
+  and exported files import their modules.
+- `Workbench(prompt=...)` sends a first chat message when the workbench is
+  created, so a cell can start a turn.
+- `workbench.import_file` accepts a string path, so another cell can import an
+  exported file.
+- `Table.columns` can be assigned after the table is created; the rows stay.
+
+Fixed:
+
+- An exported file no longer imports a name twice when the UI code and the
+  callbacks both import it, such as `Event` from `anylumino.workbench`.
+
 ## 0.4.0
 
 This release makes option values enums across the library and gives the
