@@ -26,9 +26,10 @@ def _():
         - choosing a region updates the heading, badge, and table, and the button
           writes the total under the table.
 
-        The workbench builds the UI in a background task after this cell has
-        run. marimo 0.25.2 cannot register a widget created there, so the
-        reply reports an `AssertionError` until marimo handles that case.
+        The workbench builds a reply's UI in an asyncio task that a chat
+        message starts after this cell has run. That needs a marimo version
+        that runs widget messages as part of the cell that created the widget.
+        marimo 0.25.2 does not, so the reply reports an `AssertionError`.
         """
     )
     return
