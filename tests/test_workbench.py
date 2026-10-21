@@ -102,6 +102,18 @@ def test_successful_turn_updates_all_tabs(agent_reply, tmp_path, sales):
     assert workbench.runner.session_id == "thread-1"
 
 
+def test_prompt_starts_the_first_turn(agent_reply, tmp_path, sales):
+    agent_reply(reply("Here is a sales panel.", PROGRAM, CALLBACKS))
+    workbench = Workbench(agent="codex", namespace={"sales": sales}, cwd=tmp_path, prompt="Build it")
+
+    assert workbench.chat.messages == [
+        {"role": "user", "content": "Build it", "status": "sent"},
+        {"role": "assistant", "content": "Here is a sales panel."},
+    ]
+    assert agent_reply.calls()[0]["stdin"].startswith("Build it")
+    assert code(workbench)["openui"] == PROGRAM
+
+
 def test_failing_callbacks_keep_previous_state(agent_reply, tmp_path, sales):
     agent_reply(reply("First.", PROGRAM, CALLBACKS))
     workbench = Workbench(agent="codex", namespace={"sales": sales}, cwd=tmp_path)

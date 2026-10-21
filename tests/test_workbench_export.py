@@ -96,15 +96,37 @@ def test_export_dialog_goes_up_and_keeps_the_last_folder(built, tmp_path):
 
 
 def test_export_outside_the_current_directory_shows_absolute_paths(built, tmp_path):
-    built.export(tmp_path, "sales")
+    built.export(tmp_path / "sales.py")
     assert built.chat.messages[-1]["content"].startswith(
         f"Exported `{tmp_path / 'sales.py'}`."
     )
 
 
 def test_export_failure_is_reported(built, tmp_path):
-    built.export(tmp_path / "missing", "sales")
+    built.export(tmp_path / "missing" / "sales.py")
     assert built.chat.messages[-1]["content"].startswith("Export failed: [Errno 2] No such file or directory")
+
+
+def test_export_from_a_cell_writes_a_relative_path_and_import_reads_it_back(built, tmp_path):
+    # The built fixture runs in tmp_path / "project", so the relative path lands there
+    built.export("exports/sales.py")
+
+    workbench = Workbench(agent="codex", namespace={"sales": SALES}, cwd=tmp_path)
+    workbench.import_file("exports/sales.py")
+
+    assert (tmp_path / "project" / "exports" / "sales.py").is_file()
+    assert built.chat.messages[-1]["content"].startswith("Exported `exports/sales.py`.")
+    assert code(workbench) == code(built)
+    assert workbench.chat.messages == [{"role": "system", "content": "Imported `exports/sales.py`."}]
+
+
+def test_export_without_a_ui_writes_nothing(tmp_path):
+    workbench = Workbench(agent="codex", cwd=tmp_path)
+
+    workbench.export(tmp_path / "sales.py")
+
+    assert (tmp_path / "sales.py").exists() is False
+    assert workbench.chat.messages == [{"role": "system", "content": "Export failed: there is no UI yet."}]
 
 
 def test_export_is_disabled_until_a_ui_is_built(tmp_path):
@@ -112,7 +134,7 @@ def test_export_is_disabled_until_a_ui_is_built(tmp_path):
 
 
 def test_load_builds_the_ui_with_the_namespace_keywords(built, tmp_path):
-    built.export(tmp_path, "sales")
+    built.export(tmp_path / "sales.py")
     sales = pd.DataFrame({"region": ["AMER"], "revenue": [4.0]})
 
     ui = load(str(tmp_path / "sales.py"), sales=sales)
@@ -127,7 +149,7 @@ def test_load_builds_the_ui_with_the_namespace_keywords(built, tmp_path):
 
 
 def test_load_reads_no_notebook_globals(built, tmp_path, monkeypatch):
-    built.export(tmp_path, "sales")
+    built.export(tmp_path / "sales.py")
     monkeypatch.setattr(sys.modules["__main__"], "sales", SALES, raising=False)
 
     with pytest.raises(AttributeError, match="'SalesApp' object has no attribute 'sales'"):
@@ -135,7 +157,7 @@ def test_load_reads_no_notebook_globals(built, tmp_path, monkeypatch):
 
 
 def test_exported_file_works_as_an_imported_module(built, tmp_path, monkeypatch):
-    built.export(tmp_path, "sales")
+    built.export(tmp_path / "sales.py")
     monkeypatch.syspath_prepend(str(tmp_path))
     from sales import UI, SalesApp
 
@@ -147,7 +169,7 @@ def test_exported_file_works_as_an_imported_module(built, tmp_path, monkeypatch)
 
 
 def test_app_is_composable_in_another_layout(built, tmp_path):
-    built.export(tmp_path, "sales")
+    built.export(tmp_path / "sales.py")
     first = load(tmp_path / "sales.py", sales=SALES)
     second = load(tmp_path / "sales.py", sales=SALES)
 
@@ -276,7 +298,7 @@ def test_export_dialog_opens_in_the_directory_current_at_first_open(built, tmp_p
 
 
 def test_load_resolves_relative_paths_against_the_calling_script(built, tmp_path):
-    built.export(tmp_path, "sales")
+    built.export(tmp_path / "sales.py")
     relative = Path(os.path.relpath(tmp_path, Path(__file__).parent))
 
     root = load(relative / "sales.py", sales=SALES)
@@ -285,7 +307,7 @@ def test_load_resolves_relative_paths_against_the_calling_script(built, tmp_path
 
 
 def test_load_resolves_relative_paths_against_the_notebook_directory(built, tmp_path, monkeypatch):
-    built.export(tmp_path, "sales")
+    built.export(tmp_path / "sales.py")
 
     class ZMQInteractiveShell:
         pass
@@ -305,7 +327,7 @@ def test_export_dialog_width_does_not_size_its_host(tmp_path):
 
 
 def test_export_writes_the_program_as_a_comment_that_reads_back(built, tmp_path):
-    built.export(tmp_path, "sales")
+    built.export(tmp_path / "sales.py")
     source = (tmp_path / "sales.py").read_text()
 
     exported = read_module(source)
@@ -346,7 +368,7 @@ def imported(agent_reply, tmp_path, source):
 
 def test_import_of_an_unchanged_export_fills_the_tabs_without_the_agent(built, agent_reply, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    built.export(tmp_path, "edited")
+    built.export(tmp_path / "edited.py")
 
     workbench, calls = imported(agent_reply, tmp_path, (tmp_path / "edited.py").read_text())
 
@@ -358,7 +380,7 @@ def test_import_of_an_unchanged_export_fills_the_tabs_without_the_agent(built, a
 
 def test_import_regenerates_the_ui_from_an_edited_program_comment(built, agent_reply, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    built.export(tmp_path, "edited")
+    built.export(tmp_path / "edited.py")
     source = (tmp_path / "edited.py").read_text().replace('# title = Heading("Sales")', '# title = Heading("Revenue")')
 
     workbench, calls = imported(agent_reply, tmp_path, source)
@@ -371,7 +393,7 @@ def test_import_regenerates_the_ui_from_an_edited_program_comment(built, agent_r
 
 def test_import_keeps_callbacks_edited_outside(built, agent_reply, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    built.export(tmp_path, "edited")
+    built.export(tmp_path / "edited.py")
     source = (tmp_path / "edited.py").read_text().replace('f"Total {', 'f"Sum {')
 
     workbench, calls = imported(agent_reply, tmp_path, source)
@@ -402,7 +424,7 @@ def test_import_asks_the_agent_to_reconcile_a_changed_file(
     built, agent_reply, tmp_path, monkeypatch, edit, reason, report
 ):
     monkeypatch.chdir(tmp_path)
-    built.export(tmp_path, "edited")
+    built.export(tmp_path / "edited.py")
     source = (tmp_path / "edited.py").read_text().replace(*edit)
     if "{line}" in reason:
         reason = reason.format(line=source.splitlines().index("    def on_total(self, event)") + 1)
@@ -428,7 +450,7 @@ def test_import_asks_the_agent_to_reconcile_a_changed_file(
 
 def test_reconcile_that_misses_the_edit_is_reported(built, agent_reply, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    built.export(tmp_path, "edited")
+    built.export(tmp_path / "edited.py")
     source = (tmp_path / "edited.py").read_text().replace("ax.Heading(text='Sales')", "ax.Heading(text='Revenue')")
     agent_reply(reply("Reconciled.", PROGRAM, CALLBACKS))
 

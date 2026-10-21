@@ -53,6 +53,8 @@ the program, the callbacks, or both.
 | `model`     | Model name passed to the CLI, such as `"sonnet"`. Saved with the session.                         |
 | `effort`    | Reasoning effort passed to the CLI, such as `"low"` or `"high"`. Saved with the session.          |
 | `skills`    | Skill folders that document your own libraries, described in [Notebook skills](#notebook-skills). |
+| `prompt`    | First message, sent when the workbench is created. It runs again each time the cell runs.         |
+| `height`    | CSS height of the workbench, `640` pixels by default.                                             |
 
 `model` and `effort` apply only to the workbench's turns, not to your other CLI
 use. Claude Code receives `--model` and `--effort` (`low`, `medium`, `high`,
@@ -397,6 +399,14 @@ handler, and check its widgets. It is not a widget itself, but anylumino
 containers accept it as a child and a cell shows it, both through its `widget`:
 put it in a `TabPanel`, a `SplitPanel`, or a stack next to other widgets.
 
+To export from another cell instead of the dialog, pass the file path. A
+relative path is relative to the kernel's current directory. The chat posts the
+`load` call as the dialog does, or why nothing was written:
+
+```python
+workbench.export("exports/sales.py")
+```
+
 ### Import an edited file
 
 **Import** in the header reads an exported file back into the workbench, so you
@@ -426,6 +436,9 @@ An edit that OpenUI cannot express, such as Python logic in `UI.__init__`,
 always reports a mismatch.
 A file without the program comment or the `UI` class is rejected with a chat
 message, since it was not exported from a workbench.
+
+To import from another cell, pass the file path, relative to the kernel's
+current directory: `workbench.import_file("exports/sales.py")`.
 
 ## Limits
 

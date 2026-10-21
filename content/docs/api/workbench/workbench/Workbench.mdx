@@ -57,7 +57,7 @@ Build notebook UIs by chatting with a local coding agent.
 
 ## Functions
 
-<PyFunction name="__init__" type="(agent=None, session=None, namespace=None, cwd=None, *, model=None, effort=None, skills=None, height=640) -> None" kind="constructor">
+<PyFunction name="__init__" type="(agent=None, session=None, namespace=None, cwd=None, *, model=None, effort=None, skills=None, prompt=None, height=640) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -70,6 +70,7 @@ Build notebook UIs by chatting with a local coding agent.
         model: str | None = None,
         effort: str | None = None,
         skills: Sequence[str | Path] | None = None,
+        prompt: str | None = None,
         height: int | float | str | None = 640,
     ) -> None:
         saved = store.load(session) if session else None
@@ -160,6 +161,9 @@ Build notebook UIs by chatting with a local coding agent.
         self.chat.on_stop(lambda _chat: self.schedule(self.runner.stop()))
         if saved is not None:
             self.schedule(self.restore())
+
+        if prompt:
+            self.submit(prompt)
     ```
   </PySourceCode>
 
@@ -205,6 +209,13 @@ Build notebook UIs by chatting with a local coding agent.
       format. The agent sees each name and description and loads a skill when
       it needs it. A `components.py` in the folder adds OpenUI components
       for the library's widgets. Defaults to the restored session's skills.
+    </PyParameter>
+
+    <PyParameter name="prompt" type="str | None" value="None">
+      A first message to send as soon as the workbench is created, as if typed
+      in the chat. In a notebook the turn runs in the background while the
+      workbench shows; it runs again each time the cell runs. A restored
+      session continues its conversation with it.
     </PyParameter>
 
     <PyParameter name="height" type="int | float | str | None" value="640">
@@ -265,7 +276,7 @@ Build notebook UIs by chatting with a local coding agent.
 
   <PySourceCode>
     ```python
-    def import_file(self, path: Path) -> None:
+    def import_file(self, path: str | Path) -> None:
         """Fill the tabs from an exported file, and ask the agent to reconcile it when it was edited.
 
         The program and callbacks of the file apply as a turn's would. When they
@@ -280,12 +291,12 @@ Build notebook UIs by chatting with a local coding agent.
 
         self.set_running(True)
         self.runner.stopped = False
-        self.schedule(self.run_import(path))
+        self.schedule(self.run_import(Path(path)))
     ```
   </PySourceCode>
 
   <div>
-    <PyParameter name="path" type="Path" />
+    <PyParameter name="path" type="str | Path" />
   </div>
 
   <PyFunctionReturn type="None" />
@@ -695,34 +706,45 @@ Build notebook UIs by chatting with a local coding agent.
   <PyFunctionReturn type="None" />
 </PyFunction>
 
-<PyFunction name="export" type="(folder, name) -> None">
-  Write the UI code and callbacks into one file in `folder` and post the `load` call for it.
+<PyFunction name="export" type="(path) -> None">
+  Write the UI code and callbacks into the file `path`, such as `"exports/sales.py"`.
+
+  An existing file is replaced. The chat shows the `load` call for the
+  file, or why nothing was written.
 
   <PySourceCode>
     ````python
-    def export(self, folder: Path, name: str) -> None:
-        """Write the UI code and callbacks into one file in ``folder`` and post the ``load`` call for it."""
+    def export(self, path: str | Path) -> None:
+        """Write the UI code and callbacks into the file ``path``, such as ``"exports/sales.py"``.
+
+        An existing file is replaced. The chat shows the ``load`` call for the
+        file, or why nothing was written.
+        """
+        if not self.ui_code:
+            self.add_message(ChatRole.SYSTEM, "Export failed: there is no UI yet.")
+
+            return
+
         try:
-            path = shown_path(write_module(folder, name, self.ui_code, self.state.callbacks, self.state.program))
+            write_module(Path(path), self.ui_code, self.state.callbacks, self.state.program)
         except OSError as error:
             self.add_message(ChatRole.SYSTEM, f"Export failed: {error}")
 
             return
 
-        arguments = [json.dumps(path), *(f"{key}={key}" for key in self.namespace)]
+        shown = shown_path(Path(path))
+        arguments = [json.dumps(shown), *(f"{key}={key}" for key in self.namespace)]
         # As an assistant message, since the chat shows system messages on one line without markdown
         self.add_message(
             ChatRole.ASSISTANT,
-            f"Exported `{path}`. Show the same UI in a notebook cell with:\n\n"
+            f"Exported `{shown}`. Show the same UI in a notebook cell with:\n\n"
             f"```python\nfrom anylumino.workbench import load\n\nload({', '.join(arguments)})\n```",
         )
     ````
   </PySourceCode>
 
   <div>
-    <PyParameter name="folder" type="Path" />
-
-    <PyParameter name="name" type="str" />
+    <PyParameter name="path" type="str | Path" />
   </div>
 
   <PyFunctionReturn type="None" />

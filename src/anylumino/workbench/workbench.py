@@ -86,6 +86,11 @@ class Workbench(al.SplitPanel):
         format. The agent sees each name and description and loads a skill when
         it needs it. A ``components.py`` in the folder adds OpenUI components
         for the library's widgets. Defaults to the restored session's skills.
+    prompt : str | None, default None
+        A first message to send as soon as the workbench is created, as if typed
+        in the chat. In a notebook the turn runs in the background while the
+        workbench shows; it runs again each time the cell runs. A restored
+        session continues its conversation with it.
     height : int | float | str | None, default 640
         CSS height of the workbench.
 
@@ -112,6 +117,7 @@ class Workbench(al.SplitPanel):
         model: str | None = None,
         effort: str | None = None,
         skills: Sequence[str | Path] | None = None,
+        prompt: str | None = None,
         height: int | float | str | None = 640,
     ) -> None:
         saved = store.load(session) if session else None
@@ -203,6 +209,9 @@ class Workbench(al.SplitPanel):
         if saved is not None:
             self.schedule(self.restore())
 
+        if prompt:
+            self.submit(prompt)
+
     @staticmethod
     def empty_ui() -> ax.EmptyState:
         return ax.EmptyState("No UI yet", description="Ask the agent for one in the chat.")
@@ -219,7 +228,7 @@ class Workbench(al.SplitPanel):
         self.runner.stopped = False
         self.schedule(self.run_turn(text, context))
 
-    def import_file(self, path: Path) -> None:
+    def import_file(self, path: str | Path) -> None:
         """Fill the tabs from an exported file, and ask the agent to reconcile it when it was edited.
 
         The program and callbacks of the file apply as a turn's would. When they
@@ -234,7 +243,7 @@ class Workbench(al.SplitPanel):
 
         self.set_running(True)
         self.runner.stopped = False
-        self.schedule(self.run_import(path))
+        self.schedule(self.run_import(Path(path)))
 
     def ask_agent(self, message: str, context: Any = None) -> None:
         """Send ``message`` to the agent as if the user had typed it."""
@@ -462,20 +471,30 @@ class Workbench(al.SplitPanel):
             self.ui_host.widgets = [ax.EmptyState("The saved UI could not be built", description=message)]
             self.show_code(openui=self.state.program, callbacks=self.state.callbacks)
 
-    def export(self, folder: Path, name: str) -> None:
-        """Write the UI code and callbacks into one file in ``folder`` and post the ``load`` call for it."""
+    def export(self, path: str | Path) -> None:
+        """Write the UI code and callbacks into the file ``path``, such as ``"exports/sales.py"``.
+
+        An existing file is replaced. The chat shows the ``load`` call for the
+        file, or why nothing was written.
+        """
+        if not self.ui_code:
+            self.add_message(ChatRole.SYSTEM, "Export failed: there is no UI yet.")
+
+            return
+
         try:
-            path = shown_path(write_module(folder, name, self.ui_code, self.state.callbacks, self.state.program))
+            write_module(Path(path), self.ui_code, self.state.callbacks, self.state.program)
         except OSError as error:
             self.add_message(ChatRole.SYSTEM, f"Export failed: {error}")
 
             return
 
-        arguments = [json.dumps(path), *(f"{key}={key}" for key in self.namespace)]
+        shown = shown_path(Path(path))
+        arguments = [json.dumps(shown), *(f"{key}={key}" for key in self.namespace)]
         # As an assistant message, since the chat shows system messages on one line without markdown
         self.add_message(
             ChatRole.ASSISTANT,
-            f"Exported `{path}`. Show the same UI in a notebook cell with:\n\n"
+            f"Exported `{shown}`. Show the same UI in a notebook cell with:\n\n"
             f"```python\nfrom anylumino.workbench import load\n\nload({', '.join(arguments)})\n```",
         )
 

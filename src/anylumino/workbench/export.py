@@ -226,15 +226,12 @@ def split_head(source: str) -> dict[str, str]:
     return parts
 
 
-def write_module(folder: str | Path, name: str, ui_code: str, callbacks: str, program: str = "") -> Path:
-    """Write ``ui_code`` and ``callbacks`` as one module into ``folder``, replacing an existing file.
+def write_module(path: Path, ui_code: str, callbacks: str, program: str = "") -> None:
+    """Write ``ui_code`` and ``callbacks`` as one module to ``path``, replacing an existing file.
 
     ``program`` is written as a comment, so that the file can be imported back.
     """
-    path = Path(folder) / file_name(name)
     path.write_text(module_source(ui_code, callbacks, program))
-
-    return path
 
 
 def read_module(source: str) -> ExportedFile:

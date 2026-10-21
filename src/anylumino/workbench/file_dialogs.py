@@ -85,9 +85,9 @@ class FolderDialog(ax.Dialog):
 
 
 class ExportDialog(FolderDialog):
-    """Pick a folder and a name, then call ``on_export(folder, name)``."""
+    """Pick a folder and a name, then call ``on_export(path)`` with the file in that folder."""
 
-    def __init__(self, on_export: Callable[[Path, str], None]) -> None:
+    def __init__(self, on_export: Callable[[Path], None]) -> None:
         self.on_export = on_export
         self.name = ax.TextInput("ui", label="Name")
         self.files = ax.Text("", text_type="supporting")
@@ -104,7 +104,7 @@ class ExportDialog(FolderDialog):
 
     def finish(self) -> None:
         self.hide()
-        self.on_export(self.folder, self.name.value or "ui")
+        self.on_export(self.folder / file_name(self.name.value or "ui"))
 
 
 class ImportDialog(FolderDialog):
