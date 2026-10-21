@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.6.0
+
+This release adds Astryx app frames, rich text, status widgets, and six
+bundled themes, loads each frontend bundle once per page instead of once per
+widget, and runs the widgets in marimo. Widgets now need a running kernel, so
+read the breaking change below.
+
+Breaking changes:
+
+- Widgets load their frontend bundle from Python through a widget message, so
+  they render only with a running kernel. A notebook saved with widget state
+  no longer shows the widgets without one. In exchange, a page with 81 widgets
+  uses about 35 MB of browser memory instead of 757 MB.
+
+Added:
+
+- Astryx widgets for app frames and navigation: `AppShell`, `Layout`,
+  `TopNav`, `SideNav`, `NavIcon`, `HStack`, and `VStack`. A slot takes a list
+  of widgets and stacks them.
+- Astryx `Stepper`, `Timer`, `Indicator`, `OverflowList`, and
+  `ComplexSelector`, and `Toast`, whose `notify` shows notifications from
+  Python.
+- `RichTextEditor` and `RichTextView`, which exchange Markdown.
+- The workbench catalog and its component skill cover the new widgets.
+- `BundledTheme` and the butter, chocolate, gothic, matcha, stone, and y2k
+  Astryx themes: `ax.BuiltTheme(ax.BundledTheme.MATCHA)` needs no CSS path.
+- Every widget class has a docstring example, and its API reference page shows
+  a screenshot of it. `make docs-screenshots-components` captures them with
+  Playwright.
+- `notebooks/marimo_workbench_fake_agent.py` runs the workbench in marimo.
+  Building a reply's UI there needs a marimo release that runs widget messages
+  as part of the cell that created the widget; marimo 0.25.2 does not.
+
+Fixed:
+
+- `label_hidden` on `NumberInput`, `Slider`, `MultiSelector`, `DateInput`,
+  `DateRangeInput`, `DateTimeInput`, `TimeInput`, and `ComplexSelector` was
+  ignored, so an input inside a `Field` or `InputGroup` repeated its label.
+- In marimo and other hosts without JupyterLab's Lumino stylesheet, inactive
+  tabs of `TabPanel` and the other Lumino panels stayed visible and covered the
+  selected one.
+- `AppShell` no longer stretches to the window height inside a notebook output.
+
 ## 0.5.0
 
 This release lets notebook skills add OpenUI components for their libraries'
