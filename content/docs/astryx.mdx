@@ -83,18 +83,18 @@ then content, inputs, actions, feedback, overlays, and data. Every class lives
 in the `anylumino.astryx` namespace; the module in parentheses is where its API
 reference page is.
 
-| Group                                          | Use for                                                                                                                                       | Components                                                                                                                                                                                                                                                                            |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Foundation and theme (`base`)                  | Define a shared brand, theme a subtree, or wrap an Astryx component that has no Python class yet                                              | `Widget`, `Component`, `Brand`, `BuiltTheme`, `Theme`                                                                                                                                                                                                                                 |
-| Layout panels (`layout`)                       | Structure a notebook UI with the keyed Lumino child API: tabs, one-at-a-time panels, collapsible sections, scrolling, resizable panes, reflow | `TabPanel`, `StackedPanel`, `AccordionPanel`, `ScrollBox`, `SplitPanel`, `ResponsivePanel`                                                                                                                                                                                            |
-| Layout containers (`surfaces`)                 | Arrange content inside a panel or a notebook output                                                                                           | `Stack`, `Grid`, `Center`, `Section`, `Card`, `ClickableCard`, `SelectableCard`, `AspectRatio`, `Divider`, `Collapsible`, `Carousel`                                                                                                                                                  |
-| Typography and content (`inputs`, `data`)      | Headings, body copy, rendered Markdown, code, links, avatars, and small semantic content                                                      | `Text`, `Heading`, `Markdown`, `Code`, `CodeBlock`, `Blockquote`, `Kbd`, `Link`, `Citation`, `Timestamp`, `Thumbnail`, `Avatar`, `AvatarGroup`, `Icon`                                                                                                                                |
-| Forms and direct inputs (`inputs`, `surfaces`) | Direct value entry and form composition                                                                                                       | `FormLayout`, `Field`, `FieldStatus`, `InputGroup`, `TextInput`, `TextArea`, `NumberInput`, `Slider`, `LogSlider`, `SelectionSlider`, `Checkbox`, `Switch`, `ToggleButton`, `ToggleButtonGroup`, `DateInput`, `DateRangeInput`, `DateTimeInput`, `TimeInput`, `Calendar`, `FileInput` |
-| Selection and search (`inputs`, `surfaces`)    | Choose from predefined options or searchable sources                                                                                          | `Selector`, `MultiSelector`, `SegmentedControl`, `RadioList`, `CheckboxList`, `Typeahead`, `Tokenizer`, `PowerSearch`                                                                                                                                                                 |
-| Actions and menus (`inputs`, `surfaces`)       | Command surfaces and button-like interactions                                                                                                 | `Button`, `IconButton`, `ButtonGroup`, `Toolbar`, `DropdownMenu`, `ContextMenu`, `MoreMenu`, `CommandPalette`                                                                                                                                                                         |
-| Feedback and status (`data`)                   | Show state, progress, loading placeholders, or empty results                                                                                  | `Badge`, `StatusDot`, `ProgressBar`, `Spinner`, `Skeleton`, `Token`, `Banner`, `EmptyState`                                                                                                                                                                                           |
-| Overlays and previews (`surfaces`)             | Notebook-safe contextual surfaces; dialogs render inline by default so they stay in the output area                                           | `Tooltip`, `HoverCard`, `Popover`, `Overlay`, `Lightbox`, `Dialog`, `AlertDialog`                                                                                                                                                                                                     |
-| Navigation and data (`surfaces`, `data`)       | Structured navigation and data-heavy notebook views                                                                                           | `Breadcrumbs`, `TabList`, `List`, `MetadataList`, `Outline`, `TreeList`, `Pagination`, `Table`                                                                                                                                                                                        |
+| Group                                          | Use for                                                                                                                                       | Components                                                                                                                                                                                                                                                                                              |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Foundation and theme (`base`)                  | Define a shared brand, theme a subtree, or wrap an Astryx component that has no Python class yet                                              | `Widget`, `Component`, `Brand`, `BuiltTheme`, `Theme`                                                                                                                                                                                                                                                   |
+| Layout panels (`layout`)                       | Structure a notebook UI with the keyed Lumino child API: tabs, one-at-a-time panels, collapsible sections, scrolling, resizable panes, reflow | `TabPanel`, `StackedPanel`, `AccordionPanel`, `ScrollBox`, `SplitPanel`, `ResponsivePanel`                                                                                                                                                                                                              |
+| Layout containers (`surfaces`)                 | Arrange content inside a panel or a notebook output, or frame an app with navigation                                                          | `Stack`, `Grid`, `Center`, `Section`, `Card`, `ClickableCard`, `SelectableCard`, `AspectRatio`, `Divider`, `Collapsible`, `Carousel`, `HStack`, `VStack`, `Layout`, `AppShell`                                                                                                                          |
+| Typography and content (`inputs`, `data`)      | Headings, body copy, rendered Markdown, code, links, avatars, and small semantic content                                                      | `Text`, `Heading`, `Markdown`, `Code`, `CodeBlock`, `Blockquote`, `Kbd`, `Link`, `Citation`, `Timestamp`, `Thumbnail`, `Avatar`, `AvatarGroup`, `Icon`, `RichTextView`, `NavIcon`                                                                                                                       |
+| Forms and direct inputs (`inputs`, `surfaces`) | Direct value entry and form composition                                                                                                       | `FormLayout`, `Field`, `FieldStatus`, `InputGroup`, `TextInput`, `TextArea`, `NumberInput`, `Slider`, `LogSlider`, `SelectionSlider`, `Checkbox`, `Switch`, `ToggleButton`, `ToggleButtonGroup`, `DateInput`, `DateRangeInput`, `DateTimeInput`, `TimeInput`, `Calendar`, `FileInput`, `RichTextEditor` |
+| Selection and search (`inputs`, `surfaces`)    | Choose from predefined options or searchable sources                                                                                          | `Selector`, `MultiSelector`, `SegmentedControl`, `RadioList`, `CheckboxList`, `Typeahead`, `Tokenizer`, `PowerSearch`, `ComplexSelector`                                                                                                                                                                |
+| Actions and menus (`inputs`, `surfaces`)       | Command surfaces and button-like interactions                                                                                                 | `Button`, `IconButton`, `ButtonGroup`, `Toolbar`, `DropdownMenu`, `ContextMenu`, `MoreMenu`, `CommandPalette`, `OverflowList`                                                                                                                                                                           |
+| Feedback and status (`data`, `surfaces`)       | Show state, progress, steps, elapsed time, loading placeholders, empty results, or notifications                                              | `Badge`, `StatusDot`, `ProgressBar`, `Spinner`, `Skeleton`, `Token`, `Banner`, `EmptyState`, `Stepper`, `Timer`, `Indicator`, `Toast`                                                                                                                                                                   |
+| Overlays and previews (`surfaces`)             | Notebook-safe contextual surfaces; dialogs render inline by default so they stay in the output area                                           | `Tooltip`, `HoverCard`, `Popover`, `Overlay`, `Lightbox`, `Dialog`, `AlertDialog`                                                                                                                                                                                                                       |
+| Navigation and data (`surfaces`, `data`)       | Structured navigation and data-heavy notebook views                                                                                           | `Breadcrumbs`, `TabList`, `List`, `MetadataList`, `Outline`, `TreeList`, `Pagination`, `Table`, `SideNav`, `TopNav`                                                                                                                                                                                     |
 
 ### Option values
 
@@ -288,6 +288,48 @@ orders.remove_row("O-1")
 Leave `selects=""` for no checkbox column, use `selects="single"` for one
 selected row, or use `selects="multiple"` for checkbox multi-selection.
 `set_rows(rows)` replaces the whole table with a new snapshot.
+
+## App frames and notifications
+
+`AppShell` frames content with a `TopNav` and a `SideNav`, and `Layout` places
+widgets in header, start, end, and footer regions. Pass a list to a slot to
+stack several widgets in it. A navigation click sets the nav's `value` and runs
+its `on_action` callbacks with the item value:
+
+```python
+toast = ax.Toast(position="bottomEnd")
+page = ax.Text("Overview", text_type="supporting")
+
+top = ax.TopNav(["Orders", "Fills"], "Orders", heading="Trading desk", icon="menu", end=toast)
+side = ax.SideNav(
+    ["Overview", {"type": "section", "title": "Desk", "items": ["Orders", "Fills"]}],
+    "Overview",
+    heading="Paper account",
+)
+side.on_action(lambda _nav, value: setattr(page, "text", value))
+
+steps = ax.Stepper(["Draft", "Review", "Send"], 1, label="Order ticket")
+actions = ax.OverflowList(
+    ["Refresh", "Export CSV", "Cancel all", "Flatten"],
+    max_visible=2,
+    action_callbacks=[lambda _list, action: toast.notify(f"Ran {action}")],
+)
+notes = ax.RichTextEditor("## Plan\n\n- Buy **AAPL** on the open", label="Notes")
+
+ax.AppShell(
+    ax.Layout([steps, actions, notes], header=ax.Heading("Orders", level=3), footer=page),
+    top_nav=top,
+    side_nav=side,
+    height="auto",
+)
+```
+
+`Toast` takes no space. Display it once, inside the app or on its own, then call
+`toast.notify("Filled", type="error")` from any callback; notifications sent
+before it renders are lost. `RichTextEditor` and `RichTextView` exchange
+Markdown, so formatting that Markdown cannot express is dropped when the value
+syncs. `ComplexSelector` shows any widgets in its popup: a callback inside the
+popup sets the selector's `value` and calls `hide()`.
 
 ## Theme identity
 

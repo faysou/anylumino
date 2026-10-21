@@ -1,0 +1,117 @@
+---
+title: "SideNav"
+---
+
+Render Astryx side navigation from item records.
+
+```python
+ax.SideNav(
+    ["Overview", {"type": "section", "title": "Desk", "items": ["Orders", "Fills"]}],
+    "Orders",
+    heading="Paper account",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-SideNav.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="SideNav example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe SideNav props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `collapsible` (boolean or \{defaultIsCollapsed?: boolean, hasButton?: boolean,
+    buttonLabel?: string}): Collapses the navigation to icons.
+  * `resizable` (boolean or \{defaultWidth?: number, minWidth?: number, maxWidth?: number,
+    autoSaveId?: string}): Lets the user drag the navigation width.
+  * `header`, `topContent`, `footer`, `footerIcons` (ReactNode): Slots around the items.
+    The wrapper builds `header` from `heading`, `subheading`, `icon`, and `menu`.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/SideNav](https://astryx.atmeta.com/components/SideNav).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value=None, *, heading=None, subheading=None, icon=None, menu=None, collapsible=None, resizable=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str | None = None,
+        *,
+        heading: str | None = None,
+        subheading: str | None = None,
+        icon: str | None = None,
+        menu: Iterable[Any] | None = None,
+        collapsible: bool | None = None,
+        resizable: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "SideNav",
+            value=value,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                heading=heading,
+                subheading=subheading,
+                icon=icon,
+                menu=_option_records(menu) if menu is not None else None,
+                collapsible=collapsible,
+                resizable=resizable,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item labels or records with `label` and optional `value`, `icon`,
+      `disabled`, and nested `items` keys. A record with
+      `"type": "section"`, a `title`, and `items` groups items under a
+      heading.
+    </PyParameter>
+
+    <PyParameter name="value" type="str | None" value="None">
+      Synchronized value of the selected item. Clicking an item selects it.
+    </PyParameter>
+
+    <PyParameter name="heading" type="str | None" value="None">
+      Title shown above the items.
+    </PyParameter>
+
+    <PyParameter name="subheading" type="str | None" value="None">
+      Text shown under the heading.
+    </PyParameter>
+
+    <PyParameter name="icon" type="str | None" value="None">
+      Astryx icon name shown beside the heading.
+    </PyParameter>
+
+    <PyParameter name="menu" type="Iterable[Any] | None" value="None">
+      Heading menu entries as labels or records with `label` and optional
+      `value`, `description`, and `disabled` keys. A click sends the
+      entry value as an action.
+    </PyParameter>
+
+    <PyParameter name="collapsible" type="bool | None" value="None">
+      Whether a button collapses the navigation to icons.
+    </PyParameter>
+
+    <PyParameter name="resizable" type="bool | None" value="None">
+      Whether the navigation width can be dragged.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

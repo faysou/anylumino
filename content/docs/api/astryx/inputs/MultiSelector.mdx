@@ -4,6 +4,16 @@ title: "MultiSelector"
 
 Render an Astryx selector that accepts multiple values.
 
+```python
+ax.MultiSelector(["Bid", "Ask", "Last", "Size"], value=["Bid", "Ask"], label="Fields", width=260)
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-MultiSelector.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="MultiSelector example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe MultiSelector props forwarded to Astryx.
 
@@ -57,7 +67,7 @@ Render an Astryx selector that accepts multiple values.
 
 ## Functions
 
-<PyFunction name="__init__" type="(items, value=(), *, label='', label_position='top', label_width=None, disabled=False, placeholder=None, size=None, loading=None, clear=None, select_all=None, search=None, trigger_display=None, max_badges=None, description=None, status=None, **props) -> None" kind="constructor">
+<PyFunction name="__init__" type="(items, value=(), *, label='', label_hidden=None, label_position='top', label_width=None, disabled=False, placeholder=None, size=None, loading=None, clear=None, select_all=None, search=None, trigger_display=None, max_badges=None, description=None, status=None, **props) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -66,6 +76,7 @@ Render an Astryx selector that accepts multiple values.
         value: Iterable[str] = (),
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         disabled: bool = False,
@@ -93,6 +104,7 @@ Render an Astryx selector that accepts multiple values.
                 props,
                 label_position,
                 label_width,
+                isLabelHidden=label_hidden,
                 options=_option_records(items),
                 placeholder=placeholder,
                 size=size,
@@ -120,6 +132,10 @@ Render an Astryx selector that accepts multiple values.
 
     <PyParameter name="label" type="str" value="''">
       Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
     </PyParameter>
 
     <PyParameter name="label_position" type="LabelPosition | str" value="'top'">

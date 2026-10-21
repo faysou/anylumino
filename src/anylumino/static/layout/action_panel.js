@@ -271,12 +271,6 @@ function createCommandPalette(model, activate) {
 }
 
 export default {
-  initialize({ model }) {
-    return {
-      getActionKind: () => model.get("action_kind"),
-    };
-  },
-
   render({ model, el, signal }) {
     const root = document.createElement("div");
     root.className = `anylumino-ActionHost anylumino-${model.get("action_kind")}Host`;

@@ -44,6 +44,18 @@ class ToolCallStatus(StrEnum):
 class Chat(Widget):
     """Render a chat thread and composer from a Python-owned message list.
 
+    Examples
+    --------
+    ```python
+    ax.Chat(
+        [
+            {"role": "user", "content": "Summarize today's fills."},
+            {"role": "assistant", "content": "12 fills, **+312.40** realized P&L."},
+        ],
+        height=260,
+    )
+    ```
+
     Parameters
     ----------
     messages : Iterable[Mapping[str, Any]], default ()

@@ -4,6 +4,19 @@ title: "ResponsivePanel"
 
 Astryx stack that switches direction when its width crosses a breakpoint.
 
+```python
+ax.ResponsivePanel(
+    [ax.Card(ax.Text("Controls"), padding=3), ax.Card(ax.Text("Chart"), padding=3)],
+    breakpoint=600,
+)
+```
+
+import screenshot from '../../../assets/components/astryx-layout-ResponsivePanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="ResponsivePanel example rendered in JupyterLab" />
+</figure>
+
 ## Functions
 
 <PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, breakpoint=760, wide_direction='horizontal', narrow_direction='vertical', gap=2, width=None, height=None, **props) -> None" kind="constructor">

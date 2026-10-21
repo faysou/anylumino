@@ -4,6 +4,16 @@ title: "CodeBlock"
 
 Render syntax-highlighted code with Astryx styling.
 
+```python
+ax.CodeBlock("total = sum(fill.qty for fill in fills)", language="python")
+```
+
+import screenshot from '../../../assets/components/astryx-data-CodeBlock.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="CodeBlock example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe CodeBlock props forwarded to Astryx.
 

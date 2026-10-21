@@ -1,0 +1,164 @@
+---
+title: "Toast"
+---
+
+Show Astryx toast notifications from Python.
+
+Display the widget once, then call :meth:`notify`. The widget itself takes
+no space; toasts stack in a corner of the browser window. Notifications
+sent before the widget renders are dropped.
+
+```python
+ax.Toast(position="bottomEnd")
+```
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe toast viewport props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `position` ('topEnd' or 'topStart' or 'bottomEnd' or 'bottomStart'; default 'bottomEnd'):
+    Window corner the toasts stack in.
+  * `maxVisible` (number; default 5): Most toasts shown at once.
+  * `inset` (\{top, bottom, start, end: number}): Extra distance from the window edges.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Toast](https://astryx.atmeta.com/components/Toast).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(*, position=None, max_visible=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        *,
+        position: ToastPosition | str | None = None,
+        max_visible: int | None = None,
+        **props: Any,
+    ) -> None:
+        position = optional_choice(position, ToastPosition, "position")
+        super().__init__(
+            "Toast",
+            props=_named_props(props, position=position, maxVisible=max_visible),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="position" type="ToastPosition | str | None" value="None">
+      Window corner the toasts stack in.
+    </PyParameter>
+
+    <PyParameter name="max_visible" type="int | None" value="None">
+      Most toasts shown at once; older ones queue.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="notify" type="(body, *, type=ToastType.INFO, auto_hide=None, duration=None, toast_id=None) -> str">
+  Show a toast and return its identifier.
+
+  <PySourceCode>
+    ```python
+    def notify(
+        self,
+        body: str,
+        *,
+        type: ToastType | str = ToastType.INFO,
+        auto_hide: bool | None = None,
+        duration: int | None = None,
+        toast_id: str | None = None,
+    ) -> str:
+        """Show a toast and return its identifier.
+
+        Parameters
+        ----------
+        body : str
+            Message text.
+        type : ToastType | str, default 'info'
+            Info or error styling.
+        auto_hide : bool | None, default None
+            Whether the toast hides itself. Astryx hides info toasts and keeps
+            error toasts by default.
+        duration : int | None, default None
+            Milliseconds before an auto-hiding toast hides, 5000 by default.
+        toast_id : str | None, default None
+            Identifier for :meth:`dismiss`. A toast with the identifier of one
+            still shown replaces it.
+
+        Returns
+        -------
+        str
+            The toast identifier.
+        """
+        toast_id = toast_id or uuid4().hex
+        self.send(
+            {
+                "type": "toast",
+                "id": toast_id,
+                "body": body,
+                "toast_type": choice(type, ToastType, "type"),
+                "auto_hide": auto_hide,
+                "duration": duration,
+            }
+        )
+
+        return toast_id
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="body" type="str">
+      Message text.
+    </PyParameter>
+
+    <PyParameter name="type" type="ToastType | str" value="'info'">
+      Info or error styling.
+    </PyParameter>
+
+    <PyParameter name="auto_hide" type="bool | None" value="None">
+      Whether the toast hides itself. Astryx hides info toasts and keeps
+      error toasts by default.
+    </PyParameter>
+
+    <PyParameter name="duration" type="int | None" value="None">
+      Milliseconds before an auto-hiding toast hides, 5000 by default.
+    </PyParameter>
+
+    <PyParameter name="toast_id" type="str | None" value="None">
+      Identifier for :meth:`dismiss`. A toast with the identifier of one
+      still shown replaces it.
+    </PyParameter>
+  </div>
+
+  <PyFunctionReturn type="str">
+    The toast identifier.
+  </PyFunctionReturn>
+</PyFunction>
+
+<PyFunction name="dismiss" type="(toast_id) -> None">
+  Hide the toast shown with `toast_id`.
+
+  <PySourceCode>
+    ```python
+    def dismiss(self, toast_id: str) -> None:
+        """Hide the toast shown with ``toast_id``."""
+        self.send({"type": "toast-dismiss", "id": toast_id})
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="toast_id" type="str" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

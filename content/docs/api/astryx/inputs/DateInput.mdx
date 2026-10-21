@@ -4,6 +4,16 @@ title: "DateInput"
 
 Render an Astryx date input.
 
+```python
+ax.DateInput("2026-10-21", label="Trade date", width=200)
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-DateInput.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="DateInput example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe DateInput props forwarded to Astryx.
 
@@ -47,7 +57,7 @@ Render an Astryx date input.
 
 ## Functions
 
-<PyFunction name="__init__" type="(value=None, *, label='', disabled=False, min=None, max=None, placeholder=None, size=None, clear=None, number_of_months=None, **props) -> None" kind="constructor">
+<PyFunction name="__init__" type="(value=None, *, label='', label_hidden=None, disabled=False, min=None, max=None, placeholder=None, size=None, clear=None, number_of_months=None, **props) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -55,6 +65,7 @@ Render an Astryx date input.
         value: str | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: str | None = None,
         max: str | None = None,
@@ -72,6 +83,7 @@ Render an Astryx date input.
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 placeholder=placeholder,
@@ -90,6 +102,10 @@ Render an Astryx date input.
 
     <PyParameter name="label" type="str" value="''">
       Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
     </PyParameter>
 
     <PyParameter name="disabled" type="bool" value="False">

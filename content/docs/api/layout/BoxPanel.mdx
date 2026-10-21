@@ -8,6 +8,20 @@ Lumino box layout with configurable direction, spacing, and stretch.
 `scroll=True` to enable scrolling along the natural box direction, or use
 `scroll_x` and `scroll_y` for explicit overflow behavior.
 
+```python
+al.BoxPanel(
+    [ax.Card(ax.Text("Quotes"), padding=3), ax.Card(ax.Text("Trades"), padding=3)],
+    direction="left-to-right",
+    height=120,
+)
+```
+
+import screenshot from '../../assets/components/layout-BoxPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="BoxPanel example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Notes" type="note">
   A scrolling panel establishes an overflow boundary. Hosts that cap output
   height, such as VS Code notebooks, then show a scrollbar inside a scrollbar,

@@ -24,6 +24,12 @@ class TabPanel(Widget):
     ``selected_index`` to choose the active tab. A child panel mounts the first
     time its tab is selected and stays mounted, hidden, afterwards.
 
+    Examples
+    --------
+    ```python
+    ax.TabPanel({"orders": ax.Text("3 open orders"), "fills": ax.Text("12 fills today")}, size="sm")
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -109,6 +115,12 @@ class StackedPanel(Widget):
     A child mounts the first time it is selected and stays mounted, hidden,
     afterwards, so switching back keeps its state.
 
+    Examples
+    --------
+    ```python
+    ax.StackedPanel({"summary": ax.Text("Summary view"), "detail": ax.Text("Detail view")})
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -163,6 +175,15 @@ class AccordionPanel(Widget):
 
     The open sections live in ``value``: a child key when ``multiple`` is
     ``False`` and a list of child keys otherwise.
+
+    Examples
+    --------
+    ```python
+    ax.AccordionPanel(
+        {"orders": ax.Text("3 open orders"), "fills": ax.Text("12 fills today")},
+        open=["orders"],
+    )
+    ```
 
     Parameters
     ----------
@@ -261,6 +282,12 @@ class AccordionPanel(Widget):
 class ScrollBox(Widget):
     """Astryx scrollable area holding a vertical stack of children.
 
+    Examples
+    --------
+    ```python
+    ax.ScrollBox([ax.Text(f"Fill {index}") for index in range(1, 21)], height=140)
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -337,6 +364,16 @@ class SplitPanel(Widget):
     sync the fractions back to Python, and assigning ``sizes`` resizes the
     panes.
 
+    Examples
+    --------
+    ```python
+    ax.SplitPanel(
+        {"controls": ax.Text("Controls"), "chart": ax.Text("Chart")},
+        sizes=[0.3, 0.7],
+        height=120,
+    )
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -397,6 +434,15 @@ class SplitPanel(Widget):
 
 class ResponsivePanel(Widget):
     """Astryx stack that switches direction when its width crosses a breakpoint.
+
+    Examples
+    --------
+    ```python
+    ax.ResponsivePanel(
+        [ax.Card(ax.Text("Controls"), padding=3), ax.Card(ax.Text("Chart"), padding=3)],
+        breakpoint=600,
+    )
+    ```
 
     Parameters
     ----------

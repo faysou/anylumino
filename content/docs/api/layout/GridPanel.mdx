@@ -4,6 +4,20 @@ title: "GridPanel"
 
 CSS grid-backed Lumino panel for placing children in grid cells.
 
+```python
+al.GridPanel(
+    [ax.Card(ax.Text(name), padding=3) for name in ("Quotes", "Trades", "Depth", "News")],
+    columns="1fr 1fr",
+    height=180,
+)
+```
+
+import screenshot from '../../assets/components/layout-GridPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="GridPanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

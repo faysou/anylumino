@@ -1,0 +1,105 @@
+---
+title: "Stepper"
+---
+
+Render Astryx progress through ordered steps.
+
+```python
+ax.Stepper(["Draft", "Review", "Send"], 1, label="Order ticket")
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Stepper.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Stepper example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Stepper props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `activeStep` (number; required): Zero-based index of the active step.
+  * `orientation` ('horizontal' or 'vertical'; default 'horizontal'): Layout direction.
+  * `label` (string; default 'Progress'): Accessible label.
+  * `density` ('compact' or 'balanced' or 'spacious'; default 'balanced'): Spacing between steps.
+  * `indicatorPosition` ('separated' or 'on-track'; default 'separated'): Whether indicators sit
+    apart from the track or on it.
+  * `horizontalOptions` (\{minimumStepWidth: number, collapsedVariant: 'withLabelAndControls'
+    or 'withLabel' or 'hiddenLabel'}): How a horizontal stepper collapses when steps do not fit.
+  * `onStepClick` ((index: number) => void): Enables non-linear navigation. The wrapper sets it
+    when `navigable` is true.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Stepper](https://astryx.atmeta.com/components/Stepper).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value=0, *, label=None, orientation=None, density=None, navigable=False, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: int = 0,
+        *,
+        label: str | None = None,
+        orientation: Orientation | str | None = None,
+        density: Density | str | None = None,
+        navigable: bool = False,
+        **props: Any,
+    ) -> None:
+        orientation = optional_choice(orientation, Orientation, "orientation")
+        density = optional_choice(density, Density, "density")
+        super().__init__(
+            "Stepper",
+            value=value,
+            label=label or "",
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                label=label,
+                orientation=orientation,
+                density=density,
+                isNavigable=navigable,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Step labels or records with `label` and optional `description`,
+      `status` ('accent', 'success', 'warning', or 'error'),
+      `disabled`, and `optional` keys.
+    </PyParameter>
+
+    <PyParameter name="value" type="int" value="0">
+      Synchronized zero-based index of the active step.
+    </PyParameter>
+
+    <PyParameter name="label" type="str | None" value="None">
+      Accessible label of the stepper.
+    </PyParameter>
+
+    <PyParameter name="orientation" type="Orientation | str | None" value="None">
+      Horizontal or vertical layout.
+    </PyParameter>
+
+    <PyParameter name="density" type="Density | str | None" value="None">
+      Spacing between steps.
+    </PyParameter>
+
+    <PyParameter name="navigable" type="bool" value="False">
+      Whether clicking a step makes it active.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -39,6 +39,12 @@ from .enums import ValueDisplay
 class Text(Widget):
     """Render themed Astryx body text.
 
+    Examples
+    --------
+    ```python
+    ax.Text("Orders refresh every 5 seconds", text_type="supporting")
+    ```
+
     Parameters
     ----------
     text : str
@@ -154,6 +160,12 @@ class Text(Widget):
 class Heading(Widget):
     """Render a semantic Astryx heading.
 
+    Examples
+    --------
+    ```python
+    ax.Heading("Daily P&L", level=2)
+    ```
+
     Parameters
     ----------
     text : str
@@ -255,6 +267,12 @@ class Heading(Widget):
 class Badge(Widget):
     """Render a compact status or category badge.
 
+    Examples
+    --------
+    ```python
+    ax.Badge("Filled", variant="success")
+    ```
+
     Parameters
     ----------
     label : str
@@ -292,6 +310,12 @@ class Badge(Widget):
 
 class Button(Widget):
     """Render an Astryx push button.
+
+    Examples
+    --------
+    ```python
+    ax.Button("Submit order", variant="primary")
+    ```
 
     Parameters
     ----------
@@ -383,6 +407,12 @@ class Button(Widget):
 class IconButton(Widget):
     """Render an icon-only Astryx button.
 
+    Examples
+    --------
+    ```python
+    ax.IconButton("Refresh", icon="search", variant="secondary")
+    ```
+
     Parameters
     ----------
     label : str
@@ -460,6 +490,12 @@ class IconButton(Widget):
 class ToggleButton(Widget):
     """Render a two-state Astryx toggle button.
 
+    Examples
+    --------
+    ```python
+    ax.ToggleButton(True, label="Pinned")
+    ```
+
     Parameters
     ----------
     value : bool, default False
@@ -535,6 +571,12 @@ class ToggleButton(Widget):
 
 class TextInput(Widget):
     """Render a single-line Astryx text input.
+
+    Examples
+    --------
+    ```python
+    ax.TextInput("AAPL", label="Symbol", placeholder="Ticker", width=220)
+    ```
 
     Parameters
     ----------
@@ -673,6 +715,12 @@ class TextInput(Widget):
 class TextArea(Widget):
     """Render a multiline Astryx text area.
 
+    Examples
+    --------
+    ```python
+    ax.TextArea("Watch the closing auction", label="Notes", rows=3, width=320)
+    ```
+
     Parameters
     ----------
     value : str, default ''
@@ -808,12 +856,20 @@ class TextArea(Widget):
 class NumberInput(Widget):
     """Render an Astryx numeric input.
 
+    Examples
+    --------
+    ```python
+    ax.NumberInput(100, label="Quantity", min=0, max=1000, step=10, units="sh", width=200)
+    ```
+
     Parameters
     ----------
     value : int | float | None
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
     disabled : bool, default False
         Whether the component should render disabled.
     min : int | float | None, default None
@@ -894,6 +950,7 @@ class NumberInput(Widget):
         value: int | float | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: int | float | None = None,
         max: int | float | None = None,
@@ -916,6 +973,7 @@ class NumberInput(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 step=step,
@@ -934,12 +992,20 @@ class NumberInput(Widget):
 class Slider(Widget):
     """Render an Astryx slider control.
 
+    Examples
+    --------
+    ```python
+    ax.Slider(40, label="Risk budget", min=0, max=100, width=280)
+    ```
+
     Parameters
     ----------
     value : int | float | tuple[int | float, int | float] | list[int | float], default 0
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
     label_position : LabelPosition | str, default 'top'
         Place the label above the slider or beside it in a compact row.
     label_width : int | float | str | None, default None
@@ -1012,6 +1078,7 @@ class Slider(Widget):
         value: int | float | tuple[int | float, int | float] | list[int | float] = 0,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         disabled: bool = False,
@@ -1037,6 +1104,7 @@ class Slider(Widget):
                 props,
                 label_position,
                 label_width,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 step=step,
@@ -1056,6 +1124,19 @@ class PowerSearch(Widget):
     holds the current filter records, each ``{"field": ..., "operator": ...,
     "value": ...}``. Both are plain JSON, matching how :class:`Table` and
     :class:`TreeList` take their data.
+
+    Examples
+    --------
+    ```python
+    ax.PowerSearch(
+        {
+            "name": "orders",
+            "fields": [{"key": "symbol", "label": "Symbol", "operators": [{"key": "is", "label": "is"}]}],
+        },
+        filters=[{"field": "symbol", "operator": "is", "value": "AAPL"}],
+        label="Filter orders",
+    )
+    ```
 
     Parameters
     ----------
@@ -1123,6 +1204,12 @@ class LogSlider(Widget):
     Astryx ``Slider`` steps linearly, so this wrapper drives it in exponent
     space and synchronizes ``base ** exponent`` as the value. Everything else,
     including ``continuous_update``, behaves like :class:`Slider`.
+
+    Examples
+    --------
+    ```python
+    ax.LogSlider(100, label="Notional", min_exponent=0, max_exponent=6, width=280)
+    ```
 
     Parameters
     ----------
@@ -1199,6 +1286,12 @@ class SelectionSlider(Widget):
     over option indices and synchronizes the selected option value. Pass a
     two-item ``value`` to select a range instead of a single option.
 
+    Examples
+    --------
+    ```python
+    ax.SelectionSlider(["1m", "5m", "15m", "1h", "1d"], value="15m", label="Bar size", marks=True, width=280)
+    ```
+
     Parameters
     ----------
     items : Iterable[Any] | Mapping[str, Any]
@@ -1272,6 +1365,12 @@ class SelectionSlider(Widget):
 
 class Checkbox(Widget):
     """Render an Astryx checkbox input.
+
+    Examples
+    --------
+    ```python
+    ax.Checkbox(True, label="Urgent")
+    ```
 
     Parameters
     ----------
@@ -1375,6 +1474,12 @@ class Checkbox(Widget):
 class Switch(Widget):
     """Render an Astryx switch for binary settings.
 
+    Examples
+    --------
+    ```python
+    ax.Switch(True, label="Live data")
+    ```
+
     Parameters
     ----------
     value : bool, default False
@@ -1476,6 +1581,12 @@ class Switch(Widget):
 
 class Selector(Widget):
     """Render a single-value Astryx selector.
+
+    Examples
+    --------
+    ```python
+    ax.Selector(["Smart", "Primary", "Dark"], value="Smart", label="Routing", width=220)
+    ```
 
     Parameters
     ----------
@@ -1594,6 +1705,12 @@ class Selector(Widget):
 class MultiSelector(Widget):
     """Render an Astryx selector that accepts multiple values.
 
+    Examples
+    --------
+    ```python
+    ax.MultiSelector(["Bid", "Ask", "Last", "Size"], value=["Bid", "Ask"], label="Fields", width=260)
+    ```
+
     Parameters
     ----------
     items : Iterable[Any] | Mapping[str, Any]
@@ -1602,6 +1719,8 @@ class MultiSelector(Widget):
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
     label_position : LabelPosition | str, default 'top'
         Place the label above the control or beside it in a compact row.
     label_width : int | float | str | None, default None
@@ -1689,6 +1808,7 @@ class MultiSelector(Widget):
         value: Iterable[str] = (),
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         label_position: LabelPosition | str = "top",
         label_width: int | float | str | None = None,
         disabled: bool = False,
@@ -1716,6 +1836,7 @@ class MultiSelector(Widget):
                 props,
                 label_position,
                 label_width,
+                isLabelHidden=label_hidden,
                 options=_option_records(items),
                 placeholder=placeholder,
                 size=size,
@@ -1750,12 +1871,20 @@ def _label_props(
 class DateInput(Widget):
     """Render an Astryx date input.
 
+    Examples
+    --------
+    ```python
+    ax.DateInput("2026-10-21", label="Trade date", width=200)
+    ```
+
     Parameters
     ----------
     value : str | None
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
     disabled : bool, default False
         Whether the input is disabled.
     min : str | None, default None
@@ -1820,6 +1949,7 @@ class DateInput(Widget):
         value: str | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: str | None = None,
         max: str | None = None,
@@ -1837,6 +1967,7 @@ class DateInput(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 placeholder=placeholder,
@@ -1850,12 +1981,20 @@ class DateInput(Widget):
 class TimeInput(Widget):
     """Render an Astryx time input.
 
+    Examples
+    --------
+    ```python
+    ax.TimeInput("14:30", label="Cutoff", hour_format="24h", width=160)
+    ```
+
     Parameters
     ----------
     value : str | None
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
     disabled : bool, default False
         Whether the input is disabled.
     min : str | None, default None
@@ -1931,6 +2070,7 @@ class TimeInput(Widget):
         value: str | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: str | None = None,
         max: str | None = None,
@@ -1951,6 +2091,7 @@ class TimeInput(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 hasSeconds=seconds,
@@ -1966,12 +2107,20 @@ class TimeInput(Widget):
 class DateTimeInput(Widget):
     """Render an Astryx date-time input.
 
+    Examples
+    --------
+    ```python
+    ax.DateTimeInput("2026-10-21T14:30", label="Fill time", width=260)
+    ```
+
     Parameters
     ----------
     value : str | None
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
     disabled : bool, default False
         Whether the input is disabled.
     min : str | None, default None
@@ -2048,6 +2197,7 @@ class DateTimeInput(Widget):
         value: str | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: str | None = None,
         max: str | None = None,
@@ -2066,6 +2216,7 @@ class DateTimeInput(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 hasSeconds=seconds,
@@ -2080,12 +2231,20 @@ class DateTimeInput(Widget):
 class DateRangeInput(Widget):
     """Render an Astryx date-range input.
 
+    Examples
+    --------
+    ```python
+    ax.DateRangeInput({"start": "2026-10-01", "end": "2026-10-21"}, label="Period", width=280)
+    ```
+
     Parameters
     ----------
     value : Mapping[str, str] | None
         Synchronized component value.
     label : str, default ''
         Visible or accessible label for the component.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
     disabled : bool, default False
         Whether the input is disabled.
     min : str | None, default None
@@ -2151,6 +2310,7 @@ class DateRangeInput(Widget):
         value: Mapping[str, str] | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: str | None = None,
         max: str | None = None,
@@ -2169,6 +2329,7 @@ class DateRangeInput(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 presets=list(presets) if presets is not None else None,
@@ -2176,5 +2337,122 @@ class DateRangeInput(Widget):
                 placeholder=placeholder,
                 size=size,
                 numberOfMonths=number_of_months,
+            ),
+        )
+
+
+class RichTextEditor(Widget):
+    """Render an Astryx rich text editor whose value syncs as Markdown.
+
+    Examples
+    --------
+    ```python
+    ax.RichTextEditor("## Plan\\n\\n- Buy **AAPL** on the open", label="Notes")
+    ```
+
+    Parameters
+    ----------
+    value : str, default ''
+        Synchronized Markdown content. Formatting Markdown cannot express is
+        dropped when the value syncs.
+    label : str
+        Visible or accessible label for the component.
+    placeholder : str | None, default None
+        Placeholder text shown when the editor is empty.
+    disabled : bool, default False
+        Whether the component should render disabled.
+    read_only : bool | None, default None
+        Whether the content can be selected but not edited.
+    toolbar : bool, default True
+        Whether to show the formatting toolbar.
+    size : Size | str | None, default None
+        Editor size.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
+    description : str | None, default None
+        Helper text displayed with the editor.
+    optional : bool | None, default None
+        Whether to mark the field optional.
+    required : bool | None, default None
+        Whether to mark the field required.
+    min_height : int | float | str | None, default None
+        Minimum height of the editable surface.
+    max_length : int | None, default None
+        Maximum length shown by the character counter. Astryx does not enforce it.
+    status : Mapping[str, Any] | None, default None
+        Validation status record.
+    **props : Any
+        JSON-safe RichTextEditor props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe RichTextEditor props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``label`` (string; required): Accessible label for the editor.
+    - ``isLabelHidden`` (boolean): Visually hides the label.
+    - ``description`` (string): Helper text below the label.
+    - ``isOptional`` (boolean): Marks the field optional.
+    - ``isRequired`` (boolean): Marks the field required.
+    - ``placeholder`` (string): Text shown while the editor is empty.
+    - ``isReadOnly`` (boolean): Allows selection but not editing.
+    - ``isDisabled`` (boolean): Disables the editor.
+    - ``status`` ({type: 'error' or 'warning' or 'success', message?: string}): Validation status.
+    - ``statusVariant`` ('attached' or 'detached' or 'tooltip'): Where the status message shows.
+    - ``width`` (number or string): Editor width.
+    - ``minHeight`` (number or string; default '4.5rem'): Minimum height of the editable surface.
+    - ``size`` ('sm' or 'md' or 'lg'): Editor size.
+    - ``hasMarkdownShortcuts`` (boolean; default true): Converts typed Markdown such as ``# `` and
+      ``**`` into formatting.
+    - ``hasAutoFocus`` (boolean): Focuses the editor on mount.
+    - ``maxLength`` (number): Character counter limit; not enforced.
+    - ``namespace`` (string; default 'astryx-editor'): Lexical editor namespace.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/RichTextEditor>.
+    """
+
+    def __init__(
+        self,
+        value: str = "",
+        *,
+        label: str,
+        placeholder: str | None = None,
+        disabled: bool = False,
+        read_only: bool | None = None,
+        toolbar: bool = True,
+        size: Size | str | None = None,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        optional: bool | None = None,
+        required: bool | None = None,
+        min_height: int | float | str | None = None,
+        max_length: int | None = None,
+        status: Mapping[str, Any] | None = None,
+        **props: Any,
+    ) -> None:
+        size = optional_choice(size, Size, "size")
+        super().__init__(
+            "RichTextEditor",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                placeholder=placeholder,
+                isReadOnly=read_only,
+                hasToolbar=toolbar,
+                size=size,
+                isLabelHidden=label_hidden,
+                description=description,
+                isOptional=optional,
+                isRequired=required,
+                minHeight=min_height,
+                maxLength=max_length,
+                status=status,
             ),
         )

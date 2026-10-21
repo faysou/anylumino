@@ -5,7 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Mapping
+from datetime import datetime
 from typing import Any
+from uuid import uuid4
 
 import traitlets as t
 from anylumino.enums import choice
@@ -29,6 +31,8 @@ from .enums import Density
 from .enums import Display
 from .enums import IconColor
 from .enums import IconSize
+from .enums import IndicatorKind
+from .enums import IndicatorState
 from .enums import Selects
 from .enums import Size
 from .enums import SortDirection
@@ -36,13 +40,25 @@ from .enums import SpinnerShade
 from .enums import StatusVariant
 from .enums import TableDividers
 from .enums import TextOverflow
+from .enums import TimerFormat
 from .enums import TimestampFormat
+from .enums import ToastPosition
+from .enums import ToastType
 from .enums import TokenColor
 from .enums import VerticalAlign
 
 
 class Table(Widget):
     """Render a data-driven Astryx table for notebook use.
+
+    Examples
+    --------
+    ```python
+    ax.Table(
+        [{"symbol": "AAPL", "qty": 120, "pnl": 312.4}, {"symbol": "MSFT", "qty": -40, "pnl": -86.0}],
+        {"symbol": "Symbol", "qty": "Qty", "pnl": "P&L"},
+    )
+    ```
 
     Parameters
     ----------
@@ -411,6 +427,12 @@ class Table(Widget):
 class EmptyState(Widget):
     """Render an Astryx empty-state message.
 
+    Examples
+    --------
+    ```python
+    ax.EmptyState("No rejected orders", description="Rejected orders appear here.")
+    ```
+
     Parameters
     ----------
     title : str
@@ -475,6 +497,12 @@ class EmptyState(Widget):
 
 class Banner(Widget):
     """Render an Astryx banner for prominent status messages.
+
+    Examples
+    --------
+    ```python
+    ax.Banner("Market data connected", status="success", description="Quotes stream from 3 venues.")
+    ```
 
     Parameters
     ----------
@@ -565,6 +593,12 @@ class Pagination(Widget):
     given, choosing a new page size arrives through ``on_action`` rather than
     ``value``, so the page number stays the synchronized state.
 
+    Examples
+    --------
+    ```python
+    ax.Pagination(2, total_items=120, page_size=20)
+    ```
+
     Parameters
     ----------
     page : int, default 1
@@ -641,6 +675,12 @@ class StatusDot(Widget):
     the label never appears as visible text. Pair the dot with a ``Text``
     widget in a horizontal ``Stack`` when the status needs a visible caption.
 
+    Examples
+    --------
+    ```python
+    ax.StatusDot("Connected", variant="success")
+    ```
+
     Parameters
     ----------
     label : str
@@ -696,6 +736,12 @@ class StatusDot(Widget):
 
 class ProgressBar(Widget):
     """Render an Astryx progress bar.
+
+    Examples
+    --------
+    ```python
+    ax.ProgressBar(58, label="Backfill", variant="success", value_label=True, width=280)
+    ```
 
     Parameters
     ----------
@@ -779,6 +825,12 @@ class ProgressBar(Widget):
 class Spinner(Widget):
     """Render an Astryx loading spinner.
 
+    Examples
+    --------
+    ```python
+    ax.Spinner(label="Loading fills")
+    ```
+
     Parameters
     ----------
     label : str, default 'Loading'
@@ -834,6 +886,12 @@ class Spinner(Widget):
 class Skeleton(Widget):
     """Render an Astryx skeleton placeholder.
 
+    Examples
+    --------
+    ```python
+    ax.Skeleton(width=200, height=16)
+    ```
+
     Parameters
     ----------
     width : int | str, default '100%'
@@ -884,6 +942,12 @@ class Skeleton(Widget):
 
 class Token(Widget):
     """Render an Astryx token or chip.
+
+    Examples
+    --------
+    ```python
+    ax.Token("paper", color="blue")
+    ```
 
     Parameters
     ----------
@@ -983,6 +1047,12 @@ class Token(Widget):
 class Kbd(Widget):
     """Render keyboard shortcut text with Astryx styling.
 
+    Examples
+    --------
+    ```python
+    ax.Kbd("mod+enter")
+    ```
+
     Parameters
     ----------
     keys : str
@@ -1018,6 +1088,12 @@ class Kbd(Widget):
 
 class Link(Widget):
     """Render an Astryx text link.
+
+    Examples
+    --------
+    ```python
+    ax.Link("Open the run report", href="#")
+    ```
 
     Parameters
     ----------
@@ -1141,6 +1217,12 @@ class Link(Widget):
 class Avatar(Widget):
     """Render an Astryx avatar.
 
+    Examples
+    --------
+    ```python
+    ax.Avatar("Ada Lovelace")
+    ```
+
     Parameters
     ----------
     name : str
@@ -1203,6 +1285,12 @@ class Avatar(Widget):
 class Icon(Widget):
     """Render an Astryx icon by name.
 
+    Examples
+    --------
+    ```python
+    ax.Icon("check", size="md", color="success")
+    ```
+
     Parameters
     ----------
     icon : str
@@ -1254,6 +1342,12 @@ class Icon(Widget):
 
 class Thumbnail(Widget):
     """Render an Astryx thumbnail image or placeholder.
+
+    Examples
+    --------
+    ```python
+    ax.Thumbnail(src="https://picsum.photos/id/1015/160/90", alt="River valley", label="valley.jpg")
+    ```
 
     Parameters
     ----------
@@ -1339,6 +1433,12 @@ class Thumbnail(Widget):
 
 class CodeBlock(Widget):
     """Render syntax-highlighted code with Astryx styling.
+
+    Examples
+    --------
+    ```python
+    ax.CodeBlock("total = sum(fill.qty for fill in fills)", language="python")
+    ```
 
     Parameters
     ----------
@@ -1466,6 +1566,12 @@ class CodeBlock(Widget):
 class Markdown(Widget):
     """Render Markdown content through Astryx.
 
+    Examples
+    --------
+    ```python
+    ax.Markdown("**Filled** 100 AAPL at `184.50`\\n\\n- venue: XNAS\\n- fee: 0.35")
+    ```
+
     Parameters
     ----------
     text : str
@@ -1580,6 +1686,12 @@ class Markdown(Widget):
 class Blockquote(Widget):
     """Render quoted text with Astryx blockquote styling.
 
+    Examples
+    --------
+    ```python
+    ax.Blockquote("Cut losses early and let winners run.")
+    ```
+
     Parameters
     ----------
     text : str
@@ -1613,6 +1725,12 @@ class Blockquote(Widget):
 
 class Timestamp(Widget):
     """Render a timestamp value with Astryx formatting.
+
+    Examples
+    --------
+    ```python
+    ax.Timestamp("2026-10-21T14:30:00Z", format="system_date_time")
+    ```
 
     Parameters
     ----------
@@ -1700,3 +1818,317 @@ class Timestamp(Widget):
                 weight=weight,
             ),
         )
+
+
+class Timer(Widget):
+    """Render an Astryx timer that counts up from a start time.
+
+    Examples
+    --------
+    ```python
+    ax.Timer(format="clock")
+    ```
+
+    Parameters
+    ----------
+    start_time : datetime | int | float | None, default None
+        Start of the count as a ``datetime`` or Unix milliseconds. ``None``
+        counts from when the widget renders.
+    format : TimerFormat | str | None, default None
+        Elapsed ``"1h 2m 3s"`` or clock ``"01:02:03"`` text.
+    text_type : str | None, default None
+        Semantic text type.
+    size : str | None, default None
+        Explicit text-size override.
+    color : str | None, default None
+        Text color.
+    weight : str | None, default None
+        Font weight override.
+    **props : Any
+        JSON-safe Timer props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe Timer props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``startTime`` (number): Unix milliseconds the timer counts from. Omit it to count from mount.
+    - ``format`` ('elapsed' or 'clock'; default 'elapsed'): Elapsed duration text or a clock
+      readout.
+    - ``type`` (TextType; default 'supporting'): Semantic text type.
+    - ``size`` (TextSize): Explicit font size override.
+    - ``color`` (TextColor; default 'secondary'): Text color.
+    - ``weight`` (TextWeight): Font weight override.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Timer>.
+    """
+
+    def __init__(
+        self,
+        start_time: datetime | int | float | None = None,
+        *,
+        format: TimerFormat | str | None = None,
+        text_type: str | None = None,
+        size: str | None = None,
+        color: str | None = None,
+        weight: str | None = None,
+        **props: Any,
+    ) -> None:
+        format = optional_choice(format, TimerFormat, "format")
+        if isinstance(start_time, datetime):
+            start_time = start_time.timestamp() * 1000
+
+        super().__init__(
+            "Timer",
+            props=_named_props(
+                props,
+                startTime=start_time,
+                format=format,
+                type=text_type,
+                size=size,
+                color=color,
+                weight=weight,
+            ),
+        )
+
+
+class Indicator(Widget):
+    """Render a decorative Astryx check, checkbox, or radio mark.
+
+    Examples
+    --------
+    ```python
+    ax.Indicator("indeterminate", kind="checkbox")
+    ```
+
+    Parameters
+    ----------
+    value : IndicatorState | str, default 'checked'
+        Synchronized indicator state. ``"indeterminate"`` applies to the
+        checkbox kind only.
+    kind : IndicatorKind | str, default 'checkbox'
+        Which mark to draw.
+    size : CompactSize | str | None, default None
+        Indicator size.
+    disabled : bool, default False
+        Whether the mark uses the disabled style. Indicators are not interactive.
+    **props : Any
+        JSON-safe Indicator props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe Indicator props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``state`` ('unchecked' or 'checked' or 'indeterminate'; required): Visual state.
+      ``CheckIndicator`` and ``RadioIndicator`` accept 'unchecked' or 'checked'.
+    - ``size`` ('sm' or 'md'; default 'md'): Indicator size.
+    - ``isDisabled`` (boolean): Visual disabled style only.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Indicator>.
+    """
+
+    def __init__(
+        self,
+        value: IndicatorState | str = IndicatorState.CHECKED,
+        *,
+        kind: IndicatorKind | str = IndicatorKind.CHECKBOX,
+        size: CompactSize | str | None = None,
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        value = choice(value, IndicatorState, "value")
+        kind = choice(kind, IndicatorKind, "kind")
+        size = optional_choice(size, CompactSize, "size")
+        super().__init__(
+            "Indicator",
+            value=value,
+            disabled=disabled,
+            props=_named_props(props, kind=kind, size=size),
+        )
+
+
+class NavIcon(Widget):
+    """Render an Astryx icon on the circular accent background navigation headings use.
+
+    Examples
+    --------
+    ```python
+    ax.NavIcon("menu")
+    ```
+
+    Parameters
+    ----------
+    icon : str
+        Astryx icon name.
+    **props : Any
+        JSON-safe NavIcon props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe NavIcon props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``icon`` (ReactNode; required): Icon rendered on the accent circle. The wrapper renders the
+      named Astryx icon.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/NavIcon>.
+    """
+
+    def __init__(self, icon: str, **props: Any) -> None:
+        super().__init__("NavIcon", text=icon, props=_named_props(props, icon=icon))
+
+
+class Toast(Widget):
+    """Show Astryx toast notifications from Python.
+
+    Display the widget once, then call :meth:`notify`. The widget itself takes
+    no space; toasts stack in a corner of the browser window. Notifications
+    sent before the widget renders are dropped.
+
+    Examples
+    --------
+    ```python
+    ax.Toast(position="bottomEnd")
+    ```
+
+    Parameters
+    ----------
+    position : ToastPosition | str | None, default None
+        Window corner the toasts stack in.
+    max_visible : int | None, default None
+        Most toasts shown at once; older ones queue.
+    **props : Any
+        JSON-safe toast viewport props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe toast viewport props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``position`` ('topEnd' or 'topStart' or 'bottomEnd' or 'bottomStart'; default 'bottomEnd'):
+      Window corner the toasts stack in.
+    - ``maxVisible`` (number; default 5): Most toasts shown at once.
+    - ``inset`` ({top, bottom, start, end: number}): Extra distance from the window edges.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Toast>.
+    """
+
+    def __init__(
+        self,
+        *,
+        position: ToastPosition | str | None = None,
+        max_visible: int | None = None,
+        **props: Any,
+    ) -> None:
+        position = optional_choice(position, ToastPosition, "position")
+        super().__init__(
+            "Toast",
+            props=_named_props(props, position=position, maxVisible=max_visible),
+        )
+
+    def notify(
+        self,
+        body: str,
+        *,
+        type: ToastType | str = ToastType.INFO,
+        auto_hide: bool | None = None,
+        duration: int | None = None,
+        toast_id: str | None = None,
+    ) -> str:
+        """Show a toast and return its identifier.
+
+        Parameters
+        ----------
+        body : str
+            Message text.
+        type : ToastType | str, default 'info'
+            Info or error styling.
+        auto_hide : bool | None, default None
+            Whether the toast hides itself. Astryx hides info toasts and keeps
+            error toasts by default.
+        duration : int | None, default None
+            Milliseconds before an auto-hiding toast hides, 5000 by default.
+        toast_id : str | None, default None
+            Identifier for :meth:`dismiss`. A toast with the identifier of one
+            still shown replaces it.
+
+        Returns
+        -------
+        str
+            The toast identifier.
+        """
+        toast_id = toast_id or uuid4().hex
+        self.send(
+            {
+                "type": "toast",
+                "id": toast_id,
+                "body": body,
+                "toast_type": choice(type, ToastType, "type"),
+                "auto_hide": auto_hide,
+                "duration": duration,
+            }
+        )
+
+        return toast_id
+
+    def dismiss(self, toast_id: str) -> None:
+        """Hide the toast shown with ``toast_id``."""
+        self.send({"type": "toast-dismiss", "id": toast_id})
+
+
+class RichTextView(Widget):
+    """Render Markdown read-only with the Astryx rich text viewer.
+
+    Examples
+    --------
+    ```python
+    ax.RichTextView("## Plan\\n\\n- Buy **AAPL** on the open")
+    ```
+
+    Parameters
+    ----------
+    text : str
+        Markdown content synchronized to the frontend.
+    **props : Any
+        JSON-safe RichTextView props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe RichTextView props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``value`` (string; required): Serialized editor state. The wrapper converts ``text`` from
+      Markdown.
+    - ``namespace`` (string; default 'astryx-view'): Lexical editor namespace.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/RichTextView>.
+    """
+
+    def __init__(self, text: str, **props: Any) -> None:
+        super().__init__("RichTextView", text=text, props=props)

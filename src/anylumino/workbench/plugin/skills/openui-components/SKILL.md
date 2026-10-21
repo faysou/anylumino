@@ -41,4 +41,17 @@ the OpenUI one.
 | `Badge` | [components/Badge.md](components/Badge.md) |
 | `Table` | [components/Table.md](components/Table.md) |
 | `CodeBlock` | [components/CodeBlock.md](components/CodeBlock.md) |
+| `AppShell` | [components/AppShell.md](components/AppShell.md) |
+| `Layout` | [components/Layout.md](components/Layout.md) |
+| `SideNav` | [components/SideNav.md](components/SideNav.md) |
+| `TopNav` | [components/TopNav.md](components/TopNav.md) |
+| `Stepper` | [components/Stepper.md](components/Stepper.md) |
+| `OverflowList` | [components/OverflowList.md](components/OverflowList.md) |
+| `ComplexSelector` | [components/ComplexSelector.md](components/ComplexSelector.md) |
+| `RichTextEditor` | [components/RichTextEditor.md](components/RichTextEditor.md) |
+| `RichTextView` | [components/RichTextView.md](components/RichTextView.md) |
+| `Timer` | [components/Timer.md](components/Timer.md) |
+| `Toast` | [components/Toast.md](components/Toast.md) |
+| `Indicator` | [components/Indicator.md](components/Indicator.md) |
+| `NavIcon` | [components/NavIcon.md](components/NavIcon.md) |
 | `Plot` | [components/Plot.md](components/Plot.md) |

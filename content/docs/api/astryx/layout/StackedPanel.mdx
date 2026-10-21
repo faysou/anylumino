@@ -7,6 +7,16 @@ Astryx panel that shows one selected child at a time.
 A child mounts the first time it is selected and stays mounted, hidden,
 afterwards, so switching back keeps its state.
 
+```python
+ax.StackedPanel({"summary": ax.Text("Summary view"), "detail": ax.Text("Detail view")})
+```
+
+import screenshot from '../../../assets/components/astryx-layout-StackedPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="StackedPanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

@@ -4,6 +4,19 @@ title: "Table"
 
 Render a data-driven Astryx table for notebook use.
 
+```python
+ax.Table(
+    [{"symbol": "AAPL", "qty": 120, "pnl": 312.4}, {"symbol": "MSFT", "qty": -40, "pnl": -86.0}],
+    {"symbol": "Symbol", "qty": "Qty", "pnl": "P&L"},
+)
+```
+
+import screenshot from '../../../assets/components/astryx-data-Table.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Table example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Table props forwarded to Astryx.
 

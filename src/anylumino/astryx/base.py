@@ -24,6 +24,7 @@ from .enums import Wrap
 
 _ASTRYX_COMPONENT_NAMES = {
     "AlertDialog",
+    "AppShell",
     "AspectRatio",
     "Avatar",
     "AvatarGroup",
@@ -46,6 +47,7 @@ _ASTRYX_COMPONENT_NAMES = {
     "CodeBlock",
     "Collapsible",
     "CommandPalette",
+    "ComplexSelector",
     "ContextMenu",
     "DateInput",
     "DateRangeInput",
@@ -59,13 +61,16 @@ _ASTRYX_COMPONENT_NAMES = {
     "FileInput",
     "FormLayout",
     "Grid",
+    "HStack",
     "Heading",
     "HoverCard",
     "Icon",
     "IconButton",
+    "Indicator",
     "InputGroup",
     "Item",
     "Kbd",
+    "Layout",
     "Link",
     "List",
     "Lightbox",
@@ -74,24 +79,30 @@ _ASTRYX_COMPONENT_NAMES = {
     "MetadataList",
     "MoreMenu",
     "MultiSelector",
+    "NavIcon",
     "NumberInput",
     "Outline",
+    "OverflowList",
     "Overlay",
     "Pagination",
     "Popover",
     "PowerSearch",
     "ProgressBar",
     "RadioList",
+    "RichTextEditor",
+    "RichTextView",
     "Section",
     "SegmentedControl",
     "SelectableCard",
     "SelectionSlider",
     "Selector",
+    "SideNav",
     "Skeleton",
     "Slider",
     "Spinner",
     "Stack",
     "StatusDot",
+    "Stepper",
     "Switch",
     "Table",
     "TabList",
@@ -100,15 +111,19 @@ _ASTRYX_COMPONENT_NAMES = {
     "TextInput",
     "Thumbnail",
     "TimeInput",
+    "Timer",
     "Timestamp",
+    "Toast",
     "ToggleButton",
     "ToggleButtonGroup",
     "Token",
     "Tokenizer",
     "Toolbar",
     "Tooltip",
+    "TopNav",
     "TreeList",
     "Typeahead",
+    "VStack",
 }
 
 
@@ -404,7 +419,8 @@ class Widget(ComponentWidget):
         Component host height.
     """
 
-    _esm = static_asset("astryx/astryx_widget.bundle.js")
+    _esm = static_asset("astryx/astryx_widget.loader.js")
+    _bundle = static_asset("astryx/astryx_widget.bundle.js")
     _css = static_asset("astryx/astryx_widget.bundle.css")
 
     component_family = t.Unicode("astryx").tag(sync=True)
@@ -656,6 +672,12 @@ def BuiltTheme(
 class Component(Widget):
     """Render a registered Astryx component by name.
 
+    Examples
+    --------
+    ```python
+    ax.Component("Badge", label="Beta", props={"variant": "info"})
+    ```
+
     Parameters
     ----------
     component_name : str
@@ -701,6 +723,16 @@ class Component(Widget):
 
 class Theme(Widget):
     """Apply a reusable Astryx theme to child widgets.
+
+    Examples
+    --------
+    ```python
+    ax.Theme(
+        [ax.Button("Run", variant="primary"), ax.Badge("Live", variant="success")],
+        brand=ax.Brand("desk", **{"color-accent": "#0057b8"}),
+        direction="horizontal",
+    )
+    ```
 
     Parameters
     ----------

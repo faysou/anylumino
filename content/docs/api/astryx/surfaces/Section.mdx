@@ -4,6 +4,16 @@ title: "Section"
 
 Render an Astryx section container.
 
+```python
+ax.Section([ax.Heading("Risk", level=4), ax.Text("Within limits")], padding=3)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Section.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Section example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Section props forwarded to Astryx.
 

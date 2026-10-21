@@ -1,0 +1,120 @@
+---
+title: "OverflowList"
+---
+
+Render a row of Astryx buttons whose overflow collapses into a menu.
+
+```python
+ax.OverflowList(["Refresh", "Export CSV", "Cancel all", "Flatten"], max_visible=2)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-OverflowList.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="OverflowList example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe OverflowList props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `gap` (spacing step; default 2): Spacing between items.
+  * `minVisibleItems` (number; default 0): Fewest items kept visible.
+  * `maxVisibleItems` (number): Most items shown before the rest collapse.
+  * `maxRows` (number): Rows to fill before collapsing.
+  * `collapseFrom` ('start' or 'end'; default 'end'): Which end collapses first.
+  * `behavior` ('observeParent' or 'observeSelf'; default 'observeSelf'): Which element's width
+    decides how many items fit.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/OverflowList](https://astryx.atmeta.com/components/OverflowList).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, *, label='More', gap=None, min_visible=None, max_visible=None, collapse_from=None, size=None, callbacks=None, action_callbacks=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        label: str = "More",
+        gap: int | float | None = None,
+        min_visible: int | None = None,
+        max_visible: int | None = None,
+        collapse_from: CollapseFrom | str | None = None,
+        size: Size | str | None = None,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        **props: Any,
+    ) -> None:
+        collapse_from = optional_choice(collapse_from, CollapseFrom, "collapse_from")
+        size = optional_choice(size, Size, "size")
+        super().__init__(
+            "OverflowList",
+            label=label,
+            callbacks=callbacks,
+            action_callbacks=action_callbacks,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                gap=gap,
+                minVisibleItems=min_visible,
+                maxVisibleItems=max_visible,
+                collapseFrom=collapse_from,
+                size=size,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Button labels or records with `label` and optional `value`,
+      `icon`, `variant`, and `disabled` keys. A click sends the item
+      value as an action.
+    </PyParameter>
+
+    <PyParameter name="label" type="str" value="'More'">
+      Accessible label of the menu button that holds the hidden items.
+    </PyParameter>
+
+    <PyParameter name="gap" type="int | float | None" value="None">
+      Astryx spacing step between buttons.
+    </PyParameter>
+
+    <PyParameter name="min_visible" type="int | None" value="None">
+      Fewest buttons kept visible.
+    </PyParameter>
+
+    <PyParameter name="max_visible" type="int | None" value="None">
+      Most buttons shown before the rest collapse.
+    </PyParameter>
+
+    <PyParameter name="collapse_from" type="CollapseFrom | str | None" value="None">
+      Which end collapses first.
+    </PyParameter>
+
+    <PyParameter name="size" type="Size | str | None" value="None">
+      Button size.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[ComponentWidget], None]] | None" value="None">
+      Activation callbacks run on every button or menu click.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[ComponentWidget, Any], None]] | None" value="None">
+      Callbacks receiving the clicked item value.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

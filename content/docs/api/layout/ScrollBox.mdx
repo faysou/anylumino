@@ -4,6 +4,16 @@ title: "ScrollBox"
 
 Scrollable vertical box for notebook-sized control panels.
 
+```python
+al.ScrollBox([ax.Text(f"Fill {index}") for index in range(1, 21)], height=140)
+```
+
+import screenshot from '../../assets/components/layout-ScrollBox.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="ScrollBox example rendered in JupyterLab" />
+</figure>
+
 ## Functions
 
 <PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, spacing=8, stretches=None, width='100%', height=420, resizable=True, scroll=True, scroll_x=None, scroll_y=None, child_min_width=None, child_min_height=None, fit_content=False) -> None" kind="constructor">

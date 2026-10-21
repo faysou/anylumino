@@ -8,6 +8,16 @@ Children can be passed as a list or as a keyed mapping. Mapping keys become
 stable child identifiers and default tab titles. Use `select_key` or
 `selected_index` to choose the active tab.
 
+```python
+al.TabPanel({"Orders": ax.Text("3 open orders"), "Fills": ax.Text("12 fills")}, height=140)
+```
+
+import screenshot from '../../assets/components/layout-TabPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="TabPanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

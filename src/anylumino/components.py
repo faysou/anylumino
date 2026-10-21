@@ -7,6 +7,7 @@ from typing import Any
 import anywidget
 import traitlets as t
 
+from .common import SharedBundleWidget
 from .layout import ChildInput
 from .layout import ChildList
 from .layout import TitleInput
@@ -20,7 +21,7 @@ from .layout import _widget_list_to_json
 ActionCallback = Callable[["ComponentWidget", Any], None]
 
 
-class ComponentWidget(KeyedChildren, anywidget.AnyWidget):
+class ComponentWidget(KeyedChildren, SharedBundleWidget):
     """Base class for composable component-library anywidgets.
 
     Component families inherit this class to share child composition, keyed

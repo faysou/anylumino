@@ -12,6 +12,19 @@ click inside Lab opens both menus. Prefer :class:`DropdownMenu` or
 :class:`MoreMenu` for a notebook-facing menu, and reach for this one when
 the output is embedded somewhere Lab does not claim the event.
 
+```python
+ax.ContextMenu(
+    [("Copy row", "copy"), ("Export row", "export")],
+    ax.Card(ax.Text("Right-click for row actions"), padding=3),
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-ContextMenu.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="ContextMenu example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Notes" type="note">
   See Astryx component docs: [https://astryx.atmeta.com/components/ContextMenu](https://astryx.atmeta.com/components/ContextMenu).
 </Callout>

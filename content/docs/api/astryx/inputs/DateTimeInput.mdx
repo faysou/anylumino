@@ -4,6 +4,16 @@ title: "DateTimeInput"
 
 Render an Astryx date-time input.
 
+```python
+ax.DateTimeInput("2026-10-21T14:30", label="Fill time", width=260)
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-DateTimeInput.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="DateTimeInput example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe DateTimeInput props forwarded to Astryx.
 
@@ -57,7 +67,7 @@ Render an Astryx date-time input.
 
 ## Functions
 
-<PyFunction name="__init__" type="(value=None, *, label='', disabled=False, min=None, max=None, seconds=None, hour_format=None, time_increment=None, clear=None, number_of_months=None, **props) -> None" kind="constructor">
+<PyFunction name="__init__" type="(value=None, *, label='', label_hidden=None, disabled=False, min=None, max=None, seconds=None, hour_format=None, time_increment=None, clear=None, number_of_months=None, **props) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -65,6 +75,7 @@ Render an Astryx date-time input.
         value: str | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: str | None = None,
         max: str | None = None,
@@ -83,6 +94,7 @@ Render an Astryx date-time input.
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 hasSeconds=seconds,
@@ -102,6 +114,10 @@ Render an Astryx date-time input.
 
     <PyParameter name="label" type="str" value="''">
       Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
     </PyParameter>
 
     <PyParameter name="disabled" type="bool" value="False">

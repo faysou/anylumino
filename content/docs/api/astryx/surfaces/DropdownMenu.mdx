@@ -4,6 +4,16 @@ title: "DropdownMenu"
 
 Render a button-backed Astryx dropdown menu.
 
+```python
+ax.DropdownMenu([{"label": "Refresh", "value": "refresh"}, {"label": "Export", "value": "export"}], label="Actions")
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-DropdownMenu.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="DropdownMenu example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe DropdownMenu props forwarded to Astryx.
 

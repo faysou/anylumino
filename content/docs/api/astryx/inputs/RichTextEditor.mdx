@@ -1,0 +1,158 @@
+---
+title: "RichTextEditor"
+---
+
+Render an Astryx rich text editor whose value syncs as Markdown.
+
+```python
+ax.RichTextEditor("## Plan\n\n- Buy **AAPL** on the open", label="Notes")
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-RichTextEditor.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="RichTextEditor example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe RichTextEditor props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; required): Accessible label for the editor.
+  * `isLabelHidden` (boolean): Visually hides the label.
+  * `description` (string): Helper text below the label.
+  * `isOptional` (boolean): Marks the field optional.
+  * `isRequired` (boolean): Marks the field required.
+  * `placeholder` (string): Text shown while the editor is empty.
+  * `isReadOnly` (boolean): Allows selection but not editing.
+  * `isDisabled` (boolean): Disables the editor.
+  * `status` (\{type: 'error' or 'warning' or 'success', message?: string}): Validation status.
+  * `statusVariant` ('attached' or 'detached' or 'tooltip'): Where the status message shows.
+  * `width` (number or string): Editor width.
+  * `minHeight` (number or string; default '4.5rem'): Minimum height of the editable surface.
+  * `size` ('sm' or 'md' or 'lg'): Editor size.
+  * `hasMarkdownShortcuts` (boolean; default true): Converts typed Markdown such as `# ` and
+    `**` into formatting.
+  * `hasAutoFocus` (boolean): Focuses the editor on mount.
+  * `maxLength` (number): Character counter limit; not enforced.
+  * `namespace` (string; default 'astryx-editor'): Lexical editor namespace.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/RichTextEditor](https://astryx.atmeta.com/components/RichTextEditor).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value='', *, label, placeholder=None, disabled=False, read_only=None, toolbar=True, size=None, label_hidden=None, description=None, optional=None, required=None, min_height=None, max_length=None, status=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: str = "",
+        *,
+        label: str,
+        placeholder: str | None = None,
+        disabled: bool = False,
+        read_only: bool | None = None,
+        toolbar: bool = True,
+        size: Size | str | None = None,
+        label_hidden: bool | None = None,
+        description: str | None = None,
+        optional: bool | None = None,
+        required: bool | None = None,
+        min_height: int | float | str | None = None,
+        max_length: int | None = None,
+        status: Mapping[str, Any] | None = None,
+        **props: Any,
+    ) -> None:
+        size = optional_choice(size, Size, "size")
+        super().__init__(
+            "RichTextEditor",
+            label=label,
+            value=value,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                placeholder=placeholder,
+                isReadOnly=read_only,
+                hasToolbar=toolbar,
+                size=size,
+                isLabelHidden=label_hidden,
+                description=description,
+                isOptional=optional,
+                isRequired=required,
+                minHeight=min_height,
+                maxLength=max_length,
+                status=status,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="str" value="''">
+      Synchronized Markdown content. Formatting Markdown cannot express is
+      dropped when the value syncs.
+    </PyParameter>
+
+    <PyParameter name="label" type="str">
+      Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="placeholder" type="str | None" value="None">
+      Placeholder text shown when the editor is empty.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the component should render disabled.
+    </PyParameter>
+
+    <PyParameter name="read_only" type="bool | None" value="None">
+      Whether the content can be selected but not edited.
+    </PyParameter>
+
+    <PyParameter name="toolbar" type="bool" value="True">
+      Whether to show the formatting toolbar.
+    </PyParameter>
+
+    <PyParameter name="size" type="Size | str | None" value="None">
+      Editor size.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
+    </PyParameter>
+
+    <PyParameter name="description" type="str | None" value="None">
+      Helper text displayed with the editor.
+    </PyParameter>
+
+    <PyParameter name="optional" type="bool | None" value="None">
+      Whether to mark the field optional.
+    </PyParameter>
+
+    <PyParameter name="required" type="bool | None" value="None">
+      Whether to mark the field required.
+    </PyParameter>
+
+    <PyParameter name="min_height" type="int | float | str | None" value="None">
+      Minimum height of the editable surface.
+    </PyParameter>
+
+    <PyParameter name="max_length" type="int | None" value="None">
+      Maximum length shown by the character counter. Astryx does not enforce it.
+    </PyParameter>
+
+    <PyParameter name="status" type="Mapping[str, Any] | None" value="None">
+      Validation status record.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -4,6 +4,23 @@ title: "Outline"
 
 Render a table-of-contents outline.
 
+```python
+ax.Outline(
+    [
+        {"id": "summary", "label": "Summary", "level": 1},
+        {"id": "orders", "label": "Orders", "level": 2},
+        {"id": "risk", "label": "Risk", "level": 2},
+    ],
+    active_id="orders",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Outline.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Outline example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Outline props forwarded to Astryx.
 

@@ -4,6 +4,16 @@ title: "Component"
 
 Render a registered Astryx component by name.
 
+```python
+ax.Component("Badge", label="Beta", props={"variant": "info"})
+```
+
+import screenshot from '../../../assets/components/astryx-base-Component.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Component example rendered in JupyterLab" />
+</figure>
+
 ## Functions
 
 <PyFunction name="__init__" type="(component_name, children=None, *, props=None, text='', label='', **kwargs) -> None" kind="constructor">

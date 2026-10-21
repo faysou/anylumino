@@ -1,0 +1,102 @@
+---
+title: "Timer"
+---
+
+Render an Astryx timer that counts up from a start time.
+
+```python
+ax.Timer(format="clock")
+```
+
+import screenshot from '../../../assets/components/astryx-data-Timer.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Timer example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Timer props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `startTime` (number): Unix milliseconds the timer counts from. Omit it to count from mount.
+  * `format` ('elapsed' or 'clock'; default 'elapsed'): Elapsed duration text or a clock
+    readout.
+  * `type` (TextType; default 'supporting'): Semantic text type.
+  * `size` (TextSize): Explicit font size override.
+  * `color` (TextColor; default 'secondary'): Text color.
+  * `weight` (TextWeight): Font weight override.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Timer](https://astryx.atmeta.com/components/Timer).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(start_time=None, *, format=None, text_type=None, size=None, color=None, weight=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        start_time: datetime | int | float | None = None,
+        *,
+        format: TimerFormat | str | None = None,
+        text_type: str | None = None,
+        size: str | None = None,
+        color: str | None = None,
+        weight: str | None = None,
+        **props: Any,
+    ) -> None:
+        format = optional_choice(format, TimerFormat, "format")
+        if isinstance(start_time, datetime):
+            start_time = start_time.timestamp() * 1000
+
+        super().__init__(
+            "Timer",
+            props=_named_props(
+                props,
+                startTime=start_time,
+                format=format,
+                type=text_type,
+                size=size,
+                color=color,
+                weight=weight,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="start_time" type="datetime | int | float | None" value="None">
+      Start of the count as a `datetime` or Unix milliseconds. `None`
+      counts from when the widget renders.
+    </PyParameter>
+
+    <PyParameter name="format" type="TimerFormat | str | None" value="None">
+      Elapsed `"1h 2m 3s"` or clock `"01:02:03"` text.
+    </PyParameter>
+
+    <PyParameter name="text_type" type="str | None" value="None">
+      Semantic text type.
+    </PyParameter>
+
+    <PyParameter name="size" type="str | None" value="None">
+      Explicit text-size override.
+    </PyParameter>
+
+    <PyParameter name="color" type="str | None" value="None">
+      Text color.
+    </PyParameter>
+
+    <PyParameter name="weight" type="str | None" value="None">
+      Font weight override.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

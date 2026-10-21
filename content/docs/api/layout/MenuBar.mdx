@@ -4,6 +4,21 @@ title: "MenuBar"
 
 Lumino-style menu bar with nested menu items and Python callbacks.
 
+```python
+al.MenuBar(
+    [
+        {"label": "File", "items": [{"id": "open", "label": "Open"}, {"id": "save", "label": "Save"}]},
+        {"label": "View", "items": [{"id": "zoom", "label": "Zoom in"}]},
+    ]
+)
+```
+
+import screenshot from '../../assets/components/layout-MenuBar.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="MenuBar example rendered in JupyterLab" />
+</figure>
+
 ## Functions
 
 <PyFunction name="__init__" type="(menus=None, *, callbacks=None, width='100%', height='auto') -> None" kind="constructor">

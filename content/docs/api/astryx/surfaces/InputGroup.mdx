@@ -4,6 +4,21 @@ title: "InputGroup"
 
 Group an input with prefix and suffix adornments.
 
+```python
+ax.InputGroup(
+    ax.NumberInput(value=100, label="Quantity", label_hidden=True),
+    label="Quantity",
+    suffix="sh",
+    width=200,
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-InputGroup.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="InputGroup example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe InputGroup props forwarded to Astryx.
 

@@ -4,6 +4,16 @@ title: "AlertDialog"
 
 Render an inline Astryx alert dialog for confirmations.
 
+```python
+ax.AlertDialog("Cancel all orders?", "Open orders on every venue are cancelled.", action_label="Cancel all")
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-AlertDialog.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="AlertDialog example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe AlertDialog props forwarded to Astryx.
 

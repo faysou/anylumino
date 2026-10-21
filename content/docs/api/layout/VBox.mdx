@@ -4,6 +4,16 @@ title: "VBox"
 
 Vertical `BoxPanel` convenience wrapper.
 
+```python
+al.VBox([ax.Card(ax.Text("Summary"), padding=3), ax.Card(ax.Text("Details"), padding=3)], height=160)
+```
+
+import screenshot from '../../assets/components/layout-VBox.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="VBox example rendered in JupyterLab" />
+</figure>
+
 ## Functions
 
 <PyFunction name="__init__" type="(widgets=None, *, titles=None, keys=None, spacing=8, stretches=None, width='100%', height=420, resizable=True, scroll=False, scroll_x=None, scroll_y=None, child_min_width=None, child_min_height=None, fit_content=False) -> None" kind="constructor">

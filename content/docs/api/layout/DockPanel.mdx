@@ -4,6 +4,19 @@ title: "DockPanel"
 
 Lumino dock panel for tabbed or split workspace-style layouts.
 
+```python
+al.DockPanel(
+    {"Orders": ax.Text("Open orders"), "Chart": ax.Text("Price chart")},
+    height=220,
+)
+```
+
+import screenshot from '../../assets/components/layout-DockPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="DockPanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

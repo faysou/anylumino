@@ -210,12 +210,6 @@ function createPanel(model, root, slots, onSplitSizesChanged) {
 }
 
 export default {
-  initialize({ model }) {
-    return {
-      getLayoutKind: () => model.get("layout_kind"),
-    };
-  },
-
   async render({ model, el, signal, host }) {
     if (!host?.getWidget) {
       throw new Error("[anylumino] The current anywidget host does not support widget composition.");

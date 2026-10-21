@@ -9,6 +9,16 @@ stable child keys and default tab titles. Use `select_key` or
 `selected_index` to choose the active tab. A child panel mounts the first
 time its tab is selected and stays mounted, hidden, afterwards.
 
+```python
+ax.TabPanel({"orders": ax.Text("3 open orders"), "fills": ax.Text("12 fills today")}, size="sm")
+```
+
+import screenshot from '../../../assets/components/astryx-layout-TabPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="TabPanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

@@ -107,6 +107,17 @@
   padding-block: 4px;
 }
 
+/* AppShell assumes it owns the page: it keeps a viewport-high minimum and sizes
+   its side navigation column to the viewport. In an output area both follow
+   the content or the widget height instead. */
+.anylumino-AppShellHost > .astryx-app-shell {
+  min-height: 0 !important;
+}
+
+.anylumino-AppShellHost > .astryx-app-shell > .astryx-layout > div > div > div:has(> .astryx-layout-panel) {
+  height: auto !important;
+}
+
 .anylumino-TableHost {
   max-width: 100%;
   overflow: visible;

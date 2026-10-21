@@ -4,6 +4,16 @@ title: "Typeahead"
 
 Render a notebook-safe Astryx typeahead.
 
+```python
+ax.Typeahead(["AAPL", "MSFT", "NVDA"], value="AAPL", label="Symbol", width=240)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Typeahead.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Typeahead example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Typeahead props forwarded to Astryx.
 

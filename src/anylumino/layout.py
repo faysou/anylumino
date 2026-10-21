@@ -12,6 +12,7 @@ from anywidget._descriptor import _try_get_model_id as get_model_id
 from anylumino.enums import choice
 
 from .common import ActivationCallbacks
+from .common import SharedBundleWidget
 from .common import static_asset
 from .enums import Direction, DockMode, Orientation, TabPlacement
 
@@ -474,7 +475,7 @@ class KeyedChildren(ActivationCallbacks):
 
         return complete
 
-class LayoutWidget(KeyedChildren, anywidget.AnyWidget):
+class LayoutWidget(KeyedChildren, SharedBundleWidget):
     """Base class for keyed anywidget composition layouts.
 
     ``LayoutWidget`` stores child widgets in a keyed map while syncing the
@@ -568,6 +569,12 @@ class TabPanel(LayoutWidget):
     stable child identifiers and default tab titles. Use ``select_key`` or
     ``selected_index`` to choose the active tab.
 
+    Examples
+    --------
+    ```python
+    al.TabPanel({"Orders": ax.Text("3 open orders"), "Fills": ax.Text("12 fills")}, height=140)
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -601,7 +608,8 @@ class TabPanel(LayoutWidget):
         content, with a 180 pixel minimum, instead of ``height``.
     """
 
-    _esm = static_asset("layout/tab_panel.bundle.js")
+    _esm = static_asset("layout/tab_panel.loader.js")
+    _bundle = static_asset("layout/tab_panel.bundle.js")
     _css = static_asset("layout/tab_panel.css")
     _title_prefix = "Tab"
 
@@ -658,6 +666,16 @@ class BoxPanel(LayoutWidget):
     ``scroll=True`` to enable scrolling along the natural box direction, or use
     ``scroll_x`` and ``scroll_y`` for explicit overflow behavior.
 
+    Examples
+    --------
+    ```python
+    al.BoxPanel(
+        [ax.Card(ax.Text("Quotes"), padding=3), ax.Card(ax.Text("Trades"), padding=3)],
+        direction="left-to-right",
+        height=120,
+    )
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -697,7 +715,8 @@ class BoxPanel(LayoutWidget):
     to its content rather than scroll.
     """
 
-    _esm = static_asset("layout/layout_panel.bundle.js")
+    _esm = static_asset("layout/layout_panel.loader.js")
+    _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("box").tag(sync=True)
@@ -754,6 +773,12 @@ class BoxPanel(LayoutWidget):
 
 class HBox(BoxPanel):
     """Horizontal ``BoxPanel`` convenience wrapper.
+
+    Examples
+    --------
+    ```python
+    al.HBox([ax.Card(ax.Text("Bid"), padding=3), ax.Card(ax.Text("Ask"), padding=3)], height=100)
+    ```
 
     Parameters
     ----------
@@ -821,6 +846,12 @@ class HBox(BoxPanel):
 class VBox(BoxPanel):
     """Vertical ``BoxPanel`` convenience wrapper.
 
+    Examples
+    --------
+    ```python
+    al.VBox([ax.Card(ax.Text("Summary"), padding=3), ax.Card(ax.Text("Details"), padding=3)], height=160)
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -887,6 +918,12 @@ class VBox(BoxPanel):
 class ScrollBox(VBox):
     """Scrollable vertical box for notebook-sized control panels.
 
+    Examples
+    --------
+    ```python
+    al.ScrollBox([ax.Text(f"Fill {index}") for index in range(1, 21)], height=140)
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -952,6 +989,16 @@ class ScrollBox(VBox):
 class SplitPanel(LayoutWidget):
     """Lumino split panel with draggable dividers between children.
 
+    Examples
+    --------
+    ```python
+    al.SplitPanel(
+        [ax.Card(ax.Text("Controls"), padding=3), ax.Card(ax.Text("Chart"), padding=3)],
+        sizes=[1, 2],
+        height=140,
+    )
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -982,7 +1029,8 @@ class SplitPanel(LayoutWidget):
         a chart frame that grows with its subcharts.
     """
 
-    _esm = static_asset("layout/layout_panel.bundle.js")
+    _esm = static_asset("layout/layout_panel.loader.js")
+    _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("split").tag(sync=True)
@@ -1026,6 +1074,15 @@ class SplitPanel(LayoutWidget):
 class DockPanel(LayoutWidget):
     """Lumino dock panel for tabbed or split workspace-style layouts.
 
+    Examples
+    --------
+    ```python
+    al.DockPanel(
+        {"Orders": ax.Text("Open orders"), "Chart": ax.Text("Price chart")},
+        height=220,
+    )
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -1045,7 +1102,8 @@ class DockPanel(LayoutWidget):
         Whether the dock panel gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout/layout_panel.bundle.js")
+    _esm = static_asset("layout/layout_panel.loader.js")
+    _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("dock").tag(sync=True)
@@ -1070,6 +1128,15 @@ class DockPanel(LayoutWidget):
 class AccordionPanel(LayoutWidget):
     """Lumino accordion panel with titled collapsible sections.
 
+    Examples
+    --------
+    ```python
+    al.AccordionPanel(
+        {"Orders": ax.Text("3 open orders"), "Fills": ax.Text("12 fills today")},
+        height=180,
+    )
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -1087,7 +1154,8 @@ class AccordionPanel(LayoutWidget):
         Whether the accordion gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout/layout_panel.bundle.js")
+    _esm = static_asset("layout/layout_panel.loader.js")
+    _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("accordion").tag(sync=True)
@@ -1109,6 +1177,12 @@ class AccordionPanel(LayoutWidget):
 class StackedPanel(LayoutWidget):
     """Lumino stacked panel that shows one selected child at a time.
 
+    Examples
+    --------
+    ```python
+    al.StackedPanel([ax.Text("Shown first"), ax.Text("Shown after select_key")], height=80)
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -1127,7 +1201,8 @@ class StackedPanel(LayoutWidget):
         Whether the panel gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout/layout_panel.bundle.js")
+    _esm = static_asset("layout/layout_panel.loader.js")
+    _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("stacked").tag(sync=True)
@@ -1163,6 +1238,16 @@ class StackedPanel(LayoutWidget):
 class GridPanel(LayoutWidget):
     """CSS grid-backed Lumino panel for placing children in grid cells.
 
+    Examples
+    --------
+    ```python
+    al.GridPanel(
+        [ax.Card(ax.Text(name), padding=3) for name in ("Quotes", "Trades", "Depth", "News")],
+        columns="1fr 1fr",
+        height=180,
+    )
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -1189,7 +1274,8 @@ class GridPanel(LayoutWidget):
         Whether the grid gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout/layout_panel.bundle.js")
+    _esm = static_asset("layout/layout_panel.loader.js")
+    _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("grid").tag(sync=True)
@@ -1235,6 +1321,16 @@ class GridPanel(LayoutWidget):
 class ResponsivePanel(LayoutWidget):
     """Box layout that switches direction when its width crosses a breakpoint.
 
+    Examples
+    --------
+    ```python
+    al.ResponsivePanel(
+        [ax.Card(ax.Text("Controls"), padding=3), ax.Card(ax.Text("Chart"), padding=3)],
+        breakpoint=600,
+        height=120,
+    )
+    ```
+
     Parameters
     ----------
     widgets : iterable or mapping, optional
@@ -1259,7 +1355,8 @@ class ResponsivePanel(LayoutWidget):
         Whether the panel gets a notebook resize handle.
     """
 
-    _esm = static_asset("layout/layout_panel.bundle.js")
+    _esm = static_asset("layout/layout_panel.loader.js")
+    _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.css")
 
     layout_kind = t.Unicode("responsive").tag(sync=True)
@@ -1300,8 +1397,9 @@ class ResponsivePanel(LayoutWidget):
         )
 
 
-class _ActionWidget(ActivationCallbacks, anywidget.AnyWidget):
-    _esm = static_asset("layout/action_panel.bundle.js")
+class _ActionWidget(ActivationCallbacks, SharedBundleWidget):
+    _esm = static_asset("layout/action_panel.loader.js")
+    _bundle = static_asset("layout/action_panel.bundle.js")
     _css = static_asset("layout/action_panel.css")
 
     action_kind = t.Enum(ACTION_KINDS).tag(sync=True)
@@ -1347,6 +1445,12 @@ class _ActionWidget(ActivationCallbacks, anywidget.AnyWidget):
 class Toolbar(_ActionWidget):
     """Toolbar of clickable actions that can invoke Python callbacks.
 
+    Examples
+    --------
+    ```python
+    al.Toolbar([{"id": "run", "label": "Run"}, {"id": "stop", "label": "Stop"}])
+    ```
+
     Parameters
     ----------
     actions : iterable of dict, optional
@@ -1377,6 +1481,17 @@ class Toolbar(_ActionWidget):
 
 class MenuBar(_ActionWidget):
     """Lumino-style menu bar with nested menu items and Python callbacks.
+
+    Examples
+    --------
+    ```python
+    al.MenuBar(
+        [
+            {"label": "File", "items": [{"id": "open", "label": "Open"}, {"id": "save", "label": "Save"}]},
+            {"label": "View", "items": [{"id": "zoom", "label": "Zoom in"}]},
+        ]
+    )
+    ```
 
     Parameters
     ----------
@@ -1409,6 +1524,18 @@ class MenuBar(_ActionWidget):
 
 class CommandPalette(_ActionWidget):
     """Command palette for searchable actions grouped by category.
+
+    Examples
+    --------
+    ```python
+    al.CommandPalette(
+        [
+            {"id": "refresh", "label": "Refresh data", "category": "Data"},
+            {"id": "export", "label": "Export CSV", "category": "Files"},
+        ],
+        height=200,
+    )
+    ```
 
     Parameters
     ----------
@@ -1446,6 +1573,12 @@ class CommandPalette(_ActionWidget):
 
 class TextWidget(anywidget.AnyWidget):
     """Small synced value display widget used in examples and tests.
+
+    Examples
+    --------
+    ```python
+    al.TextWidget("Plain text in a Lumino widget")
+    ```
 
     Parameters
     ----------

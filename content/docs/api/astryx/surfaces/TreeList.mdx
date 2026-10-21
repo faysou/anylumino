@@ -4,6 +4,25 @@ title: "TreeList"
 
 Render hierarchical notebook data as an expandable tree.
 
+```python
+ax.TreeList(
+    [
+        {
+            "id": "catalog",
+            "label": "catalog",
+            "isExpanded": True,
+            "children": [{"id": "quotes", "label": "quotes.parquet"}, {"id": "trades", "label": "trades.parquet"}],
+        }
+    ]
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-TreeList.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="TreeList example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe TreeList props forwarded to Astryx.
 

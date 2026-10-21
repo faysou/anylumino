@@ -8,6 +8,16 @@ Page through a data set with an Astryx pagination control.
 given, choosing a new page size arrives through `on_action` rather than
 `value`, so the page number stays the synchronized state.
 
+```python
+ax.Pagination(2, total_items=120, page_size=20)
+```
+
+import screenshot from '../../../assets/components/astryx-data-Pagination.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Pagination example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Notes" type="note">
   See Astryx component docs: [https://astryx.atmeta.com/components/Pagination](https://astryx.atmeta.com/components/Pagination).
 </Callout>

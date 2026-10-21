@@ -4,6 +4,16 @@ title: "ToggleButtonGroup"
 
 Render a single- or multiple-selection group of toggle buttons.
 
+```python
+ax.ToggleButtonGroup([("Grid", "grid"), ("List", "list")], value="grid", label="View mode")
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-ToggleButtonGroup.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="ToggleButtonGroup example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   `children`, `value`, `label`, `type`, `orientation`, `size`, and
   `isDisabled` are adapted by the named arguments above. `**props` keeps

@@ -29,6 +29,7 @@ dev = [
     "jupyter>=1.1.1",
     "jupytext>=1.19.4",
     "pandas>=2.3.3",
+    "playwright>=1.64.0",
     "plotly>=6.9.0",
     "pytest>=9.1.1",
     "pywebview>=6.2.1",

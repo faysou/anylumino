@@ -4,6 +4,22 @@ title: "List"
 
 Render an Astryx list from item records.
 
+```python
+ax.List(
+    [
+        {"label": "Opening imbalance", "description": "Auction monitor"},
+        {"label": "Venue latency", "description": "P95 execution path"},
+    ],
+    header="Watchlist",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-List.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="List example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe List props forwarded to Astryx.
 

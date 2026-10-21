@@ -4,6 +4,20 @@ title: "ResponsivePanel"
 
 Box layout that switches direction when its width crosses a breakpoint.
 
+```python
+al.ResponsivePanel(
+    [ax.Card(ax.Text("Controls"), padding=3), ax.Card(ax.Text("Chart"), padding=3)],
+    breakpoint=600,
+    height=120,
+)
+```
+
+import screenshot from '../../assets/components/layout-ResponsivePanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="ResponsivePanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

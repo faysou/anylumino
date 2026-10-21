@@ -7,6 +7,19 @@ Astryx collapsible group with one titled section per child.
 The open sections live in `value`: a child key when `multiple` is
 `False` and a list of child keys otherwise.
 
+```python
+ax.AccordionPanel(
+    {"orders": ax.Text("3 open orders"), "fills": ax.Text("12 fills today")},
+    open=["orders"],
+)
+```
+
+import screenshot from '../../../assets/components/astryx-layout-AccordionPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="AccordionPanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

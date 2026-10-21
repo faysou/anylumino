@@ -5,22 +5,23 @@ from datetime import datetime
 from datetime import time
 from typing import Any
 
-import anywidget
 import traitlets as t
 
 from .common import ActivationCallbacks
+from .common import SharedBundleWidget
 from .common import json_value as _json_value
 from .common import static_asset
 
 
-class _NativeControlWidget(ActivationCallbacks, anywidget.AnyWidget):
+class _NativeControlWidget(ActivationCallbacks, SharedBundleWidget):
     """Base class for browser-native anylumino controls.
 
     ``on_click`` runs for every value change and ``on_action`` also receives the
     new value. Both accept ``remove=True`` to unregister a callback.
     """
 
-    _esm = static_asset("controls/native_control_widget.bundle.js")
+    _esm = static_asset("controls/native_control_widget.loader.js")
+    _bundle = static_asset("controls/native_control_widget.bundle.js")
     _css = static_asset("controls/native_control_widget.css")
 
     control_family = t.Unicode("native").tag(sync=True)
@@ -44,6 +45,12 @@ class _NativeControlWidget(ActivationCallbacks, anywidget.AnyWidget):
 
 class DatePicker(_NativeControlWidget):
     """Browser-native date picker control.
+
+    Examples
+    --------
+    ```python
+    al.DatePicker("2026-10-21", description="Trade date")
+    ```
 
     Parameters
     ----------
@@ -95,6 +102,12 @@ class DatePicker(_NativeControlWidget):
 class TimePicker(DatePicker):
     """Browser-native time picker with hour and minute popup controls.
 
+    Examples
+    --------
+    ```python
+    al.TimePicker("14:30", description="Cutoff")
+    ```
+
     Parameters
     ----------
     value : time | str | None, default None
@@ -144,6 +157,12 @@ class TimePicker(DatePicker):
 
 class DatetimePicker(DatePicker):
     """Browser-native date and time picker control.
+
+    Examples
+    --------
+    ```python
+    al.DatetimePicker("2026-10-21T14:30", description="Fill time")
+    ```
 
     Parameters
     ----------

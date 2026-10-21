@@ -4,6 +4,16 @@ title: "TimeInput"
 
 Render an Astryx time input.
 
+```python
+ax.TimeInput("14:30", label="Cutoff", hour_format="24h", width=160)
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-TimeInput.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="TimeInput example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe TimeInput props forwarded to Astryx.
 
@@ -54,7 +64,7 @@ Render an Astryx time input.
 
 ## Functions
 
-<PyFunction name="__init__" type="(value=None, *, label='', disabled=False, min=None, max=None, seconds=None, clear=None, hour_format=None, increment=None, placeholder=None, size=None, **props) -> None" kind="constructor">
+<PyFunction name="__init__" type="(value=None, *, label='', label_hidden=None, disabled=False, min=None, max=None, seconds=None, clear=None, hour_format=None, increment=None, placeholder=None, size=None, **props) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -62,6 +72,7 @@ Render an Astryx time input.
         value: str | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: str | None = None,
         max: str | None = None,
@@ -82,6 +93,7 @@ Render an Astryx time input.
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 hasSeconds=seconds,
@@ -102,6 +114,10 @@ Render an Astryx time input.
 
     <PyParameter name="label" type="str" value="''">
       Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
     </PyParameter>
 
     <PyParameter name="disabled" type="bool" value="False">

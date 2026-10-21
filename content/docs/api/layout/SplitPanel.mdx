@@ -4,6 +4,20 @@ title: "SplitPanel"
 
 Lumino split panel with draggable dividers between children.
 
+```python
+al.SplitPanel(
+    [ax.Card(ax.Text("Controls"), padding=3), ax.Card(ax.Text("Chart"), padding=3)],
+    sizes=[1, 2],
+    height=140,
+)
+```
+
+import screenshot from '../../assets/components/layout-SplitPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="SplitPanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

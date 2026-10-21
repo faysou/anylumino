@@ -8,6 +8,16 @@ Astryx renders a fixed 8px dot and surfaces `label` as `aria-label`, so
 the label never appears as visible text. Pair the dot with a `Text`
 widget in a horizontal `Stack` when the status needs a visible caption.
 
+```python
+ax.StatusDot("Connected", variant="success")
+```
+
+import screenshot from '../../../assets/components/astryx-data-StatusDot.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="StatusDot example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe StatusDot props forwarded to Astryx.
 

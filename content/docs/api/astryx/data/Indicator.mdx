@@ -1,0 +1,82 @@
+---
+title: "Indicator"
+---
+
+Render a decorative Astryx check, checkbox, or radio mark.
+
+```python
+ax.Indicator("indeterminate", kind="checkbox")
+```
+
+import screenshot from '../../../assets/components/astryx-data-Indicator.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Indicator example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe Indicator props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `state` ('unchecked' or 'checked' or 'indeterminate'; required): Visual state.
+    `CheckIndicator` and `RadioIndicator` accept 'unchecked' or 'checked'.
+  * `size` ('sm' or 'md'; default 'md'): Indicator size.
+  * `isDisabled` (boolean): Visual disabled style only.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/Indicator](https://astryx.atmeta.com/components/Indicator).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(value=IndicatorState.CHECKED, *, kind=IndicatorKind.CHECKBOX, size=None, disabled=False, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        value: IndicatorState | str = IndicatorState.CHECKED,
+        *,
+        kind: IndicatorKind | str = IndicatorKind.CHECKBOX,
+        size: CompactSize | str | None = None,
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        value = choice(value, IndicatorState, "value")
+        kind = choice(kind, IndicatorKind, "kind")
+        size = optional_choice(size, CompactSize, "size")
+        super().__init__(
+            "Indicator",
+            value=value,
+            disabled=disabled,
+            props=_named_props(props, kind=kind, size=size),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="value" type="IndicatorState | str" value="IndicatorState.CHECKED">
+      Synchronized indicator state. `"indeterminate"` applies to the
+      checkbox kind only.
+    </PyParameter>
+
+    <PyParameter name="kind" type="IndicatorKind | str" value="IndicatorKind.CHECKBOX">
+      Which mark to draw.
+    </PyParameter>
+
+    <PyParameter name="size" type="CompactSize | str | None" value="None">
+      Indicator size.
+    </PyParameter>
+
+    <PyParameter name="disabled" type="bool" value="False">
+      Whether the mark uses the disabled style. Indicators are not interactive.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

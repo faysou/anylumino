@@ -12,7 +12,7 @@ from enum import StrEnum
 
 from anylumino.enums import Orientation
 
-__all__ = ["Orientation", "Align", "Axis", "BadgeVariant", "BannerStatus", "BreadcrumbsVariant", "ButtonVariant", "CalendarMode", "CardVariant", "CitationStyle", "ClickableCardVariant", "ColorMode", "CompactDensity", "CompactSize", "Container", "ContentAlign", "Density", "DialogPurpose", "DialogVariant", "Display", "DisplayType", "DividerVariant", "FileInputMode", "FieldStatusType", "FontWeight", "FormDirection", "HourFormat", "IconColor", "IconSize", "InputType", "ItemLayout", "Justify", "LabelPosition", "LabelSpacing", "LayerAlignment", "LayerPlacement", "ListStyle", "MediaType", "OverlayPosition", "OverlayTrigger", "ScrollAxis", "SectionVariant", "SelectionMode", "Selects", "Size", "SortDirection", "SpinnerShade", "StatusPlacement", "StatusVariant", "SwitchLabelPosition", "TableDividers", "TextColor", "TextJustify", "TextOverflow", "TextSize", "TextType", "TextWrap", "TimestampFormat", "TokenColor", "TriggerDisplay", "ValueDisplay", "VerticalAlign", "Wrap"]
+__all__ = ["Orientation", "Align", "Axis", "BadgeVariant", "BannerStatus", "BreadcrumbsVariant", "ButtonVariant", "CalendarMode", "CardVariant", "CitationStyle", "ClickableCardVariant", "CollapseFrom", "ColorMode", "CompactDensity", "CompactSize", "Container", "ContentAlign", "Density", "DialogPurpose", "DialogVariant", "Display", "DisplayType", "DividerVariant", "FileInputMode", "FieldStatusType", "FontWeight", "FormDirection", "FrameHeight", "FrameVariant", "HourFormat", "IconColor", "IconSize", "IndicatorKind", "IndicatorState", "InputType", "ItemLayout", "Justify", "LabelPosition", "LabelSpacing", "LayerAlignment", "LayerPlacement", "ListStyle", "MediaType", "OverlayPosition", "OverlayTrigger", "ScrollAxis", "SectionVariant", "SelectionMode", "SelectorVariant", "Selects", "Size", "SortDirection", "SpinnerShade", "StatusPlacement", "StatusVariant", "SwitchLabelPosition", "TableDividers", "TextColor", "TextJustify", "TextOverflow", "TextSize", "TextType", "TextWrap", "TimerFormat", "TimestampFormat", "ToastPosition", "ToastType", "TokenColor", "TriggerDisplay", "ValueDisplay", "VerticalAlign", "Wrap"]
 
 
 class Size(StrEnum):
@@ -571,3 +571,73 @@ class ColorMode(StrEnum):
     DARK = "dark"
     SYSTEM = "system"
     JUPYTERLAB = "jupyterlab"
+
+
+class TimerFormat(StrEnum):
+    """How a timer writes its elapsed time."""
+
+    ELAPSED = "elapsed"
+    CLOCK = "clock"
+
+
+class ToastType(StrEnum):
+    """The kind of message a toast shows."""
+
+    INFO = "info"
+    ERROR = "error"
+
+
+class ToastPosition(StrEnum):
+    """The viewport corner toasts stack in."""
+
+    TOP_END = "topEnd"
+    TOP_START = "topStart"
+    BOTTOM_END = "bottomEnd"
+    BOTTOM_START = "bottomStart"
+
+
+class IndicatorKind(StrEnum):
+    """The mark an indicator draws."""
+
+    CHECK = "check"
+    CHECKBOX = "checkbox"
+    RADIO = "radio"
+
+
+class IndicatorState(StrEnum):
+    """The state an indicator shows."""
+
+    UNCHECKED = "unchecked"
+    CHECKED = "checked"
+    INDETERMINATE = "indeterminate"
+
+
+class FrameHeight(StrEnum):
+    """Whether an app shell or layout fills its container or fits its content."""
+
+    FILL = "fill"
+    AUTO = "auto"
+
+
+class FrameVariant(StrEnum):
+    """The surface treatment of an app shell."""
+
+    WASH = "wash"
+    SURFACE = "surface"
+    SECTION = "section"
+    ELEVATED = "elevated"
+
+
+class SelectorVariant(StrEnum):
+    """The trigger style of a complex selector."""
+
+    INPUT = "input"
+    SECONDARY = "secondary"
+    GHOST = "ghost"
+
+
+class CollapseFrom(StrEnum):
+    """Which end of an overflow list collapses first."""
+
+    START = "start"
+    END = "end"

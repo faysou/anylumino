@@ -9,6 +9,23 @@ holds the current filter records, each `{"field": ..., "operator": ...,
 "value": ...}`. Both are plain JSON, matching how :class:`Table` and
 :class:`TreeList` take their data.
 
+```python
+ax.PowerSearch(
+    {
+        "name": "orders",
+        "fields": [{"key": "symbol", "label": "Symbol", "operators": [{"key": "is", "label": "is"}]}],
+    },
+    filters=[{"field": "symbol", "operator": "is", "value": "AAPL"}],
+    label="Filter orders",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-PowerSearch.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="PowerSearch example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Notes" type="note">
   See Astryx component docs: [https://astryx.atmeta.com/components/PowerSearch](https://astryx.atmeta.com/components/PowerSearch).
 </Callout>

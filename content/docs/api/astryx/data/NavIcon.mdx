@@ -1,0 +1,51 @@
+---
+title: "NavIcon"
+---
+
+Render an Astryx icon on the circular accent background navigation headings use.
+
+```python
+ax.NavIcon("menu")
+```
+
+import screenshot from '../../../assets/components/astryx-data-NavIcon.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="NavIcon example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe NavIcon props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `icon` (ReactNode; required): Icon rendered on the accent circle. The wrapper renders the
+    named Astryx icon.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/NavIcon](https://astryx.atmeta.com/components/NavIcon).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(icon, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(self, icon: str, **props: Any) -> None:
+        super().__init__("NavIcon", text=icon, props=_named_props(props, icon=icon))
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="icon" type="str">
+      Astryx icon name.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

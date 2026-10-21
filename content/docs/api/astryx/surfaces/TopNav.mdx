@@ -1,0 +1,119 @@
+---
+title: "TopNav"
+---
+
+Render Astryx top navigation from item records.
+
+```python
+ax.TopNav(
+    ["Orders", "Fills", {"label": "Reports", "items": ["Daily P&L"]}],
+    "Orders",
+    heading="Trading desk",
+    icon="menu",
+    end=ax.Button("Help", variant="ghost"),
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-TopNav.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="TopNav example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe TopNav props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `label` (string; default 'Top navigation'): Accessible label.
+  * `heading`, `startContent`, `centerContent`, `endContent` (ReactNode): Bar slots. The
+    wrapper builds `heading` from `heading`, `subheading`, `icon`, and `menu`, puts the
+    items in `startContent`, and fills `endContent` from `end`.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/TopNav](https://astryx.atmeta.com/components/TopNav).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(items, value=None, *, end=None, heading=None, subheading=None, icon=None, menu=None, label=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str | None = None,
+        *,
+        end: ChildInput = None,
+        heading: str | None = None,
+        subheading: str | None = None,
+        icon: str | None = None,
+        menu: Iterable[Any] | None = None,
+        label: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "TopNav",
+            {"end": _slot(end, Orientation.HORIZONTAL)} if end is not None else None,
+            value=value,
+            label=label or "",
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                heading=heading,
+                subheading=subheading,
+                icon=icon,
+                menu=_option_records(menu) if menu is not None else None,
+                label=label,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="items" type="Iterable[Any]">
+      Item labels or records with `label` and optional `value`, `icon`,
+      and `disabled` keys. A record with `items` opens a dropdown of
+      entries with `label` and optional `value` and `description`
+      keys; a click on an entry sends its value as an action.
+    </PyParameter>
+
+    <PyParameter name="value" type="str | None" value="None">
+      Synchronized value of the selected item. Clicking an item selects it.
+    </PyParameter>
+
+    <PyParameter name="end" type="ChildInput" value="None">
+      Widgets shown at the end of the bar, such as buttons. Several widgets
+      sit in a row.
+    </PyParameter>
+
+    <PyParameter name="heading" type="str | None" value="None">
+      Title shown at the start of the bar.
+    </PyParameter>
+
+    <PyParameter name="subheading" type="str | None" value="None">
+      Text shown under the heading.
+    </PyParameter>
+
+    <PyParameter name="icon" type="str | None" value="None">
+      Astryx icon name shown as the logo.
+    </PyParameter>
+
+    <PyParameter name="menu" type="Iterable[Any] | None" value="None">
+      Heading menu entries as labels or records with `label` and optional
+      `value`, `description`, and `disabled` keys. A click sends the
+      entry value as an action.
+    </PyParameter>
+
+    <PyParameter name="label" type="str | None" value="None">
+      Accessible label of the navigation.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -9,6 +9,8 @@ from datetime import time
 from pathlib import Path
 from typing import Any
 
+import anywidget
+
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = PACKAGE_DIR / "static"
@@ -94,6 +96,35 @@ def static_asset(filename: str) -> Path | LazyStaticAsset:
         return path
 
     return LazyStaticAsset(path)
+
+
+BUNDLE_REQUEST = "anylumino-bundle"
+
+
+class SharedBundleWidget(anywidget.AnyWidget):
+    """anywidget base whose frontend bundle loads once per page.
+
+    anywidget syncs ``_esm`` to every widget model and imports each copy as its
+    own module, so a large bundle would cost its full size in every widget. The
+    ``_esm`` of these widgets is a small loader built next to the bundle: the
+    first widget of a page requests the bundle with a ``anylumino-bundle``
+    message, and every later widget reuses the module it imported. Subclasses
+    set ``_esm`` to the loader and ``_bundle`` to the bundle it loads.
+    """
+
+    _bundle: Path | LazyStaticAsset
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.on_msg(self._send_bundle)
+
+    def _send_bundle(self, _widget: object, content: dict[str, Any], _buffers: object) -> None:
+        if content.get("type") != BUNDLE_REQUEST:
+            return
+
+        bundle = self._bundle
+        code = bundle.read_text(encoding="utf-8") if isinstance(bundle, Path) else str(bundle)
+        self.send({"type": BUNDLE_REQUEST, "code": code})
 
 
 def json_value(value: Any) -> Any:

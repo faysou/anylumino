@@ -4,6 +4,22 @@ title: "CommandPalette"
 
 Command palette for searchable actions grouped by category.
 
+```python
+al.CommandPalette(
+    [
+        {"id": "refresh", "label": "Refresh data", "category": "Data"},
+        {"id": "export", "label": "Export CSV", "category": "Files"},
+    ],
+    height=200,
+)
+```
+
+import screenshot from '../../assets/components/layout-CommandPalette.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="CommandPalette example rendered in JupyterLab" />
+</figure>
+
 ## Functions
 
 <PyFunction name="__init__" type="(commands=None, *, callbacks=None, width='100%', height=320) -> None" kind="constructor">

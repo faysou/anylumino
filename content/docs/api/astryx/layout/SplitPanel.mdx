@@ -8,6 +8,20 @@ Astryx panes separated by draggable resize handles.
 sync the fractions back to Python, and assigning `sizes` resizes the
 panes.
 
+```python
+ax.SplitPanel(
+    {"controls": ax.Text("Controls"), "chart": ax.Text("Chart")},
+    sizes=[0.3, 0.7],
+    height=120,
+)
+```
+
+import screenshot from '../../../assets/components/astryx-layout-SplitPanel.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="SplitPanel example rendered in JupyterLab" />
+</figure>
+
 ## Attributes
 
 <PyAttributes>

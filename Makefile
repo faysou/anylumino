@@ -54,6 +54,7 @@ docs-reference: docs-install
 	@mkdir -p build/docs
 	PYTHONPATH=node_modules/fumadocs-python:src uv run --no-sync python -c 'from fumapy import generate; generate()' anylumino --docstring-style numpy --dir build/docs
 	npm run docs:convert
+	uv run --no-sync python scripts/docs_examples.py api-images
 
 .PHONY: docs-install
 docs-install:
@@ -88,3 +89,15 @@ docs-check: docs-reference
 	npm run docs:lint
 	npm run docs:types
 	npm run docs:build
+
+# Capture the documentation screenshots. The capture starts its own JupyterLab
+# and runs headless Chromium; install it once with
+# `uv run --no-sync playwright install chromium`.
+.PHONY: docs-screenshots
+docs-screenshots:
+	uv run --no-sync python scripts/docs_examples.py capture docs
+	uv run --no-sync python scripts/docs_examples.py images
+
+.PHONY: docs-screenshots-components
+docs-screenshots-components:
+	uv run --no-sync python scripts/docs_examples.py capture components

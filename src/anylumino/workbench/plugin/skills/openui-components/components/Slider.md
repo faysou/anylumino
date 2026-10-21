@@ -8,6 +8,7 @@ In Python: `ax.Slider(label=..., value=..., min=..., max=..., step=...)`, plus a
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |
+| `label_hidden` | `boolean` | Whether to visually hide the accessible label. |
 | `label_position` | `"top" \| "left"` | Place the label above the slider or beside it in a compact row. |
 | `label_width` | `number \| string` | Width of a left-side label. Use the same width to align sibling sliders. |
 | `disabled` | `boolean` | Whether the component should render disabled. |

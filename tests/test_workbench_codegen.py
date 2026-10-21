@@ -187,3 +187,32 @@ class UI(View):
     assert isinstance(ui.chart, go.FigureWidget)
     assert (ui.chart.layout.height, ui.chart.layout.title.text, ui.chart.data) == (320, "Revenue", ())
     assert ui.root.widgets == [ui.chart]
+
+
+def test_app_frame_components_build_and_send_events():
+    program = """root = AppShell([layout], [top], [side])
+top = TopNav(["Orders", {label: "More", items: ["Export"]}], "Orders", [Button("Help"), Toast()])
+side = SideNav(["Overview", {type: "section", title: "Desk", items: ["Fills"]}], "Overview", @Callback("on_run"))
+layout = Layout([steps, editor], [Timer()], [actions], null, [RichTextView("**done**")])
+steps = Stepper(["Draft", "Send"], 1)
+editor = RichTextEditor("Notes", "# Plan", @Callback("on_region"))
+actions = OverflowList(["Refresh", "Export"], @Callback("on_run", "bar"))"""
+
+    source = codegen.generate(parsed(program), {"on_region", "on_run"}, {})
+    app = RecordingApp()
+    ui = ui_class(source)(app)
+    ui.side.value = "Fills"
+    ui.editor.value = "# Plan\n\nShip"
+    ui.actions._handle_frontend_message(ui.actions, {"type": "click", "value": "Export"}, None)
+
+    assert ui.root.child_keys == ["content", "top_nav", "side_nav"]
+    assert [ui.root.get_owner(key) for key in ("content", "top_nav", "side_nav")] == [ui.layout, ui.top, ui.side]
+    assert ui.top.child_keys == ["end"]
+    assert ui.top.get_owner("end").props["direction"] == "horizontal"
+    assert ui.layout.child_keys == ["content", "header", "start", "footer"]
+    assert (ui.steps.value, ui.editor.label, ui.editor.value) == (1, "Notes", "# Plan\n\nShip")
+    assert app.events == [
+        ("on_run", Event("side", "Fills", None)),
+        ("on_region", Event("editor", "# Plan\n\nShip", None)),
+        ("on_run", Event("actions", "Export", "bar")),
+    ]

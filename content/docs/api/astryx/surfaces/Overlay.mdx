@@ -4,6 +4,21 @@ title: "Overlay"
 
 Render content over a base Astryx surface or media widget.
 
+```python
+ax.Overlay(
+    ax.Card(ax.Text("Market preview"), padding=4, width=220),
+    ax.Button("Quick view", variant="ghost"),
+    show_on="always",
+    position="bottom",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Overlay.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Overlay example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   `children`, `content`, `showOn`, `isOpen`, `scrim`, `position`,
   and `align` are adapted by the named arguments above. `**props` keeps

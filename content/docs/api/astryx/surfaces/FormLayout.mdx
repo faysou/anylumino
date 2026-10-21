@@ -4,6 +4,19 @@ title: "FormLayout"
 
 Arrange Astryx form controls with consistent spacing.
 
+```python
+ax.FormLayout(
+    [ax.TextInput(value="AAPL", label="Symbol"), ax.NumberInput(value=100, label="Quantity")],
+    direction="horizontal-labels",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-FormLayout.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="FormLayout example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe FormLayout props forwarded to Astryx.
 

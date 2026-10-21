@@ -4,6 +4,19 @@ title: "Toolbar"
 
 Render an Astryx toolbar with optional slots.
 
+```python
+ax.Toolbar(
+    {"start": ax.Heading("Orders", level=4), "end": ax.Button("New order", variant="primary")},
+    label="Orders toolbar",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Toolbar.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Toolbar example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Toolbar props forwarded to Astryx.
 

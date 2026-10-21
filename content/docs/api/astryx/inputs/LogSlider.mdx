@@ -8,6 +8,16 @@ Astryx `Slider` steps linearly, so this wrapper drives it in exponent
 space and synchronizes `base ** exponent` as the value. Everything else,
 including `continuous_update`, behaves like :class:`Slider`.
 
+```python
+ax.LogSlider(100, label="Notional", min_exponent=0, max_exponent=6, width=280)
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-LogSlider.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="LogSlider example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Notes" type="note">
   See Astryx component docs: [https://astryx.atmeta.com/components/Slider](https://astryx.atmeta.com/components/Slider).
 </Callout>

@@ -4,6 +4,16 @@ title: "Card"
 
 Render an Astryx card container.
 
+```python
+ax.Card([ax.Heading("AAPL", level=4), ax.Text("Last 184.50, up 1.2%")], padding=3, width=240)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Card.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Card example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Card props forwarded to Astryx.
 

@@ -1,0 +1,109 @@
+---
+title: "AppShell"
+---
+
+Frame notebook content with Astryx top navigation, side navigation, and a banner.
+
+```python
+ax.AppShell(
+    ax.Text("Content"),
+    top_nav=ax.TopNav(["Orders", "Fills"], "Orders", heading="Trading desk"),
+    side_nav=ax.SideNav(["Overview", "Positions"], "Overview"),
+    height="auto",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-AppShell.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="AppShell example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe AppShell props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `variant` ('wash' or 'surface' or 'section' or 'elevated'; default 'elevated'): Surface
+    treatment of the content area.
+  * `contentPadding` (spacing step): Padding around the content.
+  * `height` ('fill' or 'auto'; default 'fill'): Fill the container or fit the content.
+  * `topNav`, `sideNav`, `banner` (ReactNode): Navigation and banner slots. The wrapper
+    fills them from `top_nav`, `side_nav`, and `banner`.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/AppShell](https://astryx.atmeta.com/components/AppShell).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(content, *, top_nav=None, side_nav=None, banner=None, variant=None, content_padding=None, height=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        content: ChildInput,
+        *,
+        top_nav: ChildInput = None,
+        side_nav: ChildInput = None,
+        banner: ChildInput = None,
+        variant: FrameVariant | str | None = None,
+        content_padding: int | float | None = None,
+        height: FrameHeight | str | None = None,
+        **props: Any,
+    ) -> None:
+        variant = optional_choice(variant, FrameVariant, "variant")
+        height = optional_choice(height, FrameHeight, "height")
+        slots = {"content": content, "top_nav": top_nav, "side_nav": side_nav, "banner": banner}
+        slots = {key: _slot(child) for key, child in slots.items() if child is not None}
+        super().__init__(
+            "AppShell",
+            slots,
+            props=_named_props(
+                props,
+                variant=variant,
+                contentPadding=content_padding,
+                height=height,
+            ),
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="content" type="ChildInput">
+      Main content. Several widgets in this or another slot stack
+      vertically.
+    </PyParameter>
+
+    <PyParameter name="top_nav" type="ChildInput" value="None">
+      Widget shown across the top, typically a :class:`TopNav`.
+    </PyParameter>
+
+    <PyParameter name="side_nav" type="ChildInput" value="None">
+      Widget shown along the start side, typically a :class:`SideNav`.
+    </PyParameter>
+
+    <PyParameter name="banner" type="ChildInput" value="None">
+      Widget shown above the top navigation, typically a :class:`Banner`.
+    </PyParameter>
+
+    <PyParameter name="variant" type="FrameVariant | str | None" value="None">
+      Surface treatment of the content area.
+    </PyParameter>
+
+    <PyParameter name="content_padding" type="int | float | None" value="None">
+      Padding around the content using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="height" type="FrameHeight | str | None" value="None">
+      Whether the shell fills its container or fits its content.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

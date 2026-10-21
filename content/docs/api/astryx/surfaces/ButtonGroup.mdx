@@ -4,6 +4,19 @@ title: "ButtonGroup"
 
 Render an Astryx button group from item records.
 
+```python
+ax.ButtonGroup(
+    [{"label": "Apply", "variant": "primary"}, {"label": "Stage"}, {"label": "Cancel", "variant": "ghost"}],
+    label="Order actions",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-ButtonGroup.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="ButtonGroup example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe ButtonGroup props forwarded to Astryx.
 

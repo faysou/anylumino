@@ -199,7 +199,7 @@ The repository includes Jupytext notebooks for smoke testing:
 
 - `notebooks/docs_examples.py` collects every example on these documentation
   pages in page order; `scripts/docs_examples.py` regenerates it and the
-  screenshots come from `scripts/capture-docs-screenshots.mjs`.
+  screenshots come from `make docs-screenshots`.
 - `notebooks/plotly_tabs.py` tests tabs and dynamic child addition with Plotly
   figures.
 - `notebooks/plotly_dashboard.py` exercises all layout and action widgets with
@@ -209,6 +209,9 @@ The repository includes Jupytext notebooks for smoke testing:
 - `notebooks/astryx_layout_panels.py` shows the Astryx layout panels, tabs,
   stacked, accordion, scroll box, split, and responsive, with Python-driven
   selection, open sections, and split sizes, and nests them together.
+- `notebooks/astryx_app_frame.py` frames a layout with `AppShell`, `TopNav`,
+  and `SideNav`, and shows the stepper, overflow list, complex selector, rich
+  text, timer, indicator, and toast widgets with Python-driven updates.
 - `notebooks/astryx_chat.py` runs an echo bot on `ax.Chat` that streams its
   reply, updates a tool-call row, and stops on request.
 - `notebooks/openui_workbench.py` opens an OpenUI workbench with a sales data

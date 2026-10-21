@@ -4,6 +4,22 @@ title: "Chat"
 
 Render a chat thread and composer from a Python-owned message list.
 
+```python
+ax.Chat(
+    [
+        {"role": "user", "content": "Summarize today's fills."},
+        {"role": "assistant", "content": "12 fills, **+312.40** realized P&L."},
+    ],
+    height=260,
+)
+```
+
+import screenshot from '../../../assets/components/astryx-chat-Chat.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Chat example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Notes" type="note">
   Assigning `messages` replaces the list; mutating it in place does not
   sync. To stream a reply, replace the last message with its longer

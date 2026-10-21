@@ -4,6 +4,16 @@ title: "NumberInput"
 
 Render an Astryx numeric input.
 
+```python
+ax.NumberInput(100, label="Quantity", min=0, max=1000, step=10, units="sh", width=200)
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-NumberInput.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="NumberInput example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe NumberInput props forwarded to Astryx.
 
@@ -52,7 +62,7 @@ Render an Astryx numeric input.
 
 ## Functions
 
-<PyFunction name="__init__" type="(value=None, *, label='', disabled=False, min=None, max=None, step=None, units=None, size=None, placeholder=None, integer_only=None, clear=None, description=None, status=None, select_on_focus=None, **props) -> None" kind="constructor">
+<PyFunction name="__init__" type="(value=None, *, label='', label_hidden=None, disabled=False, min=None, max=None, step=None, units=None, size=None, placeholder=None, integer_only=None, clear=None, description=None, status=None, select_on_focus=None, **props) -> None" kind="constructor">
   <PySourceCode>
     ```python
     def __init__(
@@ -60,6 +70,7 @@ Render an Astryx numeric input.
         value: int | float | None = None,
         *,
         label: str = "",
+        label_hidden: bool | None = None,
         disabled: bool = False,
         min: int | float | None = None,
         max: int | float | None = None,
@@ -82,6 +93,7 @@ Render an Astryx numeric input.
             disabled=disabled,
             props=_named_props(
                 props,
+                isLabelHidden=label_hidden,
                 min=min,
                 max=max,
                 step=step,
@@ -105,6 +117,10 @@ Render an Astryx numeric input.
 
     <PyParameter name="label" type="str" value="''">
       Visible or accessible label for the component.
+    </PyParameter>
+
+    <PyParameter name="label_hidden" type="bool | None" value="None">
+      Whether to visually hide the accessible label.
     </PyParameter>
 
     <PyParameter name="disabled" type="bool" value="False">

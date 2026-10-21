@@ -4,6 +4,20 @@ title: "Theme"
 
 Apply a reusable Astryx theme to child widgets.
 
+```python
+ax.Theme(
+    [ax.Button("Run", variant="primary"), ax.Badge("Live", variant="success")],
+    brand=ax.Brand("desk", **{"color-accent": "#0057b8"}),
+    direction="horizontal",
+)
+```
+
+import screenshot from '../../../assets/components/astryx-base-Theme.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Theme example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Stack props forwarded to Astryx.
 

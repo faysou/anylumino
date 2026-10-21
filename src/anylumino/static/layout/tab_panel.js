@@ -35,27 +35,6 @@ function createSlot(index, ref, titles, keys, parentSignal) {
 }
 
 export default {
-  initialize({ model }) {
-    return {
-      getCurrentIndex: () => model.get("selected_index"),
-      getCurrentKey: () => {
-        const keys = model.get("child_keys") ?? [];
-        return keys[model.get("selected_index")] ?? null;
-      },
-      setCurrentIndex: (index) => {
-        model.set("selected_index", index);
-        model.save_changes();
-      },
-      setCurrentKey: (key) => {
-        const index = (model.get("child_keys") ?? []).indexOf(key);
-        if (index >= 0) {
-          model.set("selected_index", index);
-          model.save_changes();
-        }
-      },
-    };
-  },
-
   async render({ model, el, signal, host }) {
     if (!host?.getWidget) {
       throw new Error("[anylumino] The current anywidget host does not support widget composition.");

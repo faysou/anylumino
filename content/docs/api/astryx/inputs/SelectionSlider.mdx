@@ -8,6 +8,16 @@ Astryx `Slider` works on a linear numeric scale, so this wrapper drives it
 over option indices and synchronizes the selected option value. Pass a
 two-item `value` to select a range instead of a single option.
 
+```python
+ax.SelectionSlider(["1m", "5m", "15m", "1h", "1d"], value="15m", label="Bar size", marks=True, width=280)
+```
+
+import screenshot from '../../../assets/components/astryx-inputs-SelectionSlider.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="SelectionSlider example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Notes" type="note">
   See Astryx component docs: [https://astryx.atmeta.com/components/Slider](https://astryx.atmeta.com/components/Slider).
 </Callout>

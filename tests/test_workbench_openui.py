@@ -21,7 +21,7 @@ def sample(prop):
         return schema["enum"][-1]
 
     if schema.get("type") == "array":
-        item = schema["items"].get("type")
+        item = schema.get("items", {}).get("type", "string")
 
         return [{"a": 1}] if item == "object" else [SAMPLES[item], SAMPLES[item]]
 
@@ -49,6 +49,19 @@ def test_catalog_lists_components_and_props_in_order():
         "Badge": ["label", "variant"],
         "Table": ["rows", "columns", "options"],
         "CodeBlock": ["code", "language", "options"],
+        "AppShell": ["content", "top_nav", "side_nav", "banner", "options"],
+        "Layout": ["content", "header", "start", "end", "footer", "options"],
+        "SideNav": ["items", "value", "on_change", "options"],
+        "TopNav": ["items", "value", "end", "on_change", "options"],
+        "Stepper": ["items", "value", "on_change", "options"],
+        "OverflowList": ["items", "action", "options"],
+        "ComplexSelector": ["label", "content", "value", "options"],
+        "RichTextEditor": ["label", "value", "on_change", "options"],
+        "RichTextView": ["text"],
+        "Timer": ["options"],
+        "Toast": ["options"],
+        "Indicator": ["value", "options"],
+        "NavIcon": ["icon"],
         "Plot": ["layout"],
         "Widget": ["name"],
     }
@@ -129,7 +142,7 @@ def test_system_prompt_teaches_only_supported_features():
     for unsupported in ("Query(", "Mutation(", "@Run", "@Set", "$binding"):
         assert unsupported not in text
 
-    assert len(text) < 12_000
+    assert len(text) < 15_000
 
 
 def test_table_options_come_from_its_keywords():
@@ -215,3 +228,4 @@ def test_namespace_summary_describes_data_frames():
 def test_prompt_names_the_reserved_statement_names():
     assert codegen.RESERVED == {"app", "widget"}
     assert "Statement names cannot be `app` or `widget`." in prompt.CALLBACKS
+

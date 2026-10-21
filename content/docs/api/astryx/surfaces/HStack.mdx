@@ -1,0 +1,123 @@
+---
+title: "HStack"
+---
+
+Arrange child widgets in a horizontal Astryx stack.
+
+```python
+ax.HStack([ax.Badge("Live", variant="success"), ax.Badge("Paper", variant="info")], gap=2)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-HStack.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="HStack example rendered in JupyterLab" />
+</figure>
+
+<Callout title="Astryx Props" type="astryx-props">
+  JSON-safe HStack props forwarded to Astryx.
+
+  Supported Astryx props include:
+
+  * `gap` (spacing step): Spacing between items. Accepts Astryx spacing steps such as 0, 0.5, 1,
+    2, 3, 4, 6, 8, and 10.
+  * `justify` ('start' or 'center' or 'end' or 'between' or 'around' or 'evenly'): Horizontal
+    distribution.
+  * `align` ('start' or 'center' or 'end' or 'stretch'; default 'stretch'): Vertical alignment.
+  * `padding` (spacing step): Inner padding on all sides using the spacing scale.
+  * `paddingInline` (spacing step): Horizontal padding override.
+  * `paddingBlock` (spacing step): Vertical padding override.
+  * `width` (number or string): Container width.
+  * `height` (number or string): Container height.
+  * `maxWidth` (number or string): Maximum container width.
+  * `minHeight` (number or string): Minimum container height.
+  * `isScrollable` (boolean; default false): Enables scrollable overflow.
+  * `wrap` ('nowrap' or 'wrap' or 'wrap-reverse'; default 'nowrap'): Whether items wrap.
+
+  Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+  documented for Astryx parity but cannot be serialized directly from Python unless the
+  wrapper adapts them.
+
+  See Astryx component docs: [https://astryx.atmeta.com/components/HStack](https://astryx.atmeta.com/components/HStack).
+</Callout>
+
+## Functions
+
+<PyFunction name="__init__" type="(children=None, *, gap=2, align=None, justify=None, width=None, height=None, padding=None, wrap=None, scrollable=None, **props) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        gap: int | float = 2,
+        align: Align | str | None = None,
+        justify: Justify | str | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        padding: int | float | None = None,
+        wrap: Wrap | str | None = None,
+        scrollable: bool | None = None,
+        **props: Any,
+    ) -> None:
+        align = optional_choice(align, Align, "align")
+        justify = optional_choice(justify, Justify, "justify")
+        wrap = optional_choice(wrap, Wrap, "wrap")
+        super().__init__(
+            children,
+            direction=Orientation.HORIZONTAL,
+            gap=gap,
+            align=align,
+            justify=justify,
+            width=width,
+            height=height,
+            padding=padding,
+            wrap=wrap,
+            scrollable=scrollable,
+            **props,
+        )
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="children" type="ChildInput" value="None">
+      Child widget, sequence of widgets, or mapping of slot names to widgets.
+    </PyParameter>
+
+    <PyParameter name="gap" type="int | float" value="2">
+      Astryx spacing step between children.
+    </PyParameter>
+
+    <PyParameter name="align" type="Align | str | None" value="None">
+      Vertical alignment of the children.
+    </PyParameter>
+
+    <PyParameter name="justify" type="Justify | str | None" value="None">
+      Horizontal distribution of the children.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      Container width.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      Container height.
+    </PyParameter>
+
+    <PyParameter name="padding" type="int | float | None" value="None">
+      Inner padding using the Astryx spacing scale.
+    </PyParameter>
+
+    <PyParameter name="wrap" type="Wrap | str | None" value="None">
+      Whether children wrap onto more rows.
+    </PyParameter>
+
+    <PyParameter name="scrollable" type="bool | None" value="None">
+      Whether overflow should scroll.
+    </PyParameter>
+
+    <PyParameter name="props" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

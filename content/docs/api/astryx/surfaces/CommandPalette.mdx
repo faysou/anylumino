@@ -4,6 +4,20 @@ title: "CommandPalette"
 
 Render an inline Astryx command palette for notebook output areas.
 
+```python
+ax.CommandPalette(
+    [{"id": "refresh", "label": "Refresh"}, {"id": "export", "label": "Export CSV"}],
+    value="refresh",
+    width=360,
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-CommandPalette.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="CommandPalette example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe CommandPalette props forwarded to Astryx.
 

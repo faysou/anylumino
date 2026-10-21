@@ -24,6 +24,7 @@ from .enums import CalendarMode
 from .enums import CardVariant
 from .enums import CitationStyle
 from .enums import ClickableCardVariant
+from .enums import CollapseFrom
 from .enums import CompactDensity
 from .enums import CompactSize
 from .enums import Density
@@ -33,6 +34,8 @@ from .enums import DividerVariant
 from .enums import FieldStatusType
 from .enums import FileInputMode
 from .enums import FormDirection
+from .enums import FrameHeight
+from .enums import FrameVariant
 from .enums import ItemLayout
 from .enums import Justify
 from .enums import LayerAlignment
@@ -43,6 +46,7 @@ from .enums import OverlayPosition
 from .enums import OverlayTrigger
 from .enums import SectionVariant
 from .enums import SelectionMode
+from .enums import SelectorVariant
 from .enums import Size
 from .enums import StatusPlacement
 from .enums import Wrap
@@ -113,6 +117,12 @@ def _lightbox_media(
 
 class Stack(Widget):
     """Arrange child widgets in an Astryx stack.
+
+    Examples
+    --------
+    ```python
+    ax.Stack([ax.Text("Orders"), ax.Text("Fills"), ax.Text("Positions")], gap=1)
+    ```
 
     Parameters
     ----------
@@ -223,6 +233,12 @@ class Stack(Widget):
 class Grid(Widget):
     """Arrange child widgets in an Astryx grid.
 
+    Examples
+    --------
+    ```python
+    ax.Grid([ax.Card(ax.Text(name), padding=3) for name in ("Quotes", "Trades", "Depth")], columns=3)
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -318,6 +334,12 @@ class Grid(Widget):
 class Carousel(Widget):
     """Scroll child widgets horizontally in an Astryx carousel.
 
+    Examples
+    --------
+    ```python
+    ax.Carousel([ax.Card(ax.Text(f"Panel {index}"), padding=3, width=200) for index in (1, 2, 3)])
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -376,6 +398,15 @@ class ContextMenu(Widget):
     :class:`MoreMenu` for a notebook-facing menu, and reach for this one when
     the output is embedded somewhere Lab does not claim the event.
 
+    Examples
+    --------
+    ```python
+    ax.ContextMenu(
+        [("Copy row", "copy"), ("Export row", "export")],
+        ax.Card(ax.Text("Right-click for row actions"), padding=3),
+    )
+    ```
+
     Parameters
     ----------
     items : Iterable[Any]
@@ -427,6 +458,12 @@ class ContextMenu(Widget):
 
 class Center(Widget):
     """Center child content in an Astryx container.
+
+    Examples
+    --------
+    ```python
+    ax.Center(ax.Badge("Centered", variant="info"), height=80)
+    ```
 
     Parameters
     ----------
@@ -489,6 +526,12 @@ class Center(Widget):
 class AspectRatio(Widget):
     """Constrain child content to a fixed aspect ratio.
 
+    Examples
+    --------
+    ```python
+    ax.AspectRatio(ax.Card(ax.Text("16:9 preview"), padding=3), ratio=16 / 9, width=240)
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -524,6 +567,17 @@ class AspectRatio(Widget):
 
 class Overlay(Widget):
     """Render content over a base Astryx surface or media widget.
+
+    Examples
+    --------
+    ```python
+    ax.Overlay(
+        ax.Card(ax.Text("Market preview"), padding=4, width=220),
+        ax.Button("Quick view", variant="ghost"),
+        show_on="always",
+        position="bottom",
+    )
+    ```
 
     Parameters
     ----------
@@ -592,6 +646,12 @@ class Overlay(Widget):
 
 class Card(Widget):
     """Render an Astryx card container.
+
+    Examples
+    --------
+    ```python
+    ax.Card([ax.Heading("AAPL", level=4), ax.Text("Last 184.50, up 1.2%")], padding=3, width=240)
+    ```
 
     Parameters
     ----------
@@ -670,6 +730,12 @@ class Card(Widget):
 
 class ClickableCard(Widget):
     """Render an Astryx card that behaves like an action target.
+
+    Examples
+    --------
+    ```python
+    ax.ClickableCard(ax.Text("Open the order ticket"), label="Order ticket", padding=3, width=240)
+    ```
 
     Parameters
     ----------
@@ -768,6 +834,12 @@ class ClickableCard(Widget):
 class SelectableCard(Widget):
     """Render an Astryx card with a selected state.
 
+    Examples
+    --------
+    ```python
+    ax.SelectableCard(ax.Text("Smart routing"), value=True, label="Smart routing", padding=3, width=240)
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -855,6 +927,12 @@ class SelectableCard(Widget):
 
 class Section(Widget):
     """Render an Astryx section container.
+
+    Examples
+    --------
+    ```python
+    ax.Section([ax.Heading("Risk", level=4), ax.Text("Within limits")], padding=3)
+    ```
 
     Parameters
     ----------
@@ -945,6 +1023,12 @@ class Section(Widget):
 class Divider(Widget):
     """Render an Astryx divider.
 
+    Examples
+    --------
+    ```python
+    ax.Divider(label="Today")
+    ```
+
     Parameters
     ----------
     orientation : Orientation | str, default 'horizontal'
@@ -1004,6 +1088,18 @@ class Divider(Widget):
 
 class List(Widget):
     """Render an Astryx list from item records.
+
+    Examples
+    --------
+    ```python
+    ax.List(
+        [
+            {"label": "Opening imbalance", "description": "Auction monitor"},
+            {"label": "Venue latency", "description": "P95 execution path"},
+        ],
+        header="Watchlist",
+    )
+    ```
 
     Parameters
     ----------
@@ -1075,6 +1171,12 @@ class List(Widget):
 
 class MetadataList(Widget):
     """Render label-value metadata rows.
+
+    Examples
+    --------
+    ```python
+    ax.MetadataList([{"label": "Account", "value": "SIM-001"}, {"label": "Region", "value": "US equities"}])
+    ```
 
     Parameters
     ----------
@@ -1148,6 +1250,14 @@ class MetadataList(Widget):
 class Breadcrumbs(Widget):
     """Render Astryx breadcrumbs from item records.
 
+    Examples
+    --------
+    ```python
+    ax.Breadcrumbs(
+        [{"label": "Desk", "href": "#"}, {"label": "Orders", "href": "#"}, {"label": "O-1042", "current": True}]
+    )
+    ```
+
     Parameters
     ----------
     items : Iterable[Any]
@@ -1207,6 +1317,12 @@ class Breadcrumbs(Widget):
 
 class TabList(Widget):
     """Render an Astryx tab list.
+
+    Examples
+    --------
+    ```python
+    ax.TabList(["Summary", "Orders", "Risk"], value="Orders")
+    ```
 
     Parameters
     ----------
@@ -1283,6 +1399,12 @@ class TabList(Widget):
 class SegmentedControl(Widget):
     """Render a compact Astryx segmented control.
 
+    Examples
+    --------
+    ```python
+    ax.SegmentedControl(["Compact", "Standard", "Detailed"], value="Standard", label="Density")
+    ```
+
     Parameters
     ----------
     items : Iterable[Any]
@@ -1351,6 +1473,12 @@ class SegmentedControl(Widget):
 
 class RadioList(Widget):
     """Render a single-choice Astryx radio list.
+
+    Examples
+    --------
+    ```python
+    ax.RadioList(["Auto", "Manual"], value="Auto", label="Routing", orientation="horizontal")
+    ```
 
     Parameters
     ----------
@@ -1442,6 +1570,12 @@ class RadioList(Widget):
 class CheckboxList(Widget):
     """Render a multi-choice Astryx checkbox list.
 
+    Examples
+    --------
+    ```python
+    ax.CheckboxList(["Quotes", "Trades", "Depth"], value=["Quotes", "Trades"], label="Streams")
+    ```
+
     Parameters
     ----------
     items : Iterable[Any]
@@ -1530,6 +1664,15 @@ class CheckboxList(Widget):
 class ButtonGroup(Widget):
     """Render an Astryx button group from item records.
 
+    Examples
+    --------
+    ```python
+    ax.ButtonGroup(
+        [{"label": "Apply", "variant": "primary"}, {"label": "Stage"}, {"label": "Cancel", "variant": "ghost"}],
+        label="Order actions",
+    )
+    ```
+
     Parameters
     ----------
     items : Iterable[Any]
@@ -1607,6 +1750,12 @@ class ButtonGroup(Widget):
 
 class ToggleButtonGroup(Widget):
     """Render a single- or multiple-selection group of toggle buttons.
+
+    Examples
+    --------
+    ```python
+    ax.ToggleButtonGroup([("Grid", "grid"), ("List", "list")], value="grid", label="View mode")
+    ```
 
     Parameters
     ----------
@@ -1688,6 +1837,12 @@ class ToggleButtonGroup(Widget):
 class AvatarGroup(Widget):
     """Render a compact group of Astryx avatars.
 
+    Examples
+    --------
+    ```python
+    ax.AvatarGroup(["Ada Lovelace", "Grace Hopper", "Katherine Johnson"], overflow_count=2)
+    ```
+
     Parameters
     ----------
     items : Iterable[Any]
@@ -1741,6 +1896,12 @@ class AvatarGroup(Widget):
 class Code(Widget):
     """Render inline code with Astryx styling.
 
+    Examples
+    --------
+    ```python
+    ax.Code("order_id")
+    ```
+
     Parameters
     ----------
     code : str
@@ -1774,6 +1935,12 @@ class Code(Widget):
 
 class Citation(Widget):
     """Render a compact inline citation reference.
+
+    Examples
+    --------
+    ```python
+    ax.Citation({"title": "Run report", "url": "#"}, number=1)
+    ```
 
     Parameters
     ----------
@@ -1825,6 +1992,17 @@ class Citation(Widget):
 
 class Field(Widget):
     """Wrap a custom control with an Astryx field label.
+
+    Examples
+    --------
+    ```python
+    ax.Field(
+        ax.TextInput(value="NVDA", label="Symbol", label_hidden=True),
+        label="Symbol",
+        description="Primary listing ticker",
+        width=240,
+    )
+    ```
 
     Parameters
     ----------
@@ -1937,6 +2115,12 @@ class Field(Widget):
 class FieldStatus(Widget):
     """Render an Astryx field status message.
 
+    Examples
+    --------
+    ```python
+    ax.FieldStatus("Quantity exceeds the risk limit", type="error")
+    ```
+
     Parameters
     ----------
     message : str
@@ -1984,6 +2168,15 @@ class FieldStatus(Widget):
 class FormLayout(Widget):
     """Arrange Astryx form controls with consistent spacing.
 
+    Examples
+    --------
+    ```python
+    ax.FormLayout(
+        [ax.TextInput(value="AAPL", label="Symbol"), ax.NumberInput(value=100, label="Quantity")],
+        direction="horizontal-labels",
+    )
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -2026,6 +2219,17 @@ class FormLayout(Widget):
 
 class InputGroup(Widget):
     """Group an input with prefix and suffix adornments.
+
+    Examples
+    --------
+    ```python
+    ax.InputGroup(
+        ax.NumberInput(value=100, label="Quantity", label_hidden=True),
+        label="Quantity",
+        suffix="sh",
+        width=200,
+    )
+    ```
 
     Parameters
     ----------
@@ -2120,6 +2324,12 @@ class InputGroup(Widget):
 class Collapsible(Widget):
     """Render expandable notebook content.
 
+    Examples
+    --------
+    ```python
+    ax.Collapsible(ax.Text("Venue latency p95: 3.2 ms"), trigger="Diagnostics", default_open=True)
+    ```
+
     Parameters
     ----------
     children : ChildInput
@@ -2178,6 +2388,19 @@ class Collapsible(Widget):
 
 class Outline(Widget):
     """Render a table-of-contents outline.
+
+    Examples
+    --------
+    ```python
+    ax.Outline(
+        [
+            {"id": "summary", "label": "Summary", "level": 1},
+            {"id": "orders", "label": "Orders", "level": 2},
+            {"id": "risk", "label": "Risk", "level": 2},
+        ],
+        active_id="orders",
+    )
+    ```
 
     Parameters
     ----------
@@ -2244,6 +2467,21 @@ class Outline(Widget):
 class TreeList(Widget):
     """Render hierarchical notebook data as an expandable tree.
 
+    Examples
+    --------
+    ```python
+    ax.TreeList(
+        [
+            {
+                "id": "catalog",
+                "label": "catalog",
+                "isExpanded": True,
+                "children": [{"id": "quotes", "label": "quotes.parquet"}, {"id": "trades", "label": "trades.parquet"}],
+            }
+        ]
+    )
+    ```
+
     Parameters
     ----------
     items : Iterable[Mapping[str, Any]]
@@ -2301,6 +2539,15 @@ class TreeList(Widget):
 
 class Toolbar(Widget):
     """Render an Astryx toolbar with optional slots.
+
+    Examples
+    --------
+    ```python
+    ax.Toolbar(
+        {"start": ax.Heading("Orders", level=4), "end": ax.Button("New order", variant="primary")},
+        label="Orders toolbar",
+    )
+    ```
 
     Parameters
     ----------
@@ -2384,6 +2631,12 @@ class Toolbar(Widget):
 
 class Tooltip(Widget):
     """Attach a tooltip to notebook content.
+
+    Examples
+    --------
+    ```python
+    ax.Tooltip("Runs the pre-trade checks", ax.Button("Validate"), open=True)
+    ```
 
     Parameters
     ----------
@@ -2492,6 +2745,12 @@ class Tooltip(Widget):
 class HoverCard(Widget):
     """Attach a hover card with richer preview content.
 
+    Examples
+    --------
+    ```python
+    ax.HoverCard(ax.Text("Last run: success"), ax.Button("Run state"))
+    ```
+
     Parameters
     ----------
     content : str | ChildInput
@@ -2592,6 +2851,12 @@ class HoverCard(Widget):
 
 class Popover(Widget):
     """Render click-triggered popover content.
+
+    Examples
+    --------
+    ```python
+    ax.Popover(ax.Text("Order details"), ax.Button("Details"), label="Details", open=True)
+    ```
 
     Parameters
     ----------
@@ -2700,6 +2965,12 @@ class Popover(Widget):
 class DropdownMenu(Widget):
     """Render a button-backed Astryx dropdown menu.
 
+    Examples
+    --------
+    ```python
+    ax.DropdownMenu([{"label": "Refresh", "value": "refresh"}, {"label": "Export", "value": "export"}], label="Actions")
+    ```
+
     Parameters
     ----------
     items : Iterable[Any]
@@ -2796,6 +3067,12 @@ class DropdownMenu(Widget):
 class MoreMenu(Widget):
     """Render a compact overflow action menu.
 
+    Examples
+    --------
+    ```python
+    ax.MoreMenu(["Edit", "Duplicate", "Archive"], label="Row actions")
+    ```
+
     Parameters
     ----------
     items : Iterable[Any]
@@ -2878,6 +3155,12 @@ class MoreMenu(Widget):
 
 class Calendar(Widget):
     """Render an Astryx calendar date picker.
+
+    Examples
+    --------
+    ```python
+    ax.Calendar("2026-10-21")
+    ```
 
     Parameters
     ----------
@@ -2968,6 +3251,12 @@ class Calendar(Widget):
 
 class FileInput(Widget):
     """Render an Astryx file input.
+
+    Examples
+    --------
+    ```python
+    ax.FileInput(label="Upload fills", accept=".csv", width=280)
+    ```
 
     Parameters
     ----------
@@ -3091,6 +3380,12 @@ class FileInput(Widget):
 
 class Typeahead(Widget):
     """Render a notebook-safe Astryx typeahead.
+
+    Examples
+    --------
+    ```python
+    ax.Typeahead(["AAPL", "MSFT", "NVDA"], value="AAPL", label="Symbol", width=240)
+    ```
 
     Parameters
     ----------
@@ -3221,6 +3516,12 @@ class Typeahead(Widget):
 
 class Tokenizer(Widget):
     """Render a notebook-safe Astryx tokenizer.
+
+    Examples
+    --------
+    ```python
+    ax.Tokenizer(["Bid", "Ask", "Last", "Size"], value=["Bid", "Ask"], label="Fields", width=280)
+    ```
 
     Parameters
     ----------
@@ -3364,6 +3665,16 @@ class Tokenizer(Widget):
 class CommandPalette(Widget):
     """Render an inline Astryx command palette for notebook output areas.
 
+    Examples
+    --------
+    ```python
+    ax.CommandPalette(
+        [{"id": "refresh", "label": "Refresh"}, {"id": "export", "label": "Export CSV"}],
+        value="refresh",
+        width=360,
+    )
+    ```
+
     Parameters
     ----------
     items : Iterable[Any] | Mapping[str, Any]
@@ -3470,6 +3781,12 @@ class CommandPalette(Widget):
 class Lightbox(Widget):
     """Display one image or video, or a gallery, in an Astryx lightbox.
 
+    Examples
+    --------
+    ```python
+    ax.Lightbox([{"src": "https://picsum.photos/id/1015/640/360", "alt": "River valley", "caption": "Daily view"}])
+    ```
+
     Parameters
     ----------
     media : Mapping[str, Any] | Iterable[Mapping[str, Any]]
@@ -3526,6 +3843,12 @@ class Lightbox(Widget):
 
 class Dialog(Widget):
     """Render Astryx dialog content inline in notebook output.
+
+    Examples
+    --------
+    ```python
+    ax.Dialog(ax.Text("The dialog renders inline in the output."), open=True, width=360)
+    ```
 
     Parameters
     ----------
@@ -3618,6 +3941,12 @@ class Dialog(Widget):
 
 class AlertDialog(Widget):
     """Render an inline Astryx alert dialog for confirmations.
+
+    Examples
+    --------
+    ```python
+    ax.AlertDialog("Cancel all orders?", "Open orders on every venue are cancelled.", action_label="Cancel all")
+    ```
 
     Parameters
     ----------
@@ -3714,5 +4043,833 @@ class AlertDialog(Widget):
                 actionVariant=action_variant,
                 isActionLoading=action_loading,
                 width=width,
+            ),
+        )
+
+
+# A keyed slot holds one widget, so a sequence for it becomes one stack.
+def _slot(child: ChildInput, direction: Orientation = Orientation.VERTICAL) -> ChildInput:
+    if isinstance(child, (list, tuple)):
+        return child[0] if len(child) == 1 else Stack(list(child), direction=direction)
+
+    return child
+
+
+class HStack(Stack):
+    """Arrange child widgets in a horizontal Astryx stack.
+
+    Examples
+    --------
+    ```python
+    ax.HStack([ax.Badge("Live", variant="success"), ax.Badge("Paper", variant="info")], gap=2)
+    ```
+
+    Parameters
+    ----------
+    children : ChildInput
+        Child widget, sequence of widgets, or mapping of slot names to widgets.
+    gap : int | float, default 2
+        Astryx spacing step between children.
+    align : Align | str, optional
+        Vertical alignment of the children.
+    justify : Justify | str, optional
+        Horizontal distribution of the children.
+    width : int | float | str | None, default None
+        Container width.
+    height : int | float | str | None, default None
+        Container height.
+    padding : int | float | None, default None
+        Inner padding using the Astryx spacing scale.
+    wrap : Wrap | str | None, default None
+        Whether children wrap onto more rows.
+    scrollable : bool | None, default None
+        Whether overflow should scroll.
+    **props : Any
+        JSON-safe HStack props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe HStack props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``gap`` (spacing step): Spacing between items. Accepts Astryx spacing steps such as 0, 0.5, 1,
+      2, 3, 4, 6, 8, and 10.
+    - ``justify`` ('start' or 'center' or 'end' or 'between' or 'around' or 'evenly'): Horizontal
+      distribution.
+    - ``align`` ('start' or 'center' or 'end' or 'stretch'; default 'stretch'): Vertical alignment.
+    - ``padding`` (spacing step): Inner padding on all sides using the spacing scale.
+    - ``paddingInline`` (spacing step): Horizontal padding override.
+    - ``paddingBlock`` (spacing step): Vertical padding override.
+    - ``width`` (number or string): Container width.
+    - ``height`` (number or string): Container height.
+    - ``maxWidth`` (number or string): Maximum container width.
+    - ``minHeight`` (number or string): Minimum container height.
+    - ``isScrollable`` (boolean; default false): Enables scrollable overflow.
+    - ``wrap`` ('nowrap' or 'wrap' or 'wrap-reverse'; default 'nowrap'): Whether items wrap.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/HStack>.
+    """
+
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        gap: int | float = 2,
+        align: Align | str | None = None,
+        justify: Justify | str | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        padding: int | float | None = None,
+        wrap: Wrap | str | None = None,
+        scrollable: bool | None = None,
+        **props: Any,
+    ) -> None:
+        align = optional_choice(align, Align, "align")
+        justify = optional_choice(justify, Justify, "justify")
+        wrap = optional_choice(wrap, Wrap, "wrap")
+        super().__init__(
+            children,
+            direction=Orientation.HORIZONTAL,
+            gap=gap,
+            align=align,
+            justify=justify,
+            width=width,
+            height=height,
+            padding=padding,
+            wrap=wrap,
+            scrollable=scrollable,
+            **props,
+        )
+
+
+class VStack(Stack):
+    """Arrange child widgets in a vertical Astryx stack.
+
+    Examples
+    --------
+    ```python
+    ax.VStack([ax.Text("Orders"), ax.Text("Fills")], gap=1)
+    ```
+
+    Parameters
+    ----------
+    children : ChildInput
+        Child widget, sequence of widgets, or mapping of slot names to widgets.
+    gap : int | float, default 2
+        Astryx spacing step between children.
+    align : Align | str, optional
+        Horizontal alignment of the children.
+    justify : Justify | str, optional
+        Vertical distribution of the children.
+    width : int | float | str | None, default None
+        Container width.
+    height : int | float | str | None, default None
+        Container height.
+    padding : int | float | None, default None
+        Inner padding using the Astryx spacing scale.
+    wrap : Wrap | str | None, default None
+        Whether children wrap onto more columns.
+    scrollable : bool | None, default None
+        Whether overflow should scroll.
+    **props : Any
+        JSON-safe VStack props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe VStack props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``gap`` (spacing step): Spacing between items. Accepts Astryx spacing steps such as 0, 0.5, 1,
+      2, 3, 4, 6, 8, and 10.
+    - ``justify`` ('start' or 'center' or 'end' or 'between' or 'around' or 'evenly'): Vertical
+      distribution.
+    - ``align`` ('start' or 'center' or 'end' or 'stretch'; default 'stretch'): Horizontal alignment.
+    - ``padding`` (spacing step): Inner padding on all sides using the spacing scale.
+    - ``paddingInline`` (spacing step): Horizontal padding override.
+    - ``paddingBlock`` (spacing step): Vertical padding override.
+    - ``width`` (number or string): Container width.
+    - ``height`` (number or string): Container height.
+    - ``maxWidth`` (number or string): Maximum container width.
+    - ``minHeight`` (number or string): Minimum container height.
+    - ``isScrollable`` (boolean; default false): Enables scrollable overflow.
+    - ``wrap`` ('nowrap' or 'wrap' or 'wrap-reverse'; default 'nowrap'): Whether items wrap.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/VStack>.
+    """
+
+    def __init__(
+        self,
+        children: ChildInput = None,
+        *,
+        gap: int | float = 2,
+        align: Align | str | None = None,
+        justify: Justify | str | None = None,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        padding: int | float | None = None,
+        wrap: Wrap | str | None = None,
+        scrollable: bool | None = None,
+        **props: Any,
+    ) -> None:
+        align = optional_choice(align, Align, "align")
+        justify = optional_choice(justify, Justify, "justify")
+        wrap = optional_choice(wrap, Wrap, "wrap")
+        super().__init__(
+            children,
+            direction=Orientation.VERTICAL,
+            gap=gap,
+            align=align,
+            justify=justify,
+            width=width,
+            height=height,
+            padding=padding,
+            wrap=wrap,
+            scrollable=scrollable,
+            **props,
+        )
+
+
+class Stepper(Widget):
+    """Render Astryx progress through ordered steps.
+
+    Examples
+    --------
+    ```python
+    ax.Stepper(["Draft", "Review", "Send"], 1, label="Order ticket")
+    ```
+
+    Parameters
+    ----------
+    items : Iterable[Any]
+        Step labels or records with ``label`` and optional ``description``,
+        ``status`` ('accent', 'success', 'warning', or 'error'),
+        ``disabled``, and ``optional`` keys.
+    value : int, default 0
+        Synchronized zero-based index of the active step.
+    label : str | None, default None
+        Accessible label of the stepper.
+    orientation : Orientation | str | None, default None
+        Horizontal or vertical layout.
+    density : Density | str | None, default None
+        Spacing between steps.
+    navigable : bool, default False
+        Whether clicking a step makes it active.
+    **props : Any
+        JSON-safe Stepper props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe Stepper props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``activeStep`` (number; required): Zero-based index of the active step.
+    - ``orientation`` ('horizontal' or 'vertical'; default 'horizontal'): Layout direction.
+    - ``label`` (string; default 'Progress'): Accessible label.
+    - ``density`` ('compact' or 'balanced' or 'spacious'; default 'balanced'): Spacing between steps.
+    - ``indicatorPosition`` ('separated' or 'on-track'; default 'separated'): Whether indicators sit
+      apart from the track or on it.
+    - ``horizontalOptions`` ({minimumStepWidth: number, collapsedVariant: 'withLabelAndControls'
+      or 'withLabel' or 'hiddenLabel'}): How a horizontal stepper collapses when steps do not fit.
+    - ``onStepClick`` ((index: number) => void): Enables non-linear navigation. The wrapper sets it
+      when ``navigable`` is true.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Stepper>.
+    """
+
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: int = 0,
+        *,
+        label: str | None = None,
+        orientation: Orientation | str | None = None,
+        density: Density | str | None = None,
+        navigable: bool = False,
+        **props: Any,
+    ) -> None:
+        orientation = optional_choice(orientation, Orientation, "orientation")
+        density = optional_choice(density, Density, "density")
+        super().__init__(
+            "Stepper",
+            value=value,
+            label=label or "",
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                label=label,
+                orientation=orientation,
+                density=density,
+                isNavigable=navigable,
+            ),
+        )
+
+
+class OverflowList(Widget):
+    """Render a row of Astryx buttons whose overflow collapses into a menu.
+
+    Examples
+    --------
+    ```python
+    ax.OverflowList(["Refresh", "Export CSV", "Cancel all", "Flatten"], max_visible=2)
+    ```
+
+    Parameters
+    ----------
+    items : Iterable[Any]
+        Button labels or records with ``label`` and optional ``value``,
+        ``icon``, ``variant``, and ``disabled`` keys. A click sends the item
+        value as an action.
+    label : str, default 'More'
+        Accessible label of the menu button that holds the hidden items.
+    gap : int | float | None, default None
+        Astryx spacing step between buttons.
+    min_visible : int | None, default None
+        Fewest buttons kept visible.
+    max_visible : int | None, default None
+        Most buttons shown before the rest collapse.
+    collapse_from : CollapseFrom | str | None, default None
+        Which end collapses first.
+    size : Size | str | None, default None
+        Button size.
+    callbacks : Iterable[Callable[[ComponentWidget], None]] | None, default None
+        Activation callbacks run on every button or menu click.
+    action_callbacks : Iterable[Callable[[ComponentWidget, Any], None]] | None, default None
+        Callbacks receiving the clicked item value.
+    **props : Any
+        JSON-safe OverflowList props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe OverflowList props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``gap`` (spacing step; default 2): Spacing between items.
+    - ``minVisibleItems`` (number; default 0): Fewest items kept visible.
+    - ``maxVisibleItems`` (number): Most items shown before the rest collapse.
+    - ``maxRows`` (number): Rows to fill before collapsing.
+    - ``collapseFrom`` ('start' or 'end'; default 'end'): Which end collapses first.
+    - ``behavior`` ('observeParent' or 'observeSelf'; default 'observeSelf'): Which element's width
+      decides how many items fit.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/OverflowList>.
+    """
+
+    def __init__(
+        self,
+        items: Iterable[Any],
+        *,
+        label: str = "More",
+        gap: int | float | None = None,
+        min_visible: int | None = None,
+        max_visible: int | None = None,
+        collapse_from: CollapseFrom | str | None = None,
+        size: Size | str | None = None,
+        callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
+        action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
+        | None = None,
+        **props: Any,
+    ) -> None:
+        collapse_from = optional_choice(collapse_from, CollapseFrom, "collapse_from")
+        size = optional_choice(size, Size, "size")
+        super().__init__(
+            "OverflowList",
+            label=label,
+            callbacks=callbacks,
+            action_callbacks=action_callbacks,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                gap=gap,
+                minVisibleItems=min_visible,
+                maxVisibleItems=max_visible,
+                collapseFrom=collapse_from,
+                size=size,
+            ),
+        )
+
+
+class ComplexSelector(Widget):
+    """Render an Astryx selector whose popup holds any widgets.
+
+    The popup content decides the value: set ``value`` from a callback of a
+    widget inside it, then call :meth:`hide` to close the popup.
+
+    Examples
+    --------
+    ```python
+    ax.ComplexSelector(ax.Text("Pick a symbol"), "AAPL", label="Symbol", width=240)
+    ```
+
+    Parameters
+    ----------
+    content : ChildInput
+        Widget shown in the popup while it is open. Several widgets stack
+        vertically.
+    value : Any, default None
+        Synchronized selection. Python sets it; the trigger shows it unless
+        ``trigger_label`` is given.
+    label : str
+        Visible or accessible label for the component.
+    label_hidden : bool | None, default None
+        Whether to visually hide the accessible label.
+    trigger_label : str | None, default None
+        Text shown on the trigger instead of ``value``.
+    placeholder : str | None, default None
+        Trigger text shown while ``value`` is empty.
+    description : str | None, default None
+        Helper text displayed with the selector.
+    size : Size | str | None, default None
+        Trigger size.
+    variant : SelectorVariant | str | None, default None
+        Input, secondary, or ghost trigger style.
+    width : int | float | str | None, default None
+        Trigger width.
+    disabled : bool, default False
+        Whether the selector is disabled.
+    **props : Any
+        JSON-safe ComplexSelector props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe ComplexSelector props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``label`` (string; required): Field label.
+    - ``isLabelHidden`` (boolean): Visually hides the label.
+    - ``description`` (string): Helper text below the label.
+    - ``isOptional`` (boolean): Marks the field optional.
+    - ``isRequired`` (boolean): Marks the field required.
+    - ``isLoading`` (boolean): Shows the loading state.
+    - ``status`` ({type: 'warning' or 'error' or 'success', message?: string}): Validation status.
+    - ``statusVariant`` ('attached' or 'detached' or 'tooltip'): Where the status message shows.
+    - ``size`` ('sm' or 'md' or 'lg'): Trigger size.
+    - ``variant`` ('input' or 'secondary' or 'ghost'): Trigger style.
+    - ``width`` (number or string): Trigger width.
+    - ``placement`` (LayerPlacement): Where the popup opens.
+    - ``alignment`` (LayerAlignment): Popup alignment along the placement side.
+    - ``triggerLabel`` (ReactNode): Trigger text. The wrapper passes ``trigger_label`` or ``value``.
+    - ``placeholder`` (ReactNode): Trigger text while empty.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/ComplexSelector>.
+    """
+
+    def __init__(
+        self,
+        content: ChildInput,
+        value: Any = None,
+        *,
+        label: str,
+        label_hidden: bool | None = None,
+        trigger_label: str | None = None,
+        placeholder: str | None = None,
+        description: str | None = None,
+        size: Size | str | None = None,
+        variant: SelectorVariant | str | None = None,
+        width: int | float | str | None = None,
+        disabled: bool = False,
+        **props: Any,
+    ) -> None:
+        size = optional_choice(size, Size, "size")
+        variant = optional_choice(variant, SelectorVariant, "variant")
+        super().__init__(
+            "ComplexSelector",
+            {"content": _slot(content)},
+            value=value,
+            label=label,
+            disabled=disabled,
+            props=_named_props(
+                props,
+                isLabelHidden=label_hidden,
+                label=label,
+                triggerLabel=trigger_label,
+                placeholder=placeholder,
+                description=description,
+                size=size,
+                variant=variant,
+                width=width,
+            ),
+        )
+
+
+class AppShell(Widget):
+    """Frame notebook content with Astryx top navigation, side navigation, and a banner.
+
+    Examples
+    --------
+    ```python
+    ax.AppShell(
+        ax.Text("Content"),
+        top_nav=ax.TopNav(["Orders", "Fills"], "Orders", heading="Trading desk"),
+        side_nav=ax.SideNav(["Overview", "Positions"], "Overview"),
+        height="auto",
+    )
+    ```
+
+    Parameters
+    ----------
+    content : ChildInput
+        Main content. Several widgets in this or another slot stack
+        vertically.
+    top_nav : ChildInput, default None
+        Widget shown across the top, typically a :class:`TopNav`.
+    side_nav : ChildInput, default None
+        Widget shown along the start side, typically a :class:`SideNav`.
+    banner : ChildInput, default None
+        Widget shown above the top navigation, typically a :class:`Banner`.
+    variant : FrameVariant | str | None, default None
+        Surface treatment of the content area.
+    content_padding : int | float | None, default None
+        Padding around the content using the Astryx spacing scale.
+    height : FrameHeight | str | None, default None
+        Whether the shell fills its container or fits its content.
+    **props : Any
+        JSON-safe AppShell props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe AppShell props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``variant`` ('wash' or 'surface' or 'section' or 'elevated'; default 'elevated'): Surface
+      treatment of the content area.
+    - ``contentPadding`` (spacing step): Padding around the content.
+    - ``height`` ('fill' or 'auto'; default 'fill'): Fill the container or fit the content.
+    - ``topNav``, ``sideNav``, ``banner`` (ReactNode): Navigation and banner slots. The wrapper
+      fills them from ``top_nav``, ``side_nav``, and ``banner``.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/AppShell>.
+    """
+
+    def __init__(
+        self,
+        content: ChildInput,
+        *,
+        top_nav: ChildInput = None,
+        side_nav: ChildInput = None,
+        banner: ChildInput = None,
+        variant: FrameVariant | str | None = None,
+        content_padding: int | float | None = None,
+        height: FrameHeight | str | None = None,
+        **props: Any,
+    ) -> None:
+        variant = optional_choice(variant, FrameVariant, "variant")
+        height = optional_choice(height, FrameHeight, "height")
+        slots = {"content": content, "top_nav": top_nav, "side_nav": side_nav, "banner": banner}
+        slots = {key: _slot(child) for key, child in slots.items() if child is not None}
+        super().__init__(
+            "AppShell",
+            slots,
+            props=_named_props(
+                props,
+                variant=variant,
+                contentPadding=content_padding,
+                height=height,
+            ),
+        )
+
+
+class Layout(Widget):
+    """Arrange widgets in the Astryx header, start, content, end, and footer regions.
+
+    Examples
+    --------
+    ```python
+    ax.Layout(
+        ax.Text("Content"),
+        header=ax.Heading("Orders", level=4),
+        start=ax.Text("Filters"),
+        footer=ax.Text("Updated 5 s ago", text_type="supporting"),
+        dividers=True,
+        height="auto",
+    )
+    ```
+
+    Parameters
+    ----------
+    content : ChildInput
+        Main content. Several widgets in this or another region stack
+        vertically.
+    header : ChildInput, default None
+        Widget shown across the top.
+    start : ChildInput, default None
+        Side panel at the start side.
+    end : ChildInput, default None
+        Side panel at the end side.
+    footer : ChildInput, default None
+        Widget shown across the bottom.
+    start_width : int | float | str | None, default None
+        Width of the start panel.
+    end_width : int | float | str | None, default None
+        Width of the end panel.
+    dividers : bool | None, default None
+        Whether borders separate the regions.
+    content_width : int | float | str | None, default None
+        Maximum width of the content in each region.
+    height : FrameHeight | str | None, default None
+        Whether the layout fills its container or fits its content.
+    padding : int | float | None, default None
+        Padding of each region using the Astryx spacing scale.
+    **props : Any
+        JSON-safe Layout props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe Layout props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``contentWidth`` (number or string): Maximum width of the content in each region.
+    - ``height`` ('fill' or 'auto'; default 'fill'): Fill the container or fit the content.
+    - ``padding`` (spacing step): Padding of each region.
+    - ``defaultHasDividers`` (boolean): Default divider visibility of the header, footer, and side
+      panels.
+    - ``header``, ``start``, ``content``, ``end``, ``footer`` (ReactNode): Region slots. The wrapper
+      fills them from the widget arguments.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/Layout>.
+    """
+
+    def __init__(
+        self,
+        content: ChildInput,
+        *,
+        header: ChildInput = None,
+        start: ChildInput = None,
+        end: ChildInput = None,
+        footer: ChildInput = None,
+        start_width: int | float | str | None = None,
+        end_width: int | float | str | None = None,
+        dividers: bool | None = None,
+        content_width: int | float | str | None = None,
+        height: FrameHeight | str | None = None,
+        padding: int | float | None = None,
+        **props: Any,
+    ) -> None:
+        height = optional_choice(height, FrameHeight, "height")
+        slots = {"content": content, "header": header, "start": start, "end": end, "footer": footer}
+        slots = {key: _slot(child) for key, child in slots.items() if child is not None}
+        super().__init__(
+            "Layout",
+            slots,
+            props=_named_props(
+                props,
+                startWidth=start_width,
+                endWidth=end_width,
+                defaultHasDividers=dividers,
+                contentWidth=content_width,
+                height=height,
+                padding=padding,
+            ),
+        )
+
+
+class SideNav(Widget):
+    """Render Astryx side navigation from item records.
+
+    Examples
+    --------
+    ```python
+    ax.SideNav(
+        ["Overview", {"type": "section", "title": "Desk", "items": ["Orders", "Fills"]}],
+        "Orders",
+        heading="Paper account",
+    )
+    ```
+
+    Parameters
+    ----------
+    items : Iterable[Any]
+        Item labels or records with ``label`` and optional ``value``, ``icon``,
+        ``disabled``, and nested ``items`` keys. A record with
+        ``"type": "section"``, a ``title``, and ``items`` groups items under a
+        heading.
+    value : str | None, default None
+        Synchronized value of the selected item. Clicking an item selects it.
+    heading : str | None, default None
+        Title shown above the items.
+    subheading : str | None, default None
+        Text shown under the heading.
+    icon : str | None, default None
+        Astryx icon name shown beside the heading.
+    menu : Iterable[Any] | None, default None
+        Heading menu entries as labels or records with ``label`` and optional
+        ``value``, ``description``, and ``disabled`` keys. A click sends the
+        entry value as an action.
+    collapsible : bool | None, default None
+        Whether a button collapses the navigation to icons.
+    resizable : bool | None, default None
+        Whether the navigation width can be dragged.
+    **props : Any
+        JSON-safe SideNav props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe SideNav props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``collapsible`` (boolean or {defaultIsCollapsed?: boolean, hasButton?: boolean,
+      buttonLabel?: string}): Collapses the navigation to icons.
+    - ``resizable`` (boolean or {defaultWidth?: number, minWidth?: number, maxWidth?: number,
+      autoSaveId?: string}): Lets the user drag the navigation width.
+    - ``header``, ``topContent``, ``footer``, ``footerIcons`` (ReactNode): Slots around the items.
+      The wrapper builds ``header`` from ``heading``, ``subheading``, ``icon``, and ``menu``.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/SideNav>.
+    """
+
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str | None = None,
+        *,
+        heading: str | None = None,
+        subheading: str | None = None,
+        icon: str | None = None,
+        menu: Iterable[Any] | None = None,
+        collapsible: bool | None = None,
+        resizable: bool | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "SideNav",
+            value=value,
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                heading=heading,
+                subheading=subheading,
+                icon=icon,
+                menu=_option_records(menu) if menu is not None else None,
+                collapsible=collapsible,
+                resizable=resizable,
+            ),
+        )
+
+
+class TopNav(Widget):
+    """Render Astryx top navigation from item records.
+
+    Examples
+    --------
+    ```python
+    ax.TopNav(
+        ["Orders", "Fills", {"label": "Reports", "items": ["Daily P&L"]}],
+        "Orders",
+        heading="Trading desk",
+        icon="menu",
+        end=ax.Button("Help", variant="ghost"),
+    )
+    ```
+
+    Parameters
+    ----------
+    items : Iterable[Any]
+        Item labels or records with ``label`` and optional ``value``, ``icon``,
+        and ``disabled`` keys. A record with ``items`` opens a dropdown of
+        entries with ``label`` and optional ``value`` and ``description``
+        keys; a click on an entry sends its value as an action.
+    value : str | None, default None
+        Synchronized value of the selected item. Clicking an item selects it.
+    end : ChildInput, default None
+        Widgets shown at the end of the bar, such as buttons. Several widgets
+        sit in a row.
+    heading : str | None, default None
+        Title shown at the start of the bar.
+    subheading : str | None, default None
+        Text shown under the heading.
+    icon : str | None, default None
+        Astryx icon name shown as the logo.
+    menu : Iterable[Any] | None, default None
+        Heading menu entries as labels or records with ``label`` and optional
+        ``value``, ``description``, and ``disabled`` keys. A click sends the
+        entry value as an action.
+    label : str | None, default None
+        Accessible label of the navigation.
+    **props : Any
+        JSON-safe TopNav props forwarded to Astryx. See the ``Astryx Props`` section below.
+
+    Astryx Props
+    ------------
+    JSON-safe TopNav props forwarded to Astryx.
+
+    Supported Astryx props include:
+
+    - ``label`` (string; default 'Top navigation'): Accessible label.
+    - ``heading``, ``startContent``, ``centerContent``, ``endContent`` (ReactNode): Bar slots. The
+      wrapper builds ``heading`` from ``heading``, ``subheading``, ``icon``, and ``menu``, puts the
+      items in ``startContent``, and fills ``endContent`` from ``end``.
+
+    Props typed as React nodes, render functions, event handlers, refs, or StyleX styles are
+    documented for Astryx parity but cannot be serialized directly from Python unless the
+    wrapper adapts them.
+
+    See Astryx component docs: <https://astryx.atmeta.com/components/TopNav>.
+    """
+
+    def __init__(
+        self,
+        items: Iterable[Any],
+        value: str | None = None,
+        *,
+        end: ChildInput = None,
+        heading: str | None = None,
+        subheading: str | None = None,
+        icon: str | None = None,
+        menu: Iterable[Any] | None = None,
+        label: str | None = None,
+        **props: Any,
+    ) -> None:
+        super().__init__(
+            "TopNav",
+            {"end": _slot(end, Orientation.HORIZONTAL)} if end is not None else None,
+            value=value,
+            label=label or "",
+            props=_named_props(
+                props,
+                items=_option_records(items),
+                heading=heading,
+                subheading=subheading,
+                icon=icon,
+                menu=_option_records(menu) if menu is not None else None,
+                label=label,
             ),
         )

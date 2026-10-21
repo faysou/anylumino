@@ -1,9 +1,11 @@
 import importlib
+import inspect
 import re
 from datetime import datetime
 from inspect import signature
 from pathlib import Path
 
+import ipywidgets
 import pytest
 import traitlets as t
 
@@ -34,7 +36,7 @@ from anylumino.common import static_asset
 
 
 def _asset_path(asset: object) -> Path:
-    path = getattr(asset, "_path", None)
+    path = asset if isinstance(asset, Path) else getattr(asset, "_path", None)
     assert isinstance(path, Path)
 
     return path
@@ -452,10 +454,12 @@ def test_date_controls_use_native_family() -> None:
 def test_widget_frontend_assets_are_lazy_paths() -> None:
     assert _asset_path(TabPanel._esm).parent.name == "layout"
     assert _asset_path(TextWidget._esm).parent.name == "layout"
-    assert _asset_path(DatePicker._esm).name == "native_control_widget.bundle.js"
+    assert _asset_path(DatePicker._esm).name == "native_control_widget.loader.js"
+    assert _asset_path(DatePicker._bundle).name == "native_control_widget.bundle.js"
     assert _asset_path(DatePicker._esm).parent.name == "controls"
     assert _asset_path(DatePicker._css).name == "native_control_widget.css"
-    assert _asset_path(ax.Widget._esm).name == "astryx_widget.bundle.js"
+    assert _asset_path(ax.Widget._esm).name == "astryx_widget.loader.js"
+    assert _asset_path(ax.Widget._bundle).name == "astryx_widget.bundle.js"
     assert _asset_path(ax.Widget._esm).parent.name == "astryx"
     assert _asset_path(ax.Widget._css).name == "astryx_widget.bundle.css"
 
@@ -1408,6 +1412,7 @@ def test_every_frontend_message_type_has_a_python_handler() -> None:
     """
     handled = {
         "activate",  # _ActionWidget._handle_frontend_event
+        "anylumino-bundle",  # SharedBundleWidget._send_bundle
         "click",  # ComponentWidget
         "close",  # ComponentWidget._handle_frontend_message
         "move",  # LayoutWidget._handle_frontend_message
@@ -1856,3 +1861,220 @@ def test_astryx_table_columns_can_be_assigned_before_rows() -> None:
 
     assert [(column["key"], column["header"]) for column in table.columns] == [("id", "Cycle"), ("delta", "Delta")]
     assert table.rows == [{"id": "1", "delta": 12.5}]
+
+
+def test_astryx_hstack_and_vstack_fix_the_stack_direction() -> None:
+    row = ax.HStack([ax.Text("a")], gap=1, justify="between")
+    column = ax.VStack([ax.Text("b")], align="center", padding=3)
+
+    assert (row.component_name, row.props) == (
+        "Stack",
+        {"direction": "horizontal", "gap": 1, "justify": "between"},
+    )
+    assert (column.component_name, column.props) == (
+        "Stack",
+        {"direction": "vertical", "gap": 2, "align": "center", "padding": 3},
+    )
+
+
+def test_astryx_status_widgets_map_their_keywords() -> None:
+    start = datetime(2026, 10, 21, 9, 30)
+    timer = ax.Timer(start, format="clock", color="primary")
+    indicator = ax.Indicator("indeterminate", kind="checkbox", size="sm", disabled=True)
+    nav_icon = ax.NavIcon("menu")
+    view = ax.RichTextView("**bold**")
+
+    assert timer.props == {"startTime": start.timestamp() * 1000, "format": "clock", "color": "primary"}
+    assert (indicator.value, indicator.disabled, indicator.props) == (
+        "indeterminate",
+        True,
+        {"kind": "checkbox", "size": "sm"},
+    )
+    assert (nav_icon.component_name, nav_icon.props) == ("NavIcon", {"icon": "menu"})
+    assert (view.component_name, view.text, view.props) == ("RichTextView", "**bold**", {})
+
+
+@pytest.mark.parametrize(
+    ("build", "message"),
+    [
+        (lambda: ax.Indicator("on"), "value='on' is not a valid IndicatorState"),
+        (lambda: ax.Indicator(kind="star"), "kind='star' is not a valid IndicatorKind"),
+        (lambda: ax.Timer(format="hours"), "format='hours' is not a valid TimerFormat"),
+        (lambda: ax.Toast(position="center"), "position='center' is not a valid ToastPosition"),
+        (lambda: ax.AppShell(ax.Text("a"), variant="flat"), "variant='flat' is not a valid FrameVariant"),
+        (lambda: ax.Layout(ax.Text("a"), height="full"), "height='full' is not a valid FrameHeight"),
+        (lambda: ax.ComplexSelector(ax.Text("a"), label="x", variant="link"), "variant='link' is not a valid SelectorVariant"),
+        (lambda: ax.OverflowList(["a"], collapse_from="middle"), "collapse_from='middle' is not a valid CollapseFrom"),
+    ],
+    ids=["indicator-state", "indicator-kind", "timer-format", "toast-position", "shell-variant", "layout-height", "selector-variant", "collapse-from"],
+)
+def test_astryx_new_widgets_reject_values_outside_their_enum(build, message) -> None:
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}; use one of "):
+        build()
+
+
+def test_astryx_toast_sends_notifications_and_dismissals(monkeypatch: pytest.MonkeyPatch) -> None:
+    toast = ax.Toast(position="topEnd", max_visible=3)
+    sent: list[dict] = []
+    monkeypatch.setattr(toast, "send", sent.append)
+
+    first = toast.notify("Filled", toast_id="fill-1")
+    second = toast.notify("Rejected", type="error", auto_hide=True, duration=2000)
+    toast.dismiss(first)
+
+    assert toast.props == {"position": "topEnd", "maxVisible": 3}
+    assert first == "fill-1"
+    assert re.fullmatch(r"[0-9a-f]{32}", second)
+    assert sent == [
+        {"type": "toast", "id": "fill-1", "body": "Filled", "toast_type": "info", "auto_hide": None, "duration": None},
+        {"type": "toast", "id": second, "body": "Rejected", "toast_type": "error", "auto_hide": True, "duration": 2000},
+        {"type": "toast-dismiss", "id": "fill-1"},
+    ]
+
+
+def test_astryx_navigation_widgets_keep_records_and_selection() -> None:
+    menu = [{"label": "Settings", "value": "settings"}]
+    side = ax.SideNav(
+        ["Overview", {"type": "section", "title": "Desk", "items": [{"label": "Fills", "value": "fills", "icon": "check"}]}],
+        "fills",
+        heading="Desk",
+        subheading="Paper",
+        icon="menu",
+        menu=menu,
+        collapsible=True,
+    )
+    top = ax.TopNav(["Orders", {"label": "More", "items": ["Export"]}], "Orders", end=ax.Button("Help"), label="Main")
+    steps = ax.Stepper(["Draft", {"label": "Send", "status": "error"}], 1, orientation="vertical", density="compact", navigable=True)
+    actions = ax.OverflowList(["Refresh", {"label": "Export", "value": "export"}], max_visible=1, collapse_from="start", size="sm")
+
+    assert (side.value, side.props) == (
+        "fills",
+        {
+            "items": ["Overview", {"type": "section", "title": "Desk", "items": [{"label": "Fills", "value": "fills", "icon": "check"}]}],
+            "heading": "Desk",
+            "subheading": "Paper",
+            "icon": "menu",
+            "menu": menu,
+            "collapsible": True,
+        },
+    )
+    assert (top.value, top.child_keys, top.props) == (
+        "Orders",
+        ["end"],
+        {"items": ["Orders", {"label": "More", "items": ["Export"]}], "label": "Main"},
+    )
+    assert (steps.value, steps.props) == (
+        1,
+        {
+            "items": ["Draft", {"label": "Send", "status": "error"}],
+            "orientation": "vertical",
+            "density": "compact",
+            "isNavigable": True,
+        },
+    )
+    assert (actions.label, actions.props) == (
+        "More",
+        {
+            "items": ["Refresh", {"label": "Export", "value": "export"}],
+            "maxVisibleItems": 1,
+            "collapseFrom": "start",
+            "size": "sm",
+        },
+    )
+
+
+def test_astryx_slot_containers_stack_widget_sequences() -> None:
+    nav = ax.TopNav(["Home"])
+    first, second = ax.Text("first"), ax.Text("second")
+    shell = ax.AppShell([first, second], top_nav=nav, variant="surface", content_padding=4, height="auto")
+    layout = ax.Layout(first, header=[second], end=ax.Text("end"), start_width=240, dividers=True)
+    selector = ax.ComplexSelector([ax.Text("a"), ax.Text("b")], "AAPL", label="Symbol", trigger_label="Apple")
+
+    content = shell.get_owner("content")
+    assert shell.child_keys == ["content", "top_nav"]
+    assert (content.component_name, content.props["direction"], content.widgets) == ("Stack", "vertical", [first, second])
+    assert shell.get_owner("top_nav") is nav
+    assert shell.props == {"variant": "surface", "contentPadding": 4, "height": "auto"}
+    assert layout.child_keys == ["content", "header", "end"]
+    assert layout.get_owner("header") is second
+    assert layout.props == {"startWidth": 240, "defaultHasDividers": True}
+    assert (selector.value, selector.child_keys, selector.props) == (
+        "AAPL",
+        ["content"],
+        {"label": "Symbol", "triggerLabel": "Apple"},
+    )
+
+
+def test_astryx_rich_text_editor_syncs_markdown_and_maps_keywords() -> None:
+    changes: list[object] = []
+    editor = ax.RichTextEditor(
+        "# Plan",
+        label="Notes",
+        placeholder="Write",
+        toolbar=False,
+        size="sm",
+        min_height=120,
+        continuous_update=False,
+        action_callbacks=[lambda _widget, value: changes.append(value)],
+    )
+    editor.value = "# Plan\n\nShip"
+
+    assert (editor.component_name, editor.label, editor.continuous_update) == ("RichTextEditor", "Notes", False)
+    assert editor.props == {"placeholder": "Write", "hasToolbar": False, "size": "sm", "minHeight": 120}
+    assert changes == ["# Plan\n\nShip"]
+
+
+VISUAL_CLASSES = [
+    (prefix, name)
+    for prefix, module in (("al", anylumino), ("ax", ax))
+    for name in module.__all__
+    if isinstance(getattr(module, name), type)
+    and issubclass(getattr(module, name), ipywidgets.DOMWidget)
+    and name not in {"ComponentWidget", "LayoutWidget", "Widget"}
+]
+
+
+@pytest.mark.parametrize(("prefix", "name"), VISUAL_CLASSES, ids=lambda value: value)
+def test_docstring_example_builds_its_class(prefix: str, name: str) -> None:
+    cls = getattr({"al": anylumino, "ax": ax}[prefix], name)
+    match = re.search(r"^Examples\n-+\n```python\n(.*?)\n```", cls.__doc__ and inspect.cleandoc(cls.__doc__), re.S | re.M)
+
+    assert match is not None
+    widget = eval(match.group(1), {"al": anylumino, "ax": ax})
+    assert type(widget).__name__ == name
+
+
+@pytest.mark.parametrize("widget_type", [TabPanel, Toolbar, DatePicker, ax.Text], ids=lambda cls: cls.__name__)
+def test_shared_bundle_widgets_send_their_bundle_on_request(
+    widget_type: type, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    widget = widget_type("Run") if widget_type is ax.Text else widget_type()
+    sent: list[dict] = []
+    monkeypatch.setattr(widget, "send", sent.append)
+
+    widget._send_bundle(widget, {"type": "search"}, None)
+    widget._send_bundle(widget, {"type": "anylumino-bundle"}, None)
+
+    assert sent == [{"type": "anylumino-bundle", "code": _asset_path(widget_type._bundle).read_text(encoding="utf-8")}]
+    assert "anylumino-bundle" in _asset_path(widget_type._esm).read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize(
+    "build",
+    [
+        lambda: ax.NumberInput(5, label="Qty", label_hidden=True),
+        lambda: ax.Slider(5, label="Risk", label_hidden=True),
+        lambda: ax.MultiSelector(["a"], label="Fields", label_hidden=True),
+        lambda: ax.DateInput("2026-10-21", label="Date", label_hidden=True),
+        lambda: ax.DateRangeInput({"start": "2026-10-01", "end": "2026-10-21"}, label="Period", label_hidden=True),
+        lambda: ax.DateTimeInput("2026-10-21T14:30", label="When", label_hidden=True),
+        lambda: ax.TimeInput("14:30", label="Cutoff", label_hidden=True),
+        lambda: ax.ComplexSelector(ax.Text("a"), label="Symbol", label_hidden=True),
+    ],
+    ids=["number", "slider", "multi-selector", "date", "date-range", "date-time", "time", "complex-selector"],
+)
+def test_astryx_inputs_hide_their_label_through_astryx(build) -> None:
+    widget = build()
+
+    assert widget.props["isLabelHidden"] is True
+    assert "label_hidden" not in widget.props

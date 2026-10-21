@@ -4,6 +4,16 @@ title: "ScrollBox"
 
 Astryx scrollable area holding a vertical stack of children.
 
+```python
+ax.ScrollBox([ax.Text(f"Fill {index}") for index in range(1, 21)], height=140)
+```
+
+import screenshot from '../../../assets/components/astryx-layout-ScrollBox.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="ScrollBox example rendered in JupyterLab" />
+</figure>
+
 ## Functions
 
 <PyFunction name="__init__" type="(children=None, *, titles=None, keys=None, axis='block', label='Scrollable content', gap=2, padding=None, width=None, height=320, max_width=None, min_height=None, **props) -> None" kind="constructor">

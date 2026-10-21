@@ -104,8 +104,12 @@ class Component:
         return prop.schema["properties"] if prop else {}
 
 
-def _children(argument: str = "widgets", required: bool = True) -> Prop:
-    return Prop("children", {"type": "array", "items": {"$ref": "#/$defs/Component"}}, required, PropKind.CHILDREN, argument)
+def _children(argument: str = "widgets", required: bool = True, name: str = "children") -> Prop:
+    return Prop(name, {"type": "array", "items": {"$ref": "#/$defs/Component"}}, required, PropKind.CHILDREN, argument)
+
+
+def _slot(name: str, required: bool = False) -> Prop:
+    return _children(name, required, name)
 
 
 def _change() -> Prop:
@@ -119,7 +123,7 @@ _COMPONENTS: tuple[Component, ...] = (
         "Stack",
         "Stacks children top to bottom at their natural size; gap is an Astryx spacing step",
         (_children("children"), Prop("gap", _NUMBER)),
-        fixed=(("direction", "vertical"),),
+        fixed=(("direction", "vertical"),)
     ),
     Component(
         "HBox",
@@ -127,7 +131,7 @@ _COMPONENTS: tuple[Component, ...] = (
         "Stack",
         "Places children left to right at their natural size; gap is an Astryx spacing step",
         (_children("children"), Prop("gap", _NUMBER)),
-        fixed=(("direction", "horizontal"),),
+        fixed=(("direction", "horizontal"),)
     ),
     Component(
         "SplitPanel",
@@ -138,14 +142,14 @@ _COMPONENTS: tuple[Component, ...] = (
             _children(),
             Prop("orientation", {"type": "string", "enum": ["horizontal", "vertical"]}),
             Prop("sizes", _NUMBERS),
-        ),
+        )
     ),
     Component(
         "TabPanel",
         "al",
         "TabPanel",
         "One tab per child, titled in order",
-        (_children(), Prop("titles", _STRINGS)),
+        (_children(), Prop("titles", _STRINGS))
     ),
     Component("Card", "ax", "Card", "A bordered surface around its children", (_children("children", False),)),
     Component(
@@ -153,7 +157,7 @@ _COMPONENTS: tuple[Component, ...] = (
         "ax",
         "Heading",
         "A section heading; level 1 is the largest",
-        (Prop("text", _STRING, True), Prop("level", _NUMBER)),
+        (Prop("text", _STRING, True), Prop("level", _NUMBER))
     ),
     Component("Text", "ax", "Text", "A run of plain text", (Prop("text", _STRING, True),)),
     Component("Markdown", "ax", "Markdown", "Rendered Markdown text", (Prop("text", _STRING, True),)),
@@ -166,21 +170,21 @@ _COMPONENTS: tuple[Component, ...] = (
             Prop("label", _STRING, True),
             Prop("action", _ACTION_REF, kind=PropKind.ACTION, event=ActionEvent.CLICK),
             Prop("variant", {"type": "string", "enum": ["primary", "secondary", "ghost", "destructive"]}),
-        ),
+        )
     ),
     Component(
         "TextInput",
         "ax",
         "TextInput",
         "A single-line text field; on_change runs with the new text",
-        (Prop("label", _STRING), Prop("value", _STRING), Prop("placeholder", _STRING), _change()),
+        (Prop("label", _STRING), Prop("value", _STRING), Prop("placeholder", _STRING), _change())
     ),
     Component(
         "TextArea",
         "ax",
         "TextArea",
         "A multi-line text field; on_change runs with the new text",
-        (Prop("label", _STRING), Prop("value", _STRING), Prop("placeholder", _STRING), Prop("rows", _NUMBER), _change()),
+        (Prop("label", _STRING), Prop("value", _STRING), Prop("placeholder", _STRING), Prop("rows", _NUMBER), _change())
     ),
     Component(
         "NumberInput",
@@ -194,14 +198,14 @@ _COMPONENTS: tuple[Component, ...] = (
             Prop("max", _NUMBER),
             Prop("step", _NUMBER),
             _change(),
-        ),
+        )
     ),
     Component(
         "Selector",
         "ax",
         "Selector",
         "A dropdown of string items; on_change runs with the chosen item",
-        (Prop("items", _STRINGS, True), Prop("value", _STRING), Prop("label", _STRING), _change()),
+        (Prop("items", _STRINGS, True), Prop("value", _STRING), Prop("label", _STRING), _change())
     ),
     Component(
         "Slider",
@@ -215,21 +219,21 @@ _COMPONENTS: tuple[Component, ...] = (
             Prop("max", _NUMBER),
             Prop("step", _NUMBER),
             _change(),
-        ),
+        )
     ),
     Component(
         "Switch",
         "ax",
         "Switch",
         "An on/off switch; on_change runs with true or false",
-        (Prop("label", _STRING), Prop("value", _BOOLEAN), _change()),
+        (Prop("label", _STRING), Prop("value", _BOOLEAN), _change())
     ),
     Component(
         "Checkbox",
         "ax",
         "Checkbox",
         "A checkbox; on_change runs with true or false",
-        (Prop("label", _STRING), Prop("value", _BOOLEAN), _change()),
+        (Prop("label", _STRING), Prop("value", _BOOLEAN), _change())
     ),
     Component(
         "Badge",
@@ -239,29 +243,113 @@ _COMPONENTS: tuple[Component, ...] = (
         (
             Prop("label", _STRING, True),
             Prop("variant", {"type": "string", "enum": ["neutral", "info", "success", "warning", "error"]}),
-        ),
+        )
     ),
     Component(
         "Table",
         "ax",
         "Table",
         "A table of row objects; columns lists the keys to show",
-        (Prop("rows", {"type": "array", "items": {"type": "object"}}, True), Prop("columns", _STRINGS)),
+        (Prop("rows", {"type": "array", "items": {"type": "object"}}, True), Prop("columns", _STRINGS))
     ),
     Component(
         "CodeBlock",
         "ax",
         "CodeBlock",
         "Highlighted source code",
-        (Prop("code", _STRING, True), Prop("language", _STRING)),
+        (Prop("code", _STRING, True), Prop("language", _STRING))
     ),
+    Component(
+        "AppShell",
+        "ax",
+        "AppShell",
+        "An app frame around content, with a TopNav in top_nav and a SideNav in side_nav",
+        (_slot("content", True), _slot("top_nav"), _slot("side_nav"), _slot("banner"))
+    ),
+    Component(
+        "Layout",
+        "ax",
+        "Layout",
+        "Content with header, footer, and start and end side panels",
+        (_slot("content", True), _slot("header"), _slot("start"), _slot("end"), _slot("footer"))
+    ),
+    Component(
+        "SideNav",
+        "ax",
+        "SideNav",
+        'Side navigation of labels or {label, value, icon, items} records; {type: "section", title, items} '
+        "groups them; on_change runs with the selected value",
+        (Prop("items", {"type": "array"}, True), Prop("value", _STRING), _change())
+    ),
+    Component(
+        "TopNav",
+        "ax",
+        "TopNav",
+        "Top navigation of labels or {label, value, icon, items} records, where items opens a dropdown; "
+        "on_change runs with the selected or clicked value",
+        (Prop("items", {"type": "array"}, True), Prop("value", _STRING), _slot("end"), _change())
+    ),
+    Component(
+        "Stepper",
+        "ax",
+        "Stepper",
+        "Ordered steps; value is the zero-based active step",
+        (Prop("items", _STRINGS, True), Prop("value", _NUMBER), _change())
+    ),
+    Component(
+        "OverflowList",
+        "ax",
+        "OverflowList",
+        "Buttons that overflow into a More menu; action runs with the clicked item",
+        (
+            Prop("items", _STRINGS, True),
+            Prop("action", _ACTION_REF, kind=PropKind.ACTION, event=ActionEvent.CHANGE),
+        )
+    ),
+    Component(
+        "ComplexSelector",
+        "ax",
+        "ComplexSelector",
+        "A selector whose popup holds content; a callback sets self.ui.<name>.value and calls .hide()",
+        (Prop("label", _STRING, True), _slot("content", True), Prop("value", _STRING))
+    ),
+    Component(
+        "RichTextEditor",
+        "ax",
+        "RichTextEditor",
+        "A rich text editor; on_change runs with the new Markdown",
+        (Prop("label", _STRING, True), Prop("value", _STRING), _change())
+    ),
+    Component("RichTextView", "ax", "RichTextView", "Read-only rich text rendered from Markdown", (Prop("text", _STRING, True),)),
+    Component(
+        "Timer",
+        "ax",
+        "Timer",
+        "Elapsed time since it rendered",
+        ()
+    ),
+    Component(
+        "Toast",
+        "ax",
+        "Toast",
+        "Notifications that callbacks show with self.ui.<name>.notify(text)",
+        (),
+    ),
+    Component(
+        "Indicator",
+        "ax",
+        "Indicator",
+        "A check, checkbox, or radio mark",
+        (Prop("value", {"type": "string", "enum": ["unchecked", "checked", "indeterminate"]}),)
+    ),
+    Component("NavIcon", "ax", "NavIcon", "An icon on an accent circle, such as an app logo", (Prop("icon", _STRING, True),)),
     Component(
         "Plot",
         "go",
         "FigureWidget",
         "An empty Plotly figure that the callbacks fill, such as self.ui.chart.add_traces(...); "
         "layout holds literal Plotly layout keys, such as {height: 320}",
-        (Prop("layout", {"type": "object"}),),
+        (Prop("layout", {"type": "object"}),)
     ),
     Component(
         "Widget",

@@ -8,6 +8,7 @@ In Python: `ax.NumberInput(label=..., value=..., min=..., max=..., step=...)`, p
 
 | Option | Type | Meaning |
 | ------ | ---- | ------- |
+| `label_hidden` | `boolean` | Whether to visually hide the accessible label. |
 | `disabled` | `boolean` | Whether the component should render disabled. |
 | `units` | `string` | Units displayed after the value. |
 | `size` | `"sm" \| "md" \| "lg"` | Input size. |

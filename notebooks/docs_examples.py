@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.5
+#       jupytext_version: 1.19.6
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -485,10 +485,22 @@ ax.Theme(
 )
 
 # %% [markdown]
+# ## astryx.mdx: Option values
+
+# %% [markdown]
+# Lines 105 to 108 of `content/docs/astryx.mdx`.
+
+# %%
+# docs-example(astryx-option-values)
+
+ax.Button("Run", size=ax.Size.LG, variant=ax.ButtonVariant.PRIMARY)
+ax.Button("Run", size="lg", variant="primary")
+
+# %% [markdown]
 # ## astryx.mdx: Layout panels
 
 # %% [markdown]
-# Lines 105 to 114 of `content/docs/astryx.mdx`.
+# Lines 123 to 132 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-layout-panels)
@@ -511,7 +523,7 @@ workspace
 # ## astryx.mdx: Form controls
 
 # %% [markdown]
-# Lines 127 to 149 of `content/docs/astryx.mdx`.
+# Lines 145 to 167 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-form-controls)
@@ -544,7 +556,7 @@ order_form
 # ## astryx.mdx: Form controls
 
 # %% [markdown]
-# Lines 155 to 158 of `content/docs/astryx.mdx`.
+# Lines 173 to 176 of `content/docs/astryx.mdx`.
 
 # %%
 order_form["symbol"].value
@@ -554,7 +566,7 @@ order_form["quantity"].value
 # ## astryx.mdx: Form controls
 
 # %% [markdown]
-# Lines 164 to 175 of `content/docs/astryx.mdx`.
+# Lines 182 to 193 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-form-controls-3)
@@ -574,7 +586,7 @@ ax.Stack({"symbol": symbol, "status": status}, gap=2)
 # ## astryx.mdx: Selection controls
 
 # %% [markdown]
-# Lines 184 to 210 of `content/docs/astryx.mdx`.
+# Lines 202 to 228 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-selection-controls)
@@ -611,7 +623,7 @@ filters
 # ## astryx.mdx: Buttons and actions
 
 # %% [markdown]
-# Lines 223 to 242 of `content/docs/astryx.mdx`.
+# Lines 241 to 260 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-buttons-and-actions)
@@ -639,7 +651,7 @@ ax.Stack({"status": status, "submit": submit, "actions": actions}, gap=3)
 # ## astryx.mdx: Tables
 
 # %% [markdown]
-# Lines 251 to 266 of `content/docs/astryx.mdx`.
+# Lines 269 to 284 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-tables)
@@ -662,10 +674,45 @@ orders.remove_row("O-1")
 orders
 
 # %% [markdown]
+# ## astryx.mdx: App frames and notifications
+
+# %% [markdown]
+# Lines 299 to 325 of `content/docs/astryx.mdx`.
+
+# %%
+# docs-example(astryx-app-frames-and-notifications)
+
+toast = ax.Toast(position="bottomEnd")
+page = ax.Text("Overview", text_type="supporting")
+
+top = ax.TopNav(["Orders", "Fills"], "Orders", heading="Trading desk", icon="menu", end=toast)
+side = ax.SideNav(
+    ["Overview", {"type": "section", "title": "Desk", "items": ["Orders", "Fills"]}],
+    "Overview",
+    heading="Paper account",
+)
+side.on_action(lambda _nav, value: setattr(page, "text", value))
+
+steps = ax.Stepper(["Draft", "Review", "Send"], 1, label="Order ticket")
+actions = ax.OverflowList(
+    ["Refresh", "Export CSV", "Cancel all", "Flatten"],
+    max_visible=2,
+    action_callbacks=[lambda _list, action: toast.notify(f"Ran {action}")],
+)
+notes = ax.RichTextEditor("## Plan\n\n- Buy **AAPL** on the open", label="Notes")
+
+ax.AppShell(
+    ax.Layout([steps, actions, notes], header=ax.Heading("Orders", level=3), footer=page),
+    top_nav=top,
+    side_nav=side,
+    height="auto",
+)
+
+# %% [markdown]
 # ## astryx.mdx: Theme identity
 
 # %% [markdown]
-# Lines 280 to 319 of `content/docs/astryx.mdx`.
+# Lines 340 to 379 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-theme-identity)
@@ -715,7 +762,7 @@ panel
 # ## astryx.mdx: Notebook-safe overlays
 
 # %% [markdown]
-# Lines 358 to 378 of `content/docs/astryx.mdx`.
+# Lines 418 to 438 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-notebook-safe-overlays)

@@ -4,6 +4,21 @@ title: "Field"
 
 Wrap a custom control with an Astryx field label.
 
+```python
+ax.Field(
+    ax.TextInput(value="NVDA", label="Symbol", label_hidden=True),
+    label="Symbol",
+    description="Primary listing ticker",
+    width=240,
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Field.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Field example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Field props forwarded to Astryx.
 

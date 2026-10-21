@@ -4,6 +4,16 @@ title: "Tooltip"
 
 Attach a tooltip to notebook content.
 
+```python
+ax.Tooltip("Runs the pre-trade checks", ax.Button("Validate"), open=True)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Tooltip.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Tooltip example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Tooltip props forwarded to Astryx.
 

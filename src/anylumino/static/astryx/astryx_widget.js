@@ -5,6 +5,7 @@ import "@astryxdesign/core/reset.css";
 import "@astryxdesign/core/astryx.css";
 import "@astryxdesign/theme-neutral/theme.css";
 import { AlertDialog } from "@astryxdesign/core/AlertDialog";
+import { AppShell } from "@astryxdesign/core/AppShell";
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Avatar } from "@astryxdesign/core/Avatar";
 import { AvatarGroup, AvatarGroupOverflow } from "@astryxdesign/core/AvatarGroup";
@@ -36,6 +37,7 @@ import { Code } from "@astryxdesign/core/Code";
 import { CodeBlock } from "@astryxdesign/core/CodeBlock";
 import { Collapsible, CollapsibleGroup } from "@astryxdesign/core/Collapsible";
 import { CommandPalette } from "@astryxdesign/core/CommandPalette";
+import { ComplexSelector } from "@astryxdesign/core/ComplexSelector";
 import { ContextMenu } from "@astryxdesign/core/ContextMenu";
 import { DateInput } from "@astryxdesign/core/DateInput";
 import { DateRangeInput } from "@astryxdesign/core/DateRangeInput";
@@ -52,9 +54,12 @@ import { Grid } from "@astryxdesign/core/Grid";
 import { HoverCard } from "@astryxdesign/core/HoverCard";
 import { Icon } from "@astryxdesign/core/Icon";
 import { IconButton } from "@astryxdesign/core/IconButton";
+import { CheckboxIndicator, CheckIndicator, RadioIndicator } from "@astryxdesign/core/Indicator";
 import { InputGroup, InputGroupText } from "@astryxdesign/core/InputGroup";
 import { Item } from "@astryxdesign/core/Item";
 import { Kbd } from "@astryxdesign/core/Kbd";
+import { LayerProvider } from "@astryxdesign/core/Layer";
+import { Layout, LayoutContent, LayoutFooter, LayoutHeader, LayoutPanel } from "@astryxdesign/core/Layout";
 import { Link } from "@astryxdesign/core/Link";
 import { Lightbox } from "@astryxdesign/core/Lightbox";
 import { List, ListItem } from "@astryxdesign/core/List";
@@ -62,8 +67,11 @@ import { Markdown } from "@astryxdesign/core/Markdown";
 import { MetadataList, MetadataListItem } from "@astryxdesign/core/MetadataList";
 import { MoreMenu } from "@astryxdesign/core/MoreMenu";
 import { MultiSelector } from "@astryxdesign/core/MultiSelector";
+import { NavIcon } from "@astryxdesign/core/NavIcon";
+import { NavHeadingMenu, NavHeadingMenuItem } from "@astryxdesign/core/NavMenu";
 import { NumberInput } from "@astryxdesign/core/NumberInput";
 import { Outline } from "@astryxdesign/core/Outline";
+import { OverflowList } from "@astryxdesign/core/OverflowList";
 import { Overlay } from "@astryxdesign/core/Overlay";
 import { Pagination } from "@astryxdesign/core/Pagination";
 import { Popover } from "@astryxdesign/core/Popover";
@@ -75,12 +83,14 @@ import { ScrollableArea } from "@astryxdesign/core/ScrollableArea";
 import { Section } from "@astryxdesign/core/Section";
 import { SegmentedControl, SegmentedControlItem } from "@astryxdesign/core/SegmentedControl";
 import { SelectableCard } from "@astryxdesign/core/SelectableCard";
+import { SideNav, SideNavHeading, SideNavItem, SideNavSection } from "@astryxdesign/core/SideNav";
 import { Selector } from "@astryxdesign/core/Selector";
 import { Skeleton } from "@astryxdesign/core/Skeleton";
 import { Slider } from "@astryxdesign/core/Slider";
 import { Spinner } from "@astryxdesign/core/Spinner";
 import { HStack, Stack, VStack } from "@astryxdesign/core/Stack";
 import { StatusDot } from "@astryxdesign/core/StatusDot";
+import { Step, Stepper } from "@astryxdesign/core/Stepper";
 import { Switch } from "@astryxdesign/core/Switch";
 import {
   Table,
@@ -95,16 +105,26 @@ import { TextArea } from "@astryxdesign/core/TextArea";
 import { TextInput } from "@astryxdesign/core/TextInput";
 import { Thumbnail } from "@astryxdesign/core/Thumbnail";
 import { TimeInput } from "@astryxdesign/core/TimeInput";
+import { Timer } from "@astryxdesign/core/Timer";
 import { Timestamp } from "@astryxdesign/core/Timestamp";
+import { useToast } from "@astryxdesign/core/Toast";
 import { ToggleButton, ToggleButtonGroup } from "@astryxdesign/core/ToggleButton";
 import { Token } from "@astryxdesign/core/Token";
 import { Tokenizer } from "@astryxdesign/core/Tokenizer";
 import { Toolbar } from "@astryxdesign/core/Toolbar";
 import { Tooltip } from "@astryxdesign/core/Tooltip";
+import { TopNav, TopNavHeading, TopNavItem, TopNavMenu } from "@astryxdesign/core/TopNav";
 import { TreeList } from "@astryxdesign/core/TreeList";
 import { Typeahead, createStaticSource } from "@astryxdesign/core/Typeahead";
 import { Theme, defineTheme, generateThemeCSS } from "@astryxdesign/core/theme";
 import { neutralTheme } from "@astryxdesign/theme-neutral/built";
+import {
+  RichTextEditor,
+  RichTextEditorToolbar,
+  RichTextView,
+  markdownToEditorStateJSON,
+} from "@astryxdesign/richtext";
+import "@astryxdesign/richtext/richtext.css";
 import {
   clampIndex,
   combineSignals,
@@ -133,6 +153,7 @@ import "./astryx_widget.css";
 
 const COMPONENTS = {
   AlertDialog,
+  AppShell,
   AspectRatio,
   Avatar,
   AvatarGroup,
@@ -169,12 +190,15 @@ const COMPONENTS = {
   FormLayout,
   Grid,
   HoverCard,
+  HStack,
   Heading,
   Icon,
   IconButton,
+  Indicator: AstryxIndicator,
   InputGroup,
   Item,
   Kbd,
+  Layout,
   Link,
   Lightbox,
   List,
@@ -182,23 +206,28 @@ const COMPONENTS = {
   MetadataList,
   MoreMenu,
   MultiSelector,
+  NavIcon,
   NumberInput,
   Outline,
+  OverflowList,
   Overlay,
   Pagination,
   Popover,
   PowerSearch,
   ProgressBar,
   RadioList,
+  RichTextView,
   Section,
   SegmentedControl,
   SelectableCard,
   Selector,
+  SideNav,
   Skeleton,
   Slider,
   Spinner,
   Stack,
   StatusDot,
+  Stepper,
   Switch,
   Table,
   TabList,
@@ -207,6 +236,7 @@ const COMPONENTS = {
   TextInput,
   Thumbnail,
   TimeInput,
+  Timer,
   Timestamp,
   ToggleButton,
   ToggleButtonGroup,
@@ -214,8 +244,10 @@ const COMPONENTS = {
   Tokenizer,
   Toolbar,
   Tooltip,
+  TopNav,
   TreeList,
   Typeahead,
+  VStack,
 };
 
 const PROP_DRIVEN_COMPONENTS = new Set([
@@ -239,15 +271,18 @@ const PROP_DRIVEN_COMPONENTS = new Set([
   "FileInput",
   "Icon",
   "IconButton",
+  "Indicator",
   "Lightbox",
   "Kbd",
   "MultiSelector",
   "MoreMenu",
+  "NavIcon",
   "NumberInput",
   "Outline",
   "Pagination",
   "PowerSearch",
   "ProgressBar",
+  "RichTextView",
   "SelectableCard",
   "Selector",
   "LogSlider",
@@ -262,6 +297,7 @@ const PROP_DRIVEN_COMPONENTS = new Set([
   "TextInput",
   "Thumbnail",
   "TimeInput",
+  "Timer",
   "Timestamp",
   "ToggleButton",
   "Token",
@@ -277,10 +313,14 @@ const GENERATED_CHILD_COMPONENTS = new Set([
   "CheckboxList",
   "List",
   "MetadataList",
+  "OverflowList",
   "RadioList",
   "SegmentedControl",
+  "SideNav",
+  "Stepper",
   "TabList",
   "ToggleButtonGroup",
+  "TopNav",
 ]);
 
 function textFor(model) {
@@ -1367,6 +1407,99 @@ function componentProps(model, draft, elementId) {
     };
   }
 
+  if (name === "Indicator") {
+    return { ...props, state: String(value || "checked"), isDisabled: disabled };
+  }
+
+  if (name === "NavIcon") {
+    return { ...props, icon: iconNode(props.icon) };
+  }
+
+  if (name === "RichTextView") {
+    return { ...props, value: markdownToEditorStateJSON(textFor(model)) };
+  }
+
+  if (name === "Stepper") {
+    const { isNavigable, ...stepperProps } = props;
+    return {
+      ...stepperProps,
+      label: props.label || undefined,
+      activeStep: Number(value ?? 0),
+      onStepClick: isNavigable ? (index) => setNumberValue(model, index) : undefined,
+    };
+  }
+
+  if (name === "OverflowList") {
+    const { size, label: _label, ...listProps } = props;
+    const items = asArray(rawProps(model).items);
+    return {
+      ...listProps,
+      overflowRenderer: (overflow) => React.createElement(MoreMenu, {
+        label: label || "More",
+        size,
+        items: menuItems(model, overflow.map(({ index }) => items[index])),
+      }),
+    };
+  }
+
+  if (name === "SideNav") {
+    const { heading, subheading, icon, menu, ...navProps } = props;
+    return {
+      ...navProps,
+      header: heading
+        ? React.createElement(SideNavHeading, {
+          heading: String(heading),
+          subheading: subheading ?? undefined,
+          icon: icon ? React.createElement(NavIcon, { icon: iconNode(icon) }) : undefined,
+          menu: navHeadingMenu(model, menu),
+        })
+        : undefined,
+    };
+  }
+
+  if (name === "TopNav") {
+    const { heading, subheading, icon, menu, ...navProps } = props;
+    return {
+      ...navProps,
+      label: props.label || undefined,
+      heading: heading || icon
+        ? React.createElement(TopNavHeading, {
+          heading: heading ?? undefined,
+          subheading: subheading ?? undefined,
+          logo: icon ? React.createElement(NavIcon, { icon: iconNode(icon) }) : undefined,
+          menu: navHeadingMenu(model, menu),
+        })
+        : undefined,
+      endContent: slotByKey(model, "end"),
+    };
+  }
+
+  if (name === "AppShell") {
+    return {
+      mobileNav: false,
+      ...props,
+      topNav: slotByKey(model, "top_nav"),
+      sideNav: slotByKey(model, "side_nav"),
+      banner: slotByKey(model, "banner"),
+    };
+  }
+
+  if (name === "Layout") {
+    const { startWidth, endWidth, ...layoutProps } = props;
+    const header = slotByKey(model, "header");
+    const start = slotByKey(model, "start");
+    const end = slotByKey(model, "end");
+    const footer = slotByKey(model, "footer");
+    return {
+      ...layoutProps,
+      header: header && React.createElement(LayoutHeader, null, header),
+      start: start && React.createElement(LayoutPanel, { width: startWidth }, start),
+      content: React.createElement(LayoutContent, null, slotByKey(model, "content")),
+      end: end && React.createElement(LayoutPanel, { width: endWidth }, end),
+      footer: footer && React.createElement(LayoutFooter, null, footer),
+    };
+  }
+
   if (name === "Text") {
     return props;
   }
@@ -1573,7 +1706,114 @@ function generatedChildren(model, name) {
     );
   }
 
+  if (name === "OverflowList") {
+    return asArray(props.items).map((item, index) =>
+      React.createElement(Button, {
+        key: itemValue(item, index),
+        label: itemLabel(item, `Action ${index + 1}`),
+        icon: iconNode(item?.icon),
+        variant: item?.variant || "secondary",
+        size: props.size,
+        isDisabled: Boolean(item?.disabled ?? item?.isDisabled),
+        onClick: () => sendModelAction(model, itemValue(item, index)),
+      }),
+    );
+  }
+
+  if (name === "Stepper") {
+    return asArray(props.items).map((item, index) =>
+      React.createElement(Step, {
+        key: index,
+        step: index,
+        label: itemLabel(item, `Step ${index + 1}`),
+        description: item?.description,
+        status: item?.status,
+        isDisabled: Boolean(item?.disabled),
+        isOptional: Boolean(item?.optional),
+      }),
+    );
+  }
+
+  if (name === "SideNav") {
+    return sideNavItems(model, props.items, String(model.get("value") ?? ""));
+  }
+
+  if (name === "TopNav") {
+    const selected = String(model.get("value") ?? "");
+    return asArray(props.items).map((item, index) => {
+      const value = itemValue(item, index);
+      if (item?.items) {
+        return React.createElement(TopNavMenu, {
+          key: value,
+          label: itemLabel(item, `Menu ${index + 1}`),
+          items: asArray(item.items).map((entry, entryIndex) => ({
+            title: itemLabel(entry, `Item ${entryIndex + 1}`),
+            description: entry?.description,
+            onClick: () => sendModelAction(model, itemValue(entry, entryIndex)),
+          })),
+        });
+      }
+      return React.createElement(TopNavItem, {
+        key: value,
+        label: itemLabel(item, `Item ${index + 1}`),
+        icon: iconNode(item?.icon),
+        isSelected: value === selected,
+        isDisabled: Boolean(item?.disabled),
+        onClick: () => setStringValue(model, value),
+      });
+    });
+  }
+
   return null;
+}
+
+function sideNavItems(model, items, selected) {
+  return asArray(items).map((item, index) => {
+    if (item?.type === "section") {
+      return React.createElement(
+        SideNavSection,
+        { key: `section-${index}`, title: String(item.title ?? item.label ?? "") },
+        sideNavItems(model, item.items, selected),
+      );
+    }
+    const value = itemValue(item, index);
+    return React.createElement(
+      SideNavItem,
+      {
+        key: value,
+        label: itemLabel(item, `Item ${index + 1}`),
+        icon: iconNode(item?.icon),
+        isSelected: value === selected,
+        isDisabled: Boolean(item?.disabled),
+        onClick: () => setStringValue(model, value),
+      },
+      item?.items ? sideNavItems(model, item.items, selected) : undefined,
+    );
+  });
+}
+
+function navHeadingMenu(model, entries) {
+  if (!entries?.length) {
+    return undefined;
+  }
+  return React.createElement(
+    NavHeadingMenu,
+    null,
+    entries.map((entry, index) =>
+      React.createElement(NavHeadingMenuItem, {
+        key: itemValue(entry, index),
+        label: itemLabel(entry, `Action ${index + 1}`),
+        description: entry?.description,
+        isDisabled: Boolean(entry?.disabled),
+        onClick: () => sendModelAction(model, itemValue(entry, index)),
+      }),
+    ),
+  );
+}
+
+function AstryxIndicator({ kind, ...props }) {
+  const Mark = kind === "check" ? CheckIndicator : kind === "radio" ? RadioIndicator : CheckboxIndicator;
+  return React.createElement(Mark, props);
 }
 
 function componentChildren(model) {
@@ -1595,8 +1835,14 @@ function componentChildren(model) {
     ].filter(Boolean);
     return children.length ? children : undefined;
   }
-  if (name === "Toolbar") {
+  if (name === "Toolbar" || name === "Layout") {
     return undefined;
+  }
+  if (name === "AppShell") {
+    return slotByKey(model, "content");
+  }
+  if (name === "TopNav") {
+    return generatedChildren(model, name);
   }
   if (slots) {
     return slots;
@@ -1976,6 +2222,125 @@ function AstryxResponsivePanelView({ model }) {
   );
 }
 
+function AstryxComplexSelectorView({ model, props }) {
+  const handleRef = React.useRef(null);
+  const isOpen = Boolean(model.get("is_open"));
+  React.useEffect(() => {
+    const handle = handleRef.current;
+    if (handle && handle.isOpen() !== isOpen) {
+      if (isOpen) {
+        handle.open();
+      } else {
+        handle.close();
+      }
+    }
+  }, [isOpen]);
+  const value = model.get("value");
+  return React.createElement(
+    ComplexSelector,
+    {
+      ...props,
+      value,
+      handleRef,
+      triggerLabel: props.triggerLabel ?? (value == null || value === "" ? undefined : String(value)),
+      isDisabled: Boolean(model.get("disabled")),
+      onOpenChange: (nextOpen) => {
+        if (nextOpen !== Boolean(model.get("is_open"))) {
+          setModelOpen(model, nextOpen);
+        }
+      },
+    },
+    () => slotByKey(model, "content"),
+  );
+}
+
+/**
+ * The value syncs as Markdown. The editor keeps its own state, so a value
+ * assigned from Python replaces the editor content, and `sent` holds the last
+ * Markdown either side produced to keep that from echoing back.
+ */
+function AstryxRichTextEditorView({ model, props }) {
+  const editorRef = React.useRef(null);
+  const value = String(model.get("value") ?? "");
+  const sent = React.useRef(value);
+  const [defaultValue] = React.useState(() => markdownToEditorStateJSON(value));
+  React.useEffect(() => {
+    const editor = editorRef.current?.getEditor();
+    if (!editor || value === sent.current) {
+      return;
+    }
+    editor.setEditorState(editor.parseEditorState(markdownToEditorStateJSON(value)));
+    sent.current = editorRef.current.getMarkdown();
+  }, [value]);
+  const commit = () => {
+    const markdown = editorRef.current?.getMarkdown() ?? "";
+    if (markdown !== sent.current) {
+      sent.current = markdown;
+      setStringValue(model, markdown);
+    }
+  };
+  const { hasToolbar, ...editorProps } = props;
+  return React.createElement(RichTextEditor, {
+    ...editorProps,
+    ref: editorRef,
+    label: String(model.get("label") || props.label || "Rich text"),
+    isDisabled: Boolean(model.get("disabled")),
+    defaultValue,
+    toolbar: hasToolbar === false ? undefined : React.createElement(RichTextEditorToolbar),
+    onChange: () => {
+      if (continuousUpdate(model)) {
+        commit();
+      }
+    },
+    onBlur: commit,
+  });
+}
+
+function AstryxToastView({ model, props }) {
+  const { position, maxVisible, inset } = props;
+  return React.createElement(
+    LayerProvider,
+    { toast: { position, maxVisible, inset } },
+    React.createElement(AstryxToastListener, { model }),
+  );
+}
+
+function AstryxToastListener({ model }) {
+  const showToast = useToast();
+  React.useEffect(() => {
+    const dismissals = new Map();
+    const onMessage = (content) => {
+      const id = String(content?.id ?? "");
+      if (content?.type === "toast") {
+        const dismiss = showToast({
+          body: String(content.body ?? ""),
+          type: content.toast_type,
+          isAutoHide: content.auto_hide ?? undefined,
+          autoHideDuration: content.duration ?? undefined,
+          uniqueID: id,
+          onHide: () => {
+            if (dismissals.get(id) === dismiss) {
+              dismissals.delete(id);
+            }
+          },
+        });
+        dismissals.set(id, dismiss);
+      } else if (content?.type === "toast-dismiss") {
+        dismissals.get(id)?.();
+      }
+    };
+    model.on("msg:custom", onMessage);
+    return () => removeModelListener(model, "msg:custom", onMessage);
+  }, [model, showToast]);
+  return null;
+}
+
+const MODEL_VIEWS = {
+  ComplexSelector: AstryxComplexSelectorView,
+  RichTextEditor: AstryxRichTextEditorView,
+  Toast: AstryxToastView,
+};
+
 const PANEL_VIEWS = {
   AccordionPanel: AstryxAccordionView,
   ResponsivePanel: AstryxResponsivePanelView,
@@ -1996,15 +2361,18 @@ function AstryxModelView({ model, styleRoot, mountChildren }) {
   const draft = useDraft();
   const props = componentProps(model, draft, React.useId());
   const PanelView = PANEL_VIEWS[name];
-  const Component = PanelView ? null : componentFor(name, props);
-  const children = PanelView ? undefined : componentChildren(model);
+  const ModelView = MODEL_VIEWS[name];
+  const Component = PanelView || ModelView ? null : componentFor(name, props);
+  const children = PanelView || ModelView ? undefined : componentChildren(model);
   const component = PanelView
     ? React.createElement(PanelView, { model, mountChildren })
-    : name === "Table"
-      ? React.createElement(AstryxTableView, { model })
-      : name === "Chat"
-        ? React.createElement(AstryxChatView, { model })
-        : React.createElement(Component, props, children);
+    : ModelView
+      ? React.createElement(ModelView, { model, props })
+      : name === "Table"
+        ? React.createElement(AstryxTableView, { model })
+        : name === "Chat"
+          ? React.createElement(AstryxChatView, { model })
+          : React.createElement(Component, props, children);
   const horizontalLabel = Component !== null
     && [Slider, TextInput, Selector, MultiSelector].includes(Component)
     && rawProps(model).labelPosition === "left"
@@ -2074,12 +2442,6 @@ async function renderChildren(model, host, rootElement, childSignal, reset) {
 }
 
 export default {
-  initialize({ model }) {
-    return {
-      getComponentName: () => model.get("component_name"),
-    };
-  },
-
   async render({ model, el, signal, host }) {
     if (!host?.getWidget && (model.get("widgets") ?? []).length > 0) {
       throw new Error("[anylumino] The current anywidget host does not support widget composition.");

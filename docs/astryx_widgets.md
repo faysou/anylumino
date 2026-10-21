@@ -108,7 +108,7 @@ reference page is.
 | Forms and direct inputs | `inputs`, `surfaces` |
 | Selection and search    | `inputs`, `surfaces` |
 | Actions and menus       | `inputs`, `surfaces` |
-| Feedback and status     | `data`               |
+| Feedback and status     | `data`, `surfaces`   |
 | Overlays and previews   | `surfaces`           |
 | Navigation and data     | `surfaces`, `data`   |
 
@@ -155,7 +155,8 @@ switches. `SplitPanel` syncs drags back to its `sizes` trait as fractions.
 
 ### Layout containers
 
-Use these to arrange content inside a panel or a notebook output.
+Use these to arrange content inside a panel or a notebook output, or to frame
+an app with top and side navigation.
 
 - `Stack`
 - `Grid`
@@ -168,6 +169,10 @@ Use these to arrange content inside a panel or a notebook output.
 - `Divider`
 - `Collapsible`
 - `Carousel`
+- `HStack`
+- `VStack`
+- `Layout`
+- `AppShell`
 
 ### Typography and content
 
@@ -188,6 +193,8 @@ small semantic content.
 - `Avatar`
 - `AvatarGroup`
 - `Icon`
+- `NavIcon`
+- `RichTextView`
 
 ### Forms and direct inputs
 
@@ -213,6 +220,7 @@ Use these for direct value entry and form composition.
 - `TimeInput`
 - `Calendar`
 - `FileInput`
+- `RichTextEditor`
 
 ### Selection and search
 
@@ -226,6 +234,7 @@ Use these when users choose from predefined options or searchable sources.
 - `Typeahead`
 - `Tokenizer`
 - `PowerSearch`
+- `ComplexSelector`
 
 ### Actions and menus
 
@@ -239,10 +248,12 @@ Use these for command surfaces and button-like interactions.
 - `ContextMenu`
 - `MoreMenu`
 - `CommandPalette`
+- `OverflowList`
 
 ### Feedback and status
 
-Use these to show state, progress, loading placeholders, or empty results.
+Use these to show state, progress, steps, elapsed time, loading placeholders,
+empty results, or notifications.
 
 - `Badge`
 - `StatusDot`
@@ -252,6 +263,10 @@ Use these to show state, progress, loading placeholders, or empty results.
 - `Token`
 - `Banner`
 - `EmptyState`
+- `Stepper`
+- `Timer`
+- `Indicator`
+- `Toast`
 
 ### Overlays and previews
 
@@ -278,6 +293,8 @@ Use these for structured navigation and data-heavy notebook views.
 - `TreeList`
 - `Pagination`
 - `Table`
+- `SideNav`
+- `TopNav`
 
 ## Input labels
 
@@ -383,6 +400,8 @@ environment.
 ## Related notebooks
 
 - `notebooks/astryx_components_smoke.py` covers the broad component family.
+- `notebooks/astryx_app_frame.py` frames a layout with `AppShell`, `TopNav`,
+  and `SideNav`, with the stepper, selector, rich text, and toast widgets.
 - `notebooks/astryx_layout_panels.py` shows each layout panel with
   Python-driven selection, open sections, and split sizes.
 - `notebooks/astryx_table.py` focuses on table selection, sorting, and row

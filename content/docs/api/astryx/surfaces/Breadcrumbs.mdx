@@ -4,6 +4,18 @@ title: "Breadcrumbs"
 
 Render Astryx breadcrumbs from item records.
 
+```python
+ax.Breadcrumbs(
+    [{"label": "Desk", "href": "#"}, {"label": "Orders", "href": "#"}, {"label": "O-1042", "current": True}]
+)
+```
+
+import screenshot from '../../../assets/components/astryx-surfaces-Breadcrumbs.png';
+
+<figure className="component-example">
+  <img src={screenshot.src} width={screenshot.width / 2} height={screenshot.height / 2} alt="Breadcrumbs example rendered in JupyterLab" />
+</figure>
+
 <Callout title="Astryx Props" type="astryx-props">
   JSON-safe Breadcrumbs props forwarded to Astryx.
 
