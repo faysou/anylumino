@@ -219,6 +219,8 @@ The repository includes Jupytext notebooks for smoke testing:
 - `notebooks/openui_workbench_fake_agent.py` runs the workbench against a fake
   `codex` that returns a fixed sales explorer, to check the tabs, callbacks,
   scrolling, and session restore without spending agent tokens.
+- `notebooks/marimo_workbench.py` opens the `openui_workbench.py`
+  workbench in marimo, with `uv run --no-sync marimo edit`.
 - `notebooks/marimo_workbench_fake_agent.py` runs the same fake-agent
   workbench in marimo, with `uv run --no-sync marimo edit`, to check the
   widgets and the workbench outside JupyterLab.
