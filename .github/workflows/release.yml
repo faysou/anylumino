@@ -44,6 +44,12 @@ jobs:
       - name: Verify committed bundles are current
         run: git diff --exit-code -- src/anylumino/static
 
+      # The wheel ships this inventory, so a release must not publish a stale one
+      - name: Verify the license inventory is current
+        run: |
+          npm run licenses
+          git diff --exit-code -- THIRD_PARTY_LICENSES.md
+
       - name: Verify the tag matches the project version
         if: github.ref_type == 'tag'
         run: |
