@@ -1,4 +1,6 @@
 import asyncio
+import subprocess
+import sys
 
 import pandas as pd
 import pytest
@@ -494,3 +496,18 @@ def test_close_tree_closes_children_without_a_widgets_trait():
     close_tree(box, set())
 
     assert (leaf.comm, box.comm) == (None, None)
+
+
+def test_turns_run_on_the_kernel_loop_outside_marimo() -> None:
+    # Outside a marimo cell, such as in JupyterLab, no marimo code runs: the
+    # check does not import marimo, and turns stay on the caller's loop.
+    script = (
+        "import sys\n"
+        "from anylumino.workbench.workbench import marimo_turn_loop\n"
+        "print(marimo_turn_loop(), 'marimo' in sys.modules)\n"
+        "import marimo\n"
+        "print(marimo_turn_loop())\n"
+    )
+    result = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True, check=True)
+
+    assert result.stdout.splitlines() == ["None False", "None"]

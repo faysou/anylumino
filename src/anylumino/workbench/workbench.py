@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import contextvars
 import json
 import os
+import sys
+import threading
 from collections.abc import Collection, Coroutine, Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -152,6 +155,7 @@ class Workbench(al.SplitPanel):
         self.last_error = ""
         self.running = False
         self.tasks: set[asyncio.Task[Any]] = set()
+        self.marimo_loop = marimo_turn_loop()
 
         self.chat = ax.Chat(self.state.messages, placeholder="Describe the UI to build", height="100%")
         self.status = ax.StatusDot("Ready", variant="neutral")
@@ -250,6 +254,12 @@ class Workbench(al.SplitPanel):
         self.submit(message, context)
 
     def schedule(self, coroutine: Coroutine[Any, Any, Any]) -> None:
+        if self.marimo_loop is not None:
+            loop, context = self.marimo_loop
+            loop.call_soon_threadsafe(self.start_task, loop, coroutine, context)
+
+            return
+
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
@@ -257,7 +267,15 @@ class Workbench(al.SplitPanel):
 
             return
 
-        task = loop.create_task(coroutine)
+        self.start_task(loop, coroutine)
+
+    def start_task(
+        self,
+        loop: asyncio.AbstractEventLoop,
+        coroutine: Coroutine[Any, Any, Any],
+        context: contextvars.Context | None = None,
+    ) -> None:
+        task = loop.create_task(coroutine, context=context)
         self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
 
@@ -583,3 +601,46 @@ def shown_path(path: Path) -> str:
         return str(path.resolve().relative_to(Path.cwd()))
     except ValueError:
         return str(path.resolve())
+
+
+def marimo_turn_loop() -> tuple[asyncio.AbstractEventLoop, contextvars.Context] | None:
+    """Start an event loop for workbench turns on a `mo.Thread` when this runs in a marimo cell.
+
+    marimo closes the widgets a cell creates when the cell reruns, so it only
+    lets work the cell started create widgets, and a turn builds the reply's
+    widgets after the cell has run. A `mo.Thread` started here belongs to the
+    cell, so turns run on its loop, in its context, can build them; the loop
+    stops when marimo tells the thread to exit. Elsewhere, such as in
+    JupyterLab, turns run on the kernel's own loop and this returns `None`.
+    """
+    if "marimo" not in sys.modules:
+        return None
+
+    import marimo as mo
+
+    if not mo.running_in_notebook():
+        return None
+
+    ready = threading.Event()
+    started: list[tuple[asyncio.AbstractEventLoop, contextvars.Context]] = []
+
+    def run() -> None:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        started.append((loop, contextvars.copy_context()))
+        ready.set()
+
+        async def until_exit() -> None:
+            thread = mo.current_thread()
+            while not thread.should_exit:
+                await asyncio.sleep(0.2)
+
+        try:
+            loop.run_until_complete(until_exit())
+        finally:
+            loop.close()
+
+    mo.Thread(target=run, daemon=True).start()
+    ready.wait()
+
+    return started[0]
