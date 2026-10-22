@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.3
+
+This release ships the complete list of third-party licenses.
+
+Fixed:
+
+- `THIRD_PARTY_LICENSES.md` in the wheel lists every package that the frontend
+  bundles include, with its notice. The 0.6.0, 0.6.1, and 0.6.2 wheels missed
+  the Astryx themes and richtext, Lexical, and `@preact/signals-core`, and
+  listed older versions of Astryx, Lumino widgets, React, and lucide-react.
+
 ## 0.6.2
 
 This release fixes the workbench's charts, file dialogs, and menus in marimo.
