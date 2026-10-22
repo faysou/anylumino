@@ -156,3 +156,11 @@ html > body[data-scroll-locked] {
   max-width: 100%;
   height: auto;
 }
+
+/* Screenshots get rounded corners and a border, which keeps a white
+   screenshot visible on a white page. The SVG illustrations stay unframed. */
+.component-example img,
+article img[src*=".png"] {
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.5rem;
+}
