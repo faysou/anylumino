@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.6.2
+
+This release fixes the workbench's charts, file dialogs, and menus in marimo.
+
+Fixed:
+
+- A Plotly chart in a workbench UI shows what `setup` added to it in marimo.
+  Before, marimo drew the chart with empty axes, because the figure lost its
+  traces before its frontend first rendered.
+- The workbench's Export and Import dialogs open in marimo. Before, they did
+  nothing when clicked.
+- Clicking an option in a `Selector`, `DropdownMenu`, or `ContextMenu` selects
+  it in marimo. Before, the click only closed the list. The frontend uses an
+  Astryx canary build with the fix until Astryx releases it.
+
+Added:
+
+- `notebooks/marimo_workbench.py` opens the workbench with a real agent in
+  marimo.
+
 ## 0.6.1
 
 This release builds the workbench's UI in marimo, without waiting for a marimo
