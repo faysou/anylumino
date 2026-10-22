@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.1
+
+This release builds the workbench's UI in marimo, without waiting for a marimo
+change.
+
+Fixed:
+
+- In a marimo cell, the workbench runs its turns on a `mo.Thread` that the cell
+  starts, so the widgets a reply builds belong to that cell and close when it
+  reruns. Before, building a reply's UI failed in marimo with an
+  `AssertionError`. Outside marimo, such as in JupyterLab, nothing changes, and
+  anylumino does not import marimo.
+
 ## 0.6.0
 
 This release adds Astryx app frames, rich text, status widgets, and six
