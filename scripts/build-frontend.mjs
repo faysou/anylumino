@@ -22,6 +22,32 @@ async function scopeRootTokensToHost(cssFile) {
   await writeFile(cssFile, css.replaceAll(/:root(?=[\s,{])/g, ":root,:host"));
 }
 
+// Astryx menus, such as Selector, DropdownMenu, and ContextMenu, find the option
+// under a released pointer with `document.elementFromPoint`, which returns the
+// shadow host for a point inside a shadow root. In a host such as marimo every
+// option click then counts as outside the menu and only closes it, so the menu
+// hit-tests in its own shadow root instead. The build fails when the Astryx
+// code changes, so that the patch is checked again.
+const menuPressCall = "element = doc.elementFromPoint(event.clientX, event.clientY);";
+const menuPressInShadowRoot = {
+  name: "astryx-menu-press-in-shadow-root",
+  setup(build) {
+    build.onLoad({ filter: /@astryxdesign[\\/]core[\\/]dist[\\/]hooks[\\/]useMenuPress\.js$/ }, async ({ path }) => {
+      const source = await readFile(path, "utf8");
+      if (!source.includes(menuPressCall)) {
+        throw new Error(`${path} no longer contains ${menuPressCall}`);
+      }
+      return {
+        contents: source.replace(
+          menuPressCall,
+          "element = (menu?.getRootNode() instanceof ShadowRoot ? menu.getRootNode() : doc).elementFromPoint(event.clientX, event.clientY);",
+        ),
+        loader: "js",
+      };
+    });
+  },
+};
+
 // anywidget imports a widget's `_esm` as its own module for every widget model,
 // so each widget would hold its own copy of the bundle and its libraries. The
 // widgets load a small loader instead: the first one on a page asks Python for
@@ -70,7 +96,7 @@ export default {
 }
 
 for (const [entryPoint, outfile, options] of entries) {
-  await build({ ...shared, ...options, entryPoints: [entryPoint], outfile });
+  await build({ ...shared, ...options, entryPoints: [entryPoint], outfile, plugins: [menuPressInShadowRoot] });
   if (outfile.endsWith(".bundle.js")) {
     const code = await readFile(outfile, "utf8");
     await writeFile(outfile.replace(/\.bundle\.js$/, ".loader.js"), loaderSource(outfile, code));

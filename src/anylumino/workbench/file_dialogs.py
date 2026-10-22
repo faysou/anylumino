@@ -10,20 +10,37 @@ from anylumino import astryx as ax
 from .export import file_name
 
 
+def run_now(call: Callable[[], None]) -> None:
+    call()
+
+
 class FolderDialog(ax.Dialog):
     """Browse the kernel's folders, with ``fields`` under the folder list and a confirm button.
 
     The dialog browses the kernel's file system, not the browser's, because
     the kernel writes and reads the files. With ``suffix``, files with that
     suffix are listed after the folders, and clicking one calls `pick`.
+    Browsing builds a button per entry, so it runs through ``run``, which
+    calls it at once by default; marimo creates widgets only from work a
+    cell started, so a workbench in marimo passes its turn loop.
     """
 
-    def __init__(self, title: str, fields: Sequence[ax.Widget], confirm: str, suffix: str = "") -> None:
+    def __init__(
+        self,
+        title: str,
+        fields: Sequence[ax.Widget],
+        confirm: str,
+        suffix: str = "",
+        run: Callable[[Callable[[], None]], None] = run_now,
+    ) -> None:
         self.suffix = suffix
+        self.run = run
         self.folder: Path | None = None
         self.path = ax.Text("", text_type="supporting")
         self.folders = ax.Stack([], direction="vertical", gap=0, height=220, scrollable=True)
-        up = ax.Button("Up", variant="ghost", size="sm", callbacks=[lambda _button: self.browse(self.folder.parent)])
+        up = ax.Button(
+            "Up", variant="ghost", size="sm", callbacks=[lambda _button: self.run(lambda: self.browse(self.folder.parent))]
+        )
         cancel = ax.Button("Cancel", callbacks=[lambda _button: self.hide()])
         self.confirm = ax.Button(confirm, variant="primary", callbacks=[lambda _button: self.finish()])
         super().__init__(
@@ -48,7 +65,7 @@ class FolderDialog(ax.Dialog):
 
     def open_in_last_folder(self) -> None:
         """Show the dialog in the last browsed folder, or the current directory at the first open."""
-        self.browse(self.folder or Path.cwd())
+        self.run(lambda: self.browse(self.folder or Path.cwd()))
         self.show()
 
     def browse(self, folder: Path) -> None:
@@ -62,7 +79,7 @@ class FolderDialog(ax.Dialog):
             entries = []
 
         folders = [
-            ax.Button(f"{entry.name}/", variant="ghost", size="sm", callbacks=[lambda _button, entry=entry: self.browse(entry)])
+            ax.Button(f"{entry.name}/", variant="ghost", size="sm", callbacks=[lambda _button, entry=entry: self.run(lambda: self.browse(entry))])
             for entry in entries
             if entry.is_dir()
         ]
@@ -87,11 +104,11 @@ class FolderDialog(ax.Dialog):
 class ExportDialog(FolderDialog):
     """Pick a folder and a name, then call ``on_export(path)`` with the file in that folder."""
 
-    def __init__(self, on_export: Callable[[Path], None]) -> None:
+    def __init__(self, on_export: Callable[[Path], None], run: Callable[[Callable[[], None]], None] = run_now) -> None:
         self.on_export = on_export
         self.name = ax.TextInput("ui", label="Name")
         self.files = ax.Text("", text_type="supporting")
-        super().__init__("Export UI", [self.name, self.files], "Export")
+        super().__init__("Export UI", [self.name, self.files], "Export", run=run)
         self.name.observe(lambda _change: self.browsed(), names="value")
 
     def open_with(self, name: str) -> None:
@@ -110,11 +127,11 @@ class ExportDialog(FolderDialog):
 class ImportDialog(FolderDialog):
     """Pick an exported ``.py`` file, then call ``on_import(path)``."""
 
-    def __init__(self, on_import: Callable[[Path], None]) -> None:
+    def __init__(self, on_import: Callable[[Path], None], run: Callable[[Callable[[], None]], None] = run_now) -> None:
         self.on_import = on_import
         self.chosen: Path | None = None
         self.files = ax.Text("", text_type="supporting")
-        super().__init__("Import UI", [self.files], "Import", suffix=".py")
+        super().__init__("Import UI", [self.files], "Import", suffix=".py", run=run)
 
     def browsed(self) -> None:
         self.chosen = None

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import warnings
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -86,6 +87,15 @@ class App:
 
         self.ui = ui
         self.call("setup")
+        # A Plotly FigureWidget sends its changes as messages that only a rendered figure keeps,
+        # and copies the whole figure into its synced state only when it is displayed. A figure
+        # inside a container is not displayed itself, so marimo, which renders it later, would
+        # show the figure without what setup added.
+        figure_widget = getattr(sys.modules.get("plotly.basewidget"), "BaseFigureWidget", None)
+        if figure_widget is not None and isinstance(ui, View):
+            for widget in vars(ui).values():
+                if isinstance(widget, figure_widget):
+                    widget._repr_mimebundle_()
 
     def setup(self) -> None:
         """Fill the UI while it is built; override it to load data into widgets."""

@@ -8,7 +8,7 @@ import json
 import os
 import sys
 import threading
-from collections.abc import Collection, Coroutine, Mapping, Sequence
+from collections.abc import Callable, Collection, Coroutine, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -161,7 +161,7 @@ class Workbench(al.SplitPanel):
         self.status = ax.StatusDot("Ready", variant="neutral")
         # Astryx shows a status dot's label only to screen readers, so a caption repeats it
         self.status_text = ax.Text("Ready", text_type="supporting")
-        self.export_dialog = ExportDialog(self.export)
+        self.export_dialog = ExportDialog(self.export, self.run_on_turn_loop)
         self.export_button = ax.Button(
             "Export",
             size="sm",
@@ -169,7 +169,7 @@ class Workbench(al.SplitPanel):
             # Session names may hold `-`, which an importable module name cannot
             callbacks=[lambda _button: self.export_dialog.open_with((self.state.name or "ui").replace("-", "_"))],
         )
-        self.import_dialog = ImportDialog(self.import_file)
+        self.import_dialog = ImportDialog(self.import_file, self.run_on_turn_loop)
         self.import_button = ax.Button(
             "Import", size="sm", callbacks=[lambda _button: self.import_dialog.open_in_last_folder()]
         )
@@ -278,6 +278,16 @@ class Workbench(al.SplitPanel):
         task = loop.create_task(coroutine, context=context)
         self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
+
+    def run_on_turn_loop(self, call: Callable[[], None]) -> None:
+        """Run ``call`` on the marimo turn loop, so that it can create widgets, or at once outside marimo."""
+        if self.marimo_loop is None:
+            call()
+
+            return
+
+        loop, context = self.marimo_loop
+        loop.call_soon_threadsafe(call, context=context)
 
     async def run_import(self, path: Path) -> None:
         shown = shown_path(path)

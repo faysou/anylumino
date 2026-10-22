@@ -16,20 +16,22 @@ Pick a folder and a name, then call `on_export(path)` with the file in that fold
 
 ## Functions
 
-<PyFunction name="__init__" type="(on_export) -> None" kind="constructor">
+<PyFunction name="__init__" type="(on_export, run=run_now) -> None" kind="constructor">
   <PySourceCode>
     ```python
-    def __init__(self, on_export: Callable[[Path], None]) -> None:
+    def __init__(self, on_export: Callable[[Path], None], run: Callable[[Callable[[], None]], None] = run_now) -> None:
         self.on_export = on_export
         self.name = ax.TextInput("ui", label="Name")
         self.files = ax.Text("", text_type="supporting")
-        super().__init__("Export UI", [self.name, self.files], "Export")
+        super().__init__("Export UI", [self.name, self.files], "Export", run=run)
         self.name.observe(lambda _change: self.browsed(), names="value")
     ```
   </PySourceCode>
 
   <div>
     <PyParameter name="on_export" type="Callable[[Path], None]" />
+
+    <PyParameter name="run" type="Callable[[Callable[[], None]], None]" value="run_now" />
   </div>
 
   <PyFunctionReturn type="None" />

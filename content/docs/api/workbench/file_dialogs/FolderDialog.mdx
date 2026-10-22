@@ -7,11 +7,16 @@ Browse the kernel's folders, with `fields` under the folder list and a confirm b
 The dialog browses the kernel's file system, not the browser's, because
 the kernel writes and reads the files. With `suffix`, files with that
 suffix are listed after the folders, and clicking one calls `pick`.
+Browsing builds a button per entry, so it runs through `run`, which
+calls it at once by default; marimo creates widgets only from work a
+cell started, so a workbench in marimo passes its turn loop.
 
 ## Attributes
 
 <PyAttributes>
   <PyAttribute name="suffix" value="suffix" />
+
+  <PyAttribute name="run" value="run" />
 
   <PyAttribute name="folder" type="Path | None" value="None" />
 
@@ -26,15 +31,25 @@ suffix are listed after the folders, and clicking one calls `pick`.
 
 ## Functions
 
-<PyFunction name="__init__" type="(title, fields, confirm, suffix='') -> None" kind="constructor">
+<PyFunction name="__init__" type="(title, fields, confirm, suffix='', run=run_now) -> None" kind="constructor">
   <PySourceCode>
     ```python
-    def __init__(self, title: str, fields: Sequence[ax.Widget], confirm: str, suffix: str = "") -> None:
+    def __init__(
+        self,
+        title: str,
+        fields: Sequence[ax.Widget],
+        confirm: str,
+        suffix: str = "",
+        run: Callable[[Callable[[], None]], None] = run_now,
+    ) -> None:
         self.suffix = suffix
+        self.run = run
         self.folder: Path | None = None
         self.path = ax.Text("", text_type="supporting")
         self.folders = ax.Stack([], direction="vertical", gap=0, height=220, scrollable=True)
-        up = ax.Button("Up", variant="ghost", size="sm", callbacks=[lambda _button: self.browse(self.folder.parent)])
+        up = ax.Button(
+            "Up", variant="ghost", size="sm", callbacks=[lambda _button: self.run(lambda: self.browse(self.folder.parent))]
+        )
         cancel = ax.Button("Cancel", callbacks=[lambda _button: self.hide()])
         self.confirm = ax.Button(confirm, variant="primary", callbacks=[lambda _button: self.finish()])
         super().__init__(
@@ -67,6 +82,8 @@ suffix are listed after the folders, and clicking one calls `pick`.
     <PyParameter name="confirm" type="str" />
 
     <PyParameter name="suffix" type="str" value="''" />
+
+    <PyParameter name="run" type="Callable[[Callable[[], None]], None]" value="run_now" />
   </div>
 
   <PyFunctionReturn type="None" />
@@ -79,7 +96,7 @@ suffix are listed after the folders, and clicking one calls `pick`.
     ```python
     def open_in_last_folder(self) -> None:
         """Show the dialog in the last browsed folder, or the current directory at the first open."""
-        self.browse(self.folder or Path.cwd())
+        self.run(lambda: self.browse(self.folder or Path.cwd()))
         self.show()
     ```
   </PySourceCode>
@@ -101,7 +118,7 @@ suffix are listed after the folders, and clicking one calls `pick`.
             entries = []
 
         folders = [
-            ax.Button(f"{entry.name}/", variant="ghost", size="sm", callbacks=[lambda _button, entry=entry: self.browse(entry)])
+            ax.Button(f"{entry.name}/", variant="ghost", size="sm", callbacks=[lambda _button, entry=entry: self.run(lambda: self.browse(entry))])
             for entry in entries
             if entry.is_dir()
         ]

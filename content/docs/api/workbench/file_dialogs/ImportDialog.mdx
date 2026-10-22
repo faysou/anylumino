@@ -16,19 +16,21 @@ Pick an exported `.py` file, then call `on_import(path)`.
 
 ## Functions
 
-<PyFunction name="__init__" type="(on_import) -> None" kind="constructor">
+<PyFunction name="__init__" type="(on_import, run=run_now) -> None" kind="constructor">
   <PySourceCode>
     ```python
-    def __init__(self, on_import: Callable[[Path], None]) -> None:
+    def __init__(self, on_import: Callable[[Path], None], run: Callable[[Callable[[], None]], None] = run_now) -> None:
         self.on_import = on_import
         self.chosen: Path | None = None
         self.files = ax.Text("", text_type="supporting")
-        super().__init__("Import UI", [self.files], "Import", suffix=".py")
+        super().__init__("Import UI", [self.files], "Import", suffix=".py", run=run)
     ```
   </PySourceCode>
 
   <div>
     <PyParameter name="on_import" type="Callable[[Path], None]" />
+
+    <PyParameter name="run" type="Callable[[Callable[[], None]], None]" value="run_now" />
   </div>
 
   <PyFunctionReturn type="None" />

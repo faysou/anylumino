@@ -4,7 +4,7 @@ title: "file_dialogs"
 
 Dialogs that browse the kernel's folders to export the workbench's file or import one.
 
-<Tabs items={["Class"]}>
+<Tabs items={["Class","Functions"]}>
   <Tab value="Class">
     <Cards>
       <Card title="FolderDialog" href="/docs/api/workbench/file_dialogs/FolderDialog" />
@@ -13,5 +13,22 @@ Dialogs that browse the kernel's folders to export the workbench's file or impor
 
       <Card title="ImportDialog" href="/docs/api/workbench/file_dialogs/ImportDialog" />
     </Cards>
+  </Tab>
+
+  <Tab value="Functions">
+    <PyFunction name="run_now" type="(call) -> None">
+      <PySourceCode>
+        ```python
+        def run_now(call: Callable[[], None]) -> None:
+            call()
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="call" type="Callable[[], None]" />
+      </div>
+
+      <PyFunctionReturn type="None" />
+    </PyFunction>
   </Tab>
 </Tabs>

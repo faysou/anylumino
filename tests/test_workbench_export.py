@@ -1,3 +1,5 @@
+import asyncio
+import contextvars
 import os
 import re
 import sys
@@ -93,6 +95,22 @@ def test_export_dialog_goes_up_and_keeps_the_last_folder(built, tmp_path):
 
     click(built.export_button)
     assert (dialog.is_open, dialog.path.text) == (True, str(tmp_path))
+
+
+def test_export_dialog_browses_on_the_marimo_turn_loop(built, tmp_path):
+    # marimo creates widgets only from work a cell started, so the folder buttons wait for the loop
+    loop = asyncio.new_event_loop()
+    built.marimo_loop = (loop, contextvars.copy_context())
+    dialog = built.export_dialog
+    try:
+        click(built.export_button)
+        waiting = (dialog.is_open, dialog.path.text, dialog.folders.widgets)
+        loop.run_until_complete(asyncio.sleep(0))
+    finally:
+        loop.close()
+
+    assert waiting == (True, "", [])
+    assert (dialog.path.text, labels(dialog.folders.widgets)) == (str(tmp_path / "project"), ["exports/"])
 
 
 def test_export_outside_the_current_directory_shows_absolute_paths(built, tmp_path):

@@ -102,5 +102,64 @@ The workbench: an agent chat beside the generated UI and the code behind it.
 
       <PyFunctionReturn type="str" />
     </PyFunction>
+
+    <PyFunction name="marimo_turn_loop" type="() -> tuple[asyncio.AbstractEventLoop, contextvars.Context] | None">
+      Start an event loop for workbench turns on a `mo.Thread` when this runs in a marimo cell.
+
+      marimo closes the widgets a cell creates when the cell reruns, so it only
+      lets work the cell started create widgets, and a turn builds the reply's
+      widgets after the cell has run. A `mo.Thread` started here belongs to the
+      cell, so turns run on its loop, in its context, can build them; the loop
+      stops when marimo tells the thread to exit. Elsewhere, such as in
+      JupyterLab, turns run on the kernel's own loop and this returns `None`.
+
+      <PySourceCode>
+        ```python
+        def marimo_turn_loop() -> tuple[asyncio.AbstractEventLoop, contextvars.Context] | None:
+            """Start an event loop for workbench turns on a `mo.Thread` when this runs in a marimo cell.
+
+            marimo closes the widgets a cell creates when the cell reruns, so it only
+            lets work the cell started create widgets, and a turn builds the reply's
+            widgets after the cell has run. A `mo.Thread` started here belongs to the
+            cell, so turns run on its loop, in its context, can build them; the loop
+            stops when marimo tells the thread to exit. Elsewhere, such as in
+            JupyterLab, turns run on the kernel's own loop and this returns `None`.
+            """
+            if "marimo" not in sys.modules:
+                return None
+
+            import marimo as mo
+
+            if not mo.running_in_notebook():
+                return None
+
+            ready = threading.Event()
+            started: list[tuple[asyncio.AbstractEventLoop, contextvars.Context]] = []
+
+            def run() -> None:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                started.append((loop, contextvars.copy_context()))
+                ready.set()
+
+                async def until_exit() -> None:
+                    thread = mo.current_thread()
+                    while not thread.should_exit:
+                        await asyncio.sleep(0.2)
+
+                try:
+                    loop.run_until_complete(until_exit())
+                finally:
+                    loop.close()
+
+            mo.Thread(target=run, daemon=True).start()
+            ready.wait()
+
+            return started[0]
+        ```
+      </PySourceCode>
+
+      <PyFunctionReturn type="tuple[asyncio.asyncio.AbstractEventLoop, contextvars.contextvars.Context] | None" />
+    </PyFunction>
   </Tab>
 </Tabs>

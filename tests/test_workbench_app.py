@@ -2,6 +2,8 @@ import pytest
 
 import dataclasses
 
+import plotly.graph_objects as go
+
 import anylumino.astryx as ax
 from anylumino import TabPanel
 from anylumino.workbench import App, Event, View
@@ -36,6 +38,25 @@ def test_set_ui_keeps_the_ui_and_runs_setup():
     ui = object()
     app.set_ui(ui)
     assert (app.ui, app.ready) == (ui, ui)
+
+
+def test_set_ui_copies_what_setup_adds_to_a_figure_into_its_synced_state():
+    class ChartApp(App):
+        def setup(self):
+            self.ui.chart.add_trace(go.Bar(x=["FX", "Rates"], y=[4.0, 3.5]))
+            self.ui.chart.layout.title.text = "Revenue"
+
+    class ChartView(View):
+        def __init__(self, app):
+            self.app = app
+            self.chart = go.FigureWidget()
+            self.widget = ax.Stack([self.chart])
+            app.set_ui(self)
+
+    view = ChartView(ChartApp())
+
+    assert [(trace["type"], trace["x"], trace["y"]) for trace in view.chart._widget_data] == [("bar", ["FX", "Rates"], [4.0, 3.5])]
+    assert view.chart._widget_layout["title"] == {"text": "Revenue"}
 
 
 def test_handler_errors_raise_without_on_error_and_go_to_it_when_set():
