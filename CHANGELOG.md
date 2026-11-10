@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.6.4
+
+This release fixes JupyterLab's layout when an anylumino layout widget renders,
+and builds Astryx from a release.
+
+Fixed:
+
+- Displaying a layout widget in JupyterLab no longer collapses the JupyterLab
+  window to a grey page. The bundled Lumino styles overrode JupyterLab's own
+  layout rules since 0.6.0.
+- The `PowerSearch` docstring example gives each operator and filter a typed
+  value, which Astryx 0.7.12 requires to render it.
+- A README example used an undefined `next_order_rows`; it uses
+  `next_order_snapshot`.
+
+Changed:
+
+- The frontend uses Astryx 0.7.12 instead of a canary build.
+- The README shows the quick start, the workbench, and an Astryx dashboard
+  rendered in JupyterLab.
+
 ## 0.6.3
 
 This release ships the complete list of third-party licenses.
