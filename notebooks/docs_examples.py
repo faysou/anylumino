@@ -491,8 +491,6 @@ ax.Theme(
 # Lines 105 to 108 of `content/docs/astryx.mdx`.
 
 # %%
-# docs-example(astryx-option-values)
-
 ax.Button("Run", size=ax.Size.LG, variant=ax.ButtonVariant.PRIMARY)
 ax.Button("Run", size="lg", variant="primary")
 
@@ -712,7 +710,7 @@ ax.AppShell(
 # ## astryx.mdx: Theme identity
 
 # %% [markdown]
-# Lines 340 to 379 of `content/docs/astryx.mdx`.
+# Lines 342 to 381 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-theme-identity)
@@ -762,7 +760,7 @@ panel
 # ## astryx.mdx: Notebook-safe overlays
 
 # %% [markdown]
-# Lines 418 to 438 of `content/docs/astryx.mdx`.
+# Lines 426 to 446 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-notebook-safe-overlays)

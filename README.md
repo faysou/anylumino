@@ -93,6 +93,8 @@ al.SplitPanel(
 )
 ```
 
+![Quick start rendered in JupyterLab: themed order controls and table above a status line](https://raw.githubusercontent.com/faysou/anylumino/main/content/docs/assets/examples/readme-quickstart.png)
+
 ## What it provides
 
 - Layout widgets: public `LayoutWidget` base plus `TabPanel`, `BoxPanel`,
@@ -151,6 +153,8 @@ notebook without the agent. **Import** reads an edited file back into the
 workbench. The workbench needs `node` on `PATH` and a signed-in agent CLI. See
 the [workbench guide](https://faysou.github.io/anylumino/docs/workbench/).
 
+![Workbench: the agent chat on the left and the generated sales explorer UI on the right](https://raw.githubusercontent.com/faysou/anylumino/main/content/docs/assets/workbench/workbench-ui.png)
+
 ## Layout composition
 
 Layout widgets are resizable by drag and drop by default. Pass
@@ -196,7 +200,7 @@ class OrderDashboard(al.VBox):
 
 
 tabs = al.TabPanel({"orders": OrderDashboard(order_rows)})
-tabs["orders"].replace_orders(next_order_rows)
+tabs["orders"].replace_orders(next_order_snapshot)
 ```
 
 ## Astryx widgets
@@ -207,6 +211,8 @@ appearance and behavior options are keyword-only constructor arguments with
 Python snake-case names. Unmodeled JSON-safe upstream options can still be
 passed through `**props`. See the [Astryx component documentation](https://astryx.atmeta.com/components)
 for the upstream component reference.
+
+![Positions dashboard built from Astryx heading, badge, description list, progress bar, buttons, and table](https://raw.githubusercontent.com/faysou/anylumino/main/content/docs/assets/examples/astryx-notebook-dashboard.png)
 
 ```python
 form = ax.FormLayout(

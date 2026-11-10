@@ -11,7 +11,11 @@ into `notebooks/component_examples.py`. Its screenshots go to
 `content/docs/assets/components/`, and `api-images` puts each one, centered,
 under the example on the class's generated API reference page.
 
-`capture docs` and `capture components` take the screenshots: they start
+`capture readme` renders the README quick start as
+`content/docs/assets/examples/readme-quickstart.png`, which the README shows
+under that code.
+
+`capture docs`, `capture components`, and `capture readme` take the screenshots: they start
 JupyterLab, run the notebook in headless Chromium through Playwright, and save
 the output of every cell with a `# docs-example(<slug>)` marker as
 `<slug>.png`. Install the browser once with
@@ -25,6 +29,7 @@ Usage:
     uv run --no-sync python scripts/docs_examples.py api-images
     uv run --no-sync python scripts/docs_examples.py capture docs
     uv run --no-sync python scripts/docs_examples.py capture components
+    uv run --no-sync python scripts/docs_examples.py capture readme
 """
 
 from __future__ import annotations
@@ -44,6 +49,8 @@ from pathlib import Path
 DOCS_DIR = Path("content/docs")
 NOTEBOOK = Path("notebooks/docs_examples.py")
 COMPONENT_NOTEBOOK = Path("notebooks/component_examples.py")
+README = Path("README.md")
+README_NOTEBOOK = Path("build/docs-shots/readme_quickstart.py")
 IMAGE_DIR = "assets/examples"
 COMPONENT_IMAGE_DIR = DOCS_DIR / "assets/components"
 API_DIR = DOCS_DIR / "api"
@@ -256,6 +263,7 @@ NO_SCREENSHOT = {
     ("guide", "Adding methods to composed widgets", 1),
     ("guide", "Mutating layouts after display", 0),
     ("astryx", "Form controls", 1),
+    ("astryx", "Option values", 0),
 }
 
 
@@ -339,6 +347,11 @@ def rendered_name(code: str) -> str:
 
 
 def write_notebook(examples: list[Example]) -> None:
+    NOTEBOOK.write_text(notebook_source(examples))
+    print(f"{NOTEBOOK}: {len(examples)} examples")
+
+
+def notebook_source(examples: list[Example]) -> str:
     # Jupytext writes its own version when it saves the notebook, so the generated header matches it
     cells = [NOTEBOOK_HEADER.replace("{jupytext_version}", version("jupytext"))]
     for example in examples:
@@ -361,8 +374,7 @@ def write_notebook(examples: list[Example]) -> None:
 
         cells.append("# %%\n" + "\n\n".join(body))
 
-    NOTEBOOK.write_text("\n\n".join(cells) + "\n")
-    print(f"{NOTEBOOK}: {len(examples)} examples")
+    return "\n\n".join(cells) + "\n"
 
 
 def write_images(examples: list[Example]) -> None:
@@ -425,6 +437,17 @@ def component_cells() -> list[str]:
         cells.append(f"# %% [markdown]\n# ## `{path}`\n\n# %%\n{marker}{code}")
 
     return cells
+
+
+def readme_examples() -> list[str]:
+    """Return the Python blocks of the README in order; the first is the quick start."""
+    return re.findall(r"^```python\n(.*?)^```", README.read_text(), re.S | re.M)
+
+
+def write_readme_notebook() -> None:
+    header = JUPYTEXT_HEADER.replace("{jupytext_version}", version("jupytext"))
+    README_NOTEBOOK.parent.mkdir(parents=True, exist_ok=True)
+    README_NOTEBOOK.write_text(f"{header}\n# %%\n# docs-example(readme-quickstart)\n{readme_examples()[0]}")
 
 
 def write_component_notebook() -> None:
@@ -660,6 +683,9 @@ def capture(target: str) -> int:
     elif target == "components":
         write_component_notebook()
         notebook, output, crop = COMPONENT_NOTEBOOK, COMPONENT_IMAGE_DIR, True
+    elif target == "readme":
+        write_readme_notebook()
+        notebook, output, crop = README_NOTEBOOK, DOCS_DIR / IMAGE_DIR, False
     else:
         print(__doc__)
 

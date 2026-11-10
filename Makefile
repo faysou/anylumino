@@ -97,6 +97,7 @@ docs-check: docs-reference
 docs-screenshots:
 	uv run --no-sync python scripts/docs_examples.py capture docs
 	uv run --no-sync python scripts/docs_examples.py images
+	uv run --no-sync python scripts/docs_examples.py capture readme
 
 .PHONY: docs-screenshots-components
 docs-screenshots-components:
