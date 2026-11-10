@@ -1,4 +1,4 @@
-const key = Symbol.for("anylumino:action_panel.bundle.js:c076db7f627133c3");
+const key = Symbol.for("anylumino:action_panel.bundle.js:ad4bca0b2650a7c3");
 
 function load(model) {
   globalThis[key] ??= new Promise((resolve, reject) => {

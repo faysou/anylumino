@@ -1,3 +1,12 @@
+/*
+ * Lumino's structural styles, such as hiding inactive tabs, ship with the widget
+ * rather than coming from JupyterLab, so hosts like marimo render it too. The
+ * layer makes them yield to the host's unlayered rules: JupyterLab's own
+ * `.jp-LabShell { position: absolute }` must beat Lumino's
+ * `.lm-Widget { position: relative }`, or the whole JupyterLab shell collapses.
+ */
+@import "@lumino/widgets/style/index.css" layer(lumino);
+
 .anylumino-TabPanelHost {
   position: relative;
   min-width: 260px;
