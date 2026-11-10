@@ -10,15 +10,15 @@ frontend dependency change.
 
 | Package | Version | License |
 | ------- | ------- | ------- |
-| @astryxdesign/core | 0.7.3-canary.97dda3c | MIT |
-| @astryxdesign/richtext | 0.7.3-canary.97dda3c | MIT |
-| @astryxdesign/theme-butter | 0.7.3-canary.97dda3c | MIT |
-| @astryxdesign/theme-chocolate | 0.7.3-canary.97dda3c | MIT |
-| @astryxdesign/theme-gothic | 0.7.3-canary.97dda3c | MIT |
-| @astryxdesign/theme-matcha | 0.7.3-canary.97dda3c | MIT |
-| @astryxdesign/theme-neutral | 0.7.3-canary.97dda3c | MIT |
-| @astryxdesign/theme-stone | 0.7.3-canary.97dda3c | MIT |
-| @astryxdesign/theme-y2k | 0.7.3-canary.97dda3c | MIT |
+| @astryxdesign/core | 0.7.12 | MIT |
+| @astryxdesign/richtext | 0.7.12 | MIT |
+| @astryxdesign/theme-butter | 0.7.12 | MIT |
+| @astryxdesign/theme-chocolate | 0.7.12 | MIT |
+| @astryxdesign/theme-gothic | 0.7.12 | MIT |
+| @astryxdesign/theme-matcha | 0.7.12 | MIT |
+| @astryxdesign/theme-neutral | 0.7.12 | MIT |
+| @astryxdesign/theme-stone | 0.7.12 | MIT |
+| @astryxdesign/theme-y2k | 0.7.12 | MIT |
 | @formatjs/fast-memoize | 3.1.7 | MIT |
 | @formatjs/icu-messageformat-parser | 3.5.17 | MIT |
 | @formatjs/icu-skeleton-parser | 2.1.11 | MIT |
@@ -55,7 +55,7 @@ frontend dependency change.
 | @lumino/widgets | 2.10.0 | BSD-3-Clause |
 | @openuidev/lang-core | 1.0.1 | MIT |
 | @preact/signals-core | 1.14.4 | MIT |
-| @stylexjs/stylex | 0.19.0 | MIT |
+| @stylexjs/stylex | 0.19.1 | MIT |
 | ci-info | 4.4.0 | MIT |
 | intl-messageformat | 11.2.14 | BSD-3-Clause |
 | lexical | 0.52.0 | MIT |
@@ -65,7 +65,7 @@ frontend dependency change.
 | scheduler | 0.28.0 | MIT |
 | zod | 4.6.7 | MIT |
 
-## @astryxdesign/core 0.7.3-canary.97dda3c
+## @astryxdesign/core 0.7.12
 
 Notice from `licenses/astryx.txt`:
 
@@ -93,7 +93,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @astryxdesign/richtext 0.7.3-canary.97dda3c
+## @astryxdesign/richtext 0.7.12
 
 Notice from `LICENSE`:
 
@@ -121,7 +121,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @astryxdesign/theme-butter 0.7.3-canary.97dda3c
+## @astryxdesign/theme-butter 0.7.12
 
 Notice from `LICENSE`:
 
@@ -149,7 +149,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @astryxdesign/theme-chocolate 0.7.3-canary.97dda3c
+## @astryxdesign/theme-chocolate 0.7.12
 
 Notice from `LICENSE`:
 
@@ -177,7 +177,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @astryxdesign/theme-gothic 0.7.3-canary.97dda3c
+## @astryxdesign/theme-gothic 0.7.12
 
 Notice from `LICENSE`:
 
@@ -205,7 +205,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @astryxdesign/theme-matcha 0.7.3-canary.97dda3c
+## @astryxdesign/theme-matcha 0.7.12
 
 Notice from `LICENSE`:
 
@@ -233,7 +233,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @astryxdesign/theme-neutral 0.7.3-canary.97dda3c
+## @astryxdesign/theme-neutral 0.7.12
 
 Notice from `LICENSE`:
 
@@ -261,7 +261,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @astryxdesign/theme-stone 0.7.3-canary.97dda3c
+## @astryxdesign/theme-stone 0.7.12
 
 Notice from `LICENSE`:
 
@@ -289,7 +289,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @astryxdesign/theme-y2k 0.7.3-canary.97dda3c
+## @astryxdesign/theme-y2k 0.7.12
 
 Notice from `LICENSE`:
 
@@ -1744,7 +1744,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @stylexjs/stylex 0.19.0
+## @stylexjs/stylex 0.19.1
 
 Notice from `licenses/stylex.txt`:
 

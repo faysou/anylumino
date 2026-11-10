@@ -1122,8 +1122,10 @@ class PowerSearch(Widget):
 
     ``config`` describes the searchable fields and their operators, and ``value``
     holds the current filter records, each ``{"field": ..., "operator": ...,
-    "value": ...}``. Both are plain JSON, matching how :class:`Table` and
-    :class:`TreeList` take their data.
+    "value": ...}``. Every operator and filter value names its type, such as
+    ``{"type": "string"}`` on an operator and
+    ``{"type": "string", "value": "AAPL"}`` on a filter. Both are plain JSON,
+    matching how :class:`Table` and :class:`TreeList` take their data.
 
     Examples
     --------
@@ -1131,9 +1133,15 @@ class PowerSearch(Widget):
     ax.PowerSearch(
         {
             "name": "orders",
-            "fields": [{"key": "symbol", "label": "Symbol", "operators": [{"key": "is", "label": "is"}]}],
+            "fields": [
+                {
+                    "key": "symbol",
+                    "label": "Symbol",
+                    "operators": [{"key": "is", "label": "is", "value": {"type": "string"}}],
+                }
+            ],
         },
-        filters=[{"field": "symbol", "operator": "is", "value": "AAPL"}],
+        filters=[{"field": "symbol", "operator": "is", "value": {"type": "string", "value": "AAPL"}}],
         label="Filter orders",
     )
     ```
@@ -1142,7 +1150,8 @@ class PowerSearch(Widget):
     ----------
     config : Mapping[str, Any]
         Search configuration: ``{"name": ..., "fields": [...]}``, where each
-        field takes a ``key``, a ``label``, and an ``operators`` sequence.
+        field takes a ``key``, a ``label``, and an ``operators`` sequence of
+        ``{"key": ..., "label": ..., "value": {"type": ...}}``.
     filters : Iterable[Mapping[str, Any]], default ()
         Active filter records, synchronized as ``value``.
     label : str, default ''

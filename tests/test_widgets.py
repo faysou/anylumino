@@ -1662,17 +1662,17 @@ def test_astryx_context_menu_dispatches_items_like_a_dropdown() -> None:
 def test_astryx_power_search_syncs_filters_as_the_value() -> None:
     config = {
         "name": "orders",
-        "fields": [{"key": "symbol", "label": "Symbol", "operators": [{"key": "is", "label": "is"}]}],
+        "fields": [{"key": "symbol", "label": "Symbol", "operators": [{"key": "is", "label": "is", "value": {"type": "string"}}]}],
     }
     search = ax.PowerSearch(
         config,
-        filters=[{"field": "symbol", "operator": "is", "value": "AAPL"}],
+        filters=[{"field": "symbol", "operator": "is", "value": {"type": "string", "value": "AAPL"}}],
         label="Filter",
         clear=True,
     )
 
     assert search.component_name == "PowerSearch"
-    assert search.value == [{"field": "symbol", "operator": "is", "value": "AAPL"}]
+    assert search.value == [{"field": "symbol", "operator": "is", "value": {"type": "string", "value": "AAPL"}}]
     assert search.props["config"] == config
     assert search.props["hasClear"] is True
     assert search.label == "Filter"

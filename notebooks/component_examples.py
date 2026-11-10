@@ -705,9 +705,15 @@ ax.Popover(ax.Text("Order details"), ax.Button("Details"), label="Details", open
 ax.PowerSearch(
     {
         "name": "orders",
-        "fields": [{"key": "symbol", "label": "Symbol", "operators": [{"key": "is", "label": "is"}]}],
+        "fields": [
+            {
+                "key": "symbol",
+                "label": "Symbol",
+                "operators": [{"key": "is", "label": "is", "value": {"type": "string"}}],
+            }
+        ],
     },
-    filters=[{"field": "symbol", "operator": "is", "value": "AAPL"}],
+    filters=[{"field": "symbol", "operator": "is", "value": {"type": "string", "value": "AAPL"}}],
     label="Filter orders",
 )
 

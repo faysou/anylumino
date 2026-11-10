@@ -547,16 +547,16 @@ order_filter = ax.PowerSearch(
             {
                 "key": "symbol",
                 "label": "Symbol",
-                "operators": [{"key": "is", "label": "is"}, {"key": "isNot", "label": "is not"}],
+                "operators": [{"key": "is", "label": "is", "value": {"type": "string"}}, {"key": "isNot", "label": "is not", "value": {"type": "string"}}],
             },
             {
                 "key": "side",
                 "label": "Side",
-                "operators": [{"key": "is", "label": "is"}],
+                "operators": [{"key": "is", "label": "is", "value": {"type": "string"}}],
             },
         ],
     },
-    filters=[{"field": "symbol", "operator": "is", "value": "AAPL"}],
+    filters=[{"field": "symbol", "operator": "is", "value": {"type": "string", "value": "AAPL"}}],
     label="Filter orders",
     clear=True,
 )
@@ -663,7 +663,7 @@ assert order_pages.value == 1
 assert order_pages.props["pageSizeOptions"] == [10, 20, 50]
 assert preview_carousel.child_keys == ["first", "second", "third"]
 assert row_menu.props["items"][0] == {"label": "Copy row", "value": "copy"}
-assert order_filter.value == [{"field": "symbol", "operator": "is", "value": "AAPL"}]
+assert order_filter.value == [{"field": "symbol", "operator": "is", "value": {"type": "string", "value": "AAPL"}}]
 
 # %%
 
