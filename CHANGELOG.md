@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.0
 
 This release adds `al.Tabulator`, a virtualized data grid built on Tabulator
 6.7 for large and live data.
