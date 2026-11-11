@@ -130,3 +130,18 @@
 .anylumino-TableHost table {
   margin: 0;
 }
+
+.anylumino-UnknownComponent {
+  padding: 8px 10px;
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #fda29b;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+/* A child's own host inside its slot. It adds no box, so the child lays out as the slot's content. */
+.anylumino-AstryxChildHost {
+  display: contents;
+}

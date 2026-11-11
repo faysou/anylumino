@@ -1,0 +1,281 @@
+# openui-workbench Specification
+
+## Purpose
+A notebook workbench that pairs an agent chat with a live, generated anylumino UI, and shows the
+OpenUI program, generated UI code, and callbacks behind it, with named sessions that survive
+kernel restarts.
+
+## Requirements
+
+### Requirement: Workbench layout
+
+The workbench SHALL be one displayable widget: a horizontal split with the chat on the left and a
+tab panel on the right. The tab panel SHALL hold, in order, the tabs `UI`, `OpenUI`, `UI code`,
+and `Callbacks`. The chat side SHALL show the agent, the session name, and the turn status.
+
+#### Scenario: Fresh workbench
+
+- **WHEN** a workbench is created with no saved session and displayed
+- **THEN** the chat is on the left, the four tabs are on the right with `UI` selected, and the
+  `UI` tab shows an empty state
+
+### Requirement: Read-only code tabs
+
+The `OpenUI`, `UI code`, and `Callbacks` tabs SHALL show their text with syntax highlighting
+and line numbers, and SHALL NOT accept edits. Only chat turns SHALL change them.
+
+#### Scenario: Code tab cannot be edited
+
+- **WHEN** the user opens the `Callbacks` tab and types into it
+- **THEN** the text does not change
+
+### Requirement: Applying a turn
+
+After a turn ends, the workbench SHALL merge and parse the program, generate the UI code, and run
+the callbacks and the UI code to build the live UI. All of these SHALL succeed before any tab
+changes. Then all four tabs SHALL update together. On any failure, the workbench SHALL keep the
+previous program, UI code, callbacks, and live UI, and SHALL show the error in the chat as a system
+message. A failure of the agent itself, including output it cannot read, SHALL end the turn with
+a system message and leave the workbench ready for the next turn. A new live UI SHALL close the
+widgets of the previous one, except widgets from the namespace. A program without callbacks SHALL
+get an empty `App` subclass.
+
+#### Scenario: Successful turn
+
+- **WHEN** a turn returns a valid program and callbacks
+- **THEN** the `UI` tab shows the new widgets, and the three code tabs show the merged program,
+  the generated code, and the callbacks from that turn
+
+#### Scenario: Failing callbacks keep the old state
+
+- **WHEN** a turn returns callbacks with a syntax error
+- **THEN** the four tabs keep their previous contents, and the chat shows a system message with the
+  error and its line
+
+#### Scenario: Unreadable agent output
+
+- **WHEN** the agent CLI writes a line that is not JSON
+- **THEN** the chat shows a system message with the error, and the status returns to `Ready`
+
+#### Scenario: Live UI runs the shown code
+
+- **WHEN** a turn has been applied
+- **THEN** the live UI is the result of running exactly the text in the `UI code` tab
+
+### Requirement: Namespace access
+
+The workbench SHALL accept a namespace mapping when it is created. The callbacks SHALL run without notebook globals, and the
+`App` subclass SHALL receive the namespace as constructor keywords. The system prompt context SHALL list each namespace
+entry's name and type, plus the shape, column names, and column types of pandas and Polars data
+frames. The namespace
+component SHALL mount widgets from that namespace.
+
+#### Scenario: Callback reads notebook data
+
+- **WHEN** the namespace contains a data frame `sales` and a handler filters `self.sales`
+- **THEN** activating the bound widget runs the filter on that data frame
+
+### Requirement: Setup callback
+
+When the `App` subclass defines `setup(self)`, it SHALL run once each time the UI is built,
+after the widgets exist. The system prompt SHALL tell the agent to fill widgets from
+namespace data there instead of copying the data into the program. An exception in `setup` SHALL
+be reported in the chat and SHALL not stop the turn from applying.
+
+#### Scenario: Setup fills a table from the namespace
+
+- **WHEN** a turn applies callbacks whose `setup` calls `set_rows` with the rows of `sales`
+- **THEN** the table in the `UI` tab shows those rows
+
+### Requirement: Callback errors do not break the workbench
+
+An exception raised by a callback SHALL be shown in the chat as a system message that names the
+handler. The workbench and the other widgets SHALL keep working.
+
+#### Scenario: Raising handler
+
+- **WHEN** a handler raises `KeyError('region')`
+- **THEN** the chat shows a system message naming the handler and the `KeyError`, and other
+  buttons still run their handlers
+
+### Requirement: Asking the agent from the UI
+
+`app.ask_agent(message, context=None)` SHALL submit a chat turn with that message, as if the user had
+typed it, with the context added to the prompt. While a turn is running, it SHALL be refused with
+a system message.
+
+#### Scenario: UI button starts a turn
+
+- **WHEN** a generated button calls `app.ask_agent("Summarize the selection")` while no turn is running
+- **THEN** a user message `Summarize the selection` appears and a turn starts
+
+### Requirement: Named session persistence
+
+A workbench created with a session name SHALL save, after each turn, a JSON file. The file SHALL
+hold the session name, agent, agent session ID, working directory, messages, program, callbacks,
+and update time. Creating a workbench with an existing session name SHALL restore the messages,
+program, and callbacks, regenerate the UI code, rebuild the live UI, and resume the agent session.
+Passing an agent that differs from the saved one SHALL raise `ValueError`.
+
+#### Scenario: Restore after kernel restart
+
+- **WHEN** a session `sales` has two applied turns, the kernel restarts, and
+  `Workbench(session="sales")` is displayed
+- **THEN** the chat shows the earlier messages, the four tabs match their state after the second
+  turn, and the next turn resumes the same agent session
+
+#### Scenario: Restore with an unrunnable UI
+
+- **WHEN** a saved program references a namespace widget that is missing in the new kernel
+- **THEN** the messages and code tabs are restored, the `UI` tab shows the error, and the chat
+  stays usable
+
+### Requirement: Export to files
+
+The workbench header SHALL have an `Export` button, disabled until a UI is built. It SHALL open a
+dialog that browses the kernel's folders, starting in the kernel's current directory, and asks for
+a name. Exporting SHALL write one module `<name>.py` in the chosen folder, replacing an existing
+file: the shown OpenUI program as a comment with a fingerprint of the `UI` class, then the shown UI
+code, then the shown callbacks, with the callbacks' leading imports moved
+up to the UI code's imports. It SHALL post a chat message with the path and a `load` call that
+uses it.
+
+#### Scenario: Export a built UI
+
+- **WHEN** a UI is built, the user opens `Export`, enters the folder `exports`, names the export
+  `sales`, and confirms
+- **THEN** `exports/sales.py` holds the `UI code` tab followed by the `Callbacks` tab, and the chat
+  shows `load("exports/sales.py", sales=sales)`
+
+### Requirement: Notebook skills
+
+A workbench SHALL accept skill folders, each with a `SKILL.md` whose front matter gives a name and
+a description. The system prompt SHALL list each skill's name, description, and path. Claude SHALL
+load the skills for each turn and be able to read their folders. The skill paths SHALL be saved
+with the session. A folder without a valid `SKILL.md` SHALL raise `ValueError`.
+A skill folder MAY hold a `components.py` that defines `COMPONENTS`, catalog components for its
+library's widgets. The workbench SHALL parse programs, generate code, and write the system prompt
+with the built-in catalog plus those components, and generated code SHALL import each component's
+module. A component name already in the catalog SHALL raise `ValueError`.
+
+#### Scenario: Skill component in a program
+
+- **WHEN** the `lightweight-charts` skill adds `TradingChart` and a program declares
+  `price_chart = TradingChart(520)`
+- **THEN** the generated UI builds a `NotebookChart` as `ui.price_chart`, and the callbacks fill it
+
+#### Scenario: Agent uses a private library
+
+- **WHEN** a workbench gets a `lightweight-charts` skill folder and the user asks for a chart
+- **THEN** the agent loads the skill, and its callbacks build the chart and place it in a container
+
+### Requirement: Importing an exported file
+
+The workbench header SHALL have an `Import` button that opens a dialog listing the kernel's folders
+and `.py` files. Importing a file SHALL read its OpenUI program comment, `UI` class, and callbacks,
+and apply the program and callbacks as a turn would. When the file does not apply, or its `UI`
+class changed since the export and differs from the generated code, the workbench SHALL send the
+file to the agent in a turn that asks for a program and callbacks that reproduce it. After that
+turn applies, the workbench SHALL post whether the generated `UI` class matches the file's. A file without
+the program comment or the `UI` class SHALL be rejected with a system message.
+
+#### Scenario: Callbacks edited outside the workbench
+
+- **WHEN** an exported file's App class is edited in an editor and the file is imported
+- **THEN** the tabs show the edited callbacks and no agent turn runs
+
+#### Scenario: UI class edited outside the workbench
+
+- **WHEN** an exported file's `UI` class is edited and the file is imported
+- **THEN** a turn sends the file to the agent, and its reply applies like any other turn
+
+### Requirement: Loading an exported file
+
+`anylumino.workbench.load(path, **namespace)` SHALL run the file, create its `App` subclass with
+`namespace`, and return a new `UI` built with that app. A relative path SHALL be relative to the
+notebook's directory, or to the calling script's directory outside Jupyter. The exported file
+SHALL read no notebook globals, so it also works as an imported module.
+
+#### Scenario: Same UI outside the workbench
+
+- **WHEN** a notebook runs `load("exports/sales.py", sales=sales)`
+- **THEN** the returned UI is the same as the workbench's, `setup` has filled it from
+  `sales`, and its handlers run against `sales`
+
+### Requirement: The workbench recovers from any failed operation
+
+When a turn, an import, or a restore fails for any reason, the workbench SHALL show a system
+message that names the failure, SHALL leave the UI unchanged, and SHALL return to the idle state
+so the next submit or import is accepted.
+
+#### Scenario: Import of a file that is not valid UTF-8
+
+- **WHEN** the user imports a `.py` file that cannot be decoded as UTF-8
+- **THEN** the chat shows that the import failed and why, the status is idle, and a following
+  submit starts a turn
+
+#### Scenario: Unexpected error inside a turn
+
+- **WHEN** a turn raises an error the workbench does not anticipate
+- **THEN** the chat shows the error, the status is idle, and the UI is unchanged
+
+### Requirement: One outcome per turn
+
+Each turn SHALL end with exactly one outcome: applied, not applied, failed, or stopped. Messages
+that depend on the outcome SHALL match it, and tool calls of a turn that did not complete SHALL
+NOT stay marked as running.
+
+#### Scenario: Agent failure during a reconcile turn
+
+- **WHEN** a reconcile turn ends because the agent failed
+- **THEN** the chat shows the failure and does not also ask the agent to close a remaining gap
+
+#### Scenario: Turn stopped while a tool runs
+
+- **WHEN** the user stops a turn while a tool call is in progress
+- **THEN** that tool call is marked `error`, in the chat and in the saved session, and the reply
+  is marked stopped; the chat component has no stopped state for a tool call
+
+#### Scenario: Stop during apply
+
+- **WHEN** the user stops a turn after the agent replied and before the reply is applied
+- **THEN** the reply is not applied and the turn ends as stopped
+
+### Requirement: Explicit working directory overrides the saved one
+
+When a workbench is created for an existing session with an explicit `cwd`, the session SHALL use
+and save that directory. Without an explicit `cwd`, it SHALL use the saved directory.
+
+#### Scenario: Project directory moved
+
+- **WHEN** `Workbench(session="x", cwd=new_dir)` is created and session `x` was saved with a
+  directory that no longer exists
+- **THEN** turns run in `new_dir` and the session file records `new_dir`
+
+#### Scenario: No cwd given
+
+- **WHEN** `Workbench(session="x")` is created for a saved session
+- **THEN** turns run in the saved directory
+
+### Requirement: Taking over a session stops its running turn
+
+When a workbench is created for a session on which another workbench in the same kernel has a
+turn running, that turn SHALL be stopped and its agent process terminated before the new
+workbench starts a turn.
+
+#### Scenario: Cell rerun during a turn
+
+- **WHEN** the cell that creates `Workbench(session="x", prompt=...)` is run again while its
+  first turn is still streaming
+- **THEN** the first turn's agent process ends, one turn runs for session `x`, and the session
+  file holds that turn's result
+
+### Requirement: Chat updates are not lost
+
+A system message added while a reply is streaming SHALL remain in the chat, in every supported
+notebook host.
+
+#### Scenario: Message during streaming in marimo
+
+- **WHEN** a callback error is reported while a turn streams its reply in marimo
+- **THEN** the chat shows both the error message and the complete reply

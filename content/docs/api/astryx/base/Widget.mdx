@@ -7,15 +7,13 @@ Base anywidget for Astryx-backed components.
 ## Attributes
 
 <PyAttributes>
-  <PyAttribute name="component_family" value="t.Unicode('astryx').tag(sync=True)" />
+  <PyAttribute name="component_family" value="t.Unicode('astryx')" />
 
   <PyAttribute name="component_name" value="t.Unicode('Stack').tag(sync=True)" />
 
   <PyAttribute name="props" value="t.Dict(default_value={}).tag(sync=True)" />
 
   <PyAttribute name="color_mode" value="t.Enum(tuple(ColorMode), default_value=ColorMode.LIGHT).tag(sync=True)" />
-
-  <PyAttribute name="theme" value="t.Unicode('neutral').tag(sync=True)" />
 
   <PyAttribute name="brand" value="t.Dict(default_value={}).tag(sync=True)" />
 

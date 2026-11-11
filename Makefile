@@ -49,6 +49,12 @@ test:
 	npm test
 	uv run pytest
 
+# Browser tests start their own JupyterLab and run headless Chromium; install it
+# once with `uv run --no-sync playwright install chromium`.
+.PHONY: test-browser
+test-browser:
+	uv run --no-sync pytest -m browser tests/browser
+
 .PHONY: docs-reference
 docs-reference: docs-install
 	@mkdir -p build/docs

@@ -55,7 +55,10 @@ import screenshot from '../../assets/components/controls-DatetimePicker.png';
 
   <div>
     <PyParameter name="value" type="datetime | str | None" value="None">
-      Initial value and synchronized Python value.
+      Initial date and time. `value` holds it as an ISO 8601 string such
+      as `"2026-10-21T14:30"`, or `None`, which it is until both a date
+      and a time are set; a `datetime` assigned later is converted the same
+      way.
     </PyParameter>
 
     <PyParameter name="description" type="str" value="''">

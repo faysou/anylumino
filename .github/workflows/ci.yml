@@ -53,6 +53,12 @@ jobs:
       - name: Run tests
         run: uv run --no-sync pytest
 
+      - name: Install the browser for browser tests
+        run: uv run --no-sync playwright install --with-deps chromium
+
+      - name: Run browser tests
+        run: make test-browser
+
       - name: Build distributions
         run: uv build
 

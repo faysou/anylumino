@@ -82,9 +82,9 @@ def test_fresh_workbench_layout(tmp_path):
     assert [view.props["hasLineNumbers"] for view in workbench.code_views.values()] == [True, True, True]
 
 
-def test_successful_turn_updates_all_tabs(agent_reply, tmp_path, sales):
+def test_successful_turn_updates_all_tabs(agent_reply, turn_agent, tmp_path, sales):
     agent_reply(reply("Here is a sales panel.", PROGRAM, CALLBACKS))
-    workbench = Workbench(agent="codex", namespace={"sales": sales}, cwd=tmp_path)
+    workbench = Workbench(agent=turn_agent, namespace={"sales": sales}, cwd=tmp_path)
 
     workbench.chat._handle_frontend_message(workbench.chat, {"type": "submit", "value": "Build it"}, None)
 
@@ -104,9 +104,9 @@ def test_successful_turn_updates_all_tabs(agent_reply, tmp_path, sales):
     assert workbench.runner.session_id == "thread-1"
 
 
-def test_prompt_starts_the_first_turn(agent_reply, tmp_path, sales):
+def test_prompt_starts_the_first_turn(agent_reply, turn_agent, tmp_path, sales):
     agent_reply(reply("Here is a sales panel.", PROGRAM, CALLBACKS))
-    workbench = Workbench(agent="codex", namespace={"sales": sales}, cwd=tmp_path, prompt="Build it")
+    workbench = Workbench(agent=turn_agent, namespace={"sales": sales}, cwd=tmp_path, prompt="Build it")
 
     assert workbench.chat.messages == [
         {"role": "user", "content": "Build it", "status": "sent"},
@@ -116,9 +116,9 @@ def test_prompt_starts_the_first_turn(agent_reply, tmp_path, sales):
     assert code(workbench)["openui"] == PROGRAM
 
 
-def test_failing_callbacks_keep_previous_state(agent_reply, tmp_path, sales):
+def test_failing_callbacks_keep_previous_state(agent_reply, turn_agent, tmp_path, sales):
     agent_reply(reply("First.", PROGRAM, CALLBACKS))
-    workbench = Workbench(agent="codex", namespace={"sales": sales}, cwd=tmp_path)
+    workbench = Workbench(agent=turn_agent, namespace={"sales": sales}, cwd=tmp_path)
     workbench.submit("Build it")
     before = (code(workbench), workbench.ui_host.widgets)
 
@@ -138,9 +138,9 @@ def test_failing_callbacks_keep_previous_state(agent_reply, tmp_path, sales):
     assert f"Current program:\n```openui-lang\n{PROGRAM}\n```" in prompt
 
 
-def test_unknown_component_is_reported(agent_reply, tmp_path):
+def test_unknown_component_is_reported(agent_reply, turn_agent, tmp_path):
     agent_reply(reply("Chart.", 'root = VBox([chart])\nchart = Chart([1])'))
-    workbench = Workbench(agent="codex", cwd=tmp_path)
+    workbench = Workbench(agent=turn_agent, cwd=tmp_path)
     workbench.submit("Chart it")
     assert workbench.chat.messages[-1]["role"] == "system"
     assert workbench.chat.messages[-1]["content"].startswith(
@@ -279,9 +279,9 @@ def test_unreadable_agent_output_ends_the_turn(agent_reply, tmp_path):
     assert (workbench.running, workbench.chat.is_streaming, workbench.status_text.text) == (False, False, "Ready")
 
 
-def test_apply_error_is_sent_only_with_the_next_turn(agent_reply, tmp_path):
+def test_apply_error_is_sent_only_with_the_next_turn(agent_reply, turn_agent, tmp_path):
     agent_reply(reply("Bad.", "root = Nope()"))
-    workbench = Workbench(agent="codex", cwd=tmp_path)
+    workbench = Workbench(agent=turn_agent, cwd=tmp_path)
     workbench.submit("Build it")
     agent_reply("A question answered.")
     workbench.submit("Why?")
@@ -292,9 +292,9 @@ def test_apply_error_is_sent_only_with_the_next_turn(agent_reply, tmp_path):
     assert ["Your previous reply was not applied" in prompt for prompt in prompts] == [False, True, False]
 
 
-def test_ui_without_handlers_gets_empty_callbacks(agent_reply, tmp_path):
+def test_ui_without_handlers_gets_empty_callbacks(agent_reply, turn_agent, tmp_path):
     agent_reply(reply("Static.", 'root = VBox([title])\ntitle = Heading("Sales")'))
-    workbench = Workbench(agent="codex", cwd=tmp_path)
+    workbench = Workbench(agent=turn_agent, cwd=tmp_path)
     workbench.submit("Build it")
 
     assert workbench.chat.messages[-1] == {"role": "assistant", "content": "Static."}
@@ -511,3 +511,252 @@ def test_turns_run_on_the_kernel_loop_outside_marimo() -> None:
     result = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True, check=True)
 
     assert result.stdout.splitlines() == ["None False", "None"]
+
+
+def assert_idle(workbench):
+    assert (workbench.running, workbench.chat.is_streaming, workbench.status_text.text) == (False, False, "Ready")
+
+
+def test_import_of_a_file_that_is_not_utf8_leaves_the_workbench_usable(agent_reply, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "latin.py").write_bytes("titre = 'caf\xe9'\n".encode("latin-1"))
+    agent_reply("Hello.")
+    workbench = Workbench(agent="codex", cwd=tmp_path)
+
+    workbench.import_file(tmp_path / "latin.py")
+    workbench.submit("Hi")
+
+    assert workbench.chat.messages[0]["role"] == "system"
+    assert workbench.chat.messages[0]["content"].startswith("Import of `latin.py` failed: 'utf-8' codec can't decode")
+    assert workbench.chat.messages[1:] == [
+        {"role": "user", "content": "Hi", "status": "sent"},
+        {"role": "assistant", "content": "Hello."},
+    ]
+    assert_idle(workbench)
+
+
+def test_unexpected_error_in_a_turn_is_reported_and_the_workbench_stays_usable(agent_reply, tmp_path):
+    agent_reply("Hello.")
+    workbench = Workbench(agent="codex", cwd=tmp_path)
+
+    async def broken(*_args):
+        raise RuntimeError("chat broke")
+
+    workbench.stream_reply = broken
+    workbench.submit("First")
+    del workbench.stream_reply
+    workbench.submit("Second")
+
+    assert workbench.chat.messages == [
+        {"role": "user", "content": "First", "status": "sent"},
+        {"role": "assistant", "content": "", "status": "sending"},
+        {"role": "system", "content": "The turn failed: RuntimeError: chat broke"},
+        {"role": "user", "content": "Second", "status": "sent"},
+        {"role": "assistant", "content": "Hello."},
+    ]
+    assert workbench.outcome == "applied"
+    assert_idle(workbench)
+
+
+def test_stop_between_the_reply_and_apply_leaves_the_ui_unchanged(agent_reply, tmp_path, monkeypatch, sales):
+    agent_reply(reply("First.", PROGRAM, CALLBACKS))
+    workbench = Workbench(agent="codex", namespace={"sales": sales}, cwd=tmp_path)
+    workbench.submit("Build it")
+    before = (workbench.ui, code(workbench), workbench.state.program)
+    agent_reply(reply("Renamed.", 'title = Heading("Revenue")'))
+    parse = openui.parse
+
+    async def parse_then_stop(*args, **kwargs):
+        result = await parse(*args, **kwargs)
+        workbench.runner.stopped = True
+        return result
+
+    monkeypatch.setattr(openui, "parse", parse_then_stop)
+    workbench.submit("Rename")
+
+    assert (workbench.ui, code(workbench), workbench.state.program) == before
+    assert workbench.outcome == "stopped"
+    assert workbench.chat.messages[-1] == {"role": "assistant", "content": "Renamed.", "status": "stopped"}
+    assert_idle(workbench)
+
+
+def test_stopped_turn_leaves_no_tool_call_running(agent_reply, tmp_path, monkeypatch):
+    stream = tmp_path / "stream.jsonl"
+    stream.write_text(
+        '{"type": "thread.started", "thread_id": "thread-1"}\n'
+        '{"type": "item.started", "item": {"id": "tool-1", "type": "command_execution", "command": "ls"}}\n'
+    )
+    monkeypatch.setenv("FAKE_SLEEP", "5")
+    workbench = Workbench(agent="codex", session="stopped", cwd=tmp_path)
+
+    async def scenario():
+        workbench.submit("List files")
+        while not (workbench.chat.messages and workbench.chat.messages[-1].get("tool_calls")):
+            await asyncio.sleep(0.01)
+
+        await workbench.runner.stop()
+        while workbench.tasks:
+            await asyncio.sleep(0.01)
+
+    asyncio.run(scenario())
+    saved = Workbench(session="stopped")
+
+    expected = {
+        "role": "assistant",
+        "content": "",
+        "status": "stopped",
+        "tool_calls": [{"name": "command_execution", "target": "ls", "status": "error"}],
+    }
+    assert workbench.chat.messages[-1] == expected
+    assert saved.state.messages[-1] == expected
+    assert workbench.outcome == "stopped"
+
+
+@pytest.mark.parametrize(
+    ("events", "exit_code", "stderr", "shown"),
+    [
+        (
+            '{"type": "turn.failed", "error": {"message": "Credit balance is too low"}}\n',
+            "1",
+            "",
+            "The agent failed: Credit balance is too low",
+        ),
+        ("", "2", "unknown option --effort", "The agent failed: `codex` exited with 2: unknown option --effort"),
+    ],
+    ids=["agent error then exit", "exit only"],
+)
+def test_agent_failure_shows_the_first_error(fake_cli, tmp_path, monkeypatch, events, exit_code, stderr, shown):
+    stream = tmp_path / "stream.jsonl"
+    stream.write_text('{"type": "thread.started", "thread_id": "thread-1"}\n' + events)
+    monkeypatch.setenv("FAKE_STREAM", str(stream))
+    monkeypatch.setenv("FAKE_EXIT", exit_code)
+    monkeypatch.setenv("FAKE_STDERR", stderr)
+    workbench = Workbench(agent="codex", cwd=tmp_path)
+
+    workbench.submit("Hi")
+
+    assert workbench.chat.messages[-1] == {"role": "system", "content": shown}
+    assert workbench.outcome == "failed"
+
+
+def test_explicit_cwd_replaces_the_directory_of_a_restored_session(agent_reply, tmp_path):
+    old, new = tmp_path / "old", tmp_path / "new"
+    old.mkdir()
+    new.mkdir()
+    agent_reply("Hello.")
+    Workbench(agent="codex", session="moved", cwd=old).submit("Hi")
+    old.rmdir()
+
+    moved = Workbench(session="moved", cwd=new)
+    moved.submit("Again")
+
+    assert agent_reply.calls()[-1]["cwd"] == str(new.resolve())
+    assert Workbench(session="moved").state.cwd == str(new.resolve())
+
+
+def test_restored_session_without_cwd_keeps_its_directory(agent_reply, tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    agent_reply("Hello.")
+    Workbench(agent="codex", session="kept", cwd=project).submit("Hi")
+    monkeypatch.chdir(tmp_path)
+
+    Workbench(session="kept").submit("Again")
+
+    assert agent_reply.calls()[-1]["cwd"] == str(project.resolve())
+
+
+def test_new_workbench_on_a_session_stops_the_turn_still_running_on_it(agent_reply, tmp_path, monkeypatch):
+    agent_reply("Reply.")
+    monkeypatch.setenv("FAKE_SLEEP", "30")
+    first = Workbench(agent="codex", session="shared", cwd=tmp_path)
+    processes = []
+
+    async def scenario():
+        first.submit("First")
+        # Taken over once the first agent has its prompt and sleeps
+        log = tmp_path / "log.jsonl"
+        while first.runner.process is None or not log.exists() or not log.read_text():
+            await asyncio.sleep(0.01)
+
+        processes.append(first.runner.process)
+        monkeypatch.setenv("FAKE_SLEEP", "0")
+        # The first turn has not saved the session yet, so the agent is named again
+        second = Workbench(agent="codex", session="shared", prompt="Second")
+        while first.tasks or second.tasks:
+            await asyncio.sleep(0.01)
+
+        return second
+
+    second = asyncio.run(scenario())
+    saved = Workbench(session="shared")
+
+    assert processes[0].returncode is not None
+    assert first.outcome == "stopped"
+    assert second.outcome == "applied"
+    assert [call["stdin"].split("\n")[0] for call in agent_reply.calls()] == ["First", "Second"]
+    assert saved.state.messages[-2:] == [
+        {"role": "user", "content": "Second", "status": "sent"},
+        {"role": "assistant", "content": "Reply."},
+    ]
+
+
+def test_chat_updates_from_two_threads_lose_no_message(tmp_path):
+    import threading
+
+    workbench = Workbench(agent="codex", cwd=tmp_path)
+    reply_index = workbench.add_message("assistant", "", "sending")
+    # A short switch interval makes the threads interleave inside each update
+    interval = sys.getswitchinterval()
+    sys.setswitchinterval(1e-6)
+    try:
+        streamer = threading.Thread(
+            target=lambda: [workbench.update_reply(reply_index, f"part {index}", []) for index in range(1000)]
+        )
+        streamer.start()
+        for index in range(1000):
+            workbench.add_message("system", f"note {index}")
+        streamer.join()
+    finally:
+        sys.setswitchinterval(interval)
+
+    contents = [message["content"] for message in workbench.chat.messages]
+    assert contents == ["part 999", *(f"note {index}" for index in range(1000))]
+
+
+@pytest.mark.parametrize(
+    ("program", "error"),
+    [
+        ('root = VBox([title, chart])\ntitle = Heading("Sales")', "root: `chart` is not defined"),
+        ('root = VBox([b])\nb = Button("Run", @Callback(on_run))', "b: `on_run` is not defined"),
+    ],
+    ids=["undefined component", "unquoted handler"],
+)
+def test_program_with_an_undefined_name_is_not_applied(agent_reply, tmp_path, sales, program, error):
+    agent_reply(reply("First.", PROGRAM, CALLBACKS))
+    workbench = Workbench(agent="codex", namespace={"sales": sales}, cwd=tmp_path)
+    workbench.submit("Build it")
+    before = (workbench.ui, code(workbench))
+    agent_reply(reply("Changed.", program))
+
+    workbench.submit("Change it")
+
+    assert (workbench.ui, code(workbench)) == before
+    assert workbench.chat.messages[-1] == {
+        "role": "system",
+        "content": f"The reply was not applied; the UI is unchanged. OpenUI errors: {error}",
+    }
+    assert workbench.last_error == f"OpenUI errors: {error}"
+
+
+def test_string_used_as_a_child_is_reported_by_statement(agent_reply, tmp_path):
+    agent_reply(reply("Box.", 'root = VBox([box])\nbox = VBox(["hello"])'))
+    workbench = Workbench(agent="codex", cwd=tmp_path)
+
+    workbench.submit("Build it")
+
+    assert workbench.chat.messages[-1] == {
+        "role": "system",
+        "content": "The reply was not applied; the UI is unchanged. UI code: box.children: 'hello' is not a component",
+    }
+    assert workbench.ui is None

@@ -35,8 +35,9 @@ import screenshot from '../../assets/components/layout-Toolbar.png';
     <PyParameter name="actions" type="Iterable[dict[str, Any]] | None" value="None">
       Action definitions. Each action should include an `id` and `label`;
       optional keys such as `icon`, `icon_src`, `icon_size`,
-      `tooltip`, `disabled`, or `separator` are forwarded to the
-      frontend. `icon` uses bundled workflow icon names.
+      `tooltip`, or `disabled` are forwarded to the frontend. `icon`
+      uses bundled workflow icon names. An action with a truthy
+      `separator` key renders as a divider between buttons.
     </PyParameter>
 
     <PyParameter name="callbacks" type="dict[str, ActionCallback] | None" value="None">

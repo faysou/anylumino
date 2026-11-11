@@ -35,6 +35,13 @@
   border: 1px solid #d5d5d5;
 }
 
+.anylumino-ToolbarSeparator {
+  align-self: stretch;
+  width: 1px;
+  margin: 2px 4px;
+  background: #d5d5d5;
+}
+
 .anylumino-ToolbarButton {
   display: inline-flex;
   align-items: center;

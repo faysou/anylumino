@@ -50,7 +50,7 @@ import screenshot from '../../../assets/components/astryx-surfaces-ToggleButtonG
                 if value is None
                 else [value]
                 if isinstance(value, str)
-                else list(value)
+                else _option_value(list(value))
             )
         else:
             if value is not None and not isinstance(value, str):

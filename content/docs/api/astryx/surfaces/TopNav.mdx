@@ -58,16 +58,15 @@ import screenshot from '../../../assets/components/astryx-surfaces-TopNav.png';
         super().__init__(
             "TopNav",
             {"end": _slot(end, Orientation.HORIZONTAL)} if end is not None else None,
-            value=value,
+            value=_option_value(value),
             label=label or "",
+            icon=icon or "",
             props=_named_props(
                 props,
                 items=_option_records(items),
                 heading=heading,
                 subheading=subheading,
-                icon=icon,
                 menu=_option_records(menu) if menu is not None else None,
-                label=label,
             ),
         )
     ```

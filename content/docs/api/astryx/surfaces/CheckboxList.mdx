@@ -66,7 +66,7 @@ import screenshot from '../../../assets/components/astryx-surfaces-CheckboxList.
         super().__init__(
             "CheckboxList",
             label=label,
-            value=list(value),
+            value=_option_value(list(value)),
             disabled=disabled,
             props=_named_props(
                 props,

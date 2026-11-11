@@ -1,0 +1,56 @@
+---
+title: "ParseResult"
+---
+
+A parsed program: its evaluated tree and what the parser reported about it.
+
+`unresolved` lists names the program uses without defining them; such a
+program does not apply.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="root" type="dict[str, Any] | None" />
+
+  <PyAttribute name="errors" type="list[dict[str, Any]]" />
+
+  <PyAttribute name="unresolved" type="list[str]" />
+
+  <PyAttribute name="orphans" type="list[str]" />
+
+  <PyAttribute name="incomplete" type="bool" />
+
+  <PyAttribute name="statements" type="list[str]" />
+
+  <PyAttribute name="states" type="list[str]" />
+
+  <PyAttribute name="queries" type="list[str]" />
+
+  <PyAttribute name="mutations" type="list[str]" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(root, errors, unresolved, orphans, incomplete, statements, states, queries, mutations) -> None" kind="constructor">
+  <div>
+    <PyParameter name="root" type="dict[str, Any] | None" />
+
+    <PyParameter name="errors" type="list[dict[str, Any]]" />
+
+    <PyParameter name="unresolved" type="list[str]" />
+
+    <PyParameter name="orphans" type="list[str]" />
+
+    <PyParameter name="incomplete" type="bool" />
+
+    <PyParameter name="statements" type="list[str]" />
+
+    <PyParameter name="states" type="list[str]" />
+
+    <PyParameter name="queries" type="list[str]" />
+
+    <PyParameter name="mutations" type="list[str]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

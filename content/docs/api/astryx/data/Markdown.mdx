@@ -79,7 +79,7 @@ import screenshot from '../../../assets/components/astryx-data-Markdown.png';
         citation_style: CitationStyle | str | None = None,
         content_width: int | float | str | None = None,
         content_align: ContentAlign | str | None = None,
-        autolink: str | None = None,
+        autolink: Literal["gfm"] | None = None,
         **props: Any,
     ) -> None:
         display = optional_choice(display, Display, "display")
@@ -142,7 +142,7 @@ import screenshot from '../../../assets/components/astryx-data-Markdown.png';
       Prose alignment inside the available width.
     </PyParameter>
 
-    <PyParameter name="autolink" type="str | None" value="None">
+    <PyParameter name="autolink" type="Literal['gfm'] | None" value="None">
       Optional GFM bare-link handling.
     </PyParameter>
 

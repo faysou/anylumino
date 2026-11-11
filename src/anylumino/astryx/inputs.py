@@ -14,6 +14,7 @@ from ..layout import _size_to_css
 from .base import Widget
 from .base import _named_props
 from .base import _option_records
+from .base import _option_value
 from .enums import BadgeVariant
 from .enums import ButtonVariant
 from .enums import CompactSize
@@ -482,7 +483,7 @@ class IconButton(Widget):
             disabled=disabled,
             callbacks=callbacks,
             props=_named_props(
-                props, icon=icon, size=size, isLoading=loading, tooltip=tooltip
+                props, size=size, isLoading=loading, tooltip=tooltip
             ),
         )
 
@@ -1305,9 +1306,11 @@ class SelectionSlider(Widget):
     ----------
     items : Iterable[Any] | Mapping[str, Any]
         Option labels, ``(label, value)`` pairs, or a label to value mapping.
+        Option values are converted to strings.
     value : Any, default None
         Selected option value, or a two-item sequence for a range. Defaults to
-        the first option.
+        the first option. Holds the option value as a string, such as ``"1"``
+        for the option ``1``.
     label : str, default ''
         Visible or accessible label for the component.
     label_position : LabelPosition | str, default 'top'
@@ -1348,17 +1351,12 @@ class SelectionSlider(Widget):
         records = _option_records(items)
         if value is None and records:
             first = records[0]
-            # Scalar options stay scalars, matching the frontend option helpers.
-            value = (
-                first.get("value", first.get("label"))
-                if isinstance(first, Mapping)
-                else first
-            )
+            value = first.get("value", first.get("label")) if isinstance(first, Mapping) else first
 
         super().__init__(
             "SelectionSlider",
             label=label,
-            value=value,
+            value=_option_value(value),
             disabled=disabled,
             props=_label_props(
                 props,
@@ -1692,7 +1690,7 @@ class Selector(Widget):
         super().__init__(
             "Selector",
             label=label,
-            value=value,
+            value=_option_value(value),
             disabled=disabled,
             props=_label_props(
                 props,
@@ -1839,7 +1837,7 @@ class MultiSelector(Widget):
         super().__init__(
             "MultiSelector",
             label=label,
-            value=list(value),
+            value=_option_value(list(value)),
             disabled=disabled,
             props=_label_props(
                 props,

@@ -5,7 +5,7 @@
   "scripts": {
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs",
     "build": "node scripts/build-frontend.mjs",
-    "test": "node --test tests/frontend/*.test.mjs",
+    "test": "eslint src/anylumino/static && node --test tests/frontend/*.test.mjs",
     "licenses": "node scripts/generate-frontend-licenses.mjs",
     "docs:convert": "node scripts/generate-api-docs.mjs",
     "docs:build": "next build",
@@ -60,6 +60,7 @@
     "esbuild": "0.28.2",
     "eslint": "9.39.4",
     "eslint-config-next": "16.4.2",
+    "globals": "16.4.0",
     "postcss": "8.5.31",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3"

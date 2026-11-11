@@ -686,7 +686,7 @@ def test_astryx_wrappers_cover_notebook_safe_component_families() -> None:
     assert widgets[14].child_keys == ["body"]
     assert widgets[15].component_name == "AvatarGroup"
     assert widgets[16].component_name == "FormLayout"
-    assert widgets[17].props["label"] == "Field symbol"
+    assert (widgets[17].label, "label" in widgets[17].props) == ("Field symbol", False)
     assert widgets[18].props["suffix"] == "sh"
     assert widgets[19].component_name == "Calendar"
     assert widgets[20].component_name == "FileInput"
@@ -1227,6 +1227,105 @@ def test_remove_widget_drops_per_child_metadata() -> None:
     assert split.child_keys == ["widget-1", "widget-3"]
     assert box.stretches == [5]
     assert grid.areas == [{"column": "2"}]
+
+
+def _box_with_stretches(a, b):
+    return BoxPanel({"a": a, "b": b}, stretches=[1, 3]), "stretches", [1, 3], 0
+
+
+def _split_with_sizes(a, b):
+    return SplitPanel({"a": a, "b": b}, sizes=[1.0, 3.0]), "sizes", [1.0, 3.0], 2.0
+
+
+def _grid_with_areas(a, b):
+    return GridPanel({"a": a, "b": b}, areas=[{"column": "1 / 3"}, {}]), "areas", [{"column": "1 / 3"}, {}], {}
+
+
+def _astryx_split_with_sizes(a, b):
+    return ax.SplitPanel({"a": a, "b": b}, sizes=[1.0, 3.0]), "sizes", [1.0, 3.0], 2.0
+
+
+PANELS_WITH_CHILD_SETTINGS = [_box_with_stretches, _split_with_sizes, _grid_with_areas, _astryx_split_with_sizes]
+
+
+def _move_a_to_end(panel, _a, _b):
+    panel.move_widget("a", 1)
+
+
+def _assign_reversed(panel, a, b):
+    panel.widgets = [b, a]
+
+
+def _drag_a_to_end(panel, _a, _b):
+    panel._handle_frontend_message(panel, {"type": "move", "from": 0, "to": 1}, None)
+
+
+@pytest.mark.parametrize("make_panel", PANELS_WITH_CHILD_SETTINGS)
+@pytest.mark.parametrize("reorder", [_move_a_to_end, _assign_reversed, _drag_a_to_end])
+def test_child_settings_follow_their_child_when_reordered(make_panel, reorder) -> None:
+    if reorder is _drag_a_to_end and make_panel is _astryx_split_with_sizes:
+        pytest.skip("Astryx panels have no drag-to-reorder message")
+
+    a, b = ax.Text("A"), ax.Text("B")
+    panel, name, (first, second), _new_entry = make_panel(a, b)
+
+    reorder(panel, a, b)
+
+    assert panel.child_keys == ["b", "a"]
+    assert getattr(panel, name) == [second, first]
+
+
+@pytest.mark.parametrize("make_panel", PANELS_WITH_CHILD_SETTINGS)
+def test_child_settings_drop_a_child_removed_by_assignment(make_panel) -> None:
+    a, b = ax.Text("A"), ax.Text("B")
+    panel, name, (_first, second), _new_entry = make_panel(a, b)
+
+    panel.widgets = [b]
+
+    assert panel.child_keys == ["b"]
+    assert getattr(panel, name) == [second]
+
+
+@pytest.mark.parametrize("make_panel", PANELS_WITH_CHILD_SETTINGS)
+@pytest.mark.parametrize("add", ["add_widget", "assign"])
+def test_added_child_gets_a_new_child_setting(make_panel, add) -> None:
+    a, b, c = ax.Text("A"), ax.Text("B"), ax.Text("C")
+    panel, name, (first, second), new_entry = make_panel(a, b)
+
+    if add == "add_widget":
+        panel.add_widget(c, key="c")
+    else:
+        panel.widgets = [a, b, c]
+
+    assert len(panel.child_keys) == 3
+    assert getattr(panel, name) == [first, second, new_entry]
+
+
+@pytest.mark.parametrize("panel_class", [BoxPanel, SplitPanel, GridPanel, ax.SplitPanel])
+def test_empty_child_settings_stay_empty(panel_class) -> None:
+    a, b, c = ax.Text("A"), ax.Text("B"), ax.Text("C")
+    panel = panel_class({"a": a, "b": b})
+    name = next(iter(panel._child_settings))
+
+    panel.add_widget(c, key="c")
+    panel.move_widget("a", 2)
+    panel.remove_widget("b")
+
+    assert panel.child_keys == ["c", "a"]
+    assert getattr(panel, name) == []
+
+
+def test_reordering_keeps_titles_owners_and_selection_with_their_child() -> None:
+    a, b, c = ax.Text("A"), ax.Text("B"), ax.Text("C")
+    tabs = TabPanel({"a": a, "b": b, "c": c}, titles={"a": "Alpha", "b": "Beta", "c": "Gamma"})
+    tabs.select_key("b")
+
+    tabs.widgets = [c, b, a]
+
+    assert tabs.child_keys == ["c", "b", "a"]
+    assert tabs.titles == ["Gamma", "Beta", "Alpha"]
+    assert tabs.selected_key == "b"
+    assert [tabs.get_owner(key) for key in ("a", "b", "c")] == [a, b, c]
 
 
 def test_remove_widget_can_close_the_removed_child() -> None:
@@ -1890,7 +1989,7 @@ def test_astryx_status_widgets_map_their_keywords() -> None:
         True,
         {"kind": "checkbox", "size": "sm"},
     )
-    assert (nav_icon.component_name, nav_icon.props) == ("NavIcon", {"icon": "menu"})
+    assert (nav_icon.component_name, nav_icon.icon, nav_icon.props) == ("NavIcon", "menu", {})
     assert (view.component_name, view.text, view.props) == ("RichTextView", "**bold**", {})
 
 
@@ -1947,21 +2046,22 @@ def test_astryx_navigation_widgets_keep_records_and_selection() -> None:
     steps = ax.Stepper(["Draft", {"label": "Send", "status": "error"}], 1, orientation="vertical", density="compact", navigable=True)
     actions = ax.OverflowList(["Refresh", {"label": "Export", "value": "export"}], max_visible=1, collapse_from="start", size="sm")
 
-    assert (side.value, side.props) == (
+    assert (side.value, side.icon, side.props) == (
         "fills",
+        "menu",
         {
             "items": ["Overview", {"type": "section", "title": "Desk", "items": [{"label": "Fills", "value": "fills", "icon": "check"}]}],
             "heading": "Desk",
             "subheading": "Paper",
-            "icon": "menu",
             "menu": menu,
             "collapsible": True,
         },
     )
-    assert (top.value, top.child_keys, top.props) == (
+    assert (top.value, top.label, top.child_keys, top.props) == (
         "Orders",
+        "Main",
         ["end"],
-        {"items": ["Orders", {"label": "More", "items": ["Export"]}], "label": "Main"},
+        {"items": ["Orders", {"label": "More", "items": ["Export"]}]},
     )
     assert (steps.value, steps.props) == (
         1,
@@ -1994,14 +2094,15 @@ def test_astryx_slot_containers_stack_widget_sequences() -> None:
     assert shell.child_keys == ["content", "top_nav"]
     assert (content.component_name, content.props["direction"], content.widgets) == ("Stack", "vertical", [first, second])
     assert shell.get_owner("top_nav") is nav
-    assert shell.props == {"variant": "surface", "contentPadding": 4, "height": "auto"}
+    assert (shell.variant, shell.props) == ("surface", {"contentPadding": 4, "height": "auto"})
     assert layout.child_keys == ["content", "header", "end"]
     assert layout.get_owner("header") is second
     assert layout.props == {"startWidth": 240, "defaultHasDividers": True}
-    assert (selector.value, selector.child_keys, selector.props) == (
+    assert (selector.value, selector.label, selector.child_keys, selector.props) == (
         "AAPL",
+        "Symbol",
         ["content"],
-        {"label": "Symbol", "triggerLabel": "Apple"},
+        {"triggerLabel": "Apple"},
     )
 
 
@@ -2089,3 +2190,143 @@ def test_astryx_bundled_themes_ship_their_css_and_built_theme(theme: str) -> Non
     assert widget.brand == {"name": theme.value, "built": True, "tokens": {}, "css": "", "components": {}}
     assert f"data-astryx-theme={theme.value}]" in stylesheet or f'data-astryx-theme="{theme.value}"]' in stylesheet
     assert f'name:"{theme.value}"' in bundle
+
+
+def test_import_names_the_anywidget_version_when_the_model_id_lookup_is_missing() -> None:
+    import subprocess
+    import sys
+    from importlib.metadata import version
+
+    code = (
+        "import sys, types\n"
+        "import anywidget\n"
+        "sys.modules['anywidget._descriptor'] = types.ModuleType('anywidget._descriptor')\n"
+        "import anylumino\n"
+    )
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+
+    assert result.returncode == 1
+    assert result.stderr.strip().splitlines()[-1] == (
+        f"ImportError: anylumino cannot find the widget model id lookup in anywidget {version('anywidget')}; "
+        "install an anywidget release that anylumino supports."
+    )
+
+
+@pytest.mark.parametrize(
+    ("make_widget", "options", "value"),
+    [
+        (lambda: ax.Selector([1, 5, 10], value=5), ["1", "5", "10"], "5"),
+        (lambda: ax.SelectionSlider([1, 2, 3]), ["1", "2", "3"], "1"),
+        (lambda: ax.SelectionSlider([1, 2, 3], value=3), ["1", "2", "3"], "3"),
+        (lambda: ax.MultiSelector([1, 2.5], value=[2.5]), ["1", "2.5"], ["2.5"]),
+        (
+            lambda: ax.RadioList([{"label": "One", "value": 1}], value=1, label="Pick"),
+            [{"label": "One", "value": "1"}],
+            "1",
+        ),
+        (lambda: ax.Selector({"Low": 1}, value=1), [{"label": "Low", "value": "1"}], "1"),
+        (lambda: ax.Selector([("Low", 1)], value="1"), [{"label": "Low", "value": "1"}], "1"),
+    ],
+)
+def test_option_values_and_selections_are_strings(make_widget, options, value) -> None:
+    widget = make_widget()
+
+    assert widget.items == options
+    assert widget.value == value
+
+
+@pytest.mark.parametrize(
+    ("rows", "method", "row", "ids"),
+    [
+        ([{"a": 1}, {"a": 2}], "append_row", {"a": 3}, [0, 1, 2]),
+        ([{"a": 1}, {"a": 2}], "prepend_row", {"a": 3}, [2, 0, 1]),
+        ([[1, 2], [3, 4]], "append_row", [5, 6], ["0", "1", "2"]),
+        ([[1, 2], [3, 4]], "prepend_row", [5, 6], ["2", "0", "1"]),
+        (["x", "y"], "append_row", "z", ["0", "1", "2"]),
+    ],
+)
+def test_table_adds_rows_with_generated_ids(rows, method, row, ids) -> None:
+    table = ax.Table(rows)
+
+    returned = getattr(table, method)(row)
+
+    assert [item["id"] for item in table.rows] == ids
+    assert returned == str(ids[0] if method == "prepend_row" else ids[-1])
+
+
+def test_table_add_row_rejects_an_explicit_duplicate_id() -> None:
+    table = ax.Table([{"id": "a", "v": 1}, {"id": "b", "v": 2}])
+
+    with pytest.raises(ValueError, match="table row already exists: b"):
+        table.append_row({"id": "b", "v": 3})
+
+    assert [item["id"] for item in table.rows] == ["a", "b"]
+
+
+def test_table_keeps_row_keys_outside_the_columns() -> None:
+    table = ax.Table([{"id": "x", "a": 1, "selectable": False}, {"id": "y", "a": 2}], columns=["a"])
+
+    assert table.rows == [{"a": 1, "selectable": False, "id": "x"}, {"a": 2, "id": "y"}]
+
+
+def test_table_columns_widened_after_construction_show_existing_values() -> None:
+    table = ax.Table([{"a": 1, "b": 2}], columns=["a"])
+
+    table.columns = ["a", "b"]
+
+    assert [column["key"] for column in table.columns] == ["a", "b"]
+    assert table.rows == [{"a": 1, "b": 2, "id": 0}]
+
+
+@pytest.mark.parametrize(("multiple", "opened", "remaining"), [(False, "a", ""), (True, ["a", "b"], ["b"])])
+def test_astryx_accordion_drops_a_removed_child_from_its_open_keys(multiple, opened, remaining) -> None:
+    accordion = ax.AccordionPanel({"a": ax.Text("A"), "b": ax.Text("B")}, open=opened, multiple=multiple)
+
+    accordion.remove_widget("a")
+
+    assert accordion.child_keys == ["b"]
+    assert accordion.value == remaining
+    assert accordion.open_keys == ([] if remaining == "" else remaining)
+
+
+def test_astryx_accordion_runs_no_callback_while_it_is_built() -> None:
+    calls = []
+
+    accordion = ax.AccordionPanel(
+        {"a": ax.Text("A"), "b": ax.Text("B")},
+        callbacks=[lambda widget: calls.append("click")],
+        action_callbacks=[lambda widget, value: calls.append(value)],
+    )
+    built = list(calls)
+    accordion.open_key("b")
+
+    assert built == []
+    assert calls == ["b", "click"]
+
+
+@pytest.mark.parametrize(
+    ("picker", "assigned", "stored"),
+    [
+        (lambda: anylumino.DatePicker(), datetime(2026, 10, 22).date(), "2026-10-22"),
+        (lambda: anylumino.TimePicker(), datetime(2026, 1, 1, 9, 45, 30).time(), "09:45:30"),
+        (lambda: anylumino.DatetimePicker(), datetime(2026, 10, 22, 14, 30), "2026-10-22T14:30:00"),
+    ],
+)
+@pytest.mark.parametrize("name", ["value", "min", "max"])
+def test_native_pickers_store_assigned_dates_as_iso_strings(picker, assigned, stored, name) -> None:
+    import json
+
+    widget = picker()
+
+    setattr(widget, name, assigned)
+
+    assert getattr(widget, name) == stored
+    assert json.loads(json.dumps(widget.get_state(name))) == {name: stored}
+
+
+def test_native_picker_value_assigned_none_stays_none() -> None:
+    picker = anylumino.DatePicker("2026-10-21")
+
+    picker.value = None
+
+    assert picker.value is None

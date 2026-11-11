@@ -55,7 +55,9 @@ import screenshot from '../../assets/components/controls-TimePicker.png';
 
   <div>
     <PyParameter name="value" type="time | str | None" value="None">
-      Initial value and synchronized Python value.
+      Initial time. `value` holds it as an ISO 8601 string such as
+      `"14:30"`, or `None`; a `time` assigned later is converted the same
+      way.
     </PyParameter>
 
     <PyParameter name="description" type="str" value="''">

@@ -6,7 +6,7 @@ from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Mapping
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 from uuid import uuid4
 
 import traitlets as t
@@ -351,7 +351,9 @@ class Table(Widget):
             self._set_table_props(columns=columns)
 
         normalized = _table_rows([row], columns, self._row_key)[0]
-        if row_key is None and self._row_key == "__row_id":
+        # A row without its own id gets the next index no row uses, of the type
+        # the table gives generated ids: a number for mappings, a string otherwise.
+        if not (isinstance(row, Mapping) and self._row_key in row):
             existing_values = {
                 str(existing.get(self._row_key)) for existing in self.rows
             }
@@ -359,7 +361,8 @@ class Table(Widget):
             while str(next_index) in existing_values:
                 next_index += 1
 
-            normalized[self._row_key] = str(next_index)
+            generated = normalized[self._row_key]
+            normalized[self._row_key] = next_index if isinstance(generated, int) else str(next_index)
 
         row_value = str(normalized.get(self._row_key))
         if any(str(existing.get(self._row_key)) == row_value for existing in self.rows):
@@ -878,7 +881,7 @@ class Spinner(Widget):
             "Spinner",
             label=label,
             props=_named_props(
-                props, label=label, size=size, shade=shade, **{"aria-label": label}
+                props, size=size, shade=shade, **{"aria-label": label}
             ),
         )
 
@@ -1034,7 +1037,6 @@ class Token(Widget):
                 props,
                 color=color,
                 size=size,
-                isDisabled=disabled,
                 href=href,
                 description=description,
                 isLabelHidden=label_hidden,
@@ -1200,7 +1202,6 @@ class Link(Widget):
                 props,
                 href=href or None,
                 hasUnderline=underline,
-                isDisabled=disabled,
                 isExternalLink=external,
                 target=target,
                 tooltip=tooltip,
@@ -1336,7 +1337,7 @@ class Icon(Widget):
             "Icon",
             text=icon,
             icon=icon,
-            props=_named_props(props, icon=icon, color=color, size=size),
+            props=_named_props(props, color=color, size=size),
         )
 
 
@@ -1422,9 +1423,7 @@ class Thumbnail(Widget):
                 props,
                 src=src or None,
                 alt=alt or label,
-                label=label,
                 isLoading=loading,
-                isDisabled=disabled,
                 onRemove=removable,
                 clickable=clickable,
             ),
@@ -1658,7 +1657,7 @@ class Markdown(Widget):
         citation_style: CitationStyle | str | None = None,
         content_width: int | float | str | None = None,
         content_align: ContentAlign | str | None = None,
-        autolink: str | None = None,
+        autolink: Literal["gfm"] | None = None,
         **props: Any,
     ) -> None:
         display = optional_choice(display, Display, "display")
@@ -1991,7 +1990,7 @@ class NavIcon(Widget):
     """
 
     def __init__(self, icon: str, **props: Any) -> None:
-        super().__init__("NavIcon", text=icon, props=_named_props(props, icon=icon))
+        super().__init__("NavIcon", text=icon, icon=icon, props=_named_props(props))
 
 
 class Toast(Widget):

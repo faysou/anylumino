@@ -1,4 +1,5 @@
 import importlib.util
+import re
 import sys
 from pathlib import Path
 
@@ -7,6 +8,8 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "docs_examples.py"
+# The script imports its sibling modules, as it does when run from the command line.
+sys.path.insert(0, str(SCRIPT.parent))
 spec = importlib.util.spec_from_file_location("docs_examples", SCRIPT)
 docs_examples = importlib.util.module_from_spec(spec)
 # Dataclasses look their module up in sys.modules while the module runs.
@@ -48,3 +51,11 @@ def test_readme_examples_run():
         exec(compile(block, f"README.md block {index}", "exec"), namespace)
 
     assert len(blocks) == 13
+
+
+def test_openui_design_note_examples_run():
+    blocks = re.findall(r"^```python\n(.*?)^```", (ROOT / "docs" / "openui.md").read_text(), re.S | re.M)
+
+    assert len(blocks) == 2
+    for block in blocks:
+        exec(compile(block, "openui.md", "exec"), {})

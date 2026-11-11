@@ -526,3 +526,20 @@ def test_ui_fingerprint_ignores_layout_comments_and_keyword_order():
 
     assert ui_fingerprint(first) == ui_fingerprint(same)
     assert ui_fingerprint(first) != ui_fingerprint(other)
+
+
+def test_failed_reconcile_turn_reports_only_the_failure(built, agent_reply, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    built.export(tmp_path / "edited.py")
+    source = (tmp_path / "edited.py").read_text().replace("ax.Heading(text='Sales')", "ax.Heading(text='Revenue')")
+    agent_reply("Partial answer.")
+    monkeypatch.setenv("FAKE_EXIT", "1")
+
+    workbench, calls = imported(agent_reply, tmp_path, source)
+
+    assert len(calls) == 1
+    assert [message["content"] for message in workbench.chat.messages if message["role"] == "system"] == [
+        "The agent failed: `codex` exited with 1: "
+    ]
+    assert workbench.outcome == "failed"
+    assert workbench.running is False

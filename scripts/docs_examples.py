@@ -36,15 +36,12 @@ from __future__ import annotations
 
 import ast
 import re
-import socket
-import subprocess
 import sys
-import time
-import urllib.request
-from contextlib import contextmanager
 from dataclasses import dataclass
 from importlib.metadata import version
 from pathlib import Path
+
+from jupyterlab_runner import jupyterlab, run_notebook
 
 DOCS_DIR = Path("content/docs")
 NOTEBOOK = Path("notebooks/docs_examples.py")
@@ -457,26 +454,6 @@ def write_component_notebook() -> None:
     print(f"{COMPONENT_NOTEBOOK}: {len(cells)} examples")
 
 
-# Page-side checks, run by Playwright inside the JupyterLab page.
-NOTEBOOK_READY_JS = """(name) =>
-  document.querySelector(".lm-DockPanel-tabBar .lm-TabBar-tab.lm-mod-current .lm-TabBar-tabLabel")
-    ?.textContent === name &&
-  !!document.querySelector(".jp-NotebookPanel:not(.lm-mod-hidden) .jp-CodeCell")"""
-
-# Execution is done once no cell is queued and the kernel has been idle a while.
-NOTEBOOK_IDLE_JS = """() => {
-  const panel = document.querySelector(".jp-NotebookPanel:not(.lm-mod-hidden)");
-  const prompts = [...panel.querySelectorAll(".jp-CodeCell .jp-InputPrompt")].map((node) => node.textContent.trim());
-  const status = panel.querySelector(".jp-Notebook-ExecutionIndicator")?.getAttribute("data-status");
-  const ran = prompts.some((prompt) => /^\\[\\d+\\]:$/.test(prompt));
-  if (prompts.some((prompt) => prompt.includes("*")) || !ran || status === "busy") {
-    window.__idleSince = 0;
-    return false;
-  }
-  window.__idleSince = window.__idleSince || Date.now();
-  return Date.now() - window.__idleSince > 5000;
-}"""
-
 # JupyterLab keeps only the cells near the viewport in the page, so the
 # notebook scrolls forward until the cell holding the marker exists.
 REVEAL_CELL_JS = """(target) => {
@@ -579,41 +556,6 @@ body, .jp-LabShell, .lm-DockPanel, .jp-MainAreaWidget { background: var(--jp-lay
 """
 
 
-@contextmanager
-def jupyterlab():
-    """Run a JupyterLab server on a free port and yield its base URL and token."""
-    with socket.socket() as probe:
-        probe.bind(("127.0.0.1", 0))
-        port = probe.getsockname()[1]
-
-    token = "docsshots"
-    LAB_LOG.parent.mkdir(parents=True, exist_ok=True)
-    log = LAB_LOG.open("w")
-    server = subprocess.Popen(
-        [sys.executable, "-m", "jupyterlab", "--no-browser", f"--port={port}", f"--ServerApp.token={token}"],
-        stdout=log,
-        stderr=subprocess.STDOUT,
-    )
-    url = f"http://127.0.0.1:{port}"
-    try:
-        deadline = time.monotonic() + 60
-        while True:
-            try:
-                urllib.request.urlopen(f"{url}/api/status?token={token}", timeout=2)
-                break
-            except OSError:
-                if time.monotonic() > deadline or server.poll() is not None:
-                    raise RuntimeError(f"JupyterLab did not start; see {log.name}") from None
-
-                time.sleep(0.5)
-
-        yield url, token
-    finally:
-        server.terminate()
-        server.wait(timeout=30)
-        log.close()
-
-
 def capture_notebook(browser, url: str, token: str, notebook: Path, output: Path, crop: bool) -> list[str]:
     """Run ``notebook`` and save every marked cell's output; return the slugs it skipped."""
     slugs = re.findall(r"# docs-example\(([\w-]+)\)", notebook.read_text())
@@ -623,18 +565,7 @@ def capture_notebook(browser, url: str, token: str, notebook: Path, output: Path
     page = browser.new_page(viewport=viewport, device_scale_factor=2)
     skipped = []
     try:
-        # A workspace of its own, reset on every run, so JupyterLab opens no
-        # notebook that an earlier session left in the default workspace.
-        workspace = re.sub(r"\W", "-", notebook.stem)
-        page.goto(f"{url}/lab/workspaces/{workspace}/tree/{notebook.as_posix()}?reset&token={token}")
-        page.wait_for_function(NOTEBOOK_READY_JS, arg=notebook.name, timeout=60_000)
-        page.wait_for_timeout(2000)
-        page.click('.jp-NotebookPanel:not(.lm-mod-hidden) [data-command="notebook:restart-run-all"]')
-        page.click(".jp-Dialog button.jp-mod-accept")
-        page.wait_for_function(NOTEBOOK_IDLE_JS, timeout=600_000, polling=1000)
-        errors = page.locator(".jp-OutputArea-output.jp-mod-error").all_inner_texts()
-        if errors:
-            raise RuntimeError(f"{notebook}: {len(errors)} cells failed: {errors[0][:300]}")
+        run_notebook(page, url, token, notebook.as_posix())
 
         output.mkdir(parents=True, exist_ok=True)
         if crop:
@@ -691,7 +622,7 @@ def capture(target: str) -> int:
 
         return 1
 
-    with jupyterlab() as (url, token), sync_playwright() as playwright:
+    with jupyterlab(LAB_LOG) as (url, token), sync_playwright() as playwright:
         browser = playwright.chromium.launch()
         try:
             skipped = capture_notebook(browser, url, token, notebook, output, crop)

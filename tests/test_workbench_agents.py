@@ -216,3 +216,28 @@ def test_second_turn_is_refused_while_running_and_stop_ends_it(fake_cli, monkeyp
     assert elapsed < 3.0
     assert not runner.running
     assert len(fake_cli()) == 1
+
+
+def test_cli_that_exits_before_reading_a_large_prompt_reports_its_stderr(tmp_path, monkeypatch):
+    import os
+    import shutil
+    import sys
+
+    from anylumino.workbench import Workbench
+
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    cli = bin_dir / "codex"
+    cli.write_text(f"#!{sys.executable}\nimport sys\nif sys.argv[1:3] == ['mcp', 'list']:\n    print('[]')\n    sys.exit(0)\nsys.stderr.write('unknown option --effort')\nsys.exit(2)\n")
+    cli.chmod(0o755)
+    node_dir = os.path.dirname(shutil.which("node") or "")
+    monkeypatch.setenv("PATH", os.pathsep.join(filter(None, [str(bin_dir), node_dir])))
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    workbench = Workbench(agent="codex", cwd=tmp_path)
+
+    workbench.submit("x" * 4_000_000)
+
+    assert workbench.chat.messages[-1] == {
+        "role": "system",
+        "content": "The agent failed: `codex` exited with 2: unknown option --effort",
+    }

@@ -98,7 +98,7 @@ function createPanel(model, root, slots, onSplitSizesChanged) {
       panel.addClass("anylumino-box");
       panel.addClass("anylumino-scrollBox");
       panel.addClass(`anylumino-scrollBox-${direction}`);
-      panel.node.style.gap = cssSize(model.get("spacing"), "8px");
+      panel.node.style.gap = `${Number(model.get("spacing") ?? 8)}px`;
       slots.forEach((slot) => panel.addWidget(slot));
       return panel;
     }

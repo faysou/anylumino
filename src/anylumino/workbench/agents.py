@@ -367,10 +367,17 @@ class AgentRunner:
         process = self.process
         try:
             assert process.stdin is not None and process.stdout is not None and process.stderr is not None
-            process.stdin.write(prompt.encode())
-            await process.stdin.drain()
-            process.stdin.close()
+            # Read before writing the prompt, so a CLI that exits without reading it
+            # still reports why
             stderr = asyncio.ensure_future(process.stderr.read())
+            try:
+                process.stdin.write(prompt.encode())
+                await process.stdin.drain()
+                process.stdin.close()
+            except (BrokenPipeError, ConnectionResetError):
+                # The CLI exited before it read the whole prompt; its exit status and stderr follow
+                pass
+
             async for line in process.stdout:
                 if not line.strip():
                     continue

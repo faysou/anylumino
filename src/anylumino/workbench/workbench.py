@@ -6,9 +6,11 @@ import asyncio
 import contextvars
 import json
 import os
+import re
 import sys
 import threading
 from collections.abc import Callable, Collection, Coroutine, Mapping, Sequence
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +22,7 @@ from anylumino.astryx import ChatRole, MessageStatus, ToolCallStatus
 
 from . import catalog, codegen, openui
 from . import session as store
-from .agents import Agent, AgentError, AgentRunner, Failed, Text, ToolFinished, ToolStarted
+from .agents import STOP_GRACE, Agent, AgentError, AgentRunner, Failed, Text, ToolFinished, ToolStarted
 from .app import App, View
 from .export import (
     CallbacksError,
@@ -55,6 +57,24 @@ class ApplyError(RuntimeError):
     """A turn's program or callbacks could not be applied; nothing changed."""
 
 
+class TurnStopped(Exception):
+    """The user stopped the turn before its reply applied."""
+
+
+class TurnOutcome(StrEnum):
+    """How a turn ended."""
+
+    APPLIED = "applied"
+    NOT_APPLIED = "not applied"
+    FAILED = "failed"
+    STOPPED = "stopped"
+
+
+# The workbench that last opened each session name in this kernel, so that a new one can stop
+# the turn an earlier one still runs on the same session.
+SESSION_OWNERS: dict[str, Workbench] = {}
+
+
 class Workbench(al.SplitPanel):
     """Build notebook UIs by chatting with a local coding agent.
 
@@ -73,7 +93,9 @@ class Workbench(al.SplitPanel):
         mounted with ``Widget(name)``. The agent sees each name and type.
     cwd : str | Path | None, default None
         Directory the agent runs in. Defaults to the current directory, or the
-        directory stored with a restored session.
+        directory stored with a restored session. Passed for a restored
+        session, it replaces the stored directory, such as after the project
+        moved.
     model : str | None, default None
         The model the agent CLI runs, such as ``"sonnet"`` for Claude Code.
         Defaults to the restored session's model, or the CLI's own default.
@@ -131,6 +153,9 @@ class Workbench(al.SplitPanel):
             name=session or "", agent=Agent(agent or Agent.CLAUDE), cwd=str(Path(cwd or os.getcwd()).resolve())
         )
         # A restored session resumes the agent's conversation with new settings when they are given
+        if cwd is not None:
+            self.state.cwd = str(Path(cwd).expanduser().resolve())
+
         self.state.model = model or self.state.model
         self.state.effort = effort or self.state.effort
         if skills is not None:
@@ -154,8 +179,15 @@ class Workbench(al.SplitPanel):
         self.ui: View | None = None
         self.last_error = ""
         self.running = False
+        self.outcome: TurnOutcome | None = None
         self.tasks: set[asyncio.Task[Any]] = set()
         self.marimo_loop = marimo_turn_loop()
+        # Turns on the marimo loop update the chat while the kernel thread can post messages
+        self.chat_lock = threading.RLock()
+        # A turn an earlier workbench of this session still runs, which the first turn here stops
+        self.superseded = SESSION_OWNERS.get(self.state.name) if self.state.name else None
+        if self.state.name:
+            SESSION_OWNERS[self.state.name] = self
 
         self.chat = ax.Chat(self.state.messages, placeholder="Describe the UI to build", height="100%")
         self.status = ax.StatusDot("Ready", variant="neutral")
@@ -210,11 +242,8 @@ class Workbench(al.SplitPanel):
         self.suppress_shortcuts = True
         self.chat.on_submit(lambda _chat, text: self.submit(text))
         self.chat.on_stop(lambda _chat: self.schedule(self.runner.stop()))
-        if saved is not None:
-            self.schedule(self.restore())
-
-        if prompt:
-            self.submit(prompt)
+        if saved is not None or prompt or self.superseded is not None:
+            self.start_turn(self.open_session(saved is not None, prompt))
 
     @staticmethod
     def empty_ui() -> ax.EmptyState:
@@ -222,15 +251,7 @@ class Workbench(al.SplitPanel):
 
     def submit(self, text: str, context: Any = None) -> None:
         """Start a turn with ``text``; refused with a system message while a turn runs."""
-        if self.running:
-            self.add_message(ChatRole.SYSTEM, "A turn is already running; wait for it or stop it.")
-
-            return
-
-        # Set before the turn starts, so that a second submit in the meantime is refused
-        self.set_running(True)
-        self.runner.stopped = False
-        self.schedule(self.run_turn(text, context))
+        self.start_turn(self.run_turn(text, context))
 
     def import_file(self, path: str | Path) -> None:
         """Fill the tabs from an exported file, and ask the agent to reconcile it when it was edited.
@@ -240,18 +261,66 @@ class Workbench(al.SplitPanel):
         program generates, a turn sends the file to the agent to update the
         program and callbacks.
         """
-        if self.running:
-            self.add_message(ChatRole.SYSTEM, "A turn is already running; wait for it or stop it.")
-
-            return
-
-        self.set_running(True)
-        self.runner.stopped = False
-        self.schedule(self.run_import(Path(path)))
+        self.start_turn(self.run_import(Path(path)))
 
     def ask_agent(self, message: str, context: Any = None) -> None:
         """Send ``message`` to the agent as if the user had typed it."""
         self.submit(message, context)
+
+    def start_turn(self, work: Coroutine[Any, Any, Any]) -> None:
+        """Run ``work`` as the turn, or refuse it with a system message while a turn runs.
+
+        Every turn, import, and restore runs through here, so that each ends idle
+        and saved whatever happens in it.
+        """
+        if self.running:
+            work.close()
+            self.add_message(ChatRole.SYSTEM, "A turn is already running; wait for it or stop it.")
+
+            return
+
+        # Set before the turn starts, so that a second submit in the meantime is refused
+        self.set_running(True)
+        self.runner.stopped = False
+        self.outcome = None
+        try:
+            self.schedule(self.run_in_turn(work))
+        except Exception as error:
+            # Such as a marimo turn loop that closed when its cell ran again
+            work.close()
+            self.set_running(False)
+            self.add_message(ChatRole.SYSTEM, f"The turn could not start: {type(error).__name__}: {error}")
+
+    async def run_in_turn(self, work: Coroutine[Any, Any, Any]) -> None:
+        try:
+            await self.stop_superseded()
+            await work
+        except Exception as error:
+            self.outcome = TurnOutcome.FAILED
+            self.add_message(ChatRole.SYSTEM, f"The turn failed: {type(error).__name__}: {error}")
+        finally:
+            self.state.agent_session_id = self.runner.session_id
+            self.set_running(False)
+            self.save()
+
+    # Stops the turn an earlier workbench of this session still runs, and waits for it to end,
+    # so that one turn at a time writes the session file
+    async def stop_superseded(self) -> None:
+        previous, self.superseded = self.superseded, None
+        if previous is None or not previous.running:
+            return
+
+        previous.run_on_turn_loop(lambda: previous.schedule(previous.runner.stop()))
+        deadline = asyncio.get_running_loop().time() + STOP_GRACE + 5
+        while previous.running and asyncio.get_running_loop().time() < deadline:
+            await asyncio.sleep(0.05)
+
+    async def open_session(self, restore: bool, prompt: str | None) -> None:
+        if restore:
+            await self.restore()
+
+        if prompt:
+            await self.run_turn(prompt)
 
     def schedule(self, coroutine: Coroutine[Any, Any, Any]) -> None:
         if self.marimo_loop is not None:
@@ -294,17 +363,17 @@ class Workbench(al.SplitPanel):
         try:
             source = path.read_text()
             reason = await self.apply_import(source)
-        except (OSError, ExportedFileError) as error:
+        except (OSError, ValueError, ExportedFileError) as error:
+            # ValueError covers a file that is not valid UTF-8
+            self.outcome = TurnOutcome.NOT_APPLIED
             self.add_message(ChatRole.SYSTEM, f"Import of `{shown}` failed: {error}")
-            self.set_running(False)
 
             return
 
         if not reason:
             self.last_error = ""
+            self.outcome = TurnOutcome.APPLIED
             self.add_message(ChatRole.SYSTEM, f"Imported `{shown}`.")
-            self.set_running(False)
-            self.save()
 
             return
 
@@ -320,7 +389,7 @@ class Workbench(al.SplitPanel):
     # Reports whether the agent's reply reproduces the file's UI class, since a valid reply can
     # still miss a hand edit; a file that is not valid Python has no class to compare
     def report_reconcile(self, shown: str, source: str) -> None:
-        if self.last_error or self.runner.stopped:
+        if self.outcome != TurnOutcome.APPLIED:
             return
 
         try:
@@ -336,8 +405,6 @@ class Workbench(al.SplitPanel):
                 f"The generated UI class still differs from `{shown}`. The UI code tab shows what applied; "
                 "ask the agent in the chat to close the gap.",
             )
-
-        self.save()
 
     async def apply_import(self, source: str) -> str:
         """Apply an exported file's program and callbacks; return why the agent must reconcile it, or ``""``."""
@@ -357,14 +424,9 @@ class Workbench(al.SplitPanel):
         return ""
 
     async def run_turn(self, text: str, context: Any = None, details: str = "") -> None:
-        try:
-            self.add_message(ChatRole.USER, text, MessageStatus.SENT)
-            index = self.add_message(ChatRole.ASSISTANT, "", MessageStatus.SENDING)
-            await self.stream_reply(index, text, context, details)
-        finally:
-            self.state.agent_session_id = self.runner.session_id
-            self.set_running(False)
-            self.save()
+        self.add_message(ChatRole.USER, text, MessageStatus.SENT)
+        index = self.add_message(ChatRole.ASSISTANT, "", MessageStatus.SENDING)
+        await self.stream_reply(index, text, context, details)
 
     async def stream_reply(self, index: int, text: str, context: Any, details: str = "") -> None:
         reply = ""
@@ -390,7 +452,9 @@ class Workbench(al.SplitPanel):
                         if tool["id"] == event.id:
                             tool["status"] = ToolCallStatus.ERROR if event.error else ToolCallStatus.COMPLETE
                 elif isinstance(event, Failed):
-                    failure = event.message
+                    # The agent's own error comes first; a later exit status only repeats
+                    # that it failed
+                    failure = failure or event.message
 
                 if flush is None:
                     flush = loop.call_later(STREAM_INTERVAL, flush_reply)
@@ -402,13 +466,26 @@ class Workbench(al.SplitPanel):
         if flush is not None:
             flush.cancel()
 
+        if self.runner.stopped or failure:
+            # A tool call the turn did not see finish has no stopped state in the chat
+            for tool in tools:
+                if tool["status"] == ToolCallStatus.RUNNING:
+                    tool["status"] = ToolCallStatus.ERROR
+
         if self.runner.stopped:
+            self.outcome = TurnOutcome.STOPPED
             self.update_reply(index, reply, tools, MessageStatus.STOPPED)
         elif failure:
+            self.outcome = TurnOutcome.FAILED
             self.update_reply(index, reply, tools, MessageStatus.ERROR)
             self.add_message(ChatRole.SYSTEM, f"The agent failed: {failure}")
         else:
-            await self.finish_reply(index, reply, tools)
+            try:
+                await self.finish_reply(index, reply, tools)
+            except TurnStopped:
+                # The reply already shows its prose; only its status changes
+                self.outcome = TurnOutcome.STOPPED
+                self.update_reply(index, self.chat.messages[index]["content"], tools, MessageStatus.STOPPED)
 
     async def finish_reply(self, index: int, reply: str, tools: list[dict[str, Any]]) -> None:
         self.last_error = ""
@@ -422,27 +499,42 @@ class Workbench(al.SplitPanel):
 
         self.update_reply(index, parts.prose, tools)
         if parts.program is None and parts.callbacks is None:
+            self.outcome = TurnOutcome.APPLIED
+
             return
 
         callbacks = (self.state.callbacks or EMPTY_CALLBACKS) if parts.callbacks is None else parts.callbacks
         try:
             program = await openui.merge(self.state.program, parts.program) if parts.program else self.state.program
+            self.raise_if_stopped()
             await self.apply(program, callbacks)
+        except TurnStopped:
+            raise
         except (ApplyError, openui.OpenUIError) as error:
             self.report_apply_error(str(error))
         except Exception as error:
             self.report_apply_error(f"{type(error).__name__}: {error}")
+        else:
+            self.outcome = TurnOutcome.APPLIED
 
     def report_apply_error(self, message: str) -> None:
         self.last_error = message
+        self.outcome = TurnOutcome.NOT_APPLIED
         self.add_message(ChatRole.SYSTEM, f"The reply was not applied; the UI is unchanged. {message}")
+
+    # Called after each wait of a turn, since a stop can arrive while the turn waits
+    def raise_if_stopped(self) -> None:
+        if self.runner.stopped:
+            raise TurnStopped
 
     async def apply(self, program: str, callbacks: str) -> None:
         """Build the UI from ``program`` and ``callbacks``, then update all tabs at once."""
         result = await openui.parse(program, self.components)
-        if result["errors"] or result["incomplete"]:
-            details = "; ".join(f"{error.get('statementId', '?')}: {error['message']}" for error in result["errors"])
-            raise ApplyError(f"OpenUI errors: {details or 'the program is incomplete'}")
+        self.raise_if_stopped()
+        if result.errors or result.incomplete or result.unresolved:
+            details = [f"{error.get('statementId', '?')}: {error['message']}" for error in result.errors]
+            details += [f"{', '.join(statements_using(program, name)) or '?'}: `{name}` is not defined" for name in result.unresolved]
+            raise ApplyError(f"OpenUI errors: {'; '.join(details) or 'the program is incomplete'}")
 
         cls = self.compile_callbacks(callbacks)
         try:
@@ -550,21 +642,24 @@ class Workbench(al.SplitPanel):
 
     def add_message(self, role: ChatRole, content: str, status: MessageStatus | None = None) -> int:
         """Append a chat message and return its index."""
-        self.set_messages([*self.chat.messages, chat_message(role, content, status)])
+        with self.chat_lock:
+            self.set_messages([*self.chat.messages, chat_message(role, content, status)])
 
-        return len(self.chat.messages) - 1
+            return len(self.chat.messages) - 1
 
     # Updates the turn's reply by index, since other messages can arrive while it streams
     def update_reply(
         self, index: int, content: str, tools: list[dict[str, Any]], status: MessageStatus | None = None
     ) -> None:
-        messages = list(self.chat.messages)
-        messages[index] = chat_message(ChatRole.ASSISTANT, content, status, tools)
-        self.set_messages(messages)
+        with self.chat_lock:
+            messages = list(self.chat.messages)
+            messages[index] = chat_message(ChatRole.ASSISTANT, content, status, tools)
+            self.set_messages(messages)
 
     def set_messages(self, messages: list[dict[str, Any]]) -> None:
-        self.chat.messages = messages
-        self.state.messages = messages
+        with self.chat_lock:
+            self.chat.messages = messages
+            self.state.messages = messages
 
     def set_running(self, running: bool) -> None:
         self.running = running
@@ -590,6 +685,11 @@ def chat_message(
         message["tool_calls"] = [{key: tool[key] for key in ("name", "target", "status")} for tool in tools]
 
     return message
+
+
+def statements_using(program: str, name: str) -> list[str]:
+    """Return the statements of ``program`` whose expression uses ``name``."""
+    return re.findall(r"^\s*(\w+)\s*=(?=.*\b%s\b)" % re.escape(name), program, re.M)
 
 
 def close_tree(widget: Widget, keep: Collection[int]) -> None:
@@ -648,6 +748,13 @@ def marimo_turn_loop() -> tuple[asyncio.AbstractEventLoop, contextvars.Context] 
         try:
             loop.run_until_complete(until_exit())
         finally:
+            # A turn still running ends here, so its agent process is terminated before
+            # the loop closes
+            pending = asyncio.all_tasks(loop)
+            for task in pending:
+                task.cancel()
+
+            loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
             loop.close()
 
     mo.Thread(target=run, daemon=True).start()

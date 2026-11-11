@@ -62,9 +62,9 @@ import screenshot from '../../../assets/components/astryx-surfaces-AppShell.png'
         super().__init__(
             "AppShell",
             slots,
+            variant=variant or "",
             props=_named_props(
                 props,
-                variant=variant,
                 contentPadding=content_padding,
                 height=height,
             ),

@@ -61,7 +61,7 @@ import screenshot from '../../../assets/components/astryx-surfaces-TabList.png';
         layout = optional_choice(layout, ItemLayout, "layout")
         super().__init__(
             "TabList",
-            value=value,
+            value=_option_value(value),
             props=_named_props(
                 props,
                 items=_option_records(items),

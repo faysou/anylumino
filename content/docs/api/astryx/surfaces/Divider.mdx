@@ -52,11 +52,10 @@ import screenshot from '../../../assets/components/astryx-surfaces-Divider.png';
         super().__init__(
             "Divider",
             variant=variant,
+            label=label or "",
             props=_named_props(
                 props,
                 orientation=orientation,
-                variant=variant,
-                label=label,
                 isFullBleed=full_bleed,
             ),
         )

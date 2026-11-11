@@ -12,19 +12,31 @@ Parse, merge, and describe OpenUI Lang programs with the bundled `@openuidev/lan
   <Tab value="Class">
     <Cards>
       <Card title="OpenUIError" href="/docs/api/workbench/openui/OpenUIError" />
+
+      <Card title="ParseResult" href="/docs/api/workbench/openui/ParseResult" />
     </Cards>
   </Tab>
 
   <Tab value="Functions">
-    <PyFunction name="parse" type="(program, components=COMPONENTS) -> dict[str, Any]">
+    <PyFunction name="parse" type="(program, components=COMPONENTS) -> ParseResult">
       Return the evaluated tree, errors, and statement names of `program` for the `components` catalog.
 
       <PySourceCode>
         ```python
-        async def parse(program: str, components: Sequence[Component] = COMPONENTS) -> dict[str, Any]:
-            """Return the evaluated tree, errors, and statement names of ``program`` for the ``components`` catalog."""
+        async def parse(program: str, components: Sequence[Component] = COMPONENTS) -> ParseResult:
+            """Return the evaluated tree, errors, and statement names of ``program`` for the ``components`` catalog.
 
-            return await run_tool({"command": "parse", "program": program, "library": library_spec(components)})
+            Raises
+            ------
+            OpenUIError
+                If the tool cannot run, or its response lacks a field of `ParseResult`.
+            """
+            response = await run_tool({"command": "parse", "program": program, "library": library_spec(components)})
+            missing = [field.name for field in fields(ParseResult) if field.name not in response]
+            if missing:
+                raise OpenUIError(f"The OpenUI tool response lacks {', '.join(missing)}.")
+
+            return ParseResult(**{field.name: response[field.name] for field in fields(ParseResult)})
         ```
       </PySourceCode>
 
@@ -34,7 +46,7 @@ Parse, merge, and describe OpenUI Lang programs with the bundled `@openuidev/lan
         <PyParameter name="components" type="Sequence[Component]" value="COMPONENTS" />
       </div>
 
-      <PyFunctionReturn type="dict[str, typing.Any]" />
+      <PyFunctionReturn type="anylumino.workbench.openui.ParseResult" />
     </PyFunction>
 
     <PyFunction name="merge" type="(current, patch) -> str">

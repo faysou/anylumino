@@ -1,3 +1,4 @@
+from dataclasses import replace
 import asyncio
 
 import pandas as pd
@@ -74,6 +75,10 @@ def test_catalog_entry_builds_its_class(component):
     kwargs.update(component.fixed)
     widget = getattr(module, component.cls)(**kwargs)
     assert isinstance(widget, getattr(module, component.cls))
+    # Every value the catalog lists for an option is one the constructor accepts
+    for key, option in component.options.items():
+        for value in option.get("enum", []):
+            assert isinstance(getattr(module, component.cls)(**kwargs, **{key: value}), getattr(module, component.cls))
 
 
 def test_library_spec_matches_catalog():
@@ -98,23 +103,23 @@ def test_library_spec_matches_catalog():
 def test_tool_parses_a_catalog_program():
     program = 'root = VBox([title, go])\ntitle = Heading("Sales")\ngo = Button("Run", @Callback("on_run"))'
     result = asyncio.run(openui.parse(program))
-    title, go = result["root"]["props"]["children"]
-    assert (result["root"]["typeName"], result["root"]["statementId"]) == ("VBox", "root")
+    title, go = result.root["props"]["children"]
+    assert (result.root["typeName"], result.root["statementId"]) == ("VBox", "root")
     assert (title["typeName"], title["statementId"], title["props"]) == ("Heading", "title", {"text": "Sales"})
     assert (go["typeName"], go["statementId"], go["props"]["label"]) == ("Button", "go", "Run")
     assert go["props"]["action"] == {
         "steps": [{"type": "custom_action", "name": "Callback", "params": {"handler": "on_run"}}]
     }
-    assert result["errors"] == []
-    assert result["statements"] == ["root", "title", "go"]
+    assert result.errors == []
+    assert result.statements == ["root", "title", "go"]
 
 
 def test_tool_reports_unknown_component():
     result = asyncio.run(openui.parse('root = VBox([chart])\nchart = Chart([1, 2])'))
-    assert [(error["code"], error["statementId"]) for error in result["errors"]] == [
+    assert [(error["code"], error["statementId"]) for error in result.errors] == [
         ("unknown-component", "chart")
     ]
-    assert "Chart" in result["errors"][0]["message"]
+    assert "Chart" in result.errors[0]["message"]
 
 
 def test_tool_merges_patch_by_statement_name():
@@ -198,7 +203,7 @@ def test_option_values_come_from_astryx_props(component, option, values):
 )
 def test_options_are_checked_by_the_parser(options, path):
     result = asyncio.run(openui.parse(f'root = VBox([t])\nt = Table([{{"a": 1}}], ["a"], {options})'))
-    assert [(error["code"], error["path"]) for error in result["errors"]] == [("type-mismatch", path)]
+    assert [(error["code"], error["path"]) for error in result.errors] == [("type-mismatch", path)]
 
 
 def test_skill_files_match_the_catalog():
@@ -229,3 +234,25 @@ def test_prompt_names_the_reserved_statement_names():
     assert codegen.RESERVED == {"app", "widget"}
     assert "Statement names cannot be `app` or `widget`." in prompt.CALLBACKS
 
+
+
+def without_descriptions(schema):
+    if isinstance(schema, dict):
+        return {key: without_descriptions(value) for key, value in schema.items() if key != "description"}
+
+    return schema
+
+
+@pytest.mark.parametrize("name", ["Markdown", "Button", "Table", "SplitPanel"])
+def test_catalog_options_do_not_depend_on_the_docstring(name, monkeypatch):
+    from anylumino.workbench.catalog import _with_options, component_class
+
+    component = CATALOG[name]
+    plain = replace(component, props=tuple(prop for prop in component.props if prop.kind != PropKind.OPTIONS))
+    cls = component_class(component)
+    monkeypatch.setattr(cls, "__doc__", "A rewritten docstring with no Parameters or Astryx Props sections.")
+
+    rebuilt = _with_options(plain)
+
+    assert without_descriptions(rebuilt.options) == without_descriptions(component.options)
+    assert {key: option["description"] for key, option in rebuilt.options.items()} == dict.fromkeys(rebuilt.options, "")

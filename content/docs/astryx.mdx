@@ -197,7 +197,9 @@ ax.Stack({"symbol": symbol, "status": status}, gap=2)
 ## Selection controls
 
 Astryx selection widgets cover small option sets, searchable option sets, and
-multi-value tokenized filters.
+multi-value tokenized filters. Option values are strings: `ax.Selector([1, 5, 10],
+value=5)` shows the numbers and holds `value == "5"`, and every later selection
+is a string too.
 
 ```python
 filters = ax.Stack(

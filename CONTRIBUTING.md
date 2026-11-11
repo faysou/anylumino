@@ -9,12 +9,17 @@ npm ci
 npm run build
 ```
 
-Run `uv run --no-sync pytest` for Python tests, `npm test` for frontend tests,
-and `make docs-check` for generated API pages, documentation links, linting,
+Run `uv run --no-sync pytest` for Python tests, `npm test` for frontend tests
+and the undefined-name check on the widget sources, and `make docs-check` for generated API pages, documentation links, linting,
 types, and the production documentation build. Keep generated frontend bundles
 current by running `npm run build` after frontend changes, and regenerate
 `THIRD_PARTY_LICENSES.md` with `npm run licenses` after frontend dependency
 changes. CI verifies both files.
+
+`make test-browser` runs the tests in `tests/browser`, which the default pytest
+run skips. Each one runs a small notebook in a JupyterLab server of its own under
+headless Chromium and checks the rendered widgets and the kernel state. Install
+the browser once with `uv run --no-sync playwright install chromium`.
 
 To test against a local anywidget checkout in `../anywidget`, run
 `make install-dev-anywidget-local`. It builds the checkout's frontend with

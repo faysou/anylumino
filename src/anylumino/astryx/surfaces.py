@@ -16,6 +16,7 @@ from .base import Widget
 from .base import _clean_value
 from .base import _named_props
 from .base import _option_records
+from .base import _option_value
 from .base import _search_records
 from .enums import Align
 from .enums import Axis
@@ -718,7 +719,6 @@ class Card(Widget):
             height=height,
             props=_named_props(
                 props,
-                variant=variant,
                 padding=padding,
                 width=width,
                 height=height,
@@ -820,7 +820,6 @@ class ClickableCard(Widget):
             height=height,
             props=_named_props(
                 props,
-                variant=variant,
                 href=href,
                 target=target,
                 padding=padding,
@@ -916,7 +915,6 @@ class SelectableCard(Widget):
             height=height,
             props=_named_props(
                 props,
-                variant=variant,
                 padding=padding,
                 width=width,
                 height=height,
@@ -1009,7 +1007,6 @@ class Section(Widget):
             height=height,
             props=_named_props(
                 props,
-                variant=variant,
                 padding=padding,
                 paddingBlock=padding_block,
                 dividers=list(dividers) if dividers is not None else None,
@@ -1076,11 +1073,10 @@ class Divider(Widget):
         super().__init__(
             "Divider",
             variant=variant,
+            label=label or "",
             props=_named_props(
                 props,
                 orientation=orientation,
-                variant=variant,
-                label=label,
                 isFullBleed=full_bleed,
             ),
         )
@@ -1235,11 +1231,11 @@ class MetadataList(Widget):
         orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "MetadataList",
+            label=label or "",
             props=_named_props(
                 props,
                 items=_clean_value(list(items)),
                 columns=columns,
-                label=label,
                 maxNumOfItems=max_items,
                 orientation=orientation,
                 title=title,
@@ -1305,12 +1301,12 @@ class Breadcrumbs(Widget):
         variant = optional_choice(variant, BreadcrumbsVariant, "variant")
         super().__init__(
             "Breadcrumbs",
+            variant=variant or "",
+            label=label or "",
             props=_named_props(
                 props,
                 items=_option_records(items),
                 separator=separator,
-                variant=variant,
-                label=label,
             ),
         )
 
@@ -1384,7 +1380,7 @@ class TabList(Widget):
         layout = optional_choice(layout, ItemLayout, "layout")
         super().__init__(
             "TabList",
-            value=value,
+            value=_option_value(value),
             props=_named_props(
                 props,
                 items=_option_records(items),
@@ -1463,7 +1459,7 @@ class SegmentedControl(Widget):
         super().__init__(
             "SegmentedControl",
             label=label,
-            value=value,
+            value=_option_value(value),
             disabled=disabled,
             props=_named_props(
                 props, items=_option_records(items), size=size, layout=layout
@@ -1553,7 +1549,7 @@ class RadioList(Widget):
         super().__init__(
             "RadioList",
             label=label,
-            value=value,
+            value=_option_value(value),
             disabled=disabled,
             props=_named_props(
                 props,
@@ -1647,7 +1643,7 @@ class CheckboxList(Widget):
         super().__init__(
             "CheckboxList",
             label=label,
-            value=list(value),
+            value=_option_value(list(value)),
             disabled=disabled,
             props=_named_props(
                 props,
@@ -1741,7 +1737,6 @@ class ButtonGroup(Widget):
             props=_named_props(
                 props,
                 items=_option_records(items),
-                label=label,
                 orientation=orientation,
                 size=size,
             ),
@@ -1810,7 +1805,7 @@ class ToggleButtonGroup(Widget):
                 if value is None
                 else [value]
                 if isinstance(value, str)
-                else list(value)
+                else _option_value(list(value))
             )
         else:
             if value is not None and not isinstance(value, str):
@@ -1984,7 +1979,6 @@ class Citation(Widget):
             props={
                 "source": _clean_value(source),
                 "number": number,
-                "variant": variant,
                 **props,
             },
         )
@@ -2099,7 +2093,6 @@ class Field(Widget):
             width=width,
             props=_named_props(
                 props,
-                label=label,
                 inputID=input_id,
                 description=description or None,
                 status=_clean_value(status) if status else None,
@@ -2160,8 +2153,8 @@ class FieldStatus(Widget):
         super().__init__(
             "FieldStatus",
             label=message,
-            variant=type,
-            props={"type": type, "message": message, "variant": variant, **props},
+            variant=variant,
+            props={"type": type, "message": message, **props},
         )
 
 
@@ -2308,7 +2301,6 @@ class InputGroup(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
-                label=label,
                 prefix=prefix or None,
                 suffix=suffix or None,
                 isLabelHidden=label_hidden,
@@ -2457,7 +2449,6 @@ class Outline(Widget):
             value=active_id,
             props={
                 "items": _clean_value(list(items)),
-                "label": label,
                 "density": density,
                 **props,
             },
@@ -2617,13 +2608,12 @@ class Toolbar(Widget):
             "Toolbar",
             children,
             label=label,
+            variant=variant or "",
             props=_named_props(
                 props,
-                label=label,
                 size=size,
                 gap=gap,
                 orientation=orientation,
-                variant=variant,
                 dividers=list(dividers) if dividers is not None else None,
             ),
         )
@@ -2950,7 +2940,6 @@ class Popover(Widget):
             props=_named_props(
                 props,
                 content=content_prop,
-                label=label,
                 placement=placement,
                 alignment=alignment,
                 isOpen=open,
@@ -3055,7 +3044,6 @@ class DropdownMenu(Widget):
             props=_named_props(
                 props,
                 items=_option_records(items),
-                button={"label": label, "variant": variant},
                 menuWidth=menu_width,
                 hasChevron=chevron,
                 placement=placement,
@@ -3145,8 +3133,6 @@ class MoreMenu(Widget):
             props=_named_props(
                 props,
                 items=_option_records(items),
-                label=label,
-                variant=variant,
                 size=size,
                 hasAutoFocus=auto_focus,
             ),
@@ -3363,7 +3349,6 @@ class FileInput(Widget):
             disabled=disabled,
             props=_named_props(
                 props,
-                label=label,
                 isMultiple=multiple,
                 accept=accept,
                 maxSize=max_size,
@@ -3501,7 +3486,6 @@ class Typeahead(Widget):
             props=_named_props(
                 props,
                 items=_search_records(items),
-                label=label,
                 placeholder=placeholder,
                 hasEntriesOnFocus=entries_on_focus,
                 hasClear=clear,
@@ -3648,7 +3632,6 @@ class Tokenizer(Widget):
             props=_named_props(
                 props,
                 items=_search_records(items),
-                label=label,
                 placeholder=placeholder,
                 maxEntries=max_entries,
                 hasClear=clear,
@@ -3768,7 +3751,6 @@ class CommandPalette(Widget):
             props=_named_props(
                 props,
                 items=_search_records(items),
-                label=label,
                 isInline=inline,
                 width=width,
                 maxHeight=max_height,
@@ -3927,13 +3909,13 @@ class Dialog(Widget):
             children,
             open=open,
             width=width,
+            variant=variant or "",
             props=_named_props(
                 props,
                 isInline=inline,
                 width=width,
                 maxHeight=max_height,
                 position=position,
-                variant=variant,
                 purpose=purpose,
             ),
         )
@@ -4311,7 +4293,6 @@ class Stepper(Widget):
             props=_named_props(
                 props,
                 items=_option_records(items),
-                label=label,
                 orientation=orientation,
                 density=density,
                 isNavigable=navigable,
@@ -4502,15 +4483,14 @@ class ComplexSelector(Widget):
             value=value,
             label=label,
             disabled=disabled,
+            variant=variant or "",
             props=_named_props(
                 props,
                 isLabelHidden=label_hidden,
-                label=label,
                 triggerLabel=trigger_label,
                 placeholder=placeholder,
                 description=description,
                 size=size,
-                variant=variant,
                 width=width,
             ),
         )
@@ -4589,9 +4569,9 @@ class AppShell(Widget):
         super().__init__(
             "AppShell",
             slots,
+            variant=variant or "",
             props=_named_props(
                 props,
-                variant=variant,
                 contentPadding=content_padding,
                 height=height,
             ),
@@ -4771,13 +4751,13 @@ class SideNav(Widget):
     ) -> None:
         super().__init__(
             "SideNav",
-            value=value,
+            value=_option_value(value),
+            icon=icon or "",
             props=_named_props(
                 props,
                 items=_option_records(items),
                 heading=heading,
                 subheading=subheading,
-                icon=icon,
                 menu=_option_records(menu) if menu is not None else None,
                 collapsible=collapsible,
                 resizable=resizable,
@@ -4861,15 +4841,14 @@ class TopNav(Widget):
         super().__init__(
             "TopNav",
             {"end": _slot(end, Orientation.HORIZONTAL)} if end is not None else None,
-            value=value,
+            value=_option_value(value),
             label=label or "",
+            icon=icon or "",
             props=_named_props(
                 props,
                 items=_option_records(items),
                 heading=heading,
                 subheading=subheading,
-                icon=icon,
                 menu=_option_records(menu) if menu is not None else None,
-                label=label,
             ),
         )

@@ -42,6 +42,12 @@ class _NativeControlWidget(ActivationCallbacks, SharedBundleWidget):
         self.observe(self._notify_value_change, names="value")
         self._register_callbacks(callbacks)
 
+    @t.validate("value", "min", "max")
+    def _iso_value(self, proposal: dict[str, Any]) -> Any:
+        # The browser reads ISO strings, so a date, time, or datetime object becomes one
+        # on every assignment.
+        return _json_value(proposal["value"])
+
 
 class DatePicker(_NativeControlWidget):
     """Browser-native date picker control.
@@ -55,7 +61,9 @@ class DatePicker(_NativeControlWidget):
     Parameters
     ----------
     value : date | str | None, default None
-        Initial value and synchronized Python value.
+        Initial date. ``value`` holds it as an ISO 8601 string such as
+        ``"2026-10-21"``, or `None`; a `date` assigned later is converted
+        the same way.
     description : str, default ''
         Label shown above the control.
     disabled : bool, default False
@@ -111,7 +119,9 @@ class TimePicker(DatePicker):
     Parameters
     ----------
     value : time | str | None, default None
-        Initial value and synchronized Python value.
+        Initial time. ``value`` holds it as an ISO 8601 string such as
+        ``"14:30"``, or `None`; a `time` assigned later is converted the same
+        way.
     description : str, default ''
         Label shown above the control.
     disabled : bool, default False
@@ -167,7 +177,10 @@ class DatetimePicker(DatePicker):
     Parameters
     ----------
     value : datetime | str | None, default None
-        Initial value and synchronized Python value.
+        Initial date and time. ``value`` holds it as an ISO 8601 string such
+        as ``"2026-10-21T14:30"``, or `None`, which it is until both a date
+        and a time are set; a `datetime` assigned later is converted the same
+        way.
     description : str, default ''
         Label shown above the control.
     disabled : bool, default False

@@ -15,6 +15,7 @@ with open(os.environ["FAKE_LOG"], "a") as log:
     log.write(json.dumps({{"argv": sys.argv[1:], "stdin": sys.stdin.read(), "cwd": os.getcwd()}}) + "\\n")
 sys.stdout.write(open(os.environ["FAKE_STREAM"]).read())
 sys.stdout.flush()
+sys.stderr.write(os.environ.get("FAKE_STDERR", ""))
 time.sleep(float(os.environ.get("FAKE_SLEEP", "0")))
 sys.exit(int(os.environ.get("FAKE_EXIT", "0")))
 """
@@ -41,19 +42,38 @@ def fake_cli(tmp_path, monkeypatch):
     return calls
 
 
+@pytest.fixture(params=["codex", "claude"])
+def turn_agent(request):
+    """The agent a test runs its turns with; `agent_reply` writes the stream in its format."""
+    return request.param
+
+
+def reply_events(agent, text):
+    """The stream a CLI writes for a turn that replies ``text``, in ``agent``'s format."""
+    if agent == "claude":
+        return [
+            {"type": "system", "subtype": "init", "session_id": "thread-1"},
+            {"type": "stream_event", "event": {"type": "content_block_start", "content_block": {"type": "text"}}},
+            {"type": "stream_event", "event": {"type": "content_block_delta", "delta": {"type": "text_delta", "text": text}}},
+            {"type": "result", "subtype": "success", "is_error": False, "result": text},
+        ]
+
+    return [
+        {"type": "thread.started", "thread_id": "thread-1"},
+        {"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "text": text}},
+        {"type": "turn.completed"},
+    ]
+
+
 @pytest.fixture
-def agent_reply(fake_cli, tmp_path, monkeypatch):
+def agent_reply(fake_cli, tmp_path, monkeypatch, request):
     stream = tmp_path / "stream.jsonl"
     monkeypatch.setenv("FAKE_STREAM", str(stream))
     monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    agent = request.getfixturevalue("turn_agent") if "turn_agent" in request.fixturenames else "codex"
 
     def set_reply(text):
-        events = [
-            {"type": "thread.started", "thread_id": "thread-1"},
-            {"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "text": text}},
-            {"type": "turn.completed"},
-        ]
-        stream.write_text("".join(json.dumps(event) + "\n" for event in events))
+        stream.write_text("".join(json.dumps(event) + "\n" for event in reply_events(agent, text)))
 
     set_reply.calls = fake_cli
 

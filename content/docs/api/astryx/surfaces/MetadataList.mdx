@@ -58,11 +58,11 @@ import screenshot from '../../../assets/components/astryx-surfaces-MetadataList.
         orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
             "MetadataList",
+            label=label or "",
             props=_named_props(
                 props,
                 items=_clean_value(list(items)),
                 columns=columns,
-                label=label,
                 maxNumOfItems=max_items,
                 orientation=orientation,
                 title=title,

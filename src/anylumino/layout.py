@@ -1,15 +1,23 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from importlib.metadata import version
 from typing import Any, Iterable
 
 import anywidget
 import traitlets as t
 
+from anylumino.enums import choice
+
 # anywidget keeps the model id lookup private until
 # https://github.com/manzt/anywidget/pull/1024 lands.
-from anywidget._descriptor import _try_get_model_id as get_model_id
-from anylumino.enums import choice
+try:
+    from anywidget._descriptor import _try_get_model_id as get_model_id
+except ImportError as error:
+    raise ImportError(
+        f"anylumino cannot find the widget model id lookup in anywidget {version('anywidget')}; "
+        "install an anywidget release that anylumino supports."
+    ) from error
 
 from .common import ActivationCallbacks
 from .common import SharedBundleWidget
@@ -75,6 +83,11 @@ def _key_to_string(key: object) -> str:
         raise ValueError(msg)
 
     return text
+
+
+def _mean_size(sizes: list[float]) -> float:
+    """Return the relative size a new split pane gets: an equal share of the current ones."""
+    return sum(sizes) / len(sizes)
 
 
 def _validate_keys(key_list: list[str]) -> None:
@@ -195,9 +208,15 @@ class KeyedChildren(ActivationCallbacks):
     wrapper objects exposing a ``widget`` attribute keep their own API.
     Subscripting returns the owner. Widgets with a ``selected_index`` trait
     also gain ``selected_key`` and ``select_key``.
+
+    Subclasses list their per-child list traits in ``_child_settings``, each
+    with a function that returns the entry a new child gets. Every change to
+    the children reorders those lists with them, so an entry stays with the
+    child it was given for. An empty list stays empty.
     """
 
     _title_prefix = "Widget"
+    _child_settings: Mapping[str, Callable[[list[Any]], Any]] = {}
 
     widgets: list[Any]
     child_keys: list[str]
@@ -258,35 +277,81 @@ class KeyedChildren(ActivationCallbacks):
     def _adopt_children(self, views: Iterable[object]) -> None:
         """Apply parent-owned state to newly attached children."""
 
-    def _drop_child_metadata(self, index: int) -> None:
-        """Drop per-child metadata for a child that was removed."""
-
     def _rekey_children(self, previous: list[object], current: list[object]) -> None:
-        selected_key = getattr(self, "selected_key", None)
-        previous_keys = {id(view): key for view, key in zip(previous, self.child_keys)}
-        titles_by_key = dict(zip(self.child_keys, self._complete_titles()))
-        key_list: list[str] = []
-        adopted: list[object] = []
+        previous_indexes: dict[int, list[int]] = {}
+        for index, view in enumerate(previous[: len(self.child_keys)]):
+            previous_indexes.setdefault(id(view), []).append(index)
+
+        sources: list[int | None] = []
+        added: list[tuple[str, str, object]] = []
+        taken: list[str] = []
         for view in current:
-            key = previous_keys.pop(id(view), None)
-            if key is None:
-                key = self._unused_key(key_list)
-                adopted.append(view)
+            indexes = previous_indexes.get(id(view))
+            if indexes:
+                sources.append(indexes.pop(0))
+            else:
+                key = self._unused_key(taken)
+                taken.append(key)
+                sources.append(None)
+                added.append((key, "", view))
+
+        self._arrange_children(current, sources, added)
+        self._adopt_children([view for view, source in zip(current, sources) if source is None])
+
+    def _arrange_children(
+        self,
+        views: list[object],
+        sources: list[int | None],
+        added: Iterable[tuple[str, str, object]] = (),
+        *,
+        select: str | None = None,
+    ) -> None:
+        """Set the children to ``views`` and reorder keys, titles, owners, and per-child settings with them.
+
+        ``sources`` gives, for each position, the index the child held before,
+        or `None` for a new child, which takes the next ``(key, title, owner)``
+        of ``added``. The selection stays on its child, or moves to ``select``.
+        """
+        selected_key = select if select is not None else self.selected_key
+        keys = list(self.child_keys)
+        titles = self._complete_titles()
+        new_children = iter(added)
+        key_list: list[str] = []
+        title_list: list[str] = []
+        owners: dict[str, object] = {}
+        for view, source in zip(views, sources, strict=True):
+            if source is None:
+                key, title, owner = next(new_children)
+            else:
+                key, title = keys[source], titles[source]
+                owner = self._owners_by_key.get(key, view)
 
             key_list.append(key)
+            title_list.append(title)
+            owners[key] = owner
 
-        owners = {key: self._owners_by_key.get(key, view) for key, view in zip(key_list, current)}
+        settings = {}
+        for name, new_entry in self._child_settings.items():
+            values = list(getattr(self, name))
+            if values:
+                settings[name] = [
+                    values[source] if source is not None and source < len(values) else new_entry(values)
+                    for source in sources
+                ]
+
         self._syncing_children = True
         try:
             with self.hold_sync():
+                self.widgets = list(views)
                 self.child_keys = key_list
-                self.titles = [titles_by_key.get(key, "") for key in key_list]
+                self.titles = title_list
                 self._owners_by_key = owners
+                for name, values in settings.items():
+                    setattr(self, name, values)
+
                 self._restore_selection(selected_key)
         finally:
             self._syncing_children = False
-
-        self._adopt_children(adopted)
 
     def _observe_widgets(self, change: dict[str, Any]) -> None:
         if self._syncing_children:
@@ -376,19 +441,12 @@ class KeyedChildren(ActivationCallbacks):
         child_key = self._next_key(key)
         child_title = title or (child_key if has_explicit_key else f"{self._title_prefix} {next_index + 1}")
         view = _view_for_child(widget)
-        titles = self._complete_titles()
-        self._syncing_children = True
-        try:
-            with self.hold_sync():
-                self.widgets = [*self.widgets, view]
-                self.child_keys = [*self.child_keys, child_key]
-                self.titles = [*titles, child_title]
-                self._owners_by_key[child_key] = widget
-                if select and hasattr(self, "selected_index"):
-                    self.selected_index = next_index
-        finally:
-            self._syncing_children = False
-
+        self._arrange_children(
+            [*self.widgets, view],
+            [*range(next_index), None],
+            [(child_key, child_title, widget)],
+            select=child_key if select else None,
+        )
         self._adopt_children([view])
 
     def remove_widget(self, key_or_index: str | int, *, close: bool = False) -> object:
@@ -399,22 +457,10 @@ class KeyedChildren(ActivationCallbacks):
         the default keeps the returned owner alive for the caller to reuse.
         """
         index = self._resolve_index(key_or_index)
-        key = self.child_keys[index]
         owner = self.get_owner(index)
         view = self.widgets[index]
-        selected_key = self.selected_key
-        titles = self._complete_titles()
-        self._syncing_children = True
-        try:
-            with self.hold_sync():
-                self.widgets = [*self.widgets[:index], *self.widgets[index + 1 :]]
-                self.child_keys = [*self.child_keys[:index], *self.child_keys[index + 1 :]]
-                self.titles = [*titles[:index], *titles[index + 1 :]]
-                self._owners_by_key.pop(key, None)
-                self._drop_child_metadata(index)
-                self._restore_selection(selected_key)
-        finally:
-            self._syncing_children = False
+        kept = [position for position in range(len(self.child_keys)) if position != index]
+        self._arrange_children([self.widgets[position] for position in kept], kept)
 
         if close:
             for target in {id(view): view, id(owner): owner}.values():
@@ -431,19 +477,9 @@ class KeyedChildren(ActivationCallbacks):
         if current == target:
             return
 
-        selected_key = self.selected_key
-        titles = self._complete_titles()
         order = [position for position in range(len(self.child_keys)) if position != current]
         order.insert(target, current)
-        self._syncing_children = True
-        try:
-            with self.hold_sync():
-                self.widgets = [self.widgets[position] for position in order]
-                self.child_keys = [self.child_keys[position] for position in order]
-                self.titles = [titles[position] for position in order]
-                self._restore_selection(selected_key)
-        finally:
-            self._syncing_children = False
+        self._arrange_children([self.widgets[position] for position in order], order)
 
     def rename_widget(self, key_or_index: str | int, title: str) -> None:
         index = self._resolve_index(key_or_index)
@@ -719,6 +755,8 @@ class BoxPanel(LayoutWidget):
     _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.bundle.css")
 
+    _child_settings = {"stretches": lambda _stretches: 0}
+
     layout_kind = t.Unicode("box").tag(sync=True)
     direction = t.Enum(tuple(Direction), default_value=Direction.LEFT_TO_RIGHT).tag(sync=True)
     spacing = t.Int(8).tag(sync=True)
@@ -766,9 +804,6 @@ class BoxPanel(LayoutWidget):
             stretches=_as_list(stretches),
         )
 
-    def _drop_child_metadata(self, index: int) -> None:
-        if index < len(self.stretches):
-            self.stretches = [*self.stretches[:index], *self.stretches[index + 1 :]]
 
 
 class HBox(BoxPanel):
@@ -1033,6 +1068,8 @@ class SplitPanel(LayoutWidget):
     _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.bundle.css")
 
+    _child_settings = {"sizes": _mean_size}
+
     layout_kind = t.Unicode("split").tag(sync=True)
     orientation = t.Enum(tuple(Orientation), default_value=Orientation.HORIZONTAL).tag(sync=True)
     spacing = t.Int(6).tag(sync=True)
@@ -1066,9 +1103,6 @@ class SplitPanel(LayoutWidget):
             sizes=_as_list(sizes),
         )
 
-    def _drop_child_metadata(self, index: int) -> None:
-        if index < len(self.sizes):
-            self.sizes = [*self.sizes[:index], *self.sizes[index + 1 :]]
 
 
 class DockPanel(LayoutWidget):
@@ -1278,6 +1312,8 @@ class GridPanel(LayoutWidget):
     _bundle = static_asset("layout/layout_panel.bundle.js")
     _css = static_asset("layout/layout_panel.bundle.css")
 
+    _child_settings = {"areas": lambda _areas: {}}
+
     layout_kind = t.Unicode("grid").tag(sync=True)
     columns = t.Unicode("1fr 1fr").tag(sync=True)
     rows = t.Unicode("auto").tag(sync=True)
@@ -1313,9 +1349,6 @@ class GridPanel(LayoutWidget):
             areas=_as_list(areas),
         )
 
-    def _drop_child_metadata(self, index: int) -> None:
-        if index < len(self.areas):
-            self.areas = [*self.areas[:index], *self.areas[index + 1 :]]
 
 
 class ResponsivePanel(LayoutWidget):
@@ -1456,8 +1489,9 @@ class Toolbar(_ActionWidget):
     actions : iterable of dict, optional
         Action definitions. Each action should include an ``id`` and ``label``;
         optional keys such as ``icon``, ``icon_src``, ``icon_size``,
-        ``tooltip``, ``disabled``, or ``separator`` are forwarded to the
-        frontend. ``icon`` uses bundled workflow icon names.
+        ``tooltip``, or ``disabled`` are forwarded to the frontend. ``icon``
+        uses bundled workflow icon names. An action with a truthy
+        ``separator`` key renders as a divider between buttons.
     callbacks : dict[str, callable], optional
         Callback map keyed by action id. A callback receives the activated
         action id. The map stays available as the ``callbacks`` attribute, and
@@ -1499,8 +1533,9 @@ class MenuBar(_ActionWidget):
         Menu definitions. A menu normally has a ``label`` and an ``items``
         sequence. Item dictionaries should include an ``id`` and ``label`` and
         may include frontend options such as ``icon``, ``icon_src``,
-        ``icon_size``, ``disabled``, or ``separator``. ``icon`` uses bundled
-        workflow icon names.
+        ``icon_size``, or ``disabled``. ``icon`` uses bundled workflow icon
+        names. An item with a truthy ``separator`` key, or with ``type`` set to
+        ``"separator"``, renders as a divider line.
     callbacks : dict[str, callable], optional
         Callback map keyed by menu item id. A callback receives the activated
         item id. The map stays available as the ``callbacks`` attribute, and

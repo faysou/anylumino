@@ -209,6 +209,8 @@ def _clean_theme_mode(mode: ColorMode | str) -> ColorMode:
     return choice(mode, ColorMode, "color_mode")
 
 
+# Option values travel as strings, as the browser compares and reports them, so a
+# selection reads the same in Python before and after the user changes it.
 def _option_records(options: Iterable[Any] | Mapping[str, Any]) -> list[Any]:
     if isinstance(options, Mapping):
         return [
@@ -219,14 +221,28 @@ def _option_records(options: Iterable[Any] | Mapping[str, Any]) -> list[Any]:
     normalized = []
     for option in options:
         if isinstance(option, Mapping):
-            normalized.append(_clean_value(option))
+            record = _clean_value(option)
+            if record.get("value") is not None:
+                record["value"] = str(record["value"])
+            normalized.append(record)
         elif isinstance(option, (list, tuple)) and len(option) == 2:
             label, value = option
             normalized.append({"label": str(label), "value": str(value)})
         else:
-            normalized.append(_clean_value(option))
+            normalized.append(_option_value(_clean_value(option)))
 
     return normalized
+
+
+def _option_value(value: Any) -> Any:
+    """Return an option value, or a list of them, as the strings the options carry."""
+    if value is None or isinstance(value, Mapping):
+        return value
+
+    if isinstance(value, (list, tuple)):
+        return [_option_value(item) for item in value]
+
+    return str(value)
 
 
 def _search_records(items: Iterable[Any] | Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -325,6 +341,10 @@ def _table_rows(
                 column["key"]: _clean_value(row.get(column["key"], ""))
                 for column in columns
             }
+            # Keys outside the columns stay with the row: the browser reads row
+            # flags such as ``selectable``, and wider columns show them later.
+            for key, value in row.items():
+                item.setdefault(str(key), _clean_value(value))
             item[row_key] = _clean_value(row.get(row_key, index))
         elif isinstance(row, (list, tuple)):
             item = {
@@ -423,11 +443,10 @@ class Widget(ComponentWidget):
     _bundle = static_asset("astryx/astryx_widget.bundle.js")
     _css = static_asset("astryx/astryx_widget.bundle.css")
 
-    component_family = t.Unicode("astryx").tag(sync=True)
+    component_family = t.Unicode("astryx")
     component_name = t.Unicode("Stack").tag(sync=True)
     props = t.Dict(default_value={}).tag(sync=True)
     color_mode = t.Enum(tuple(ColorMode), default_value=ColorMode.LIGHT).tag(sync=True)
-    theme = t.Unicode("neutral").tag(sync=True)
     brand = t.Dict(default_value={}).tag(sync=True)
     continuous_update = t.Bool(True).tag(sync=True)
     search_mode = t.Unicode("static").tag(sync=True)

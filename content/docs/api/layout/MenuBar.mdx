@@ -41,8 +41,9 @@ import screenshot from '../../assets/components/layout-MenuBar.png';
       Menu definitions. A menu normally has a `label` and an `items`
       sequence. Item dictionaries should include an `id` and `label` and
       may include frontend options such as `icon`, `icon_src`,
-      `icon_size`, `disabled`, or `separator`. `icon` uses bundled
-      workflow icon names.
+      `icon_size`, or `disabled`. `icon` uses bundled workflow icon
+      names. An item with a truthy `separator` key, or with `type` set to
+      `"separator"`, renders as a divider line.
     </PyParameter>
 
     <PyParameter name="callbacks" type="dict[str, ActionCallback] | None" value="None">

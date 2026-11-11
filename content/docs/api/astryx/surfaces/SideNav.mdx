@@ -57,13 +57,13 @@ import screenshot from '../../../assets/components/astryx-surfaces-SideNav.png';
     ) -> None:
         super().__init__(
             "SideNav",
-            value=value,
+            value=_option_value(value),
+            icon=icon or "",
             props=_named_props(
                 props,
                 items=_option_records(items),
                 heading=heading,
                 subheading=subheading,
-                icon=icon,
                 menu=_option_records(menu) if menu is not None else None,
                 collapsible=collapsible,
                 resizable=resizable,

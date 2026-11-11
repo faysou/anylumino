@@ -48,6 +48,9 @@ import screenshot from '../../../assets/components/astryx-layout-AccordionPanel.
         height: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        # Callbacks register after the initial open state, so building the panel runs none of them.
+        callbacks = props.pop("callbacks", None)
+        action_callbacks = props.pop("action_callbacks", None)
         super().__init__(
             "AccordionPanel",
             children,
@@ -62,6 +65,8 @@ import screenshot from '../../../assets/components/astryx-layout-AccordionPanel.
             ),
         )
         self.value = self._open_value(open, multiple)
+        self.observe(self._drop_removed_open_keys, names="child_keys")
+        self._register_callbacks(callbacks, action_callbacks)
     ```
   </PySourceCode>
 

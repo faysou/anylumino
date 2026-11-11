@@ -33,7 +33,7 @@ Generate Python that builds anylumino widgets from an evaluated OpenUI tree.
       <PySourceCode>
         ```python
         def generate(
-            result: Mapping[str, Any],
+            result: ParseResult,
             handlers: Collection[str],
             namespace: Mapping[str, Any],
             components: Sequence[Component] = COMPONENTS,
@@ -45,15 +45,15 @@ Generate Python that builds anylumino widgets from an evaluated OpenUI tree.
             ``components`` is the catalog the program was parsed with; a component
             from another module, such as one a notebook skill adds, imports it.
             """
-            for key, label in (("states", "$state variables"), ("queries", "Query"), ("mutations", "Mutation")):
-                if result.get(key):
-                    raise GenerationError(f"{label} is not supported: {', '.join(result[key])}")
+            for names, label in ((result.states, "$state variables"), (result.queries, "Query"), (result.mutations, "Mutation")):
+                if names:
+                    raise GenerationError(f"{label} is not supported: {', '.join(names)}")
 
-            if result.get("root") is None:
+            if result.root is None:
                 raise GenerationError("The program has no root component.")
 
             writer = _Writer(set(handlers), namespace, {component.name: component for component in components})
-            root = writer.element(result["root"])
+            root = writer.element(result.root)
             footer = f"\n        self.widget = {root}\n        app.set_ui(self)\n"
             imports = [text for module, text in IMPORTS.items() if module in ("al", "ax", "workbench") or module in writer.modules]
             imports += [f"import {module}\n" for module in sorted(writer.modules - set(IMPORTS))]
@@ -63,7 +63,7 @@ Generate Python that builds anylumino widgets from an evaluated OpenUI tree.
       </PySourceCode>
 
       <div>
-        <PyParameter name="result" type="Mapping[str, Any]" />
+        <PyParameter name="result" type="ParseResult" />
 
         <PyParameter name="handlers" type="Collection[str]" />
 

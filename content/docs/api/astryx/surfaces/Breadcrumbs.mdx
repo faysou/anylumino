@@ -54,12 +54,12 @@ import screenshot from '../../../assets/components/astryx-surfaces-Breadcrumbs.p
         variant = optional_choice(variant, BreadcrumbsVariant, "variant")
         super().__init__(
             "Breadcrumbs",
+            variant=variant or "",
+            label=label or "",
             props=_named_props(
                 props,
                 items=_option_records(items),
                 separator=separator,
-                variant=variant,
-                label=label,
             ),
         )
     ```

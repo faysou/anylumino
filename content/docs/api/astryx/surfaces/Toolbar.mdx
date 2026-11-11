@@ -70,13 +70,12 @@ import screenshot from '../../../assets/components/astryx-surfaces-Toolbar.png';
             "Toolbar",
             children,
             label=label,
+            variant=variant or "",
             props=_named_props(
                 props,
-                label=label,
                 size=size,
                 gap=gap,
                 orientation=orientation,
-                variant=variant,
                 dividers=list(dividers) if dividers is not None else None,
             ),
         )

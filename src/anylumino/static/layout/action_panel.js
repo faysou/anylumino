@@ -43,6 +43,10 @@ const ICON_SIZES = {
   xxl: 28,
 };
 
+function isSeparator(action) {
+  return Boolean(action?.separator) || action?.type === "separator";
+}
+
 function actionId(action) {
   return String(action?.id ?? action?.label ?? "");
 }
@@ -51,9 +55,13 @@ function actionLabel(action) {
   return String(action?.label ?? action?.id ?? "");
 }
 
-function actionIconClass(action) {
+// Each rendered widget gets its own scope, so icon classes of actions that share an id
+// across widgets on one page do not match each other's menu items.
+let nextIconScope = 1;
+
+function actionIconClass(action, scope) {
   const id = actionId(action).replace(/[^a-zA-Z0-9_-]/g, "_");
-  return iconSpec(action) ? `anylumino-CommandIcon-${id}` : "";
+  return iconSpec(action) ? `anylumino-CommandIcon-${scope}-${id}` : "";
 }
 
 function workflowIconName(rawName) {
@@ -154,10 +162,10 @@ function flattenActions(actions) {
       flat.push(action);
     }
   }
-  return flat.filter((action) => actionId(action));
+  return flat.filter((action) => !isSeparator(action) && actionId(action));
 }
 
-function addCommands(commands, actions, activate) {
+function addCommands(commands, actions, activate, scope) {
   for (const action of flattenActions(actions)) {
     const id = actionId(action);
     if (commands.hasCommand(id)) {
@@ -166,14 +174,18 @@ function addCommands(commands, actions, activate) {
     commands.addCommand(id, {
       label: actionLabel(action),
       caption: String(action?.caption ?? actionLabel(action)),
-      iconClass: actionIconClass(action),
+      iconClass: actionIconClass(action, scope),
       isEnabled: () => !action.disabled,
       execute: () => activate(id),
     });
   }
 }
 
-function decorateCommandIcons(actions) {
+/**
+ * Draw the icons of `actions` into the command items under `nodes`, now and
+ * whenever those nodes re-render, such as a menu that opens.
+ */
+function decorateCommandIcons(actions, scope, nodes) {
   const iconActions = flattenActions(actions).filter((action) => iconSpec(action));
   if (iconActions.length === 0) {
     return null;
@@ -181,11 +193,11 @@ function decorateCommandIcons(actions) {
 
   const decorate = () => {
     for (const action of iconActions) {
-      const className = actionIconClass(action);
+      const className = actionIconClass(action, scope);
       if (!className) {
         continue;
       }
-      document.querySelectorAll(`.${className}`).forEach((node) => {
+      nodes.flatMap((root) => [...root.querySelectorAll(`.${className}`)]).forEach((node) => {
         if (node.dataset.anyluminoIcon === "true") {
           return;
         }
@@ -199,7 +211,9 @@ function decorateCommandIcons(actions) {
   };
 
   const observer = new MutationObserver(decorate);
-  observer.observe(document.body, { childList: true, subtree: true });
+  for (const node of nodes) {
+    observer.observe(node, { childList: true, subtree: true });
+  }
   decorate();
   return observer;
 }
@@ -208,6 +222,13 @@ function createToolbar(model, activate) {
   const panel = new Panel();
   panel.addClass("anylumino-Toolbar");
   for (const action of model.get("actions") ?? []) {
+    if (isSeparator(action)) {
+      const separator = document.createElement("div");
+      separator.className = "anylumino-ToolbarSeparator";
+      separator.setAttribute("role", "separator");
+      panel.node.appendChild(separator);
+      continue;
+    }
     const id = actionId(action);
     const button = document.createElement("button");
     button.type = "button";
@@ -232,10 +253,10 @@ function createToolbar(model, activate) {
   return panel;
 }
 
-function createMenuBar(model, activate) {
+function createMenuBar(model, activate, scope) {
   const commands = new CommandRegistry();
   const actions = model.get("actions") ?? [];
-  addCommands(commands, actions, activate);
+  addCommands(commands, actions, activate, scope);
 
   const bar = new MenuBar();
   bar.addClass("anylumino-MenuBar");
@@ -244,7 +265,7 @@ function createMenuBar(model, activate) {
     const menu = new Menu({ commands });
     menu.title.label = String(menuSpec.label ?? "Menu");
     for (const item of menuSpec.items ?? []) {
-      if (item.type === "separator") {
+      if (isSeparator(item)) {
         menu.addItem({ type: "separator" });
       } else {
         menu.addItem({ command: actionId(item) });
@@ -255,10 +276,10 @@ function createMenuBar(model, activate) {
   return bar;
 }
 
-function createCommandPalette(model, activate) {
+function createCommandPalette(model, activate, scope) {
   const commands = new CommandRegistry();
   const actions = model.get("actions") ?? [];
-  addCommands(commands, actions, activate);
+  addCommands(commands, actions, activate, scope);
 
   const palette = new CommandPalette({ commands });
   palette.addClass("anylumino-CommandPalette");
@@ -281,6 +302,7 @@ export default {
 
     let panel = null;
     let iconObserver = null;
+    const scope = nextIconScope++;
 
     const activate = (id) => {
       model.send({ type: "activate", id });
@@ -298,9 +320,9 @@ export default {
       clearPanel();
       const kind = model.get("action_kind");
       if (kind === "menubar") {
-        panel = createMenuBar(model, activate);
+        panel = createMenuBar(model, activate, scope);
       } else if (kind === "command_palette") {
-        panel = createCommandPalette(model, activate);
+        panel = createCommandPalette(model, activate, scope);
       } else {
         panel = createToolbar(model, activate);
       }
@@ -312,7 +334,9 @@ export default {
       // Lumino drops update requests posted while a widget is hidden, so a
       // palette built before attach renders no results until its first input.
       panel.update();
-      iconObserver = decorateCommandIcons(model.get("actions") ?? []);
+      // Menus open outside the widget, so their nodes are watched next to the widget's own.
+      const menuNodes = panel instanceof MenuBar ? panel.menus.map((menu) => menu.node) : [];
+      iconObserver = decorateCommandIcons(model.get("actions") ?? [], scope, [panel.node, ...menuNodes]);
     };
 
     const syncSize = () => {

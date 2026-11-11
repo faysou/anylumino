@@ -98,7 +98,7 @@ import screenshot from '../../../assets/components/astryx-inputs-MultiSelector.p
         super().__init__(
             "MultiSelector",
             label=label,
-            value=list(value),
+            value=_option_value(list(value)),
             disabled=disabled,
             props=_label_props(
                 props,

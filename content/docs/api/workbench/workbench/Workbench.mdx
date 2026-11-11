@@ -30,9 +30,15 @@ Build notebook UIs by chatting with a local coding agent.
 
   <PyAttribute name="running" value="False" />
 
+  <PyAttribute name="outcome" type="TurnOutcome | None" value="None" />
+
   <PyAttribute name="tasks" type="set[asyncio.Task[Any]]" value="set()" />
 
   <PyAttribute name="marimo_loop" value="marimo_turn_loop()" />
+
+  <PyAttribute name="chat_lock" value="threading.RLock()" />
+
+  <PyAttribute name="superseded" value="SESSION_OWNERS.get(self.state.name) if self.state.name else None" />
 
   <PyAttribute name="chat" value="ax.Chat(self.state.messages, placeholder='Describe the UI to build', height='100%')" />
 
@@ -83,6 +89,9 @@ Build notebook UIs by chatting with a local coding agent.
             name=session or "", agent=Agent(agent or Agent.CLAUDE), cwd=str(Path(cwd or os.getcwd()).resolve())
         )
         # A restored session resumes the agent's conversation with new settings when they are given
+        if cwd is not None:
+            self.state.cwd = str(Path(cwd).expanduser().resolve())
+
         self.state.model = model or self.state.model
         self.state.effort = effort or self.state.effort
         if skills is not None:
@@ -106,8 +115,15 @@ Build notebook UIs by chatting with a local coding agent.
         self.ui: View | None = None
         self.last_error = ""
         self.running = False
+        self.outcome: TurnOutcome | None = None
         self.tasks: set[asyncio.Task[Any]] = set()
         self.marimo_loop = marimo_turn_loop()
+        # Turns on the marimo loop update the chat while the kernel thread can post messages
+        self.chat_lock = threading.RLock()
+        # A turn an earlier workbench of this session still runs, which the first turn here stops
+        self.superseded = SESSION_OWNERS.get(self.state.name) if self.state.name else None
+        if self.state.name:
+            SESSION_OWNERS[self.state.name] = self
 
         self.chat = ax.Chat(self.state.messages, placeholder="Describe the UI to build", height="100%")
         self.status = ax.StatusDot("Ready", variant="neutral")
@@ -162,11 +178,8 @@ Build notebook UIs by chatting with a local coding agent.
         self.suppress_shortcuts = True
         self.chat.on_submit(lambda _chat, text: self.submit(text))
         self.chat.on_stop(lambda _chat: self.schedule(self.runner.stop()))
-        if saved is not None:
-            self.schedule(self.restore())
-
-        if prompt:
-            self.submit(prompt)
+        if saved is not None or prompt or self.superseded is not None:
+            self.start_turn(self.open_session(saved is not None, prompt))
     ```
   </PySourceCode>
 
@@ -190,7 +203,9 @@ Build notebook UIs by chatting with a local coding agent.
 
     <PyParameter name="cwd" type="str | Path | None" value="None">
       Directory the agent runs in. Defaults to the current directory, or the
-      directory stored with a restored session.
+      directory stored with a restored session. Passed for a restored
+      session, it replaces the stored directory, such as after the project
+      moved.
     </PyParameter>
 
     <PyParameter name="model" type="str | None" value="None">
@@ -248,15 +263,7 @@ Build notebook UIs by chatting with a local coding agent.
     ```python
     def submit(self, text: str, context: Any = None) -> None:
         """Start a turn with ``text``; refused with a system message while a turn runs."""
-        if self.running:
-            self.add_message(ChatRole.SYSTEM, "A turn is already running; wait for it or stop it.")
-
-            return
-
-        # Set before the turn starts, so that a second submit in the meantime is refused
-        self.set_running(True)
-        self.runner.stopped = False
-        self.schedule(self.run_turn(text, context))
+        self.start_turn(self.run_turn(text, context))
     ```
   </PySourceCode>
 
@@ -287,14 +294,7 @@ Build notebook UIs by chatting with a local coding agent.
         program generates, a turn sends the file to the agent to update the
         program and callbacks.
         """
-        if self.running:
-            self.add_message(ChatRole.SYSTEM, "A turn is already running; wait for it or stop it.")
-
-            return
-
-        self.set_running(True)
-        self.runner.stopped = False
-        self.schedule(self.run_import(Path(path)))
+        self.start_turn(self.run_import(Path(path)))
     ```
   </PySourceCode>
 
@@ -320,6 +320,110 @@ Build notebook UIs by chatting with a local coding agent.
     <PyParameter name="message" type="str" />
 
     <PyParameter name="context" type="Any" value="None" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="start_turn" type="(work) -> None">
+  Run `work` as the turn, or refuse it with a system message while a turn runs.
+
+  Every turn, import, and restore runs through here, so that each ends idle
+  and saved whatever happens in it.
+
+  <PySourceCode>
+    ```python
+    def start_turn(self, work: Coroutine[Any, Any, Any]) -> None:
+        """Run ``work`` as the turn, or refuse it with a system message while a turn runs.
+
+        Every turn, import, and restore runs through here, so that each ends idle
+        and saved whatever happens in it.
+        """
+        if self.running:
+            work.close()
+            self.add_message(ChatRole.SYSTEM, "A turn is already running; wait for it or stop it.")
+
+            return
+
+        # Set before the turn starts, so that a second submit in the meantime is refused
+        self.set_running(True)
+        self.runner.stopped = False
+        self.outcome = None
+        try:
+            self.schedule(self.run_in_turn(work))
+        except Exception as error:
+            # Such as a marimo turn loop that closed when its cell ran again
+            work.close()
+            self.set_running(False)
+            self.add_message(ChatRole.SYSTEM, f"The turn could not start: {type(error).__name__}: {error}")
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="work" type="Coroutine[Any, Any, Any]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="run_in_turn" type="(work) -> None">
+  <PySourceCode>
+    ```python
+    async def run_in_turn(self, work: Coroutine[Any, Any, Any]) -> None:
+        try:
+            await self.stop_superseded()
+            await work
+        except Exception as error:
+            self.outcome = TurnOutcome.FAILED
+            self.add_message(ChatRole.SYSTEM, f"The turn failed: {type(error).__name__}: {error}")
+        finally:
+            self.state.agent_session_id = self.runner.session_id
+            self.set_running(False)
+            self.save()
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="work" type="Coroutine[Any, Any, Any]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="stop_superseded" type="() -> None">
+  <PySourceCode>
+    ```python
+    async def stop_superseded(self) -> None:
+        previous, self.superseded = self.superseded, None
+        if previous is None or not previous.running:
+            return
+
+        previous.run_on_turn_loop(lambda: previous.schedule(previous.runner.stop()))
+        deadline = asyncio.get_running_loop().time() + STOP_GRACE + 5
+        while previous.running and asyncio.get_running_loop().time() < deadline:
+            await asyncio.sleep(0.05)
+    ```
+  </PySourceCode>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="open_session" type="(restore, prompt) -> None">
+  <PySourceCode>
+    ```python
+    async def open_session(self, restore: bool, prompt: str | None) -> None:
+        if restore:
+            await self.restore()
+
+        if prompt:
+            await self.run_turn(prompt)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="restore" type="bool" />
+
+    <PyParameter name="prompt" type="str | None" />
   </div>
 
   <PyFunctionReturn type="None" />
@@ -411,17 +515,17 @@ Build notebook UIs by chatting with a local coding agent.
         try:
             source = path.read_text()
             reason = await self.apply_import(source)
-        except (OSError, ExportedFileError) as error:
+        except (OSError, ValueError, ExportedFileError) as error:
+            # ValueError covers a file that is not valid UTF-8
+            self.outcome = TurnOutcome.NOT_APPLIED
             self.add_message(ChatRole.SYSTEM, f"Import of `{shown}` failed: {error}")
-            self.set_running(False)
 
             return
 
         if not reason:
             self.last_error = ""
+            self.outcome = TurnOutcome.APPLIED
             self.add_message(ChatRole.SYSTEM, f"Imported `{shown}`.")
-            self.set_running(False)
-            self.save()
 
             return
 
@@ -447,7 +551,7 @@ Build notebook UIs by chatting with a local coding agent.
   <PySourceCode>
     ```python
     def report_reconcile(self, shown: str, source: str) -> None:
-        if self.last_error or self.runner.stopped:
+        if self.outcome != TurnOutcome.APPLIED:
             return
 
         try:
@@ -463,8 +567,6 @@ Build notebook UIs by chatting with a local coding agent.
                 f"The generated UI class still differs from `{shown}`. The UI code tab shows what applied; "
                 "ask the agent in the chat to close the gap.",
             )
-
-        self.save()
     ```
   </PySourceCode>
 
@@ -512,14 +614,9 @@ Build notebook UIs by chatting with a local coding agent.
   <PySourceCode>
     ```python
     async def run_turn(self, text: str, context: Any = None, details: str = "") -> None:
-        try:
-            self.add_message(ChatRole.USER, text, MessageStatus.SENT)
-            index = self.add_message(ChatRole.ASSISTANT, "", MessageStatus.SENDING)
-            await self.stream_reply(index, text, context, details)
-        finally:
-            self.state.agent_session_id = self.runner.session_id
-            self.set_running(False)
-            self.save()
+        self.add_message(ChatRole.USER, text, MessageStatus.SENT)
+        index = self.add_message(ChatRole.ASSISTANT, "", MessageStatus.SENDING)
+        await self.stream_reply(index, text, context, details)
     ```
   </PySourceCode>
 
@@ -561,7 +658,9 @@ Build notebook UIs by chatting with a local coding agent.
                         if tool["id"] == event.id:
                             tool["status"] = ToolCallStatus.ERROR if event.error else ToolCallStatus.COMPLETE
                 elif isinstance(event, Failed):
-                    failure = event.message
+                    # The agent's own error comes first; a later exit status only repeats
+                    # that it failed
+                    failure = failure or event.message
 
                 if flush is None:
                     flush = loop.call_later(STREAM_INTERVAL, flush_reply)
@@ -573,13 +672,26 @@ Build notebook UIs by chatting with a local coding agent.
         if flush is not None:
             flush.cancel()
 
+        if self.runner.stopped or failure:
+            # A tool call the turn did not see finish has no stopped state in the chat
+            for tool in tools:
+                if tool["status"] == ToolCallStatus.RUNNING:
+                    tool["status"] = ToolCallStatus.ERROR
+
         if self.runner.stopped:
+            self.outcome = TurnOutcome.STOPPED
             self.update_reply(index, reply, tools, MessageStatus.STOPPED)
         elif failure:
+            self.outcome = TurnOutcome.FAILED
             self.update_reply(index, reply, tools, MessageStatus.ERROR)
             self.add_message(ChatRole.SYSTEM, f"The agent failed: {failure}")
         else:
-            await self.finish_reply(index, reply, tools)
+            try:
+                await self.finish_reply(index, reply, tools)
+            except TurnStopped:
+                # The reply already shows its prose; only its status changes
+                self.outcome = TurnOutcome.STOPPED
+                self.update_reply(index, self.chat.messages[index]["content"], tools, MessageStatus.STOPPED)
     ```
   </PySourceCode>
 
@@ -611,16 +723,23 @@ Build notebook UIs by chatting with a local coding agent.
 
         self.update_reply(index, parts.prose, tools)
         if parts.program is None and parts.callbacks is None:
+            self.outcome = TurnOutcome.APPLIED
+
             return
 
         callbacks = (self.state.callbacks or EMPTY_CALLBACKS) if parts.callbacks is None else parts.callbacks
         try:
             program = await openui.merge(self.state.program, parts.program) if parts.program else self.state.program
+            self.raise_if_stopped()
             await self.apply(program, callbacks)
+        except TurnStopped:
+            raise
         except (ApplyError, openui.OpenUIError) as error:
             self.report_apply_error(str(error))
         except Exception as error:
             self.report_apply_error(f"{type(error).__name__}: {error}")
+        else:
+            self.outcome = TurnOutcome.APPLIED
     ```
   </PySourceCode>
 
@@ -640,6 +759,7 @@ Build notebook UIs by chatting with a local coding agent.
     ```python
     def report_apply_error(self, message: str) -> None:
         self.last_error = message
+        self.outcome = TurnOutcome.NOT_APPLIED
         self.add_message(ChatRole.SYSTEM, f"The reply was not applied; the UI is unchanged. {message}")
     ```
   </PySourceCode>
@@ -647,6 +767,18 @@ Build notebook UIs by chatting with a local coding agent.
   <div>
     <PyParameter name="message" type="str" />
   </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="raise_if_stopped" type="() -> None">
+  <PySourceCode>
+    ```python
+    def raise_if_stopped(self) -> None:
+        if self.runner.stopped:
+            raise TurnStopped
+    ```
+  </PySourceCode>
 
   <PyFunctionReturn type="None" />
 </PyFunction>
@@ -659,9 +791,11 @@ Build notebook UIs by chatting with a local coding agent.
     async def apply(self, program: str, callbacks: str) -> None:
         """Build the UI from ``program`` and ``callbacks``, then update all tabs at once."""
         result = await openui.parse(program, self.components)
-        if result["errors"] or result["incomplete"]:
-            details = "; ".join(f"{error.get('statementId', '?')}: {error['message']}" for error in result["errors"])
-            raise ApplyError(f"OpenUI errors: {details or 'the program is incomplete'}")
+        self.raise_if_stopped()
+        if result.errors or result.incomplete or result.unresolved:
+            details = [f"{error.get('statementId', '?')}: {error['message']}" for error in result.errors]
+            details += [f"{', '.join(statements_using(program, name)) or '?'}: `{name}` is not defined" for name in result.unresolved]
+            raise ApplyError(f"OpenUI errors: {'; '.join(details) or 'the program is incomplete'}")
 
         cls = self.compile_callbacks(callbacks)
         try:
@@ -863,9 +997,10 @@ Build notebook UIs by chatting with a local coding agent.
     ```python
     def add_message(self, role: ChatRole, content: str, status: MessageStatus | None = None) -> int:
         """Append a chat message and return its index."""
-        self.set_messages([*self.chat.messages, chat_message(role, content, status)])
+        with self.chat_lock:
+            self.set_messages([*self.chat.messages, chat_message(role, content, status)])
 
-        return len(self.chat.messages) - 1
+            return len(self.chat.messages) - 1
     ```
   </PySourceCode>
 
@@ -886,9 +1021,10 @@ Build notebook UIs by chatting with a local coding agent.
     def update_reply(
         self, index: int, content: str, tools: list[dict[str, Any]], status: MessageStatus | None = None
     ) -> None:
-        messages = list(self.chat.messages)
-        messages[index] = chat_message(ChatRole.ASSISTANT, content, status, tools)
-        self.set_messages(messages)
+        with self.chat_lock:
+            messages = list(self.chat.messages)
+            messages[index] = chat_message(ChatRole.ASSISTANT, content, status, tools)
+            self.set_messages(messages)
     ```
   </PySourceCode>
 
@@ -909,8 +1045,9 @@ Build notebook UIs by chatting with a local coding agent.
   <PySourceCode>
     ```python
     def set_messages(self, messages: list[dict[str, Any]]) -> None:
-        self.chat.messages = messages
-        self.state.messages = messages
+        with self.chat_lock:
+            self.chat.messages = messages
+            self.state.messages = messages
     ```
   </PySourceCode>
 

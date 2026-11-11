@@ -44,3 +44,5 @@ packages = ["src/anylumino"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not browser'"
+markers = ["browser: runs a notebook in JupyterLab under headless Chromium; run with `make test-browser`"]

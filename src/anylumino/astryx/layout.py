@@ -10,6 +10,7 @@ from anylumino.enums import choice
 
 from ..layout import ChildInput
 from ..layout import TitleInput
+from ..layout import _mean_size
 from .base import Widget
 from .base import _named_props
 from .enums import Orientation
@@ -223,6 +224,9 @@ class AccordionPanel(Widget):
         height: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        # Callbacks register after the initial open state, so building the panel runs none of them.
+        callbacks = props.pop("callbacks", None)
+        action_callbacks = props.pop("action_callbacks", None)
         super().__init__(
             "AccordionPanel",
             children,
@@ -237,6 +241,8 @@ class AccordionPanel(Widget):
             ),
         )
         self.value = self._open_value(open, multiple)
+        self.observe(self._drop_removed_open_keys, names="child_keys")
+        self._register_callbacks(callbacks, action_callbacks)
 
     @property
     def open_keys(self) -> list[str]:
@@ -259,6 +265,11 @@ class AccordionPanel(Widget):
         key = self.get_key(self.get_index(key_or_index) if isinstance(key_or_index, str) else key_or_index)
         remaining = [open for open in self.open_keys if open != key]
         self.value = remaining if self.props.get("type") == "multiple" else (remaining[0] if remaining else "")
+
+    def _drop_removed_open_keys(self, change: dict[str, Any]) -> None:
+        remaining = [key for key in self.open_keys if key in change["new"]]
+        if remaining != self.open_keys:
+            self.value = remaining if self.props.get("type") == "multiple" else (remaining[0] if remaining else "")
 
     def _open_value(self, open: str | int | Iterable[str | int] | None, multiple: bool) -> str | list[str]:
         if open is None:
@@ -398,6 +409,7 @@ class SplitPanel(Widget):
     """
 
     _title_prefix = "Pane"
+    _child_settings = {"sizes": _mean_size}
 
     sizes = t.List(t.Float(), default_value=[]).tag(sync=True)
 
@@ -427,9 +439,6 @@ class SplitPanel(Widget):
             props=_named_props(props, orientation=orientation, minSize=min_size),
         )
 
-    def _drop_child_metadata(self, index: int) -> None:
-        if index < len(self.sizes):
-            self.sizes = [*self.sizes[:index], *self.sizes[index + 1 :]]
 
 
 class ResponsivePanel(Widget):

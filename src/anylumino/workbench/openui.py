@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 from collections.abc import Sequence
+from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any
 
@@ -20,10 +21,39 @@ class OpenUIError(RuntimeError):
     """The OpenUI tool could not run or rejected the request."""
 
 
-async def parse(program: str, components: Sequence[Component] = COMPONENTS) -> dict[str, Any]:
-    """Return the evaluated tree, errors, and statement names of ``program`` for the ``components`` catalog."""
+@dataclass(frozen=True)
+class ParseResult:
+    """A parsed program: its evaluated tree and what the parser reported about it.
 
-    return await run_tool({"command": "parse", "program": program, "library": library_spec(components)})
+    ``unresolved`` lists names the program uses without defining them; such a
+    program does not apply.
+    """
+
+    root: dict[str, Any] | None
+    errors: list[dict[str, Any]]
+    unresolved: list[str]
+    orphans: list[str]
+    incomplete: bool
+    statements: list[str]
+    states: list[str]
+    queries: list[str]
+    mutations: list[str]
+
+
+async def parse(program: str, components: Sequence[Component] = COMPONENTS) -> ParseResult:
+    """Return the evaluated tree, errors, and statement names of ``program`` for the ``components`` catalog.
+
+    Raises
+    ------
+    OpenUIError
+        If the tool cannot run, or its response lacks a field of `ParseResult`.
+    """
+    response = await run_tool({"command": "parse", "program": program, "library": library_spec(components)})
+    missing = [field.name for field in fields(ParseResult) if field.name not in response]
+    if missing:
+        raise OpenUIError(f"The OpenUI tool response lacks {', '.join(missing)}.")
+
+    return ParseResult(**{field.name: response[field.name] for field in fields(ParseResult)})
 
 
 async def merge(current: str, patch: str) -> str:

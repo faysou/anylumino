@@ -59,7 +59,7 @@ import screenshot from '../../../assets/components/astryx-surfaces-SegmentedCont
         super().__init__(
             "SegmentedControl",
             label=label,
-            value=value,
+            value=_option_value(value),
             disabled=disabled,
             props=_named_props(
                 props, items=_option_records(items), size=size, layout=layout

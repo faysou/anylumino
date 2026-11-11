@@ -12,6 +12,11 @@ wrapper objects exposing a `widget` attribute keep their own API.
 Subscripting returns the owner. Widgets with a `selected_index` trait
 also gain `selected_key` and `select_key`.
 
+Subclasses list their per-child list traits in `_child_settings`, each
+with a function that returns the entry a new child gets. Every change to
+the children reorders those lists with them, so an entry stays with the
+child it was given for. An empty list stays empty.
+
 ## Attributes
 
 <PyAttributes>
@@ -231,19 +236,12 @@ also gain `selected_key` and `select_key`.
         child_key = self._next_key(key)
         child_title = title or (child_key if has_explicit_key else f"{self._title_prefix} {next_index + 1}")
         view = _view_for_child(widget)
-        titles = self._complete_titles()
-        self._syncing_children = True
-        try:
-            with self.hold_sync():
-                self.widgets = [*self.widgets, view]
-                self.child_keys = [*self.child_keys, child_key]
-                self.titles = [*titles, child_title]
-                self._owners_by_key[child_key] = widget
-                if select and hasattr(self, "selected_index"):
-                    self.selected_index = next_index
-        finally:
-            self._syncing_children = False
-
+        self._arrange_children(
+            [*self.widgets, view],
+            [*range(next_index), None],
+            [(child_key, child_title, widget)],
+            select=child_key if select else None,
+        )
         self._adopt_children([view])
     ```
   </PySourceCode>
@@ -278,22 +276,10 @@ also gain `selected_key` and `select_key`.
         the default keeps the returned owner alive for the caller to reuse.
         """
         index = self._resolve_index(key_or_index)
-        key = self.child_keys[index]
         owner = self.get_owner(index)
         view = self.widgets[index]
-        selected_key = self.selected_key
-        titles = self._complete_titles()
-        self._syncing_children = True
-        try:
-            with self.hold_sync():
-                self.widgets = [*self.widgets[:index], *self.widgets[index + 1 :]]
-                self.child_keys = [*self.child_keys[:index], *self.child_keys[index + 1 :]]
-                self.titles = [*titles[:index], *titles[index + 1 :]]
-                self._owners_by_key.pop(key, None)
-                self._drop_child_metadata(index)
-                self._restore_selection(selected_key)
-        finally:
-            self._syncing_children = False
+        kept = [position for position in range(len(self.child_keys)) if position != index]
+        self._arrange_children([self.widgets[position] for position in kept], kept)
 
         if close:
             for target in {id(view): view, id(owner): owner}.values():
@@ -326,19 +312,9 @@ also gain `selected_key` and `select_key`.
         if current == target:
             return
 
-        selected_key = self.selected_key
-        titles = self._complete_titles()
         order = [position for position in range(len(self.child_keys)) if position != current]
         order.insert(target, current)
-        self._syncing_children = True
-        try:
-            with self.hold_sync():
-                self.widgets = [self.widgets[position] for position in order]
-                self.child_keys = [self.child_keys[position] for position in order]
-                self.titles = [titles[position] for position in order]
-                self._restore_selection(selected_key)
-        finally:
-            self._syncing_children = False
+        self._arrange_children([self.widgets[position] for position in order], order)
     ```
   </PySourceCode>
 

@@ -12,12 +12,18 @@ The workbench: an agent chat beside the generated UI and the code behind it.
   <PyAttribute name="HEADER_HEIGHT" value="40" />
 
   <PyAttribute name="EMPTY_CALLBACKS" value="'from anylumino.workbench import App\n\n\nclass UIApp(App):\n    pass\n'" />
+
+  <PyAttribute name="SESSION_OWNERS" type="dict[str, Workbench]" value="{}" />
 </PyAttributes>
 
 <Tabs items={["Class","Functions"]}>
   <Tab value="Class">
     <Cards>
       <Card title="ApplyError" href="/docs/api/workbench/workbench/ApplyError" />
+
+      <Card title="TurnStopped" href="/docs/api/workbench/workbench/TurnStopped" />
+
+      <Card title="TurnOutcome" href="/docs/api/workbench/workbench/TurnOutcome" />
 
       <Card title="Workbench" href="/docs/api/workbench/workbench/Workbench" />
     </Cards>
@@ -52,6 +58,26 @@ The workbench: an agent chat beside the generated UI and the code behind it.
       </div>
 
       <PyFunctionReturn type="dict[str, typing.Any]" />
+    </PyFunction>
+
+    <PyFunction name="statements_using" type="(program, name) -> list[str]">
+      Return the statements of `program` whose expression uses `name`.
+
+      <PySourceCode>
+        ```python
+        def statements_using(program: str, name: str) -> list[str]:
+            """Return the statements of ``program`` whose expression uses ``name``."""
+            return re.findall(r"^\s*(\w+)\s*=(?=.*\b%s\b)" % re.escape(name), program, re.M)
+        ```
+      </PySourceCode>
+
+      <div>
+        <PyParameter name="program" type="str" />
+
+        <PyParameter name="name" type="str" />
+      </div>
+
+      <PyFunctionReturn type="list[str]" />
     </PyFunction>
 
     <PyFunction name="close_tree" type="(widget, keep) -> None">
@@ -150,6 +176,13 @@ The workbench: an agent chat beside the generated UI and the code behind it.
                 try:
                     loop.run_until_complete(until_exit())
                 finally:
+                    # A turn still running ends here, so its agent process is terminated before
+                    # the loop closes
+                    pending = asyncio.all_tasks(loop)
+                    for task in pending:
+                        task.cancel()
+
+                    loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
                     loop.close()
 
             mo.Thread(target=run, daemon=True).start()

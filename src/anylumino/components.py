@@ -33,9 +33,8 @@ class ComponentWidget(KeyedChildren, SharedBundleWidget):
     than callbacks.
     """
 
-    component_family = t.Unicode("").tag(sync=True)
+    component_family = t.Unicode("")
     component_kind = t.Unicode("element").tag(sync=True)
-    tag = t.Unicode("").tag(sync=True)
     widgets = ChildList(anywidget.WidgetTrait(), default_value=[]).tag(
         sync=True,
         to_json=_widget_list_to_json,
@@ -49,17 +48,11 @@ class ComponentWidget(KeyedChildren, SharedBundleWidget):
     is_open = t.Bool(False).tag(sync=True)
     disabled = t.Bool(False).tag(sync=True)
     selected = t.Bool(False).tag(sync=True)
-    indeterminate = t.Bool(False).tag(sync=True)
     variant = t.Unicode("").tag(sync=True)
-    placement = t.Unicode("bottom").tag(sync=True)
-    orientation = t.Unicode("horizontal").tag(sync=True)
     width = t.Unicode("").tag(sync=True)
     height = t.Unicode("").tag(sync=True)
     icon = t.Unicode("").tag(sync=True)
-    icon_src = t.Unicode("").tag(sync=True)
-    icon_size = t.Unicode("s").tag(sync=True)
-    attributes = t.Dict(default_value={}).tag(sync=True)
-    last_action = t.Any(None, allow_none=True).tag(sync=True)
+    last_action = t.Any(None, allow_none=True)
 
     def __init__(
         self,

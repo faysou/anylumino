@@ -66,7 +66,7 @@ class UI(View):
 
 def parsed(program):
     result = asyncio.run(openui.parse(program))
-    assert result["errors"] == []
+    assert result.errors == []
 
     return result
 
@@ -156,7 +156,7 @@ def test_generate_rejects_with_named_error(program, handlers, namespace, message
 
 def test_generate_rejects_a_program_without_root():
     with pytest.raises(codegen.GenerationError, match="^The program has no root component.$"):
-        codegen.generate({"root": None}, set(), {})
+        codegen.generate(openui.ParseResult(None, [], [], [], False, [], [], [], []), set(), {})
 
 
 def test_plot_builds_a_figure_and_imports_plotly():

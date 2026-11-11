@@ -5,15 +5,15 @@ from __future__ import annotations
 import importlib
 import inspect
 import re
-from collections.abc import Iterable, Sequence
+import types
+import typing
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import Any
 
 import anylumino as al
 import anylumino.astryx as ax
-from anylumino import enums as layout_enums
-from anylumino.astryx import enums as astryx_enums
 
 # Plotly is optional, so the Plot component exists only where it is installed
 try:
@@ -361,24 +361,32 @@ _COMPONENTS: tuple[Component, ...] = (
 )
 
 _MODULES = {"al": al, "ax": ax, "go": go}
-_OPTION_ENUMS = {
-    name: value
-    for module in (layout_enums, astryx_enums)
-    for name, value in vars(module).items()
-    if isinstance(value, type) and issubclass(value, StrEnum) and value is not StrEnum
-}
-_ANNOTATIONS = {
-    "bool": _BOOLEAN,
-    "int": _NUMBER,
-    "float": _NUMBER,
-    "str": _STRING,
-    "Iterable[str]": _STRINGS,
-    "Iterable[int]": _NUMBERS,
-    "Iterable[Mapping[str, Any]]": {"type": "array", "items": {"type": "object"}},
-    "Iterable[Any]": {"type": "array"},
-    "Mapping[str, Any]": {"type": "object"},
-    "Mapping[str, str]": {"type": "object"},
-    "TitleInput": {"anyOf": [_STRINGS, {"type": "object"}]},
+def _type_key(annotation: Any) -> Any:
+    """Return ``annotation`` in one form for `typing` and `collections.abc` generics, which differ."""
+    if isinstance(annotation, (list, tuple)):
+        # Such as the parameter list of `Callable[[str], None]`
+        return tuple(_type_key(item) for item in annotation)
+
+    origin = typing.get_origin(annotation)
+
+    return annotation if origin is None else (origin, _type_key(typing.get_args(annotation)))
+
+
+# Literal types of option values, by the Python type that annotates them
+_TYPE_SCHEMAS: dict[Any, dict[str, Any]] = {
+    _type_key(annotation): schema
+    for annotation, schema in (
+        (bool, _BOOLEAN),
+        (int, _NUMBER),
+        (float, _NUMBER),
+        (str, _STRING),
+        (Iterable[str], _STRINGS),
+        (Iterable[int], _NUMBERS),
+        (Iterable[Mapping[str, Any]], {"type": "array", "items": {"type": "object"}}),
+        (Iterable[Any], {"type": "array"}),
+        (Mapping[str, Any], {"type": "object"}),
+        (Mapping[str, str], {"type": "object"}),
+    )
 }
 
 
@@ -395,27 +403,16 @@ def _with_options(component: Component) -> Component:
 
     cls = component_class(component)
     taken = {prop.keyword for prop in component.props} | {key for key, _ in component.fixed}
-    doc = inspect.cleandoc(cls.__doc__ or "")
-    parameters = _parameters(doc)
-    literals = _astryx_literals(doc)
-    renamed = _astryx_names(cls)
+    descriptions = _parameters(inspect.cleandoc(cls.__doc__ or ""))
+    types = _parameter_types(cls.__init__)
     properties = {}
     for name, parameter in inspect.signature(cls.__init__).parameters.items():
         if name == "self" or name in taken or parameter.kind in (parameter.VAR_POSITIONAL, parameter.VAR_KEYWORD):
             continue
 
-        schema = _annotation_schema(str(parameter.annotation))
-        if schema is None:
-            continue
-
-        kind, description = parameters.get(name, ("", ""))
-        values = _set_literals(kind) or literals.get(renamed.get(name, _camel(name)), [])
-        if schema == _STRING and values:
-            default = parameter.default
-            extra = [default] if isinstance(default, str) and default not in values else []
-            schema = {"type": "string", "enum": [*values, *extra]}
-
-        properties[name] = {**schema, "description": description}
+        schema = _type_schema(types[name]) if name in types else None
+        if schema is not None:
+            properties[name] = {**schema, "description": descriptions.get(name, ("", ""))[1]}
 
     if not properties:
         return component
@@ -425,24 +422,54 @@ def _with_options(component: Component) -> Component:
     return replace(component, props=(*component.props, Prop("options", schema, kind=PropKind.OPTIONS)))
 
 
+def _parameter_types(function: Any) -> dict[str, Any]:
+    """Return the resolved annotation of each parameter of ``function``.
+
+    A parameter annotated with a name its module only imports for type
+    checking has no resolved type, so it stays out of the options.
+    """
+    try:
+        return typing.get_type_hints(function)
+    except Exception:
+        types = {}
+        for name, annotation in inspect.get_annotations(function).items():
+            try:
+                types[name] = typing.get_type_hints(_annotated(name, annotation), function.__globals__)[name]
+            except Exception:
+                continue
+
+        return types
+
+
+def _annotated(name: str, annotation: Any) -> Any:
+    def holder() -> None: ...
+
+    holder.__annotations__ = {name: annotation}
+
+    return holder
+
+
 # Callables and other Python-only types have no OpenUI literal, so their keywords stay out of options.
 # An option enum, such as `Size | str`, allows only the enum's values: the `str` takes the same values.
-def _annotation_schema(annotation: str) -> dict[str, Any] | None:
-    parts = [part.strip() for part in annotation.split(" | ")]
-    option_enums = [_OPTION_ENUMS[part] for part in parts if part in _OPTION_ENUMS]
+def _type_schema(annotation: Any) -> dict[str, Any] | None:
+    parts = typing.get_args(annotation) if isinstance(annotation, types.UnionType) or typing.get_origin(annotation) is typing.Union else (annotation,)
+    parts = [part for part in parts if part is not type(None)]
+    option_enums = [part for part in parts if isinstance(part, type) and issubclass(part, StrEnum)]
     if option_enums:
         return {"type": "string", "enum": [member.value for member in option_enums[0]]}
 
+    literals = [value for part in parts if typing.get_origin(part) is typing.Literal for value in typing.get_args(part)]
+    if literals:
+        return {"type": "string", "enum": [str(value) for value in literals]}
+
     schemas = []
     for part in parts:
-        if part == "None":
-            continue
-
-        if part not in _ANNOTATIONS:
+        schema = _TYPE_SCHEMAS.get(_type_key(part))
+        if schema is None:
             return None
 
-        if _ANNOTATIONS[part] not in schemas:
-            schemas.append(_ANNOTATIONS[part])
+        if schema not in schemas:
+            schemas.append(schema)
 
     if not schemas:
         return None
@@ -474,35 +501,6 @@ def _parameters(doc: str) -> dict[str, tuple[str, str]]:
             descriptions[current].append(line.strip())
 
     return {name: (kinds[name], " ".join(text)) for name, text in descriptions.items()}
-
-
-# A numpydoc type such as ``{'top', 'left'}, default 'top'`` lists the values the wrapper accepts.
-def _set_literals(kind: str) -> list[str]:
-    match = re.match(r"^\{([^}]*)\}", kind)
-
-    return re.findall(r"['\"]([^'\"]*)['\"]", match.group(1)) if match else []
-
-
-# The ``Astryx Props`` section lists string unions such as ``('compact' or 'balanced')`` by Astryx prop
-# name, with entries wrapped onto indented lines. They apply to keywords the wrapper passes through.
-def _astryx_literals(doc: str) -> dict[str, list[str]]:
-    entries = re.sub(r"\n  +", " ", doc)
-    matches = re.finditer(r"^- ``(\w+)`` \(((?:'[^']*'(?: or )?)+)(?:;[^)]*)?\)", entries, re.M)
-
-    return {match.group(1): re.findall(r"'([^']*)'", match.group(2)) for match in matches}
-
-
-# Wrappers pass keywords on as ``astryxName=keyword``; the source gives the names that differ.
-def _astryx_names(cls: type) -> dict[str, str]:
-    source = inspect.getsource(cls.__init__)
-
-    return {keyword: prop for prop, keyword in re.findall(r"\b(\w+)=(\w+)[,)\s]", source) if prop != keyword}
-
-
-def _camel(name: str) -> str:
-    head, *rest = name.split("_")
-
-    return head + "".join(part.capitalize() for part in rest)
 
 
 COMPONENTS: tuple[Component, ...] = tuple(
