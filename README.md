@@ -212,8 +212,6 @@ Python snake-case names. Unmodeled JSON-safe upstream options can still be
 passed through `**props`. See the [Astryx component documentation](https://astryx.atmeta.com/components)
 for the upstream component reference.
 
-![Positions dashboard built from Astryx heading, badge, description list, progress bar, buttons, and table](https://raw.githubusercontent.com/faysou/anylumino/main/content/docs/assets/examples/astryx-notebook-dashboard.png)
-
 ```python
 form = ax.FormLayout(
     {
