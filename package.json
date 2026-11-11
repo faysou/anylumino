@@ -39,15 +39,18 @@
     "@lumino/commands": "2.3.4",
     "@lumino/widgets": "2.10.0",
     "@openuidev/lang-core": "1.0.1",
+    "@uwdata/flechette": "2.8.0",
     "fumadocs-core": "16.17.7",
     "fumadocs-mdx": "15.4.9",
     "fumadocs-python": "1.0.4",
     "fumadocs-ui": "npm:@fumadocs/base-ui@16.17.7",
     "lexical": "0.52.0",
+    "luxon": "3.7.2",
     "next": "16.4.2",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "shiki": "4.5.0",
+    "tabulator-tables": "6.7.1",
     "zod": "4.6.7"
   },
   "devDependencies": {

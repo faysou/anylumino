@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+This release adds `al.Tabulator`, a virtualized data grid built on Tabulator
+6.7 for large and live data.
+
+Added:
+
+- `al.Tabulator` takes Tabulator column definitions and options under
+  Tabulator's own names. Python holds the rows; `update_rows`, `add_rows`,
+  `upsert_rows`, and `delete_rows` send only the changed rows, and a view that
+  misses a change reloads every row.
+- A pandas or polars DataFrame travels as Arrow IPC when `pyarrow` is
+  installed. `transport` takes a `Transport` to force JSON or Arrow.
+- `selected`, `on_select`, `on_edit` with a `CellEdit`, `on_click`, and
+  `on_action` report selection, cell edits, and row clicks.
+- `al.JsCode` passes a JavaScript function wherever Tabulator takes one.
+  Tabulator's `datetime` formatter, sorter, and editors work by name.
+- The workbench catalog has a `Tabulator` component. Its columns and options
+  take JavaScript functions as `{"$js": "<source>"}`, so an agent program can
+  run JavaScript in the page that shows the workbench.
+- The bundle includes `tabulator-tables` 6.7.1, `luxon` 3.7.2, and
+  `@uwdata/flechette` 2.8.0.
+
 ## 0.7.0
 
 This release fixes defects across the layout widgets, the Astryx widgets, the

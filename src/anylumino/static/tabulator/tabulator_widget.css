@@ -1,0 +1,166 @@
+/*
+ * Host colors for Tabulator's "simple" theme. JupyterLab's --jp-* variables
+ * come first, then marimo's --background family, which reaches into the shadow
+ * root marimo renders widgets in. A host with neither gets the light fallbacks.
+ */
+.anylumino-Tabulator,
+.tabulator-popup-container {
+  --anylumino-tabulator-background: var(--jp-layout-color1, var(--background, #fff));
+  --anylumino-tabulator-background-alt: var(--jp-layout-color2, var(--muted, #f6f6f6));
+  --anylumino-tabulator-background-hover: var(--jp-layout-color3, var(--accent, #e4e4e4));
+  --anylumino-tabulator-text: var(--jp-ui-font-color1, var(--foreground, #222));
+  --anylumino-tabulator-text-muted: var(--jp-ui-font-color2, var(--muted-foreground, #555));
+  --anylumino-tabulator-border: var(--jp-border-color2, var(--border, #ddd));
+  --anylumino-tabulator-border-strong: var(--jp-border-color1, var(--border, #aaa));
+  --anylumino-tabulator-accent: var(--jp-brand-color1, var(--primary, #1d68cd));
+  --anylumino-tabulator-selected: color-mix(in srgb, var(--anylumino-tabulator-accent) 28%, var(--anylumino-tabulator-background));
+  --anylumino-tabulator-font: var(--jp-ui-font-family, system-ui, sans-serif);
+  --anylumino-tabulator-font-size: var(--jp-ui-font-size1, 13px);
+}
+
+.anylumino-Tabulator {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+}
+
+.anylumino-TabulatorTable {
+  height: 100%;
+}
+
+.anylumino-TabulatorError {
+  padding: 8px;
+  color: var(--jp-error-color1, #b00020);
+  font-family: var(--jp-code-font-family, monospace);
+  white-space: pre-wrap;
+}
+
+.anylumino-Tabulator .tabulator {
+  border-color: var(--anylumino-tabulator-border-strong);
+  background-color: var(--anylumino-tabulator-background);
+  color: var(--anylumino-tabulator-text);
+  font-family: var(--anylumino-tabulator-font);
+  font-size: var(--anylumino-tabulator-font-size);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-header {
+  border-bottom-color: var(--anylumino-tabulator-border-strong);
+  background-color: var(--anylumino-tabulator-background);
+  color: var(--anylumino-tabulator-text-muted);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-header .tabulator-col {
+  border-right-color: var(--anylumino-tabulator-border);
+  background: var(--anylumino-tabulator-background);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-header .tabulator-col.tabulator-sortable.tabulator-col-sorter-element:hover {
+  background-color: var(--anylumino-tabulator-background-hover);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title .tabulator-title-editor,
+.anylumino-Tabulator .tabulator .tabulator-header .tabulator-col .tabulator-header-filter input,
+.anylumino-Tabulator .tabulator .tabulator-row .tabulator-cell.tabulator-editing input,
+.anylumino-Tabulator .tabulator .tabulator-row .tabulator-cell.tabulator-editing select {
+  border-color: var(--anylumino-tabulator-border-strong);
+  background: var(--anylumino-tabulator-background);
+  color: var(--anylumino-tabulator-text);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-tableholder {
+  background-color: var(--anylumino-tabulator-background);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-tableholder .tabulator-table {
+  background-color: var(--anylumino-tabulator-background);
+  color: var(--anylumino-tabulator-text);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-tableholder .tabulator-placeholder .tabulator-placeholder-contents {
+  color: var(--anylumino-tabulator-text-muted);
+}
+
+.anylumino-Tabulator .tabulator-row {
+  border-bottom-color: var(--anylumino-tabulator-border);
+  background-color: var(--anylumino-tabulator-background);
+}
+
+.anylumino-Tabulator .tabulator-row.tabulator-row-even {
+  background-color: var(--anylumino-tabulator-background-alt);
+}
+
+.anylumino-Tabulator .tabulator-row .tabulator-cell {
+  border-right-color: var(--anylumino-tabulator-border);
+}
+
+.anylumino-Tabulator .tabulator-row.tabulator-selectable:hover {
+  background-color: var(--anylumino-tabulator-background-hover);
+}
+
+.anylumino-Tabulator .tabulator-row.tabulator-selected,
+.anylumino-Tabulator .tabulator-row.tabulator-selected:hover {
+  background-color: var(--anylumino-tabulator-selected);
+}
+
+.anylumino-Tabulator .tabulator-row .tabulator-cell.tabulator-editing {
+  border-color: var(--anylumino-tabulator-accent);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-header .tabulator-calcs-holder,
+.anylumino-Tabulator .tabulator .tabulator-header .tabulator-calcs-holder .tabulator-row,
+.anylumino-Tabulator .tabulator .tabulator-footer .tabulator-calcs-holder,
+.anylumino-Tabulator .tabulator .tabulator-footer .tabulator-calcs-holder .tabulator-row,
+.anylumino-Tabulator .tabulator-row.tabulator-calcs {
+  border-color: var(--anylumino-tabulator-border);
+  background-color: var(--anylumino-tabulator-background-alt);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-footer {
+  border-top-color: var(--anylumino-tabulator-border-strong);
+  background-color: var(--anylumino-tabulator-background-alt);
+  color: var(--anylumino-tabulator-text);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-footer .tabulator-paginator,
+.anylumino-Tabulator .tabulator .tabulator-footer .tabulator-page {
+  color: var(--anylumino-tabulator-text);
+}
+
+.anylumino-Tabulator .tabulator-row.tabulator-group {
+  border-color: var(--anylumino-tabulator-border-strong);
+  background: var(--anylumino-tabulator-background-alt);
+}
+
+.anylumino-Tabulator .tabulator .tabulator-alert .tabulator-alert-msg {
+  background: var(--anylumino-tabulator-background);
+  color: var(--anylumino-tabulator-text);
+}
+
+.tabulator-popup-container {
+  border-color: var(--anylumino-tabulator-border-strong);
+  background: var(--anylumino-tabulator-background);
+  color: var(--anylumino-tabulator-text);
+  font-family: var(--anylumino-tabulator-font);
+  font-size: var(--anylumino-tabulator-font-size);
+}
+
+.tabulator-menu .tabulator-menu-item:not(.tabulator-menu-item-disabled):hover {
+  background: var(--anylumino-tabulator-background-hover);
+}
+
+.tabulator-menu .tabulator-menu-separator {
+  border-top-color: var(--anylumino-tabulator-border);
+}
+
+.tabulator-edit-list .tabulator-edit-list-item,
+.tabulator-edit-list .tabulator-edit-list-placeholder,
+.tabulator-edit-list .tabulator-edit-list-group {
+  color: var(--anylumino-tabulator-text);
+}
+
+.tabulator-edit-list .tabulator-edit-list-item.active,
+.tabulator-edit-list .tabulator-edit-list-item:hover {
+  background: var(--anylumino-tabulator-accent);
+  color: #fff;
+}

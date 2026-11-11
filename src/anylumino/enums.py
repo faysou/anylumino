@@ -48,6 +48,15 @@ class DockMode(StrEnum):
     SPLIT_BOTTOM = "split-bottom"
 
 
+class Transport(StrEnum):
+    """How a `Tabulator` sends rows to the browser."""
+
+    AUTO = "auto"
+    """Arrow IPC for columnar input when pyarrow imports, JSON otherwise."""
+    JSON = "json"
+    ARROW = "arrow"
+
+
 def choice(value: E | str, enum: type[E], name: str) -> E:
     """Return ``value`` as a member of ``enum``.
 

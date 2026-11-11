@@ -40,6 +40,7 @@ the OpenUI one.
 | `Checkbox` | [components/Checkbox.md](components/Checkbox.md) |
 | `Badge` | [components/Badge.md](components/Badge.md) |
 | `Table` | [components/Table.md](components/Table.md) |
+| `Tabulator` | [components/Tabulator.md](components/Tabulator.md) |
 | `CodeBlock` | [components/CodeBlock.md](components/CodeBlock.md) |
 | `AppShell` | [components/AppShell.md](components/AppShell.md) |
 | `Layout` | [components/Layout.md](components/Layout.md) |

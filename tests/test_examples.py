@@ -50,7 +50,7 @@ def test_readme_examples_run():
     for index, block in enumerate(blocks):
         exec(compile(block, f"README.md block {index}", "exec"), namespace)
 
-    assert len(blocks) == 13
+    assert len(blocks) == 14
 
 
 def test_openui_design_note_examples_run():

@@ -253,6 +253,16 @@ _COMPONENTS: tuple[Component, ...] = (
         (Prop("rows", {"type": "array", "items": {"type": "object"}}, True), Prop("columns", _STRINGS))
     ),
     Component(
+        "Tabulator",
+        "al",
+        "Tabulator",
+        "A virtualized data grid of row objects with Tabulator column definitions, such as "
+        "{title: \"Last\", field: \"last\", editor: \"number\"}; a callback changes rows with "
+        "self.ui.grid.update_rows, add_rows, upsert_rows, or delete_rows. Wherever Tabulator takes a function, "
+        "pass {\"$js\": \"function(cell) { return cell.getValue(); }\"}: its JavaScript source runs in the page",
+        (Prop("data", {"type": "array", "items": {"type": "object"}}, True), Prop("columns", {"type": "array", "items": {"type": "object"}})),
+    ),
+    Component(
         "CodeBlock",
         "ax",
         "CodeBlock",

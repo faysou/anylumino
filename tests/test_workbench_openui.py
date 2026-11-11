@@ -49,6 +49,7 @@ def test_catalog_lists_components_and_props_in_order():
         "Checkbox": ["label", "value", "on_change", "options"],
         "Badge": ["label", "variant"],
         "Table": ["rows", "columns", "options"],
+        "Tabulator": ["data", "columns", "options"],
         "CodeBlock": ["code", "language", "options"],
         "AppShell": ["content", "top_nav", "side_nav", "banner", "options"],
         "Layout": ["content", "header", "start", "end", "footer", "options"],
@@ -170,6 +171,18 @@ def test_table_options_come_from_its_keywords():
     }
     assert CATALOG["Table"].options["sortable"]["description"] == "Whether table columns should be sortable by default."
     assert library_spec()["components"]["Table"]["signature"] == "Table(rows: object[], columns?: string[], options?: object)"
+
+
+def test_tabulator_options_come_from_its_keywords():
+    assert {name: type_name(schema) for name, schema in CATALOG["Tabulator"].options.items()} == {
+        "index": "string",
+        "options": "object",
+        "selected": "any[]",
+        "transport": '"auto" | "json" | "arrow"',
+        "width": "number | string",
+        "height": "number | string",
+    }
+    assert library_spec()["components"]["Tabulator"]["signature"] == "Tabulator(data: object[], columns?: object[], options?: object)"
 
 
 def test_button_options_leave_out_python_callbacks():

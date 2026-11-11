@@ -584,7 +584,7 @@ ax.Stack({"symbol": symbol, "status": status}, gap=2)
 # ## astryx.mdx: Selection controls
 
 # %% [markdown]
-# Lines 202 to 228 of `content/docs/astryx.mdx`.
+# Lines 204 to 230 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-selection-controls)
@@ -621,7 +621,7 @@ filters
 # ## astryx.mdx: Buttons and actions
 
 # %% [markdown]
-# Lines 241 to 260 of `content/docs/astryx.mdx`.
+# Lines 243 to 262 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-buttons-and-actions)
@@ -649,7 +649,7 @@ ax.Stack({"status": status, "submit": submit, "actions": actions}, gap=3)
 # ## astryx.mdx: Tables
 
 # %% [markdown]
-# Lines 269 to 284 of `content/docs/astryx.mdx`.
+# Lines 271 to 286 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-tables)
@@ -675,7 +675,7 @@ orders
 # ## astryx.mdx: App frames and notifications
 
 # %% [markdown]
-# Lines 299 to 325 of `content/docs/astryx.mdx`.
+# Lines 301 to 327 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-app-frames-and-notifications)
@@ -710,7 +710,7 @@ ax.AppShell(
 # ## astryx.mdx: Theme identity
 
 # %% [markdown]
-# Lines 342 to 381 of `content/docs/astryx.mdx`.
+# Lines 344 to 383 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-theme-identity)
@@ -760,7 +760,7 @@ panel
 # ## astryx.mdx: Notebook-safe overlays
 
 # %% [markdown]
-# Lines 426 to 446 of `content/docs/astryx.mdx`.
+# Lines 428 to 448 of `content/docs/astryx.mdx`.
 
 # %%
 # docs-example(astryx-notebook-safe-overlays)
@@ -886,10 +886,42 @@ al.SplitPanel(
 )
 
 # %% [markdown]
+# ## examples.mdx: Live grid with Tabulator
+
+# %% [markdown]
+# Lines 99 to 122 of `content/docs/examples.mdx`.
+
+# %%
+# docs-example(examples-live-grid-with-tabulator)
+
+import anylumino as al
+
+prices = {"ESZ6": 5012.25, "NQZ6": 18011.5, "RTYZ6": 2310.1, "CLZ6": 71.2}
+grid = al.Tabulator(
+    [{"id": symbol, "symbol": symbol, "last": price, "change": 0.0} for symbol, price in prices.items()],
+    [
+        {"title": "Symbol", "field": "symbol"},
+        {"title": "Last", "field": "last", "hozAlign": "right"},
+        {
+            "title": "Change",
+            "field": "change",
+            "hozAlign": "right",
+            "formatter": al.JsCode(
+                "function(cell) { const v = cell.getValue(); cell.getElement().style.color = v < 0 ? '#c62828' : '#2e7d32'; return v.toFixed(2); }"
+            ),
+        },
+    ],
+    options={"layout": "fitColumns"},
+    height=180,
+)
+grid.upsert_rows([{"id": "ESZ6", "last": 5013.5, "change": 1.25}, {"id": "CLZ6", "last": 70.9, "change": -0.3}])
+grid
+
+# %% [markdown]
 # ## examples.mdx: Chat with a streamed reply
 
 # %% [markdown]
-# Lines 101 to 147 of `content/docs/examples.mdx`.
+# Lines 131 to 177 of `content/docs/examples.mdx`.
 
 # %%
 # docs-example(examples-chat-with-a-streamed-reply)
@@ -944,7 +976,7 @@ chat
 # ## examples.mdx: Lumino action skeleton
 
 # %% [markdown]
-# Lines 156 to 185 of `content/docs/examples.mdx`.
+# Lines 186 to 215 of `content/docs/examples.mdx`.
 
 # %%
 # docs-example(examples-lumino-action-skeleton)

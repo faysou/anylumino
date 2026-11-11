@@ -1,7 +1,7 @@
 """A workbench answered by a fake `codex`, for checking the workbench without spending agent tokens.
 
-The fake `codex` on `PATH` answers every turn with the same reply: a sales
-explorer program and its callbacks. It logs each call to `WORKDIR / "log.jsonl"`.
+The fake `codex` on `PATH` answers every turn with the same reply, by default a
+sales explorer program and its callbacks. It logs each call to `WORKDIR / "log.jsonl"`.
 `HOME` points to a temporary directory, so the `fake-agent` session file stays
 out of `~/.anylumino`. The notebooks that use it import it from this folder.
 """
@@ -81,15 +81,18 @@ SALES = pd.DataFrame(
 )
 
 
-def workbench() -> Workbench:
-    """Install the fake `codex` and return a workbench on it, with `SALES` as `sales` in the namespace."""
+def workbench(reply: str = REPLY) -> Workbench:
+    """Install the fake `codex` and return a workbench on it, with `SALES` as `sales` in the namespace.
+
+    The fake `codex` answers every turn with ``reply``, the sales explorer by default.
+    """
     (WORKDIR / "bin").mkdir(parents=True, exist_ok=True)
     codex = WORKDIR / "bin" / "codex"
     codex.write_text(FAKE_CODEX)
     codex.chmod(0o755)
     events = [
         {"type": "thread.started", "thread_id": "thread-fake"},
-        {"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "text": REPLY}},
+        {"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "text": reply}},
         {"type": "turn.completed"},
     ]
     (WORKDIR / "stream.jsonl").write_text("".join(json.dumps(event) + "\n" for event in events))

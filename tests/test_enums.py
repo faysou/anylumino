@@ -1,3 +1,4 @@
+import dataclasses
 import inspect
 import re
 from enum import StrEnum
@@ -58,7 +59,8 @@ def test_every_enum_annotated_keyword_validates_its_value():
     for module in (al, ax):
         for name in module.__all__:
             cls = getattr(module, name)
-            if not inspect.isclass(cls) or issubclass(cls, StrEnum):
+            # A dataclass's generated __init__ has no source and takes no option enums.
+            if not inspect.isclass(cls) or issubclass(cls, StrEnum) or dataclasses.is_dataclass(cls):
                 continue
 
             source = inspect.getsource(cls.__init__) if "__init__" in vars(cls) else ""

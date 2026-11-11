@@ -111,6 +111,9 @@ al.SplitPanel(
 - Astryx table helpers: normalized rows and columns, optional checkbox
   selection, sorting, row append/prepend/update/remove helpers, and Python
   callbacks for selection and sort changes.
+- `Tabulator`: a virtualized data grid built on Tabulator 6.7 for large or
+  live data, with row deltas from Python, editing, selection, and JavaScript
+  function options through `JsCode`.
 - Reusable Astryx theming with `Brand` and `Theme`, so notebooks can
   define shared colors, radii, and component treatment once.
 - Action widgets: `Toolbar`, `DropdownMenu`, `MoreMenu`, and
@@ -346,6 +349,54 @@ update through traitlets. `prepend_row` inserts before existing rows and
 `append_row` inserts after existing rows. Leave `selects=""` for no checkbox
 column, use `selects="single"` for one selected row, or use
 `selects="multiple"` for multi-row selection.
+
+## Tabulator grids
+
+`al.Tabulator` renders only the visible rows, so it stays responsive with
+100,000 rows. `columns` and `options` take
+[Tabulator's own names](https://tabulator.info/docs/6.7). Python holds the
+rows: the row methods send only the changed rows to the browser, and every view
+of the widget shows the same rows.
+
+```python
+import anylumino as al
+
+blotter = al.Tabulator(
+    [
+        {"id": 1, "symbol": "ESZ6", "last": 5012.25, "qty": 3},
+        {"id": 2, "symbol": "NQZ6", "last": 18011.5, "qty": -1},
+    ],
+    [
+        {"title": "Symbol", "field": "symbol"},
+        {"title": "Last", "field": "last", "formatter": al.JsCode("function(cell) { return cell.getValue().toFixed(2); }")},
+        {"title": "Qty", "field": "qty", "editor": "number"},
+    ],
+    options={"selectableRows": True},
+    height=200,
+)
+
+blotter.update_rows([{"id": 1, "last": 5013.0}])
+blotter.upsert_rows([{"id": 2, "qty": 2}, {"id": 3, "symbol": "RTYZ6", "last": 2310.1, "qty": 10}])
+blotter.delete_rows([3])
+blotter.on_edit(lambda widget, edit: print(edit.row_id, edit.field, edit.value))
+blotter
+```
+
+- **Rows**: every row needs a unique value under the `index` field, `"id"` by
+  default. Rows without it get the ids `0, 1, 2, ...`. Assigning `data`
+  replaces every row and keeps each view's sort and scroll position.
+- **Deltas**: batch the rows of one update into one call. Each call sends one
+  message, and the browser repaints once per frame.
+- **Transport**: a pandas or polars DataFrame travels as Arrow IPC when
+  `pyarrow` is installed; other rows travel as JSON. Arrow showed 100,000 rows
+  by 20 columns in about 1 s against 4.6 s for JSON.
+- **Functions**: `al.JsCode` passes a JavaScript function wherever Tabulator
+  takes one. Its source runs in the notebook page.
+- **Events**: `selected` syncs both ways; `on_select`, `on_edit`, `on_click`,
+  and `on_action` report selection, cell edits, and row clicks.
+
+Open `notebooks/tabulator_table.py` for editors, menus, and dates, and
+`notebooks/tabulator_streaming.py` for a 10 Hz blotter inside a `TabPanel`.
 
 ## Theming
 

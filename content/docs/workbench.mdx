@@ -184,6 +184,13 @@ prompt. Both read a component's file only when they need it, which keeps the
 system prompt small. After you change a widget's keywords or the catalog, run
 `make workbench-skill` to regenerate the skill.
 
+A `Tabulator` grid takes JavaScript functions in its columns and options, as an
+object whose only key is `$js`, such as
+`{formatter: {"$js": "function(cell) { return cell.getValue(); }"}}`. The
+generated Python passes the object to the widget, which turns it into a
+function in the page. A program the agent writes can therefore run JavaScript
+in the page that shows the workbench.
+
 ## Notebook skills
 
 The catalog covers anylumino widgets. To let the agent use your own libraries,
@@ -443,7 +450,7 @@ current directory: `workbench.import_file("exports/sales.py")`.
 ## Limits
 
 - The OpenUI program can use the components in the workbench catalog: layout
-  panels, cards, text, inputs, badges, tables, code blocks, Plotly figures,
+  panels, cards, text, inputs, badges, tables, Tabulator grids, code blocks, Plotly figures,
   mounted namespace widgets, and the components that
   [notebook skills](#skill-components) add for other libraries.
 - Option values must be literals, so constructor keywords that take Python

@@ -1,7 +1,7 @@
 from . import astryx
 from .components import ComponentWidget
 from .controls import DatePicker, DatetimePicker, TimePicker
-from .enums import Direction, DockMode, Orientation, TabPlacement
+from .enums import Direction, DockMode, Orientation, TabPlacement, Transport
 from .layout import (
     AccordionPanel,
     BoxPanel,
@@ -21,11 +21,13 @@ from .layout import (
     Toolbar,
     VBox,
 )
+from .tabulator import CellEdit, JsCode, Tabulator
 
 __all__ = [
     "astryx",
     "AccordionPanel",
     "BoxPanel",
+    "CellEdit",
     "CommandPalette",
     "ComponentWidget",
     "DatePicker",
@@ -35,6 +37,7 @@ __all__ = [
     "DockPanel",
     "GridPanel",
     "HBox",
+    "JsCode",
     "KeyedChildren",
     "LayoutWidget",
     "MenuBar",
@@ -45,8 +48,10 @@ __all__ = [
     "StackedPanel",
     "TabPanel",
     "TabPlacement",
+    "Tabulator",
     "TextWidget",
     "TimePicker",
     "Toolbar",
+    "Transport",
     "VBox",
 ]

@@ -1,0 +1,365 @@
+---
+title: "Tabulator"
+---
+
+Virtualized data grid built on Tabulator 6.7.
+
+`columns` and `options` take Tabulator's own names, so the
+[Tabulator documentation](https://tabulator.info/docs/6.7) applies to them.
+Wherever Tabulator takes a function, pass a `JsCode`.
+
+Python holds the rows. `update_rows`, `add_rows`, `upsert_rows`, and
+`delete_rows` change them and send only the changed rows to the browser;
+assigning `data` replaces every row. Every row carries a unique value
+under the `index` field.
+
+`on_select` callbacks run when the user changes the selection, which
+needs Tabulator's `selectableRows` option. `on_edit` callbacks run
+with a `CellEdit` when the user edits a cell, which needs an `editor` on
+the column. `on_click` callbacks run when the user clicks a row, and
+`on_action` callbacks also receive the row mapping.
+
+```python
+al.Tabulator(
+    [
+        {"id": 1, "symbol": "ESZ6", "last": 5012.25, "qty": 3},
+        {"id": 2, "symbol": "NQZ6", "last": 18011.5, "qty": -1},
+    ],
+    [
+        {"title": "Symbol", "field": "symbol"},
+        {"title": "Last", "field": "last", "hozAlign": "right"},
+        {"title": "Qty", "field": "qty", "editor": "number"},
+    ],
+    options={"selectableRows": 1},
+    height=160,
+)
+```
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="columns" value="t.List(t.Any(), default_value=[]).tag(sync=True, to_json=lambda value, _widget: _wire(value))" />
+
+  <PyAttribute name="options" value="t.Dict(default_value={}).tag(sync=True, to_json=lambda value, _widget: _wire(value))" />
+
+  <PyAttribute name="index" value="t.Unicode('id').tag(sync=True)" />
+
+  <PyAttribute name="selected" value="t.List(t.Any(), default_value=[]).tag(sync=True)" />
+
+  <PyAttribute name="width" value="t.Unicode('100%').tag(sync=True)" />
+
+  <PyAttribute name="height" value="t.Unicode('320px').tag(sync=True)" />
+
+  <PyAttribute name="data" type="list[dict[str, Any]]">
+    Copies of the current rows, in insertion order.
+
+    Cell values are stored as the browser receives them: dates, times, and
+    datetimes become ISO 8601 strings, and NaN becomes `None`. Assigning
+    rows replaces every row in every view, keeping each view's sort and
+    scroll position.
+  </PyAttribute>
+
+  <PyAttribute name="revision" type="int">
+    Number of row changes so far; every snapshot and delta carries it.
+  </PyAttribute>
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(data=None, columns=None, *, index='id', options=None, selected=(), transport=Transport.AUTO, width=None, height=None, callbacks=None, action_callbacks=None, **kwargs) -> None" kind="constructor">
+  <PySourceCode>
+    ```python
+    def __init__(
+        self,
+        data: Any = None,
+        columns: Iterable[Mapping[str, Any]] | None = None,
+        *,
+        index: str = "id",
+        options: Mapping[str, Any] | None = None,
+        selected: Iterable[Any] = (),
+        transport: Transport | str = Transport.AUTO,
+        width: int | float | str | None = None,
+        height: int | float | str | None = None,
+        callbacks: Iterable[Callable[[Tabulator], None]] | None = None,
+        action_callbacks: Iterable[Callable[[Tabulator, Any], None]] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        self._transport = choice(transport, Transport, "transport")
+        if self._transport == Transport.ARROW:
+            _require_arrow()
+
+        self._index = index
+        self._revision = 0
+        self._load(data)
+        self._init_callbacks()
+        self._select_callbacks: list[SelectCallback] = []
+        self._edit_callbacks: list[EditCallback] = []
+        super().__init__(
+            columns=list(columns or []),
+            options=dict(options or {}),
+            index=index,
+            selected=list(selected),
+            width=_size_to_css(width, "100%"),
+            height=_size_to_css(height, "320px"),
+            **kwargs,
+        )
+        self.on_msg(self._handle_message)
+        self._register_callbacks(callbacks, action_callbacks)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="data" type="Any" value="None">
+      Rows: an iterable of mappings, an object with `to_dict("records")`
+      such as a pandas DataFrame, or an object with `__arrow_c_stream__`
+      such as a polars DataFrame, which needs `pyarrow`.
+    </PyParameter>
+
+    <PyParameter name="columns" type="Iterable[Mapping[str, Any]] | None" value="None">
+      Tabulator column definitions. Without them the grid shows one column
+      per row field.
+    </PyParameter>
+
+    <PyParameter name="index" type="str" value="'id'">
+      Row id field. When no row has it, rows get the ids `0, 1, 2, ...`.
+    </PyParameter>
+
+    <PyParameter name="options" type="Mapping[str, Any] | None" value="None">
+      Other Tabulator constructor options, such as `layout` or
+      `selectableRows`. `data`, `columns`, and `index` have their own
+      arguments.
+    </PyParameter>
+
+    <PyParameter name="selected" type="Iterable[Any]" value="()">
+      Index values of the initially selected rows.
+    </PyParameter>
+
+    <PyParameter name="transport" type="Transport | str" value="Transport.AUTO">
+      How rows reach the browser. `"auto"` sends Arrow IPC for columnar
+      input when `pyarrow` imports, and JSON otherwise.
+    </PyParameter>
+
+    <PyParameter name="width" type="int | float | str | None" value="None">
+      CSS width; `"100%"` when omitted. Inside a layout panel the grid
+      fills its slot instead, as for `height`.
+    </PyParameter>
+
+    <PyParameter name="height" type="int | float | str | None" value="None">
+      CSS height; `"320px"` when omitted. The grid needs a bounded height
+      to render only its visible rows. Inside a layout panel the grid fills
+      its slot instead, except in a scroll box or a `fit_content` panel.
+    </PyParameter>
+
+    <PyParameter name="callbacks" type="Iterable[Callable[[Tabulator], None]] | None" value="None">
+      Row click callbacks.
+    </PyParameter>
+
+    <PyParameter name="action_callbacks" type="Iterable[Callable[[Tabulator, Any], None]] | None" value="None">
+      Row click callbacks that receive the row mapping.
+    </PyParameter>
+
+    <PyParameter name="kwargs" type="Any" value="{}" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="update_rows" type="(rows) -> None">
+  Update existing rows by index value, merging the given fields.
+
+  <PySourceCode>
+    ```python
+    def update_rows(self, rows: Iterable[Mapping[str, Any]]) -> None:
+        """Update existing rows by index value, merging the given fields.
+
+        Raises
+        ------
+        ValueError
+            If a row lacks the ``index`` field.
+        KeyError
+            If no row has a given index value. Nothing changes in either case.
+        """
+        updates = [self._row(row) for row in rows]
+        current = self._row_map()
+        for row in updates:
+            if row[self._index] not in current:
+                raise KeyError(f"table row not found: {row[self._index]!r}")
+
+        if not updates:
+            return
+
+        for row in updates:
+            current[row[self._index]].update(row)
+        self._send_delta(DeltaOp.UPDATE, rows=updates)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="rows" type="Iterable[Mapping[str, Any]]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="add_rows" type="(rows, *, top=False) -> None">
+  Append rows, or prepend them with `top=True`.
+
+  `rows` takes the same forms as `data`. When the table assigned its
+  own ids, rows without the `index` field continue them.
+
+  <PySourceCode>
+    ```python
+    def add_rows(self, rows: Any, *, top: bool = False) -> None:
+        """Append rows, or prepend them with ``top=True``.
+
+        ``rows`` takes the same forms as ``data``. When the table assigned its
+        own ids, rows without the ``index`` field continue them.
+
+        Raises
+        ------
+        ValueError
+            If an index value is missing from some rows or already taken.
+        """
+        current = self._row_map()
+        added, source = self._parse(rows, existing=current)
+        if not added:
+            return
+
+        self._rows = {**added, **current} if top else {**current, **added}
+        if source is not None and self._use_arrow():
+            self._send_delta(DeltaOp.ADD, top=top, arrow=source)
+        else:
+            self._send_delta(DeltaOp.ADD, rows=list(added.values()), top=top)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="rows" type="Any" />
+
+    <PyParameter name="top" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="upsert_rows" type="(rows) -> None">
+  Update rows whose index value exists and append the others.
+
+  <PySourceCode>
+    ```python
+    def upsert_rows(self, rows: Iterable[Mapping[str, Any]]) -> None:
+        """Update rows whose index value exists and append the others.
+
+        Raises
+        ------
+        ValueError
+            If a row lacks the ``index`` field.
+        """
+        changes = [self._row(row) for row in rows]
+        if not changes:
+            return
+
+        current = self._row_map()
+        for row in changes:
+            key = row[self._index]
+            if key in current:
+                current[key].update(row)
+            else:
+                current[key] = dict(row)
+        self._send_delta(DeltaOp.UPSERT, rows=changes)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="rows" type="Iterable[Mapping[str, Any]]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="delete_rows" type="(ids) -> None">
+  Delete rows by index value and drop them from `selected`.
+
+  <PySourceCode>
+    ```python
+    def delete_rows(self, ids: Iterable[Any]) -> None:
+        """Delete rows by index value and drop them from ``selected``.
+
+        Raises
+        ------
+        KeyError
+            If no row has a given index value; nothing changes.
+        """
+        keys = list(dict.fromkeys(_cell(key) for key in ids))
+        current = self._row_map()
+        for key in keys:
+            if key not in current:
+                raise KeyError(f"table row not found: {key!r}")
+
+        if not keys:
+            return
+
+        for key in keys:
+            del current[key]
+        self._send_delta(DeltaOp.DELETE, ids=keys)
+        if any(key in keys for key in self.selected):
+            self.selected = [key for key in self.selected if key not in keys]
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="ids" type="Iterable[Any]" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="on_select" type="(callback, remove=False) -> None">
+  Register or unregister a callback for selection changes made in a view.
+
+  <PySourceCode>
+    ```python
+    def on_select(self, callback: SelectCallback, remove: bool = False) -> None:
+        """Register or unregister a callback for selection changes made in a view."""
+        if remove:
+            self._select_callbacks = [item for item in self._select_callbacks if item is not callback]
+
+            return
+
+        self._select_callbacks.append(callback)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="callback" type="SelectCallback" />
+
+    <PyParameter name="remove" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>
+
+<PyFunction name="on_edit" type="(callback, remove=False) -> None">
+  Register or unregister a callback for cell edits made in a view.
+
+  <PySourceCode>
+    ```python
+    def on_edit(self, callback: EditCallback, remove: bool = False) -> None:
+        """Register or unregister a callback for cell edits made in a view."""
+        if remove:
+            self._edit_callbacks = [item for item in self._edit_callbacks if item is not callback]
+
+            return
+
+        self._edit_callbacks.append(callback)
+    ```
+  </PySourceCode>
+
+  <div>
+    <PyParameter name="callback" type="EditCallback" />
+
+    <PyParameter name="remove" type="bool" value="False" />
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

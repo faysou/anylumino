@@ -1,0 +1,41 @@
+---
+title: "CellEdit"
+---
+
+A cell edit made in a `Tabulator` view.
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="row_id" type="Any" />
+
+  <PyAttribute name="field" type="str" />
+
+  <PyAttribute name="value" type="Any" />
+
+  <PyAttribute name="old_value" type="Any" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(row_id, field, value, old_value) -> None" kind="constructor">
+  <div>
+    <PyParameter name="row_id" type="Any">
+      The edited row's value under the table's `index` field.
+    </PyParameter>
+
+    <PyParameter name="field" type="str">
+      The edited column's field.
+    </PyParameter>
+
+    <PyParameter name="value" type="Any">
+      The new value.
+    </PyParameter>
+
+    <PyParameter name="old_value" type="Any">
+      The value before the edit.
+    </PyParameter>
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

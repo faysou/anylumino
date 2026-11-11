@@ -2,6 +2,7 @@ import asyncio
 
 import pytest
 
+import anylumino as al
 from anylumino import astryx as ax
 from anylumino.workbench import App, Event, codegen, openui
 from anylumino.workbench.catalog import go
@@ -187,6 +188,28 @@ class UI(View):
     assert isinstance(ui.chart, go.FigureWidget)
     assert (ui.chart.layout.height, ui.chart.layout.title.text, ui.chart.data) == (320, "Revenue", ())
     assert ui.root.widgets == [ui.chart]
+
+
+def test_tabulator_passes_javascript_functions_through():
+    program = (
+        'root = VBox([grid])\n'
+        'grid = Tabulator([{id: 1, symbol: "ESZ6", last: 5012.25}], '
+        '[{title: "Symbol", field: "symbol"}, {title: "Last", field: "last", formatter: {"$js": "function(cell) { return cell.getValue(); }"}}], '
+        '{options: {layout: "fitColumns"}, height: 240})'
+    )
+
+    source = codegen.generate(parsed(program), set(), {})
+    ui = ui_class(source)(RecordingApp())
+
+    assert (
+        "        self.grid = al.Tabulator(data=[{'id': 1, 'symbol': 'ESZ6', 'last': 5012.25}], "
+        "columns=[{'title': 'Symbol', 'field': 'symbol'}, {'title': 'Last', 'field': 'last', "
+        "'formatter': {'$js': 'function(cell) { return cell.getValue(); }'}}], "
+        "options={'layout': 'fitColumns'}, height=240)\n"
+    ) in source
+    assert ui.grid.data == [{"id": 1, "symbol": "ESZ6", "last": 5012.25}]
+    assert ui.grid.columns[1]["formatter"] == al.JsCode("function(cell) { return cell.getValue(); }")
+    assert ui.grid.get_state(["options", "height"]) == {"options": {"layout": "fitColumns"}, "height": "240px"}
 
 
 def test_app_frame_components_build_and_send_events():

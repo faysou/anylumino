@@ -1,0 +1,32 @@
+---
+title: "JsCode"
+---
+
+JavaScript function source that Tabulator receives as a function.
+
+Use it wherever Tabulator takes a function, such as a column formatter,
+sorter, editor, validator, mutator, or menu action. The source runs in the
+notebook page. A mapping whose only key is `"$js"`, with the source as its
+value, means the same.
+
+```python
+al.JsCode("function(cell) { return cell.getValue().toFixed(2); }")
+```
+
+## Attributes
+
+<PyAttributes>
+  <PyAttribute name="source" type="str" />
+</PyAttributes>
+
+## Functions
+
+<PyFunction name="__init__" type="(source) -> None" kind="constructor">
+  <div>
+    <PyParameter name="source" type="str">
+      A JavaScript expression that evaluates to a function.
+    </PyParameter>
+  </div>
+
+  <PyFunctionReturn type="None" />
+</PyFunction>

@@ -1,0 +1,44 @@
+---
+title: "tabulator"
+---
+
+A virtualized data grid built on Tabulator, with rows held in Python.
+
+The kernel owns the rows and a revision counter. Each view asks for a snapshot
+when it renders and then applies the row changes the kernel sends, so a grid
+takes updates at tick rate without resending every row. A view that misses a
+revision asks for a new snapshot.
+
+<PyAttributes>
+  <PyAttribute name="SNAPSHOT" value="'tabulator-snapshot'" />
+
+  <PyAttribute name="DELTA" value="'tabulator-delta'" />
+
+  <PyAttribute name="EDIT" value="'tabulator-edit'" />
+
+  <PyAttribute name="SELECT" value="'tabulator-select'" />
+
+  <PyAttribute name="ROW_CLICK" value="'tabulator-row-click'" />
+
+  <PyAttribute name="FUNCTION_KEY" value="'$js'" />
+
+  <PyAttribute name="RESERVED_OPTIONS" value="('data', 'columns', 'index')" />
+
+  <PyAttribute name="SelectCallback" value="Callable[['Tabulator'], None]" />
+
+  <PyAttribute name="EditCallback" value="Callable[['Tabulator', CellEdit], None]" />
+</PyAttributes>
+
+<Tabs items={["Class"]}>
+  <Tab value="Class">
+    <Cards>
+      <Card title="DeltaOp" href="/docs/api/tabulator/DeltaOp" />
+
+      <Card title="JsCode" href="/docs/api/tabulator/JsCode" />
+
+      <Card title="CellEdit" href="/docs/api/tabulator/CellEdit" />
+
+      <Card title="Tabulator" href="/docs/api/tabulator/Tabulator" />
+    </Cards>
+  </Tab>
+</Tabs>

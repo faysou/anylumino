@@ -91,6 +91,38 @@ al.SplitPanel(
 
 ![Order blotter with callbacks example rendered in JupyterLab](assets/examples/examples-order-blotter-with-callbacks.png)
 
+## Live grid with Tabulator
+
+`al.Tabulator` takes row changes from Python and repaints only the changed
+rows. Each `upsert_rows` call updates the rows it names and adds the others:
+
+```python
+import anylumino as al
+
+prices = {"ESZ6": 5012.25, "NQZ6": 18011.5, "RTYZ6": 2310.1, "CLZ6": 71.2}
+grid = al.Tabulator(
+    [{"id": symbol, "symbol": symbol, "last": price, "change": 0.0} for symbol, price in prices.items()],
+    [
+        {"title": "Symbol", "field": "symbol"},
+        {"title": "Last", "field": "last", "hozAlign": "right"},
+        {
+            "title": "Change",
+            "field": "change",
+            "hozAlign": "right",
+            "formatter": al.JsCode(
+                "function(cell) { const v = cell.getValue(); cell.getElement().style.color = v < 0 ? '#c62828' : '#2e7d32'; return v.toFixed(2); }"
+            ),
+        },
+    ],
+    options={"layout": "fitColumns"},
+    height=180,
+)
+grid.upsert_rows([{"id": "ESZ6", "last": 5013.5, "change": 1.25}, {"id": "CLZ6", "last": 70.9, "change": -0.3}])
+grid
+```
+
+![Live grid with Tabulator example rendered in JupyterLab](assets/examples/examples-live-grid-with-tabulator.png)
+
 ## Chat with a streamed reply
 
 `ax.Chat` renders the messages that Python assigns. The submit callback adds
