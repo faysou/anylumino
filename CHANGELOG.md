@@ -1,5 +1,86 @@
 # Changelog
 
+## 0.7.0
+
+This release fixes defects across the layout widgets, the Astryx widgets, the
+native pickers, and the workbench, and adds checks that keep the Python classes
+and the browser code in agreement.
+
+Breaking changes:
+
+- Option values are strings. `ax.SelectionSlider([1, 2, 3]).value` is `"1"`,
+  not `1`, and a selection after a drag is a string too, as it already was.
+  `ax.Selector([1, 5, 10], value=5)` renders, and its `value` is `"5"`.
+- `label`, `variant`, `disabled`, and `icon` live in their traits only, not
+  also in `props`. Assigning one of them after display now updates the widget.
+- `ComponentWidget` no longer has the traits `tag`, `indeterminate`,
+  `placement`, `orientation`, `icon_src`, `icon_size`, and `attributes`, and
+  `astryx.Widget` no longer has `theme`; no frontend read them. `last_action`
+  and `component_family` stay as Python attributes but no longer sync.
+- `FieldStatus` keeps its placement in the `variant` trait and its status type
+  in `props["type"]`. Before, the `variant` trait held the status type.
+- `workbench.openui.parse` returns a `ParseResult` with attributes, such as
+  `result.errors`, instead of a dictionary.
+
+Fixed:
+
+- `stretches`, `sizes`, and `areas` stay with their child when children move,
+  are reassigned, or are added, as they did on removal.
+- A scrolling `BoxPanel` applies `spacing`.
+- A toolbar action or menu item with `separator: True` renders a separator.
+- Menus on one page that share an action id show their own icons.
+- A widget whose code does not arrive shows why instead of staying blank, and a
+  later widget retries.
+- `Table.append_row` and `prepend_row` work on tables with generated row ids.
+  Table rows keep keys outside `columns`, so row flags such as `selectable`
+  work, and widening `columns` shows the values rows already had.
+- `Table(select_all_label=...)`, `Pagination(disabled=...)`,
+  `ContextMenu(disabled=...)`, and `ButtonGroup(disabled=...)` take effect.
+- `Typeahead` and `Tokenizer` with a Python `search` show picked items, and a
+  `Tokenizer` adds each pick to the earlier ones. A widget change during a
+  search keeps its results.
+- A child widget keeps its state when its parent hides and shows it, such as a
+  `SplitPanel` in an unselected tab or a reopened `Dialog`, and stays one view.
+- `FileInput` shows the chosen file.
+- An Astryx `AccordionPanel` drops a removed child from its open keys and runs
+  no callback while it is built.
+- `DatePicker`, `TimePicker`, and `DatetimePicker` store a `date`, `time`, or
+  `datetime` assigned after construction as an ISO string. `DatetimePicker`
+  syncs a value only when it has both a date and a time and keeps seconds on a
+  date edit. The time popup starts from the current value, and the pickers
+  release their listeners and apply a changed `continuous_update`.
+- The workbench returns to Ready after any failed turn, import, or restore,
+  such as an import of a file that is not UTF-8. A stop between the reply and
+  its apply leaves the UI unchanged, and a stopped turn leaves no tool call
+  running.
+- A program that uses an undefined name is rejected with the name and its
+  statement, and a string used as a child names its statement.
+- The workbench shows the agent's own error when the CLI then exits with an
+  error status, and the CLI's error output when it exits before reading a
+  large prompt.
+- `Workbench(session=..., cwd=...)` uses the given directory for a restored
+  session.
+- A new workbench on a session stops the turn an earlier workbench still runs
+  on it, and marimo stops a running turn when its cell runs again.
+- Chat messages posted from another thread during a reply are kept.
+
+Added:
+
+- `make test-browser` runs browser tests in JupyterLab under headless
+  Chromium, and CI runs them.
+- A contract test fails when a synced trait is unread by the browser code, a
+  component name is not registered there, or a message type has no handler.
+- An unknown component name renders an error in the output.
+- `npm test` checks the widget sources for undefined names.
+
+Changed:
+
+- The Astryx frontend is a table of component specs, split into modules by
+  widget family.
+- The workbench catalog reads option values from constructor annotations, not
+  from docstrings.
+- `docs/openui.md` describes the shipped OpenUI design.
+
 ## 0.6.4
 
 This release fixes JupyterLab's layout when an anylumino layout widget renders,
