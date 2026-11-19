@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.0
 
 This release adds a Markdown editor with a live preview, renders math and
 Mermaid diagrams in every Astryx Markdown view, and lets the workbench place
