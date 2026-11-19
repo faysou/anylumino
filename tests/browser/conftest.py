@@ -73,6 +73,9 @@ MODEL_LISTENERS_JS = """async ([modelId, event]) => {""" + FIND_MANAGER_JS + """
 
 # Frontend failures that belong to anylumino rather than to JupyterLab itself.
 FRONTEND_ERROR_WORDS = ("anylumino", "astryx", "anywidget", "react", "lumino", "uncaught")
+# JupyterLab rejects a pending kernel request when its connection drops or restarts, which
+# CI runners hit at random; the rejection names no widget code.
+FRONTEND_ERROR_JUPYTERLAB = "message before replies were done"
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
@@ -119,7 +122,11 @@ class Notebook:
 
     def frontend_errors(self) -> list[str]:
         """Return console errors and inline child errors raised by widget code."""
-        errors = [text for text in self.console_errors if any(word in text.lower() for word in FRONTEND_ERROR_WORDS)]
+        errors = [
+            text
+            for text in self.console_errors
+            if any(word in text.lower() for word in FRONTEND_ERROR_WORDS) and FRONTEND_ERROR_JUPYTERLAB not in text
+        ]
         errors += self.page.locator(".anylumino-ChildError").all_inner_texts()
 
         return errors
