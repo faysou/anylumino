@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.1
+
+This release ships the same package as 0.9.0 with a CI fix.
+
+Fixed:
+
+- The browser tests no longer fail when JupyterLab cancels a pending kernel
+  request, an error that names no widget code and made CI fail at random.
+
 ## 0.9.0
 
 This release adds a Markdown editor with a live preview, renders math and
