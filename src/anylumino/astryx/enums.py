@@ -659,3 +659,38 @@ class BundledTheme(StrEnum):
     MATCHA = "matcha"
     STONE = "stone"
     Y2K = "y2k"
+
+
+class AvatarSize(StrEnum):
+    """Named avatar sizes; avatars also take a size in pixels."""
+
+    XSM = "xsm"
+    SM = "sm"
+    MD = "md"
+    LG = "lg"
+    XL = "xl"
+
+
+class PaginationVariant(StrEnum):
+    """How pagination shows the pages."""
+
+    PAGES = "pages"
+    COUNT = "count"
+    COMPACT = "compact"
+    DOTS = "dots"
+    INPUT = "input"
+    NONE = "none"
+
+
+class TabLayout(StrEnum):
+    """Whether tabs hug their labels or fill the tab list."""
+
+    HUG = "hug"
+    FILL = "fill"
+
+
+class Autolink(StrEnum):
+    """Bare-link handling in Markdown."""
+
+    GFM = "gfm"
+    """GitHub-Flavored Markdown autolink literals."""

@@ -72,3 +72,38 @@ def test_fake_agent_program_places_a_tabulator_that_callbacks_update(notebook):
         "9.50", "2.00", "3.20", "0.80", "1.10",
     ]
     assert nb.frontend_errors() == []
+
+
+NOTES_PROGRAM = """root = VBox([notes, length])
+notes = MarkdownEditorPane("# Plan\\n\\nRisk is $`\\\\sigma^2`$.", @Callback("on_notes"), {height: 320})
+length = Text("")"""
+
+NOTES_CALLBACKS = """from anylumino.workbench import App
+
+
+class NotesApp(App):
+    def on_notes(self, event):
+        self.ui.length.text = f"{len(event.value)} characters"
+"""
+
+NOTES_REPLY = f"Here is an editor.\n\n```openui-lang\n{NOTES_PROGRAM}\n```\n\n```python\n{NOTES_CALLBACKS}```"
+
+
+def test_fake_agent_program_places_a_markdown_editor_pane_whose_edits_reach_callbacks(notebook):
+    nb = notebook(
+        f"import sys\nsys.path.insert(0, {str(ROOT / 'notebooks')!r})",
+        f"import fake_agent\nworkbench = fake_agent.workbench({NOTES_REPLY!r})\nworkbench",
+    )
+
+    send_turn(nb, "Build a notes editor")
+    pane = nb.output(1).locator(".anylumino-MarkdownEditorPane")
+    pane.locator(".katex").first.wait_for(timeout=30_000)
+    pane.locator(".cm-content").click()
+    nb.page.keyboard.press("ControlOrMeta+End")
+    nb.page.keyboard.type(" Done")
+    nb.output(1).get_by_text("34 characters").wait_for(timeout=10_000)
+
+    assert nb.value("workbench.outcome") == "applied"
+    assert nb.value("workbench.ui.notes.value") == "# Plan\n\nRisk is $`\\sigma^2`$. Done"
+    assert pane.locator(".anylumino-MarkdownEditorPane-preview h1").inner_text() == "Plan"
+    assert nb.frontend_errors() == []

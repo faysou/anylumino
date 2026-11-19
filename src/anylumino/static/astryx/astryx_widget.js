@@ -20,6 +20,7 @@ import { neutralTheme } from "@astryxdesign/theme-neutral/built";
 import { stoneTheme } from "@astryxdesign/theme-stone/built";
 import { y2kTheme } from "@astryxdesign/theme-y2k/built";
 import "@astryxdesign/richtext/richtext.css";
+import "katex/dist/katex.min.css";
 import { combineSignals, cssSize, removeModelListener, renderWidgetRef } from "../layout/composition.js";
 import {
   childSignature,
@@ -29,14 +30,18 @@ import {
   resolveColorMode,
 } from "./astryx_bridge.mjs";
 import { claimDocumentTheme, claimThemeCSS } from "./astryx_theme.mjs";
+import { addKatexFonts } from "./katex_fonts.mjs";
 import { SPECS as CHAT_SPECS } from "./components/chat.mjs";
 import { SPECS as DATA_SPECS } from "./components/data.mjs";
 import { SPECS as INPUT_SPECS } from "./components/inputs.mjs";
 import { SPECS as LAYOUT_SPECS } from "./components/layout.mjs";
+import { SPECS as MARKDOWN_EDITOR_SPECS } from "./components/markdown_editor.mjs";
 import { componentName, continuousUpdate, rawProps, setModelValue, textFor, traitProps } from "./components/model.mjs";
 import { ownSlots, slotsOrText } from "./components/slots.mjs";
 import { SPECS as SURFACE_SPECS } from "./components/surfaces.mjs";
 import "./astryx_widget.css";
+
+addKatexFonts();
 
 /**
  * How each Astryx component renders, by component name. A spec gives the React
@@ -47,7 +52,7 @@ import "./astryx_widget.css";
  * the shared traits it receives as same-named props (see `traitProps`), and
  * `labelRow` lets `labelPosition="left"` place the label beside the control.
  */
-const SPECS = { ...CHAT_SPECS, ...DATA_SPECS, ...INPUT_SPECS, ...LAYOUT_SPECS, ...SURFACE_SPECS };
+const SPECS = { ...CHAT_SPECS, ...DATA_SPECS, ...INPUT_SPECS, ...LAYOUT_SPECS, ...MARKDOWN_EDITOR_SPECS, ...SURFACE_SPECS };
 
 // The built themes bundled with anylumino, by name. Their CSS is in the widget
 // stylesheet, so a descriptor that names one needs no CSS of its own.

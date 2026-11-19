@@ -52,8 +52,13 @@ def built(agent_reply, tmp_path, monkeypatch):
     return workbench
 
 
-def labels(widgets):
-    return [widget.label for widget in widgets]
+def entries(dialog):
+    return [item["label"] for item in dialog.entries.props["items"]]
+
+
+def choose(dialog, index):
+    # What a click on a list item sends
+    dialog.entries.value = dialog.entries.props["items"][index]["value"]
 
 
 def test_export_writes_the_tabs_and_posts_the_load_call(built, tmp_path):
@@ -62,13 +67,13 @@ def test_export_writes_the_tabs_and_posts_the_load_call(built, tmp_path):
 
     click(built.export_button)
     project = tmp_path / "project"
-    assert (dialog.is_open, dialog.path.text, labels(dialog.folders.widgets)) == (True, str(project), ["exports/"])
+    assert (dialog.is_open, dialog.path.text, entries(dialog)) == (True, str(project), ["exports/"])
     assert (dialog.name.value, dialog.files.text) == (
         "sales",
         "Writes sales.py here, replacing an existing file.",
     )
-    click(dialog.folders.widgets[0])
-    assert (dialog.path.text, labels(dialog.folders.widgets)) == (str(project / "exports"), ["old/"])
+    choose(dialog, 0)
+    assert (dialog.path.text, entries(dialog)) == (str(project / "exports"), ["old/"])
     dialog.name.value = "explorer"
     assert dialog.files.text == "Writes explorer.py here, replacing an existing file."
     (project / "exports" / "explorer.py").write_text("old")
@@ -88,7 +93,7 @@ def test_export_writes_the_tabs_and_posts_the_load_call(built, tmp_path):
 def test_export_dialog_goes_up_and_keeps_the_last_folder(built, tmp_path):
     dialog = built.export_dialog
     click(built.export_button)
-    up = dialog.widgets[0].widgets[1].widgets[1]
+    up = dialog.widgets[0].widgets[0].widgets[1]
     click(up)
     assert dialog.path.text == str(tmp_path)
     dialog.hide()
@@ -98,19 +103,19 @@ def test_export_dialog_goes_up_and_keeps_the_last_folder(built, tmp_path):
 
 
 def test_export_dialog_browses_on_the_marimo_turn_loop(built, tmp_path):
-    # marimo creates widgets only from work a cell started, so the folder buttons wait for the loop
+    # A workbench in marimo browses on its turn loop, so the folder list waits for it
     loop = asyncio.new_event_loop()
     built.marimo_loop = (loop, contextvars.copy_context())
     dialog = built.export_dialog
     try:
         click(built.export_button)
-        waiting = (dialog.is_open, dialog.path.text, dialog.folders.widgets)
+        waiting = (dialog.is_open, dialog.path.text, entries(dialog))
         loop.run_until_complete(asyncio.sleep(0))
     finally:
         loop.close()
 
     assert waiting == (True, "", [])
-    assert (dialog.path.text, labels(dialog.folders.widgets)) == (str(tmp_path / "project"), ["exports/"])
+    assert (dialog.path.text, entries(dialog)) == (str(tmp_path / "project"), ["exports/"])
 
 
 def test_export_outside_the_current_directory_shows_absolute_paths(built, tmp_path):
@@ -509,8 +514,8 @@ def test_import_dialog_lists_python_files_and_enables_import_on_pick(tmp_path, m
     dialog = workbench.import_dialog
 
     click(workbench.import_button)
-    before = (dialog.is_open, labels(dialog.folders.widgets), dialog.confirm.disabled, dialog.files.text)
-    click(dialog.folders.widgets[1])
+    before = (dialog.is_open, entries(dialog), dialog.confirm.disabled, dialog.files.text)
+    choose(dialog, 1)
     after = (dialog.confirm.disabled, dialog.files.text)
     click(dialog.confirm)
 

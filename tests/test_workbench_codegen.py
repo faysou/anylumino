@@ -239,3 +239,17 @@ actions = OverflowList(["Refresh", "Export"], @Callback("on_run", "bar"))"""
         ("on_region", Event("editor", "# Plan\n\nShip", None)),
         ("on_run", Event("actions", "Export", "bar")),
     ]
+
+
+def test_markdown_editor_pane_builds_and_sends_edits():
+    program = """root = VBox([notes])
+notes = MarkdownEditorPane("# Plan", @Callback("on_region"), {height: 320})"""
+
+    source = codegen.generate(parsed(program), {"on_region"}, {})
+    app = RecordingApp()
+    ui = ui_class(source)(app)
+    ui.notes.value = "# Plan\n\n$`x^2`$"
+
+    assert "        self.notes = ax.MarkdownEditorPane(value='# Plan', height=320)\n" in source
+    assert ui.notes.get_state(["value", "height"]) == {"value": "# Plan\n\n$`x^2`$", "height": "320px"}
+    assert app.events == [("on_region", Event("notes", "# Plan\n\n$`x^2`$", None))]

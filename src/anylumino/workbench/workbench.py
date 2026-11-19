@@ -190,24 +190,24 @@ class Workbench(al.SplitPanel):
             SESSION_OWNERS[self.state.name] = self
 
         self.chat = ax.Chat(self.state.messages, placeholder="Describe the UI to build", height="100%")
-        self.status = ax.StatusDot("Ready", variant="neutral")
+        self.status = ax.StatusDot("Ready", variant=ax.StatusVariant.NEUTRAL)
         # Astryx shows a status dot's label only to screen readers, so a caption repeats it
-        self.status_text = ax.Text("Ready", text_type="supporting")
+        self.status_text = ax.Text("Ready", text_type=ax.TextType.SUPPORTING)
         self.export_dialog = ExportDialog(self.export, self.run_on_turn_loop)
         self.export_button = ax.Button(
             "Export",
-            size="sm",
+            size=ax.Size.SM,
             disabled=True,
             # Session names may hold `-`, which an importable module name cannot
             callbacks=[lambda _button: self.export_dialog.open_with((self.state.name or "ui").replace("-", "_"))],
         )
         self.import_dialog = ImportDialog(self.import_file, self.run_on_turn_loop)
         self.import_button = ax.Button(
-            "Import", size="sm", callbacks=[lambda _button: self.import_dialog.open_in_last_folder()]
+            "Import", size=ax.Size.SM, callbacks=[lambda _button: self.import_dialog.open_in_last_folder()]
         )
         header = ax.Stack(
             [
-                ax.Badge(" ".join(filter(None, [self.state.agent, self.state.model, self.state.effort])), variant="info"),
+                ax.Badge(" ".join(filter(None, [self.state.agent, self.state.model, self.state.effort])), variant=ax.BadgeVariant.INFO),
                 ax.Badge(self.state.name or "unsaved"),
                 self.status,
                 self.status_text,
@@ -216,9 +216,9 @@ class Workbench(al.SplitPanel):
                 self.export_dialog,
                 self.import_dialog,
             ],
-            direction="horizontal",
+            direction=ax.Orientation.HORIZONTAL,
             gap=2,
-            align="center",
+            align=ax.Align.CENTER,
             height=HEADER_HEIGHT,
             padding=2,
         )
@@ -665,7 +665,7 @@ class Workbench(al.SplitPanel):
         self.running = running
         self.chat.is_streaming = running
         self.status.label = self.status_text.text = "Running" if running else "Ready"
-        self.status.variant = "accent" if running else "neutral"
+        self.status.variant = ax.StatusVariant.ACCENT if running else ax.StatusVariant.NEUTRAL
         self.status.props = {**self.status.props, "isPulsing": running}
 
     def save(self) -> None:

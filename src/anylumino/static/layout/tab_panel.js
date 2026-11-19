@@ -21,7 +21,9 @@ import {
   whenConnected,
 } from "./composition.js";
 
-function createSlot(index, ref, titles, keys, parentSignal) {
+// Python decides whether a closed tab goes, for example after asking to save, so the close
+// request becomes a message in place of Lumino detaching the tab.
+function createSlot(index, ref, titles, keys, parentSignal, requestClose) {
   const node = document.createElement("div");
   node.className = "anylumino-TabPanelChild";
   node.dataset.anyluminoRef = ref;
@@ -32,6 +34,7 @@ function createSlot(index, ref, titles, keys, parentSignal) {
   labelSlot(slot, index, titles, keys, "Tab");
   slot.anyluminoController = new AbortController();
   slot.anyluminoSignal = combineSignals(parentSignal, slot.anyluminoController.signal);
+  slot.onCloseRequest = () => requestClose(slot);
   return slot;
 }
 
@@ -138,6 +141,20 @@ export default {
       panel.tabsMovable = Boolean(model.get("tabs_movable"));
     };
 
+    const syncClosable = () => {
+      const closable = Boolean(model.get("tabs_closable"));
+      [...panel.widgets].forEach((slot) => {
+        slot.title.closable = closable;
+      });
+    };
+
+    const requestClose = (slot) => {
+      const key = (model.get("child_keys") ?? [])[[...panel.widgets].indexOf(slot)];
+      if (key !== undefined) {
+        model.send({ type: "close", key });
+      }
+    };
+
     const syncSelectedIndex = () => {
       if (selectionFromFrontend) {
         return;
@@ -209,6 +226,7 @@ export default {
       const titles = model.get("titles") ?? [];
       const keys = model.get("child_keys") ?? [];
       [...panel.widgets].forEach((slot, index) => labelSlot(slot, index, titles, keys, "Tab"));
+      syncClosable();
       updatePanel();
     };
 
@@ -230,7 +248,7 @@ export default {
       const nextSlots = refs.map((ref, index) => {
         const existing = reusable.take(ref);
         if (existing === undefined) {
-          return createSlot(index, ref, titles, keys, signal);
+          return createSlot(index, ref, titles, keys, signal, requestClose);
         }
         labelSlot(existing, index, titles, keys, "Tab");
         return existing;
@@ -250,6 +268,7 @@ export default {
         syncingFromModel = false;
       }
 
+      syncClosable();
       syncSelectedIndex();
       notifyCurrentWidgetVisible();
       await renderCurrentChild();
@@ -300,6 +319,7 @@ export default {
       ["selected_index", syncSelectedIndex],
       ["tab_placement", syncPlacement],
       ["tabs_movable", syncMovable],
+      ["tabs_closable", syncClosable],
       [
         "fit_content",
         () => {

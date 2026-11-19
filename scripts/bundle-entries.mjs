@@ -1,3 +1,5 @@
+import { katexFonts } from "./katex-fonts.mjs";
+
 export const shared = {
   bundle: true,
   format: "esm",
@@ -11,7 +13,11 @@ export const entries = [
   ["src/anylumino/static/layout/layout_panel.js", "src/anylumino/static/layout/layout_panel.bundle.js"],
   ["src/anylumino/static/layout/action_panel.js", "src/anylumino/static/layout/action_panel.bundle.js"],
   ["src/anylumino/static/controls/native_control_widget.js", "src/anylumino/static/controls/native_control_widget.bundle.js"],
-  ["src/anylumino/static/astryx/astryx_widget.js", "src/anylumino/static/astryx/astryx_widget.bundle.js"],
+  [
+    "src/anylumino/static/astryx/astryx_widget.js",
+    "src/anylumino/static/astryx/astryx_widget.bundle.js",
+    { plugins: [katexFonts], loader: { ".woff2": "binary" } },
+  ],
   ["src/anylumino/static/tabulator/tabulator_widget.js", "src/anylumino/static/tabulator/tabulator_widget.bundle.js"],
   ["scripts/openui_tool.mjs", "src/anylumino/static/openui/openui_tool.bundle.mjs", { platform: "node" }],
 ];

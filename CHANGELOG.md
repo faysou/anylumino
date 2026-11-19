@@ -1,5 +1,47 @@
 # Changelog
 
+## Unreleased
+
+This release adds a Markdown editor with a live preview, renders math and
+Mermaid diagrams in every Astryx Markdown view, and lets the workbench place
+the editor pane.
+
+Added:
+
+- `anylumino.MarkdownEditor` edits Markdown files in closable tabs. Its File
+  menu has New, Open, Save, and Save as with icons and keyboard shortcuts, the
+  path of the selected file shows under the menu, a tab title starts with `*`
+  while its text differs from the saved file, and closing such a tab asks
+  whether to save or discard the changes.
+- `ax.MarkdownEditorPane` puts a CodeMirror 6 source editor beside its
+  rendered view, with a draggable split that can hide either side. The source
+  is highlighted, Python code blocks included, and the view scrolls to the
+  block holding the caret line.
+- `ax.Markdown`, the chat messages, and the editor typeset inline math written
+  as ``$`...`$`` and display math in `$$` blocks with KaTeX, and draw
+  `mermaid` code blocks as diagrams. Plain `$...$` stays literal text.
+- The workbench catalog has a `MarkdownEditorPane` component whose `on_change`
+  runs with the new Markdown.
+- `al.TabPanel(tabs_closable=True)` shows a close button on each tab, and
+  `on_tab_close` registers what a close does.
+- `al.MenuBar` items take a `shortcut`, such as `"Accel S"`, shown beside the
+  item and active while focus is inside the widget that holds the menu bar.
+  The bundled icons add `FolderOpen`, `Save`, and `SaveAs`.
+- `ax.List(clickable=True)` sets `value` from a click on an item.
+- Enums cover more fixed choices, such as `AvatarSize`, `PaginationVariant`,
+  `TabLayout`, and `Autolink`. Every choice still accepts its string value.
+- The bundle includes `katex` 0.18.11, `mermaid` 12.3.0, and CodeMirror 6.
+
+Changed:
+
+- Widget classes that share a stylesheet inject it once per page instead of
+  once per class, and the KaTeX fonts load once, which keeps typing responsive
+  in pages with many widgets.
+- The Astryx bundle grows from 3.0 MB to 9.3 MB with KaTeX, Mermaid, and
+  CodeMirror.
+- The folder dialogs list entries in one clickable list, so changing folders
+  takes tens of milliseconds instead of most of a second.
+
 ## 0.8.0
 
 This release adds `al.Tabulator`, a virtualized data grid built on Tabulator

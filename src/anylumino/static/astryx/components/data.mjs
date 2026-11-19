@@ -28,6 +28,7 @@ import { removeModelListener } from "../../layout/composition.js";
 import { modelProps, sendModelAction } from "../astryx_bridge.mjs";
 import { iconNode } from "./items.mjs";
 import { asArray, rawProps, setNumberValue, textFor } from "./model.mjs";
+import { MARKDOWN_EXTENSIONS } from "./markdown.mjs";
 import { slotsOnly } from "./slots.mjs";
 
 function tableWidth(width) {
@@ -312,7 +313,12 @@ export const SPECS = {
     component: Link,
     traits: ["disabled"],
   },
-  Markdown: { component: Markdown },
+  Markdown: {
+    component: Markdown,
+    props: ({ props }) => {
+      return { ...MARKDOWN_EXTENSIONS, ...props };
+    },
+  },
   NavIcon: {
     component: NavIcon,
     traits: ["icon"],

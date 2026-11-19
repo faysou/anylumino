@@ -102,11 +102,12 @@
   color: currentColor;
 }
 
+/* The tab bar's colors, so a menu above tabs reads as one header. */
 .anylumino-MenuBar {
   min-height: 32px;
   color: #222;
-  background: #f8f8f8;
-  border: 1px solid #d5d5d5;
+  background: #eef2f7;
+  border: 1px solid #d8dee9;
 }
 
 .anylumino-MenuBar .lm-MenuBar-content {

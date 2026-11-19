@@ -631,6 +631,12 @@ class TabPanel(LayoutWidget):
         Whether tabs can be reordered in the frontend. A drag reorders
         ``widgets``, ``child_keys``, and ``titles`` in Python too, so
         ``selected_key`` keeps naming the visible child.
+    tabs_closable : bool, default False
+        Whether each tab shows a close button. Clicking it calls the
+        callbacks registered with ``on_tab_close`` with the panel and the
+        tab's key, and they decide whether to remove the tab, for example
+        after asking to save. With no callback registered, the tab is
+        removed.
     width : int, float, str, or None
         Widget width. Numbers above 1 are pixels, numbers between 0 and 1 are
         percentages, and strings are passed through as CSS sizes.
@@ -652,6 +658,7 @@ class TabPanel(LayoutWidget):
     selected_index = t.Int(0).tag(sync=True)
     tab_placement = t.Enum(tuple(TabPlacement), default_value=TabPlacement.TOP).tag(sync=True)
     tabs_movable = t.Bool(False).tag(sync=True)
+    tabs_closable = t.Bool(False).tag(sync=True)
 
     def __init__(
         self,
@@ -662,12 +669,14 @@ class TabPanel(LayoutWidget):
         selected_index: int = 0,
         tab_placement: TabPlacement | str = "top",
         tabs_movable: bool = False,
+        tabs_closable: bool = False,
         width: int | float | str | None = "100%",
         height: int | float | str | None = 420,
         resizable: bool = True,
         fit_content: bool = False,
     ) -> None:
         tab_placement = choice(tab_placement, TabPlacement, "tab_placement")
+        self._tab_close_callbacks: list[Callable[[TabPanel, str], None]] = []
         self._init_composed(
             widgets,
             titles,
@@ -679,7 +688,33 @@ class TabPanel(LayoutWidget):
             selected_index=selected_index,
             tab_placement=tab_placement,
             tabs_movable=tabs_movable,
+            tabs_closable=tabs_closable,
         )
+
+    def on_tab_close(self, callback: Callable[[TabPanel, str], None], remove: bool = False) -> None:
+        """Register or unregister a callback receiving the panel and the key of a tab whose close button was clicked."""
+        if remove:
+            self._tab_close_callbacks = [item for item in self._tab_close_callbacks if item is not callback]
+
+            return
+
+        self._tab_close_callbacks.append(callback)
+
+    def _handle_frontend_message(self, widget: object, content: dict[str, Any], buffers: object) -> None:
+        if content.get("type") != "close":
+            super()._handle_frontend_message(widget, content, buffers)
+
+            return
+
+        key = content.get("key")
+        if key not in self.child_keys:
+            return
+
+        if not self._tab_close_callbacks:
+            self.remove_widget(key)
+
+        for callback in list(self._tab_close_callbacks):
+            callback(self, key)
 
     def select(self, index: int) -> None:
         self.selected_index = index
@@ -1534,7 +1569,10 @@ class MenuBar(_ActionWidget):
         sequence. Item dictionaries should include an ``id`` and ``label`` and
         may include frontend options such as ``icon``, ``icon_src``,
         ``icon_size``, or ``disabled``. ``icon`` uses bundled workflow icon
-        names. An item with a truthy ``separator`` key, or with ``type`` set to
+        names. ``shortcut`` takes a Lumino keystroke such as ``"Accel S"``
+        (Cmd on macOS, Ctrl elsewhere), shown on the right of the item. It
+        runs the item while focus is inside the widget that holds the menu
+        bar. An item with a truthy ``separator`` key, or with ``type`` set to
         ``"separator"``, renders as a divider line.
     callbacks : dict[str, callable], optional
         Callback map keyed by menu item id. A callback receives the activated

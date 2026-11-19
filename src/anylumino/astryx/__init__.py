@@ -41,6 +41,7 @@ from .inputs import IconButton
 from .inputs import LogSlider
 from .inputs import MultiSelector
 from .inputs import NumberInput
+from .inputs import MarkdownEditorPane
 from .inputs import RichTextEditor
 from .inputs import SelectionSlider
 from .inputs import PowerSearch
@@ -286,6 +287,7 @@ __all__ = [
     "ListStyle",
     "LogSlider",
     "Markdown",
+    "MarkdownEditorPane",
     "MediaType",
     "MessageStatus",
     "MetadataList",

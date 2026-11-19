@@ -2,6 +2,7 @@ import { ChatComposer, ChatLayout, ChatMessage, ChatMessageBubble, ChatMessageLi
 import { Markdown } from "@astryxdesign/core/Markdown";
 import React from "react";
 import { chatMessages, modelProps } from "../astryx_bridge.mjs";
+import { MARKDOWN_EXTENSIONS } from "./markdown.mjs";
 
 function AstryxChatView({ model }) {
   const props = modelProps(model);
@@ -24,7 +25,7 @@ function AstryxChatView({ model }) {
       React.createElement(
         ChatMessageBubble,
         { metadata },
-        React.createElement(Markdown, { isStreaming: isStreaming && index === lastIndex }, message.content),
+        React.createElement(Markdown, { ...MARKDOWN_EXTENSIONS, isStreaming: isStreaming && index === lastIndex }, message.content),
       ),
       message.toolCalls.length > 0 ? React.createElement(ChatToolCalls, { calls: message.toolCalls }) : null,
     );

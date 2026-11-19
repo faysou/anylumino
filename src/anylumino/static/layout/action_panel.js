@@ -19,6 +19,9 @@ const ICON_PATHS = {
   ClockPending: ["M12 8v5l3 2", "M12 2a10 10 0 1 0 10 10"],
   Comment: ["M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"],
   Date: ["M3 5h18v16H3Z", "M16 3v4", "M8 3v4", "M3 10h18"],
+  FolderOpen: [
+    "m6 14 1.5-2.9A2 2 0 0 1 9.2 10H20a2 2 0 0 1 1.9 2.5l-1.5 6a2 2 0 0 1-2 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.7.9l.8 1.2a2 2 0 0 0 1.7.9H18a2 2 0 0 1 2 2v2",
+  ],
   FullScreen: ["M8 3H3v5", "M16 3h5v5", "M8 21H3v-5", "M16 21h5v-5"],
   GraphTrend: ["m3 17 6-6 4 4 8-9", "M17 6h4v4"],
   HelpCircle: [
@@ -30,6 +33,17 @@ const ICON_PATHS = {
   Light: ["M12 2a7 7 0 0 0 0 14Z", "M12 2v20"],
   Magnify: ["M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16", "m21 21-4.4-4.4"],
   RotateRight: ["M21 12a9 9 0 1 1-2.6-6.4L21 8", "M21 3v5h-5"],
+  Save: [
+    "M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z",
+    "M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7",
+    "M7 3v4a1 1 0 0 0 1 1h7",
+  ],
+  SaveAs: [
+    "M11 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10.2a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V11",
+    "M7 21v-7a1 1 0 0 1 1-1h4",
+    "M7 3v4a1 1 0 0 0 1 1h7",
+    "M21.4 15.6a1.9 1.9 0 0 0-2.8-2.8L14 17.4V20h2.6Z",
+  ],
   Star: ["m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.2L5.8 21 7 14.2 2 9.3l6.9-1Z"],
   StepForward: ["m5 4 10 8L5 20Z", "M19 5v14"],
   Upload: ["M12 16V3", "m7 8 5-5 5 5", "M5 21h14"],
@@ -273,7 +287,38 @@ function createMenuBar(model, activate, scope) {
     }
     bar.addMenu(menu);
   }
+  bindShortcuts(commands, bar, flattenActions(actions));
   return bar;
+}
+
+const SHORTCUT_SCOPE = ".anylumino-AstryxWidgetHost, .anylumino-LayoutHost, .anylumino-TabPanelHost";
+
+/**
+ * Register each action's `shortcut` (a Lumino keystroke such as "Accel S"), which the
+ * menus show beside the item. A shortcut runs while focus is inside the widget holding
+ * `bar`. The window capture phase runs before JupyterLab's document listener, so
+ * shortcuts such as Accel S act on this widget instead of saving the notebook.
+ */
+function bindShortcuts(commands, bar, actions) {
+  const shortcuts = actions.filter((action) => String(action?.shortcut ?? "").trim());
+  if (shortcuts.length === 0) {
+    return;
+  }
+  for (const action of shortcuts) {
+    commands.addKeyBinding({ command: actionId(action), keys: [String(action.shortcut)], selector: "body" });
+  }
+  const keydown = (event) => {
+    const scope = bar.node.parentElement?.closest(SHORTCUT_SCOPE) ?? bar.node;
+    if (!(event.target instanceof Node) || !scope.contains(event.target)) {
+      return;
+    }
+    commands.processKeydownEvent(event);
+    if (event.defaultPrevented) {
+      event.stopPropagation();
+    }
+  };
+  window.addEventListener("keydown", keydown, true);
+  bar.disposed.connect(() => window.removeEventListener("keydown", keydown, true));
 }
 
 function createCommandPalette(model, activate, scope) {

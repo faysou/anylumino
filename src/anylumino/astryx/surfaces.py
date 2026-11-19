@@ -19,8 +19,10 @@ from .base import _option_records
 from .base import _option_value
 from .base import _search_records
 from .enums import Align
+from .enums import AvatarSize
 from .enums import Axis
 from .enums import BreadcrumbsVariant
+from .enums import ButtonVariant
 from .enums import CalendarMode
 from .enums import CardVariant
 from .enums import CitationStyle
@@ -256,9 +258,9 @@ class Grid(Widget):
         Row spacing override.
     column_gap : int | float | None, default None
         Column spacing override.
-    align : str | None, default None
+    align : Align | str | None, default None
         Vertical item alignment.
-    justify : str | None, default None
+    justify : Align | str | None, default None
         Horizontal item alignment.
     width : int | float | str | None, default None
         Grid width.
@@ -307,12 +309,14 @@ class Grid(Widget):
         gap: int | float = 3,
         row_gap: int | float | None = None,
         column_gap: int | float | None = None,
-        align: str | None = None,
-        justify: str | None = None,
+        align: Align | str | None = None,
+        justify: Align | str | None = None,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        justify = optional_choice(justify, Align, "justify")
+        align = optional_choice(align, Align, "align")
         super().__init__(
             "Grid",
             children,
@@ -415,7 +419,7 @@ class ContextMenu(Widget):
         set ``disabled`` or ``{"type": "divider"}``.
     children : ChildInput
         The widgets that respond to a right click.
-    size : str | None, default None
+    size : Size | str | None, default None
         Menu item size.
     menu_width : int | None, default None
         Fixed menu width in pixels.
@@ -436,13 +440,14 @@ class ContextMenu(Widget):
         items: Iterable[Any],
         children: ChildInput = None,
         *,
-        size: str | None = None,
+        size: Size | str | None = None,
         menu_width: int | None = None,
         disabled: bool = False,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
         | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "ContextMenu",
             children,
@@ -1111,6 +1116,12 @@ class List(Widget):
         List marker style.
     start : int | None, default None
         Starting number for ordered lists.
+    clickable : bool, default False
+        Whether items are buttons. Clicking one sets ``value`` to the item's
+        ``value``, or its label when it has none, so ``on_action`` callbacks
+        and ``observe(..., names="value")`` run. Clicking the item that
+        ``value`` already names changes nothing, so reset ``value`` to
+        ``None`` to accept the same click again.
     **props : Any
         JSON-safe List props forwarded to Astryx. See the ``Astryx Props`` section below.
 
@@ -1147,6 +1158,7 @@ class List(Widget):
         dividers: bool | None = None,
         list_style: ListStyle | str | None = None,
         start: int | None = None,
+        clickable: bool = False,
         **props: Any,
     ) -> None:
         list_style = optional_choice(list_style, ListStyle, "list_style")
@@ -1161,6 +1173,7 @@ class List(Widget):
                 hasDividers=dividers,
                 listStyle=list_style,
                 start=start,
+                clickable=clickable or None,
             ),
         )
 
@@ -1764,9 +1777,9 @@ class ToggleButtonGroup(Widget):
     selection_mode : SelectionMode | str, default 'single'
         ``"single"`` for exclusive selection or ``"multiple"`` for
         independent selections.
-    orientation : str, default 'horizontal'
+    orientation : Orientation | str, default 'horizontal'
         Horizontal or vertical button layout.
-    size : str | None, default None
+    size : Size | str | None, default None
         Default size inherited by every toggle button.
     disabled : bool, default False
         Whether all toggle buttons are disabled.
@@ -1789,11 +1802,13 @@ class ToggleButtonGroup(Widget):
         *,
         label: str,
         selection_mode: SelectionMode | str = "single",
-        orientation: str = "horizontal",
-        size: str | None = None,
+        orientation: Orientation | str = "horizontal",
+        size: Size | str | None = None,
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        orientation = choice(orientation, Orientation, "orientation")
         selection_mode = choice(selection_mode, SelectionMode, "selection_mode")
         if selection_mode not in {"single", "multiple"}:
             msg = "selection_mode must be 'single' or 'multiple'"
@@ -1844,7 +1859,7 @@ class AvatarGroup(Widget):
         Item records used by generated child components or static search sources.
     overflow_count : int, default 0
         Number shown in the avatar-group overflow indicator.
-    size : str | None, default None
+    size : AvatarSize | str | None, default None
         Avatar size used by the group.
     **props : Any
         JSON-safe AvatarGroup props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1874,9 +1889,10 @@ class AvatarGroup(Widget):
         items: Iterable[Any],
         *,
         overflow_count: int = 0,
-        size: str | None = None,
+        size: AvatarSize | str | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, AvatarSize, "size")
         super().__init__(
             "AvatarGroup",
             props=_named_props(
@@ -2552,7 +2568,7 @@ class Toolbar(Widget):
         Astryx spacing step between children.
     orientation : Orientation | str | None, default None
         Horizontal or vertical keyboard navigation.
-    variant : str | None, default None
+    variant : SectionVariant | str | None, default None
         Toolbar section visual variant.
     dividers : Iterable[str] | None, default None
         Toolbar sides that display divider borders.
@@ -2598,10 +2614,11 @@ class Toolbar(Widget):
         size: Size | str = "sm",
         gap: int | float = 1,
         orientation: Orientation | str | None = None,
-        variant: str | None = None,
+        variant: SectionVariant | str | None = None,
         dividers: Iterable[str] | None = None,
         **props: Any,
     ) -> None:
+        variant = optional_choice(variant, SectionVariant, "variant")
         size = choice(size, Size, "size")
         orientation = optional_choice(orientation, Orientation, "orientation")
         super().__init__(
@@ -2966,7 +2983,7 @@ class DropdownMenu(Widget):
         Item records used by generated child components or static search sources.
     label : str
         Visible or accessible label for the component.
-    variant : str, default 'secondary'
+    variant : ButtonVariant | str, default 'secondary'
         Astryx visual variant.
     disabled : bool, default False
         Whether the component should render disabled.
@@ -3020,7 +3037,7 @@ class DropdownMenu(Widget):
         items: Iterable[Any],
         *,
         label: str,
-        variant: str = "secondary",
+        variant: ButtonVariant | str = "secondary",
         disabled: bool = False,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
@@ -3032,6 +3049,7 @@ class DropdownMenu(Widget):
         auto_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        variant = choice(variant, ButtonVariant, "variant")
         placement = optional_choice(placement, LayerPlacement, "placement")
         super().__init__(
             "DropdownMenu",
@@ -3067,7 +3085,7 @@ class MoreMenu(Widget):
         Item records used by generated child components or static search sources.
     label : str, default 'More options'
         Visible or accessible label for the component.
-    variant : str, default 'ghost'
+    variant : ButtonVariant | str, default 'ghost'
         Astryx visual variant.
     disabled : bool, default False
         Whether the component should render disabled.
@@ -3075,7 +3093,7 @@ class MoreMenu(Widget):
         Python callbacks invoked for frontend activations.
     action_callbacks : Iterable[Callable[[ComponentWidget, Any], None]] | None
         Python callbacks receiving the selected menu value.
-    size : str | None, default None
+    size : Size | str | None, default None
         Trigger button size.
     open : bool, default False
         Controlled menu visibility.
@@ -3112,16 +3130,18 @@ class MoreMenu(Widget):
         items: Iterable[Any],
         *,
         label: str = "More options",
-        variant: str = "ghost",
+        variant: ButtonVariant | str = "ghost",
         disabled: bool = False,
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
         | None = None,
-        size: str | None = None,
+        size: Size | str | None = None,
         open: bool = False,
         auto_focus: bool | None = None,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, Size, "size")
+        variant = choice(variant, ButtonVariant, "variant")
         super().__init__(
             "MoreMenu",
             label=label,
@@ -3949,7 +3969,7 @@ class AlertDialog(Widget):
         Python callbacks invoked when the primary action is activated.
     action_callbacks : Iterable[Callable[[ComponentWidget, Any], None]] | None
         Python callbacks receiving the ``"confirm"`` action identifier.
-    action_variant : str | None, default None
+    action_variant : ButtonVariant | str | None, default None
         Primary action button variant.
     action_loading : bool | None, default None
         Whether the primary action shows a loading state.
@@ -4002,11 +4022,12 @@ class AlertDialog(Widget):
         callbacks: Iterable[Callable[[ComponentWidget], None]] | None = None,
         action_callbacks: Iterable[Callable[[ComponentWidget, Any], None]]
         | None = None,
-        action_variant: str | None = None,
+        action_variant: ButtonVariant | str | None = None,
         action_loading: bool | None = None,
         width: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        action_variant = optional_choice(action_variant, ButtonVariant, "action_variant")
         super().__init__(
             "AlertDialog",
             label=title,

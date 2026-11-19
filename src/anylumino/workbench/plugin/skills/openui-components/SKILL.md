@@ -51,6 +51,7 @@ the OpenUI one.
 | `ComplexSelector` | [components/ComplexSelector.md](components/ComplexSelector.md) |
 | `RichTextEditor` | [components/RichTextEditor.md](components/RichTextEditor.md) |
 | `RichTextView` | [components/RichTextView.md](components/RichTextView.md) |
+| `MarkdownEditorPane` | [components/MarkdownEditorPane.md](components/MarkdownEditorPane.md) |
 | `Timer` | [components/Timer.md](components/Timer.md) |
 | `Toast` | [components/Toast.md](components/Toast.md) |
 | `Indicator` | [components/Indicator.md](components/Indicator.md) |

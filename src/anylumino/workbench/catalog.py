@@ -332,6 +332,14 @@ _COMPONENTS: tuple[Component, ...] = (
     ),
     Component("RichTextView", "ax", "RichTextView", "Read-only rich text rendered from Markdown", (Prop("text", _STRING, True),)),
     Component(
+        "MarkdownEditorPane",
+        "ax",
+        "MarkdownEditorPane",
+        "A Markdown source editor beside its rendered view, math and Mermaid diagrams included, with a draggable split; "
+        "on_change runs with the new Markdown once typing pauses",
+        (Prop("value", _STRING), _change()),
+    ),
+    Component(
         "Timer",
         "ax",
         "Timer",

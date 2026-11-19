@@ -60,6 +60,7 @@ def test_catalog_lists_components_and_props_in_order():
         "ComplexSelector": ["label", "content", "value", "options"],
         "RichTextEditor": ["label", "value", "on_change", "options"],
         "RichTextView": ["text"],
+        "MarkdownEditorPane": ["value", "on_change", "options"],
         "Timer": ["options"],
         "Toast": ["options"],
         "Indicator": ["value", "options"],

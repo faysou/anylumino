@@ -1513,7 +1513,7 @@ def test_every_frontend_message_type_has_a_python_handler() -> None:
         "activate",  # _ActionWidget._handle_frontend_event
         "anylumino-bundle",  # SharedBundleWidget._send_bundle
         "click",  # ComponentWidget
-        "close",  # ComponentWidget._handle_frontend_message
+        "close",  # ComponentWidget._handle_frontend_message, TabPanel._handle_frontend_message
         "move",  # LayoutWidget._handle_frontend_message
         "open",  # ComponentWidget._handle_frontend_message
         "search",  # astryx Widget._handle_frontend_message
@@ -2330,3 +2330,34 @@ def test_native_picker_value_assigned_none_stays_none() -> None:
     picker.value = None
 
     assert picker.value is None
+
+
+def test_closing_a_tab_without_callbacks_removes_it() -> None:
+    panel = TabPanel({"a": ax.Text("A"), "b": ax.Text("B")}, tabs_closable=True)
+    panel._handle_frontend_message(panel, {"type": "close", "key": "a"}, None)
+
+    assert panel.child_keys == ["b"]
+    assert panel.tabs_closable is True
+
+
+def test_closing_a_tab_calls_the_callbacks_which_decide() -> None:
+    panel = TabPanel({"a": ax.Text("A"), "b": ax.Text("B")}, tabs_closable=True)
+    calls = []
+    panel.on_tab_close(lambda source, key: calls.append((source, key)))
+    panel._handle_frontend_message(panel, {"type": "close", "key": "b"}, None)
+    panel._handle_frontend_message(panel, {"type": "close", "key": "missing"}, None)
+
+    assert calls == [(panel, "b")]
+    assert panel.child_keys == ["a", "b"]
+
+
+def test_clickable_list_reports_the_clicked_item_value() -> None:
+    plain = ax.List(["Orders"])
+    clickable = ax.List([{"label": "Orders", "value": "orders"}, "Fills"], clickable=True)
+    clicked = []
+    clickable.on_action(lambda _widget, value: clicked.append(value))
+    clickable.value = "orders"
+
+    assert "clickable" not in plain.props
+    assert clickable.props["clickable"] is True
+    assert clicked == ["orders"]

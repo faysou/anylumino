@@ -12,6 +12,7 @@ In Python: `al.TabPanel(widgets=..., titles=...)`, plus any option below as a ke
 | `selected_index` | `number` | Initially selected tab index. |
 | `tab_placement` | `"top" \| "bottom" \| "left" \| "right"` | Where Lumino should place the tab bar. |
 | `tabs_movable` | `boolean` | Whether tabs can be reordered in the frontend. A drag reorders `widgets`, `child_keys`, and `titles` in Python too, so `selected_key` keeps naming the visible child. |
+| `tabs_closable` | `boolean` | Whether each tab shows a close button. Clicking it calls the callbacks registered with `on_tab_close` with the panel and the tab's key, and they decide whether to remove the tab, for example after asking to save. With no callback registered, the tab is removed. |
 | `width` | `number \| string` | Widget width. Numbers above 1 are pixels, numbers between 0 and 1 are percentages, and strings are passed through as CSS sizes. |
 | `height` | `number \| string` | Widget height. Numbers above 1 are pixels, numbers between 0 and 1 are percentages, and strings are passed through as CSS sizes. |
 | `resizable` | `boolean` | Whether the panel receives a notebook-friendly resize handle. |

@@ -455,7 +455,7 @@ export const SPECS = {
   },
   List: {
     component: List,
-    reserved: ["items", "tabs", "segments", "metadata"],
+    reserved: ["items", "tabs", "segments", "metadata", "clickable"],
     children: (ctx) => slotChildren(ctx.model) ?? (({ model }) => {
       const props = rawProps(model);
       return asArray(props.items).map((item, index) =>
@@ -465,6 +465,7 @@ export const SPECS = {
           description: item && typeof item === "object" ? item.description : undefined,
           isSelected: Boolean(item?.selected),
           isDisabled: Boolean(item?.disabled),
+          onClick: props.clickable ? () => setStringValue(model, itemValue(item, index)) : undefined,
         }),
       );
     })(ctx),

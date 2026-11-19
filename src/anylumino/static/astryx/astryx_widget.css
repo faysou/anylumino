@@ -145,3 +145,14 @@
 .anylumino-AstryxChildHost {
   display: contents;
 }
+
+/* Long documents skip layout and paint of blocks off screen, which halves the time to show a
+   pane again after a tab switch. The preview lays out in full once before skipping starts, so
+   each block's real height is remembered and caret alignment measures off-screen blocks exactly. */
+.anylumino-MarkdownEditorPane-preview > * > * {
+  contain-intrinsic-size: auto 3em;
+}
+
+.anylumino-MarkdownEditorPane-preview[data-measured] > * > * {
+  content-visibility: auto;
+}

@@ -6,7 +6,7 @@ from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Mapping
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any
 from uuid import uuid4
 
 import traitlets as t
@@ -21,6 +21,8 @@ from .base import _named_props
 from .base import _table_columns
 from .base import _table_row_ids
 from .base import _table_rows
+from .enums import Autolink
+from .enums import AvatarSize
 from .enums import BannerStatus
 from .enums import CitationStyle
 from .enums import CompactDensity
@@ -29,17 +31,22 @@ from .enums import Container
 from .enums import ContentAlign
 from .enums import Density
 from .enums import Display
+from .enums import FontWeight
 from .enums import IconColor
 from .enums import IconSize
 from .enums import IndicatorKind
 from .enums import IndicatorState
+from .enums import PaginationVariant
 from .enums import Selects
 from .enums import Size
 from .enums import SortDirection
 from .enums import SpinnerShade
 from .enums import StatusVariant
 from .enums import TableDividers
+from .enums import TextColor
 from .enums import TextOverflow
+from .enums import TextSize
+from .enums import TextType
 from .enums import TimerFormat
 from .enums import TimestampFormat
 from .enums import ToastPosition
@@ -618,9 +625,9 @@ class Pagination(Widget):
         Whether more pages exist, for cursor-style paging.
     sibling_count : int | None, default None
         Page buttons shown either side of the current page.
-    variant : str, default ''
-        Astryx visual variant.
-    size : str | None, default None
+    variant : PaginationVariant | str | None, default None
+        How the pages show: numbered pages, a count, dots, or a page input.
+    size : CompactSize | str | None, default None
         Control size.
     label : str, default ''
         Accessible label for the control.
@@ -644,17 +651,19 @@ class Pagination(Widget):
         page_size_options: Iterable[int] | None = None,
         more: bool | None = None,
         sibling_count: int | None = None,
-        variant: str = "",
-        size: str | None = None,
+        variant: PaginationVariant | str | None = None,
+        size: CompactSize | str | None = None,
         label: str = "",
         disabled: bool = False,
         **props: Any,
     ) -> None:
+        size = optional_choice(size, CompactSize, "size")
+        variant = optional_choice(variant, PaginationVariant, "variant")
         super().__init__(
             "Pagination",
             value=page,
             label=label,
-            variant=variant,
+            variant=variant or "",
             disabled=disabled,
             props=_named_props(
                 props,
@@ -1115,13 +1124,13 @@ class Link(Widget):
         Hover tooltip text.
     standalone : bool | None, default None
         Whether to apply standalone text sizing.
-    text_type : str | None, default None
+    text_type : TextType | str | None, default None
         Semantic text type.
-    size : str | None, default None
+    size : TextSize | str | None, default None
         Explicit text-size override.
-    weight : str | None, default None
+    weight : FontWeight | str | None, default None
         Font-weight override.
-    color : str | None, default None
+    color : TextColor | str | None, default None
         Theme text color.
     max_lines : int | None, default None
         Maximum rendered lines before truncation.
@@ -1186,13 +1195,17 @@ class Link(Widget):
         target: str | None = None,
         tooltip: str | None = None,
         standalone: bool | None = None,
-        text_type: str | None = None,
-        size: str | None = None,
-        weight: str | None = None,
-        color: str | None = None,
+        text_type: TextType | str | None = None,
+        size: TextSize | str | None = None,
+        weight: FontWeight | str | None = None,
+        color: TextColor | str | None = None,
         max_lines: int | None = None,
         **props: Any,
     ) -> None:
+        color = optional_choice(color, TextColor, "color")
+        weight = optional_choice(weight, FontWeight, "weight")
+        size = optional_choice(size, TextSize, "size")
+        text_type = optional_choice(text_type, TextType, "text_type")
         super().__init__(
             "Link",
             text=label,
@@ -1234,7 +1247,7 @@ class Avatar(Widget):
         Fallback image URL.
     alt : str | None, default None
         Alternative image text.
-    size : str | int | None, default None
+    size : AvatarSize | str | int | None, default None
         Named or pixel avatar size.
     **props : Any
         JSON-safe Avatar props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1266,9 +1279,11 @@ class Avatar(Widget):
         src: str | None = None,
         fallback_src: str | None = None,
         alt: str | None = None,
-        size: str | int | None = None,
+        size: AvatarSize | str | int | None = None,
         **props: Any,
     ) -> None:
+        if not isinstance(size, int):
+            size = optional_choice(size, AvatarSize, "size")
         super().__init__(
             "Avatar",
             label=name,
@@ -1591,7 +1606,7 @@ class Markdown(Widget):
         Maximum prose width.
     content_align : ContentAlign | str | None, default None
         Prose alignment inside the available width.
-    autolink : str | None, default None
+    autolink : Autolink | str | None, default None
         Optional GFM bare-link handling.
     **props : Any
         JSON-safe Markdown props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1657,9 +1672,10 @@ class Markdown(Widget):
         citation_style: CitationStyle | str | None = None,
         content_width: int | float | str | None = None,
         content_align: ContentAlign | str | None = None,
-        autolink: Literal["gfm"] | None = None,
+        autolink: Autolink | str | None = None,
         **props: Any,
     ) -> None:
+        autolink = optional_choice(autolink, Autolink, "autolink")
         display = optional_choice(display, Display, "display")
         density = optional_choice(density, CompactDensity, "density")
         content_align = optional_choice(content_align, ContentAlign, "content_align")
@@ -1745,13 +1761,13 @@ class Timestamp(Widget):
         Whether to append the timezone abbreviation.
     live : bool | None, default None
         Whether relative text updates over time.
-    text_type : str | None, default None
+    text_type : TextType | str | None, default None
         Semantic text type.
-    size : str | None, default None
+    size : TextSize | str | None, default None
         Explicit text-size override.
-    color : str | None, default None
+    color : TextColor | str | None, default None
         Theme text color.
-    weight : str | None, default None
+    weight : FontWeight | str | None, default None
         Font-weight override.
     **props : Any
         JSON-safe Timestamp props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1794,12 +1810,16 @@ class Timestamp(Widget):
         tooltip: bool | None = None,
         timezone: bool | None = None,
         live: bool | None = None,
-        text_type: str | None = None,
-        size: str | None = None,
-        color: str | None = None,
-        weight: str | None = None,
+        text_type: TextType | str | None = None,
+        size: TextSize | str | None = None,
+        color: TextColor | str | None = None,
+        weight: FontWeight | str | None = None,
         **props: Any,
     ) -> None:
+        weight = optional_choice(weight, FontWeight, "weight")
+        color = optional_choice(color, TextColor, "color")
+        size = optional_choice(size, TextSize, "size")
+        text_type = optional_choice(text_type, TextType, "text_type")
         format = optional_choice(format, TimestampFormat, "format")
         super().__init__(
             "Timestamp",
@@ -1835,13 +1855,13 @@ class Timer(Widget):
         counts from when the widget renders.
     format : TimerFormat | str | None, default None
         Elapsed ``"1h 2m 3s"`` or clock ``"01:02:03"`` text.
-    text_type : str | None, default None
+    text_type : TextType | str | None, default None
         Semantic text type.
-    size : str | None, default None
+    size : TextSize | str | None, default None
         Explicit text-size override.
-    color : str | None, default None
+    color : TextColor | str | None, default None
         Text color.
-    weight : str | None, default None
+    weight : FontWeight | str | None, default None
         Font weight override.
     **props : Any
         JSON-safe Timer props forwarded to Astryx. See the ``Astryx Props`` section below.
@@ -1872,12 +1892,16 @@ class Timer(Widget):
         start_time: datetime | int | float | None = None,
         *,
         format: TimerFormat | str | None = None,
-        text_type: str | None = None,
-        size: str | None = None,
-        color: str | None = None,
-        weight: str | None = None,
+        text_type: TextType | str | None = None,
+        size: TextSize | str | None = None,
+        color: TextColor | str | None = None,
+        weight: FontWeight | str | None = None,
         **props: Any,
     ) -> None:
+        weight = optional_choice(weight, FontWeight, "weight")
+        color = optional_choice(color, TextColor, "color")
+        size = optional_choice(size, TextSize, "size")
+        text_type = optional_choice(text_type, TextType, "text_type")
         format = optional_choice(format, TimerFormat, "format")
         if isinstance(start_time, datetime):
             start_time = start_time.timestamp() * 1000

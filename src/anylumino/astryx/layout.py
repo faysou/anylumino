@@ -7,6 +7,7 @@ from typing import Any
 
 import traitlets as t
 from anylumino.enums import choice
+from anylumino.enums import optional_choice
 
 from ..layout import ChildInput
 from ..layout import TitleInput
@@ -15,6 +16,8 @@ from .base import Widget
 from .base import _named_props
 from .enums import Orientation
 from .enums import ScrollAxis
+from .enums import Size
+from .enums import TabLayout
 
 
 class TabPanel(Widget):
@@ -42,9 +45,9 @@ class TabPanel(Widget):
         Stable child keys for iterable ``children``.
     selected_index : int, default 0
         Initially selected tab index.
-    size : str | None, default None
+    size : Size | str | None, default None
         Tab size, ``"sm"``, ``"md"``, or ``"lg"``.
-    layout : str | None, default None
+    layout : TabLayout | str | None, default None
         ``"hug"`` or ``"fill"`` tab layout.
     divider : bool | None, default None
         Whether to show the tab-list divider.
@@ -69,14 +72,16 @@ class TabPanel(Widget):
         titles: TitleInput = None,
         keys: Iterable[str] | None = None,
         selected_index: int = 0,
-        size: str | None = None,
-        layout: str | None = None,
+        size: Size | str | None = None,
+        layout: TabLayout | str | None = None,
         divider: bool | None = None,
         gap: int | float = 2,
         width: int | float | str | None = None,
         height: int | float | str | None = None,
         **props: Any,
     ) -> None:
+        layout = optional_choice(layout, TabLayout, "layout")
+        size = optional_choice(size, Size, "size")
         super().__init__(
             "TabPanel",
             children,

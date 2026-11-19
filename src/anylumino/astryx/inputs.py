@@ -1241,7 +1241,7 @@ class LogSlider(Widget):
         Exponent step between slider positions.
     disabled : bool, default False
         Whether the component should render disabled.
-    value_display : str | None, default None
+    value_display : ValueDisplay | str | None, default None
         Tooltip, text, or hidden value presentation.
     description : str | None, default None
         Helper text displayed with the input.
@@ -1265,10 +1265,11 @@ class LogSlider(Widget):
         max_exponent: int | float = 4,
         step: int | float = 0.1,
         disabled: bool = False,
-        value_display: str | None = None,
+        value_display: ValueDisplay | str | None = None,
         description: str | None = None,
         **props: Any,
     ) -> None:
+        value_display = optional_choice(value_display, ValueDisplay, "value_display")
         label_position = choice(label_position, LabelPosition, "label_position")
         super().__init__(
             "LogSlider",
@@ -1321,7 +1322,7 @@ class SelectionSlider(Widget):
         Whether to draw a labelled tick for every option.
     disabled : bool, default False
         Whether the component should render disabled.
-    value_display : str | None, default None
+    value_display : ValueDisplay | str | None, default None
         Tooltip, text, or hidden value presentation.
     description : str | None, default None
         Helper text displayed with the input.
@@ -1343,10 +1344,11 @@ class SelectionSlider(Widget):
         label_width: int | float | str | None = None,
         marks: bool = False,
         disabled: bool = False,
-        value_display: str | None = None,
+        value_display: ValueDisplay | str | None = None,
         description: str | None = None,
         **props: Any,
     ) -> None:
+        value_display = optional_choice(value_display, ValueDisplay, "value_display")
         label_position = choice(label_position, LabelPosition, "label_position")
         records = _option_records(items)
         if value is None and records:
@@ -2463,3 +2465,38 @@ class RichTextEditor(Widget):
                 status=status,
             ),
         )
+
+
+class MarkdownEditorPane(Widget):
+    """Edit Markdown with highlighted source on the left and its rendered view on the right.
+
+    The view follows every edit in the browser, typesets math and draws
+    Mermaid diagrams like `Markdown`, and scrolls so the block holding the
+    caret line sits at the caret's height in the editor. ``value`` syncs to
+    Python once typing pauses and when the editor loses focus.
+
+    Examples
+    --------
+    ```python
+    ax.MarkdownEditorPane("# Fills\\n\\nRealized P&L is $`\\\\sum_i q_i (p_i - \\\\bar p)`$.", height=200)
+    ```
+
+    Parameters
+    ----------
+    value : str, default ''
+        Markdown source. Assigning it from Python replaces the editor content.
+    width : int | float | str | None, default None
+        CSS width. Numbers are normalized by anylumino where supported.
+    height : int | float | str | None, default 480
+        CSS height. Both panes scroll inside this height, so it needs a
+        definite value. Numbers are normalized by anylumino where supported.
+    """
+
+    def __init__(
+        self,
+        value: str = "",
+        *,
+        width: int | float | str | None = None,
+        height: int | float | str | None = 480,
+    ) -> None:
+        super().__init__("MarkdownEditorPane", value=value, width=width, height=height)

@@ -21,6 +21,7 @@ from .layout import (
     Toolbar,
     VBox,
 )
+from .markdown_editor import MarkdownEditor
 from .tabulator import CellEdit, JsCode, Tabulator
 
 __all__ = [
@@ -40,6 +41,7 @@ __all__ = [
     "JsCode",
     "KeyedChildren",
     "LayoutWidget",
+    "MarkdownEditor",
     "MenuBar",
     "Orientation",
     "ResponsivePanel",

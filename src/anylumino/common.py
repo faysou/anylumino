@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import hashlib
 from collections.abc import Iterable
 from collections.abc import Mapping
 from datetime import date
 from datetime import datetime
 from datetime import time
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -115,6 +117,8 @@ class SharedBundleWidget(anywidget.AnyWidget):
     _bundle: Path | LazyStaticAsset
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        if hasattr(type(self), "_css"):
+            kwargs.setdefault("_anywidget_id", css_id(type(self)))
         super().__init__(*args, **kwargs)
         self.on_msg(self._send_bundle)
 
@@ -125,6 +129,20 @@ class SharedBundleWidget(anywidget.AnyWidget):
         bundle = self._bundle
         code = bundle.read_text(encoding="utf-8") if isinstance(bundle, Path) else str(bundle)
         self.send({"type": BUNDLE_REQUEST, "code": code})
+
+
+@cache
+def css_id(cls: type) -> str:
+    """Name the page ``<style>`` that holds the CSS of ``cls``.
+
+    anywidget writes a widget's ``_css`` into one ``<style>`` per
+    ``_anywidget_id``, which defaults to the class name, so every class that
+    shares a stylesheet would add its own copy. Each copy multiplies the cost
+    of every style recalculation of the page: with ten copies of the Astryx
+    CSS, a page of typeset math took a second to restyle after each kernel
+    status change. Naming the tag after the CSS content keeps one copy.
+    """
+    return f"anylumino-css-{hashlib.sha256(str(cls._css).encode()).hexdigest()[:16]}"
 
 
 def json_value(value: Any) -> Any:

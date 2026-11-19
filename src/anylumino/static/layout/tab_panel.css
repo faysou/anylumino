@@ -132,11 +132,33 @@
 }
 
 .anylumino-TabPanelHost .lm-TabBar-tabLabel {
+  flex: 1 1 auto;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 13px;
   line-height: 1.2;
+}
+
+.anylumino-TabPanelHost .lm-TabBar-tab.lm-mod-closable > .lm-TabBar-tabCloseIcon {
+  display: flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  height: 16px;
+  margin-left: 6px;
+  border-radius: 3px;
+}
+
+.anylumino-TabPanelHost .lm-TabBar-tab.lm-mod-closable > .lm-TabBar-tabCloseIcon::before {
+  content: "\00d7";
+  font-size: 15px;
+  line-height: 1;
+}
+
+.anylumino-TabPanelHost .lm-TabBar-tab.lm-mod-closable > .lm-TabBar-tabCloseIcon:hover {
+  background: #d8dee9;
 }
 
 .anylumino-TabPanelHost .lm-TabPanel-stackedPanel {
